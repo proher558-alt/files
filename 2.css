@@ -1,0 +1,25 @@
+body{
+    min-height:100vh;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg,#7d88bb 0%, #330661 100%);
+    padding: 20px;
+}
+h1{
+    color: rgb(2, 3, 43);
+}
+div{
+    background:  rgba(42, 196, 11, 0);
+    padding: 40px 60px;
+    border-radius: 23px;
+    backdrop-filter: blur(100px);
+    box-shadow: 0 20px 60px rgba(2, 3, 43, 0.178);
+    border: 1px solid rgb(116, 0, 0);
+    margin:30px;
+}
+p{
+    font-size: 20px;
+    -webkit-text-stroke: 1px #dab3ff;
+}
