@@ -253,6 +253,7 @@ body.touch #wAmmo{font-size:26px}
       <button class="btn" data-spawn="clean">Смыть кровь<small>Пол и стены · C</small></button>
       <button class="btn" data-spawn="bodies">Убрать тела<small>И куски</small></button>
       <button class="btn" data-spawn="all">Очистить всё<small>Полигон с нуля</small></button>
+      <button class="btn" data-spawn="pills">Таблетки<small>Пузырёк на полу в прицеле</small></button>
       <button class="btn" data-spawn="kill">Суицид<small>Мгновенная смерть и возрождение · K</small></button>
     </div>
     <div class="row" style="margin-top:16px">
@@ -2124,6 +2125,7 @@ document.querySelectorAll('[data-spawn]').forEach((b) => b.onclick = () => {
   else if (k === 'clean') cleanBlood(); else if (k === 'bodies') clearBodies(); else if (k === 'all') clearAll();
   closeSpawn();
   if (k === 'kill') suicide();
+  if (k === 'pills') placePills(aimPoint());
 });
 function syncChips() {
   document.querySelectorAll('#mapChips .chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.v === settings.map)));
@@ -2149,9 +2151,10 @@ function makePillBottle() {
   g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.0328, 0.0328, 0.045, 16, 1, true), pillMats.label));
   return g;
 }
-function placePills() {
-  removePills(); if (mapId !== 'polygon' || madness.on) return;
-  const s = pick(MAPS.polygon.pills), g = new THREE.Group();
+function placePills(at) {
+  removePills(); if (madness.on) return;
+  if (!at && mapId !== 'polygon') return;
+  const s = at ? [at.x, 0, at.z] : pick(MAPS.polygon.pills), g = new THREE.Group();
   const bt = makePillBottle(); bt.rotation.set(0, rand(0, 6.28), Math.PI / 2); bt.position.y = 0.034; g.add(bt);
   for (let i = 0; i < 7; i++) { const p = new THREE.Mesh(new THREE.CapsuleGeometry(0.007, 0.012, 3, 6), pillMats.pill); p.rotation.set(Math.PI / 2, 0, rand(0, 6.28)); p.position.set(rand(-0.13, 0.13), 0.008, rand(-0.13, 0.13)); g.add(p); }
   g.position.set(s[0], s[1], s[2]); scene.add(g);
