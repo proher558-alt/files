@@ -614,6 +614,24 @@ const Sound = {
   twang() { if (!this.ok()) return; const t = this.ctx.currentTime; const o = this.out(0.5, 0.15); const os = this.osc('triangle', t, 380, 110, 0.14); const g = this.env(t, 0.002, 0.7, 0.14); os.connect(g); g.connect(o); const n = this.noise(t, 0.03); const hp = this.filt('highpass', 3000); const g2 = this.env(t, 0.001, 0.4, 0.03); n.connect(hp); hp.connect(g2); g2.connect(o); },
   flame(vol = 0.7) { if (!this.ok() || this.budget > 8) return; this.budget++; const t = this.ctx.currentTime; const o = this.out(vol * 0.5, 0.3); const n = this.noise(t, 0.12); const bp = this.filt('bandpass', rand(500, 900), 0.9); const g = this.env(t, 0.01, 0.8, 0.12); n.connect(bp); bp.connect(g); g.connect(o); },
   sawLoop(on) { if (!this.ok()) return; if (!this.sawN) { const c = this.ctx; const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 96; const lfo = c.createOscillator(); lfo.frequency.value = 26; const lg = c.createGain(); lg.gain.value = 9; lfo.connect(lg); lg.connect(o.frequency); const f = this.filt('lowpass', 1100, 3); const g = c.createGain(); g.gain.value = 0; o.connect(f); f.connect(g); g.connect(this.master); o.start(); lfo.start(); this.sawN = g; } this.sawN.gain.setTargetAtTime(on ? 0.22 : 0, this.ctx.currentTime, 0.04); },
+  grip() {
+    if (!this.ok()) return; const c = this.ctx, t0 = c.currentTime + 0.05; const o = this.out(0.85, 0.35);
+    const F = { o: [520, 950, 2450], a: [760, 1250, 2600], e: [480, 1900, 2650], i: [320, 2300, 3100] };
+    const syl = [['o', 0.00, 0.26, 150, -0.10], ['a', 0.30, 0.12, 146, -0.04], ['e', 0.46, 0.24, 138, -0.08], ['a', 0.74, 0.12, 128, -0.03], ['i', 0.90, 0.62, 122, -0.22]];
+    for (const [v, st, du, f0, glide] of syl) {
+      const t = t0 + st, end = t + du;
+      const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.9, t + 0.025); g.gain.setValueAtTime(0.85, end - 0.06); g.gain.exponentialRampToValueAtTime(0.0001, end + 0.03); g.connect(o);
+      for (const det of [-9, 9]) {
+        const os = c.createOscillator(); os.type = 'sawtooth'; os.detune.value = det;
+        os.frequency.setValueAtTime(f0, t); os.frequency.linearRampToValueAtTime(f0 * (1 + glide), end);
+        const vib = c.createOscillator(); vib.frequency.value = 6.5; const vg = c.createGain(); vg.gain.value = 9; vib.connect(vg); vg.connect(os.frequency);
+        F[v].forEach((fr, k) => { const bp = this.filt('bandpass', fr * (1 + Math.random() * 0.02), k === 0 ? 6 : 9); const fg = c.createGain(); fg.gain.value = [1, 0.55, 0.3][k]; os.connect(bp); bp.connect(fg); fg.connect(g); });
+        const rg = c.createGain(); rg.gain.value = 0.25; const rough = this.noise(t, du + 0.05); const rbp = this.filt('bandpass', 2800, 1.2); rough.connect(rbp); rbp.connect(rg); rg.connect(g);
+        os.start(t); vib.start(t); os.stop(end + 0.05); vib.stop(end + 0.05);
+      }
+    }
+    const tail = t0 + 1.52; const cough = this.noise(tail, 0.2); const cf = this.filt('bandpass', 900, 2); const cg = this.env(tail, 0.01, 0.35, 0.18); cough.connect(cf); cf.connect(cg); cg.connect(o);
+  },
   hurt() { if (!this.ok()) return; const t = this.ctx.currentTime; const o = this.out(0.7, 0.2); const os = this.osc('sine', t, 140, 50, 0.22); const g = this.env(t, 0.005, 0.9, 0.22); os.connect(g); g.connect(o); const n = this.noise(t, 0.1); const lp = this.filt('lowpass', 700); const g2 = this.env(t, 0.002, 0.6, 0.1); n.connect(lp); lp.connect(g2); g2.connect(o); },
 };
 const dv = (pos) => 1 / (1 + camera.position.distanceTo(pos) * 0.13);
@@ -2262,7 +2280,7 @@ function updateCutscene(dt) {
   if (t < 1.4) player.pitch = lerp(player.pitch, t < 0.5 ? -0.15 : 0.35, Math.min(1, dt * 4)); else player.pitch = lerp(player.pitch, 0, Math.min(1, dt * 2));
   if (t > 1.1 && !cut.screamed) madness.target = Math.min(0.4, (t - 1.1) * 0.22);
   cut.hb -= dt; if (t > 1.0 && cut.hb <= 0) { cut.hb = Math.max(0.32, 0.9 - (t - 1) * 0.16); Sound.heartbeat(); shake = Math.max(shake, 0.12 + t * 0.03); }
-  if (t > 2.0 && !cut.spoke) { cut.spoke = true; speak('Gotta get a grip.'); }
+  if (t > 2.0 && !cut.spoke) { cut.spoke = true; Sound.grip(); }
   if (cut.spoke && !cut.screamed) { const full = 'Gotta get a grip…'; $('cutText').textContent = full.slice(0, Math.min(full.length, Math.floor((t - 2.0) * 13))); }
   if (t > 4.3 && !cut.screamed) { cut.screamed = true; $('cutText').textContent = 'Gotta get a grip… AAAAAAAAAA'; $('scream').hidden = false; Sound.bigScream(); shake = 1.4; madness.target = 1; }
   if (cut.screamed) { madness.amt = Math.min(1, madness.amt + dt * 0.7); shake = Math.max(shake, 0.55); }
