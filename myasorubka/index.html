@@ -293,6 +293,7 @@ body.touch #wAmmo{font-size:26px}
     <button class="btn" id="madOffBtn" hidden style="width:100%;margin-bottom:10px">Прийти в себя<small>Выключить безумие</small></button>
     <button class="btn" id="contStory" hidden style="width:100%;margin-bottom:10px">Продолжить главу 1<small id="contWhere"></small></button>
     <button class="btn primary" id="playStory" style="width:100%;margin-bottom:10px">Сюжет · Глава 1<small>«Преступница Свити». Награда за её устранение — 50 000 $</small></button>
+    <button class="btn" id="exclBtn" style="width:100%;margin-bottom:10px">Эксклюзив<small>Награды за концовки сюжета: костюмы Свити</small></button>
     <div class="modes">
       <button class="btn" id="playSandbox">Песочница<small>Спавните людей, зомби и манекены. Делайте что хотите.</small></button>
       <button class="btn" id="playWaves">Зомби-волны<small>Выживите как можно дольше. Каждая волна злее.</small></button>
@@ -329,6 +330,8 @@ body.touch #wAmmo{font-size:26px}
     <div class="warn"><b>18+</b> · Графическое насилие, расчленение, много крови. Все персонажи вымышлены.</div>
   </div>
 </div>
+
+<div id="excl" class="overlay" hidden><div class="panel"><div class="eyebrow">Награды</div><h1 style="font-size:clamp(34px,8vw,64px)">Эксклюзив</h1><p class="mapdesc" id="exclInfo"></p><div class="spawngrid" id="exclGrid"></div><div class="row" style="margin-top:16px"><button class="btn primary" id="exclClose" style="flex:1">Закрыть</button></div></div></div>
 
 <div id="spawn" class="overlay" hidden>
   <div class="panel">
@@ -417,7 +420,7 @@ function randTangent(n, out = new V3()) { randUnit(out); out.addScaledVector(n, 
 function angDiff(a, b) { let d = b - a; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return d; }
 const isTouch = true; // the game is built for phones only
 
-const settings = { blood: 1, quality: isTouch ? 'low' : 'high', sens: 1, map: 'polygon', view: 'fps' };
+const settings = { blood: 1, quality: isTouch ? 'low' : 'high', sens: 1, map: 'polygon', view: 'fps', skin: 'default' };
 try { const s = JSON.parse(localStorage.getItem('myasorubka-settings') || 'null'); if (s) Object.assign(settings, s); } catch (e) {}
 settings.look = Object.assign({ shirt: 0x2b3a55, skin: 0xe2b59a, hair: 0x15100c }, settings.look || {});
 function saveSettings() { try { localStorage.setItem('myasorubka-settings', JSON.stringify(settings)); } catch (e) {} }
@@ -2436,6 +2439,11 @@ class Humanoid {
       tg('uLegL', -1.75, 0, 0.18); tg('uLegR', -1.75, 0, -0.18); tg('lLegL', 2.25, 0, 0); tg('lLegR', 2.25, 0, 0);
       tg('torso', 0.75, 0, 0); tg('head', 0.5, 0, 0);
       tg('uArmL', -2.5, 0, 0.35); tg('uArmR', -2.5, 0, -0.35); tg('lArmL', -2.0, 0, 0); tg('lArmR', -2.0, 0, 0);
+    } else if (pose === 'stop') {
+      py = 1.0; prx = 0; pry = 0; prz = 0;
+      tg('uLegL', -sw * amp + 0.08, 0, 0.05); tg('uLegR', sw * amp - 0.08, 0, -0.05); tg('lLegL', 0.12, 0, 0); tg('lLegR', 0.25, 0, 0);
+      tg('torso', 0.1, 0, 0); tg('head', 0.08, 0, 0);
+      tg('uArmR', -1.65 + Math.sin(t * 9) * 0.03, 0, -0.1); tg('lArmR', -0.1, 0, 0); tg('uArmL', 0.25, 0, 0.2); tg('lArmL', -0.4, 0, 0);
     } else if (pose === 'sit') {
       // sitting on a sofa
       py = 0.55; prx = 0; pry = 0; prz = 0;
@@ -2616,7 +2624,7 @@ const ragCam = { init: false, pos: new V3(), q: new THREE.Quaternion(), orb: 0 }
 const view3 = () => settings.view === 'tps' && !story.zoom;
 function makeAvatar() {
   if (avatar) { avatar.controlled = false; avatar.isPlayer = false; if (avatar.state !== 'dead') avatar.dispose(); else { if (!npcs.includes(avatar)) npcs.push(avatar); enforceCorpseLimit(); } }
-  avatar = new Humanoid('player', player.pos.x, player.pos.z, player.yaw + Math.PI);
+  avatar = new Humanoid('player', player.pos.x, player.pos.z, player.yaw + Math.PI, mode !== 'story' && skinOk(settings.skin) && settings.skin !== 'default' ? settings.skin : undefined);
   avatar.isPlayer = true; avatar.controlled = true; avatar.pos.y = player.pos.y; avatar.root.position.copy(player.pos);
   attachHeld();
 }
@@ -3918,7 +3926,7 @@ function storyMap(id) { loadMap(id); respawnPlayer(); }
 function setStage(stage, obj) { story.stage = stage; $('sObj').textContent = obj; $('storyHud').hidden = false; subOff(); resume(); renderNotes(); }
 function renderNotes() { $('sNotes').innerHTML = story.notes.length ? '<b>БЛОКНОТ · СВИТИ</b>' + story.notes.map((n) => '— ' + n).join('<br>') : ''; }
 function storyReset() {
-  Object.assign(story, { on: false, stage: '', cut: null, zoom: false, tv: false, noFire: false, showAvatar: false, gun: true, svity: null, desk: null, notes: [], wp: null, lidT: 0, doorT: 0, lockT: 0, chase: 0, taxi: null, drive: false, svIn: false, svWalk: false, siren: false, talked: new Set(), huntGoal: 12, huntNext: null, huntTxt: '', curCase: null });
+  Object.assign(story, { on: false, stage: '', cut: null, zoom: false, tv: false, noFire: false, showAvatar: false, gun: true, svity: null, desk: null, notes: [], wp: null, lidT: 0, doorT: 0, lockT: 0, chase: 0, taxi: null, drive: false, svIn: false, svWalk: false, siren: false, talked: new Set(), huntGoal: 12, huntNext: null, huntPts: null, huntFade: true, huntTxt: '', curCase: null });
   MAPS.home.red[2] = 2.5; $('credits').hidden = true; $('actBtn').hidden = true;
   for (const e of story.extras) e.dispose(); story.extras.length = 0;
   $('storyHud').hidden = true; $('sArrow').hidden = true; $('polaroid').hidden = true; $('sSay').textContent = ''; $('chapter').classList.remove('on'); $('scope').hidden = true; $('choice').hidden = true; $('love').classList.remove('on'); $('photoBtn').hidden = true; $('complainBtn').hidden = true; $('sNotes').innerHTML = '';
@@ -4384,25 +4392,83 @@ function cutBaby() {
     [11.6, () => line('Новости', 'Охота на опасную пару продолжается. У них родился сын.', 1.0, 1.05)],
     [16.0, () => { MAPS.home.red[2] = 10; redLight.position.set(HX - 0.5, 1.5, 0.5); story.siren = true; Sound.siren(0.5); later(2, () => Sound.siren(0.5)); later(4, () => Sound.siren(0.5)); }],
     [17.4, () => { for (let i = 0; i < 3; i++) later(i * 0.35, () => { Sound.thud(0.9); shake = Math.max(shake, 0.15); }); }],
-    [18.6, () => line('Голос за дверью', 'Откройте! Спецназ!', 0.7, 1.15)],
+    [18.6, () => { HOME.door.rotation.y = 1.3; Sound.thud(0.9); line('Голос за дверью', 'Откройте! Спецназ!', 0.7, 1.15); }],
     [21.6, () => line('Свити', 'Они нашли нас…', 1.3, 0.9)],
     [24.4, () => { standAvatar(); player.pos.z = -HZ + 1.2; selectWeapon(1); story.gun = true; Sound.click(500, 0.45); later(0.25, () => Sound.click(900, 0.4)); }],
     [26.0, () => line('Вы', 'Сделаем.', 0.5, 0.85)],
     [28.4, () => line('Свити', 'Я с тобой. До конца.', 1.35, 0.95)],
-    [31.6, fadeOut],
   ], (t) => {
     if (story.siren) redLight.color.setHex(Math.sin(t * 9) > 0 ? 0xff2020 : 0x2050ff);
     camPath(t, [[0, 1.8, 1.6, 1.8, 0, 0.8, -1.4], [8, 1.2, 1.5, 1.2, 0, 0.8, -1.4], [8.01, 0.5, 0.95, 1.4, 0, 0.45, cz], [11.6, 0.4, 0.9, 1.2, 0, 0.45, cz], [11.61, 0.5, 1.4, -2.95, 0, 1.06, HZ], [16, 0.4, 1.3, -2.2, 0, 1.06, HZ], [16.01, -1.0, 1.6, -1.0, HX, 1.4, 0.5], [24.4, -1.2, 1.6, -1.4, HX, 1.4, 0.5], [24.41, -0.3, 1.65, -0.5, -0.7, 1.55, -2.0], [33, -0.4, 1.6, -0.8, -0.7, 1.55, -2.0]]);
-  }, 32.8, () => { MAPS.home.red[2] = 2.5; story.siren = false; rollCredits(false); });
+  }, 31.6, startSwatFight);
+}
+function startSwatFight() {
+  const sv = story.extras.shift(); sv.scripted = true; sv.pose = 'stand'; sv.poseDur = 0; sv.pos.set(3.0, 0, 1.4); sv.yaw = -Math.PI / 2; sv.root.position.copy(sv.pos); sv.root.rotation.y = sv.yaw; npcs.push(sv); story.svity = sv; targetsDirty = true;
+  standAvatar(); player.pos.set(2.6, 0, -0.2); player.yaw = Math.PI / 2; player.pitch = 0; player.vel.set(0, 0, 0);
+  story.showAvatar = false; story.gun = true; W.ammo = WEAPONS.map((w) => w.mag || 0); selectWeapon(2); W.switchT = 0;
+  story.killBase = stats.kills; story.spawned = 0; story.huntT = 0.8; story.huntGoal = 6; story.huntTxt = 'Спецназ штурмует квартиру. Отбейтесь'; story.huntNext = cutGhost; story.huntFade = false; story.huntPts = [[-3.3, -0.5], [-3.3, 0.7], [-3.5, 0.1]];
+  setStage('hunted', story.huntTxt + ': 0/6'); banner('Штурм', 'держите дверь');
+}
+/* the finale of the bad ending: the one who kept resurrecting you turns on you */
+function cutGhost() {
+  const sv = story.svity, G = buildGhost(), gx = 2.5, gz = 0.2;
+  for (const n of npcs) if (n.alive && n !== sv) n.die('prop');
+  player.pos.set(-1.6, 0, 0.2); player.yaw = Math.PI / 2; player.pitch = 0; player.vel.set(0, 0, 0); story.showAvatar = true; story.gun = false; standAvatar();
+  sv.pos.set(-1.7, 0, 1.4); sv.yaw = -Math.PI / 2; sv.root.position.copy(sv.pos); sv.root.rotation.y = sv.yaw; Music.stop();
+  let lunge = 0;
+  runCut([
+    [0.3, () => { sub('', 'Тишина. Слишком тихая тишина…'); Sound.beat(0.8); }],
+    [2.2, () => Sound.beat(0.9)],
+    [3.2, () => { Sound.chime(); G.root.visible = true; }],
+    [5.4, () => { sub('', 'Что-то дышит у вас за спиной.'); Sound.breath(0.4); }],
+    [8.0, () => { subOff(); Sound.whoosh(); }],
+    [11.2, () => { Sound.boom(); shake = 1; pulseFx = 1; flashScreen('#fff', 400); }],
+    [12.0, () => line('Воскреситель', 'Ты нас предал.', 0.3, 0.75)],
+    [15.4, () => line('Воскреситель', 'Хотя я возрождал тебя всё время.', 0.3, 0.75)],
+    [19.4, () => { madness.target = 1; Sound.ghostVoice(4); const sh = $('shout'); sh.innerHTML = '<span>ПРЕДАТЕЛЬ.</span>'; sh.classList.add('on'); pulseFx = 1; }],
+    [23.0, () => { $('shout').classList.remove('on'); madness.target = 0; subOff(); avatar.pose = 'stop'; avatar.poseDur = Infinity; avatar.poseT = 0; avatar.poseRate = 8; line('Вы', 'Стой! Это же я! Не надо!', 0.55, 1.1); }],
+    [26.4, () => { lunge = 1; Sound.whoosh(); sv.pose = 'cover'; sv.poseDur = Infinity; sv.poseT = 0; }],
+    [27.6, () => line('Воскреситель', 'Прощай.', 0.3, 0.7)],
+    [28.8, () => { Sound.boom(); shake = 1.2; pulseFx = 1; flashScreen('#fff', 900); sv.die('boom'); avatar.die('boom'); }],
+    [30.2, () => { Sound.beat(0.7); }],
+    [31.4, () => { Sound.beat(0.4); fadeOut(); }],
+    [33.2, () => Sound.beat(0.2)],
+  ], (t, dt) => {
+    darkFx = Math.max(darkFx, t < 3 ? 0.35 : 0.6);
+    const k1 = sm(8, 11.2, t), f = sm(3.2, 4.6, t), ign = sm(8.6, 10.8, t), cr = lerp(0.55, 1, k1);
+    G.root.position.set(gx - (lunge ? Math.min(2.6, (t - 26.4) * 3.2) : 0), 0, gz); G.root.lookAt(player.pos.x, 0, player.pos.z);
+    const speak = (t > 12 && t < 15 || t > 15.4 && t < 19 || t > 27.6 && t < 29) ? 1 : 0;
+    animGhost(t, f, ign, lerp(0.5, 0, k1), 0, speak);
+    G.body.scale.y *= cr; G.arms.forEach((a) => { a.rotation.x = lerp(-1.25, a.rotation.x, k1); });
+    if (t > 19 && t < 23.4) { G.body.scale.x *= 1 + rand(-0.2, 0.45); G.body.scale.z *= 1 + rand(-0.2, 0.45); G.root.position.x += rand(-0.1, 0.1); G.root.position.z += rand(-0.1, 0.1); }
+    if (t > 11 || (t > 19 && t < 24)) { G.eyeM.color.setRGB(2.2, 0.04, 0.04); G.glow.material.color.setHex(0xff1a1a); }
+    if (t > 26.4 && t < 28.8) G.arms[0].rotation.x = -2.4;
+    gSpot.position.set(G.root.position.x - 1.2, 4.6, G.root.position.z); gSpot.target.position.set(G.root.position.x, 1, G.root.position.z); gSpot.intensity = 55 * f;
+    if (t > 23 && t < 26.4) walkPlayer(0.9, 0.2, 1.0, dt);
+    camPath(t, [[0, -3.4, 1.5, 0.7, 2.4, 0.9, 0.2], [8, -2.9, 1.4, 0.5, 2.4, 0.8, 0.2], [8.01, 0.9, 0.35, 0.9, 2.5, 0.5, 0.2], [12, 0.6, 0.3, 1.0, 2.5, 1.5, 0.2], [12.01, 0.9, 1.75, 0.6, 2.5, 1.6, 0.2], [19, 1.3, 1.7, 0.45, 2.5, 1.62, 0.2], [19.01, -0.5, 1.4, -1.8, 2.5, 1.3, 0.2], [23, -0.2, 1.5, -1.5, 2.5, 1.3, 0.2], [23.01, 0.3, 1.5, -2.8, 0.4, 1.2, 0.2], [29, 0.6, 1.45, -2.2, 0.6, 1.25, 0.2], [34, 0.6, 1.45, -2.2, 0.6, 1.25, 0.2]]);
+    if (t > 19 && t < 23.4) { camera.position.x += rand(-0.05, 0.05); camera.position.y += rand(-0.04, 0.04); }
+  }, 34.4, () => { hideGhost(); G.glow.material.color.setHex(0x5a3aff); madness.target = 0; MAPS.home.red[2] = 2.5; story.siren = false; rollCredits(false); });
 }
 function rollCredits(good) {
   fadeOut(); const el = $('credits');
-  el.innerHTML = '<div class="roll"><h2>Мясорубка</h2>Глава 1 · Преступница Свити' + [['Герой', 'Вы'], ['Свити', 'Свити'], [good ? 'Президент' : 'Ребёнок', good ? 'Президент' : 'Сын героя'], ['Дежурный', 'Сержант Петров'], ['Фанаты, охотники, спецназ', 'Массовка']].map(([a, b]) => `<b>${a}</b>${b}`).join('') + `<b>${good ? 'Награда' : 'Финал'}</b>${good ? '50 000 $' : 'Продолжение следует…'}<b>Спасибо</b>за игру!</div>`;
+  el.innerHTML = '<div class="roll"><h2>Мясорубка</h2>Глава 1 · Преступница Свити' + [['Герой', 'Вы'], ['Свити', 'Свити'], [good ? 'Президент' : 'Ребёнок', good ? 'Президент' : 'Сын героя'], ['Дежурный', 'Сержант Петров'], ...(good ? [] : [['Воскреситель', 'Призрак']]), ['Фанаты, охотники, спецназ', 'Массовка']].map(([a, b]) => `<b>${a}</b>${b}`).join('') + `<b>${good ? 'Награда' : 'Финал'}</b>${good ? '50 000 $' : 'Продолжение следует…'}<b>Спасибо</b>за игру!</div>`;
   el.hidden = false; subOff();
   runCut([[0.1, () => {}]], null, 16, () => { el.hidden = true; showEnd(good); });
 }
+const EXCL = [['svity-street', 'Свити · Уличная', 'Чёрная кофта «СВИТИ», рыжие кончики волос'], ['svity-cop', 'Свити · Полицейская', 'Форма, значок и рация'], ['svity-gala', 'Свити · Вечерняя', 'Чёрное платье с золотым узором']];
+function getUn() { try { return JSON.parse(localStorage.getItem('myasorubka-unlocks') || '{}'); } catch (e) { return {}; } }
+function addUn(k) { const u = getUn(); u[k] = true; try { localStorage.setItem('myasorubka-unlocks', JSON.stringify(u)); } catch (e) {} }
+function skinOk(id) { const u = getUn(); return id === 'default' || (u.good && u.bad && EXCL.some((e) => e[0] === id)); }
+function renderExcl() {
+  const u = getUn(), all = !!(u.good && u.bad);
+  $('exclInfo').textContent = `Концовки главы 1: хорошая ${u.good ? '✅' : '⬜'} · плохая ${u.bad ? '✅' : '⬜'}. Пройдите обе, и костюмы Свити станут вашими.`;
+  $('exclGrid').innerHTML = EXCL.map(([id, name, d]) => { const on = settings.skin === id && all; return `<button class="btn" data-skin="${id}" ${all ? '' : 'disabled style="opacity:.5"'}>${all ? '' : '🔒 '}${name}<small>${all ? (on ? '✔ Надето · нажмите, чтобы снять' : d) : 'Закрыто'}</small></button>`; }).join('');
+  $('exclGrid').querySelectorAll('[data-skin]').forEach((b) => b.onclick = () => { if (!all) return; settings.skin = settings.skin === b.dataset.skin ? 'default' : b.dataset.skin; saveSettings(); renderExcl(); Sound.click(1200, 0.2); });
+}
+$('exclBtn').onclick = () => { Sound.init(); renderExcl(); $('excl').hidden = false; };
+$('exclClose').onclick = () => { $('excl').hidden = true; };
 function showEnd(good) {
-  saveCp(null); fadeIn(); setLids(0); $('cut').hidden = true; $('cut').classList.remove('on', 'ghost'); $('flash').style.opacity = 0; $('sNotes').innerHTML = ''; $('credits').hidden = true; hideGhost();
+  addUn(good ? 'good' : 'bad'); saveCp(null); fadeIn(); setLids(0); $('cut').hidden = true; $('cut').classList.remove('on', 'ghost'); $('flash').style.opacity = 0; $('sNotes').innerHTML = ''; $('credits').hidden = true; hideGhost();
   const k = stats.kills - story.killBase;
   storyReset(); mode = 'story'; Music.stop();
   document.body.classList.remove('playing'); state = 'over';
@@ -4453,9 +4519,9 @@ function updateStory(dt) {
   else if (st === 'hunted') {
     const k = stats.kills - story.killBase, goal = story.huntGoal || 12, al = npcs.filter((n) => n.type === 'soldier' && n.alive).length;
     story.huntT -= dt;
-    if (story.huntT <= 0 && al < 4 && npcs.filter((n) => n.alive).length < 17) { const [x, z] = edgePoint(); spawnNPC('soldier', x, z, undefined, Math.random() < 0.5 ? 'guard' : undefined); story.spawned++; story.huntT = 1.6; }
+    if (story.huntT <= 0 && al < 4 && npcs.filter((n) => n.alive).length < 17) { const [x, z] = story.huntPts ? pick(story.huntPts) : edgePoint(); spawnNPC('soldier', x, z, undefined, story.huntPts ? undefined : Math.random() < 0.5 ? 'guard' : undefined); story.spawned++; story.huntT = 1.6; }
     if (tick) $('sObj').textContent = `${story.huntTxt}: ${Math.min(goal, k)}/${goal}`;
-    if (k >= goal) { story.stage = 'hunt-done'; toast('Отбились!'); const nx = story.huntNext; later(1.5, () => { fadeOut(); later(1.2, nx); }); }
+    if (k >= goal) { story.stage = 'hunt-done'; toast('Отбились!'); const nx = story.huntNext; if (story.huntFade === false) later(1.4, nx); else later(1.5, () => { fadeOut(); later(1.2, nx); }); }
   }
 }
 
@@ -4559,7 +4625,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
