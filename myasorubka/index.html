@@ -176,6 +176,16 @@ body.touch #slots{display:none}
 body.touch #health{bottom:auto;top:calc(112px + env(safe-area-inset-top,0px))}
 body.touch #weapon{bottom:auto;top:calc(80px + env(safe-area-inset-top,0px))}
 body.touch #wAmmo{font-size:26px}
+#sArrow{position:fixed;left:50%;top:calc(96px + env(safe-area-inset-top,0px));width:64px;margin-left:-32px;text-align:center;pointer-events:none;font-family:var(--mono);font-size:11px;color:#ffe6a8;text-shadow:0 1px 3px #000}
+#sArrow i{display:block;font-style:normal;font-size:30px;line-height:30px;color:#ffb030;transition:transform .12s linear}
+#sSay{margin-top:6px;display:inline-block;font-family:var(--ui);font-size:13px;color:#fff;background:rgba(160,30,90,.75);padding:5px 10px;border-radius:12px;max-width:100%}
+#sSay:empty{display:none}
+#polaroid{position:fixed;right:calc(70px + env(safe-area-inset-right,0px));top:30%;width:min(220px,30vw);background:#f4f1ea;padding:8px 8px 26px;box-shadow:0 10px 30px rgba(0,0,0,.6);transform:rotate(6deg);pointer-events:none;transition:opacity .5s;font-family:var(--ui);font-size:12px;color:#2a1a10;text-align:center;z-index:5}
+#polaroid img{display:block;width:100%;background:#000}
+#chapter{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity 1s;z-index:46;text-align:center}
+#chapter.on{opacity:1}
+#chapter small{font-family:var(--mono);font-size:14px;letter-spacing:.5em;color:var(--hazard)}
+#chapter b{font-family:var(--display);font-weight:400;font-size:clamp(44px,10vw,110px);color:var(--blood-hi);text-shadow:0 5px 0 #3a0303}
 #storyHud{position:absolute;left:50%;top:calc(8px + env(safe-area-inset-top,0px));transform:translateX(-50%);max-width:min(560px,52vw);text-align:center;pointer-events:none}
 #sObj{font-family:var(--ui);font-size:13px;letter-spacing:.05em;color:#ffe6a8;background:rgba(0,0,0,.6);padding:5px 10px;border-left:3px solid var(--hazard)}
 #sNotes{margin-top:6px;display:inline-block;text-align:left;color:#2b1d12;font-family:var(--ui);font-size:12px;line-height:18px;padding:6px 12px 6px 16px;transform:rotate(-1deg);box-shadow:0 4px 12px rgba(0,0,0,.5);background:repeating-linear-gradient(#efe3c2 0 17px,#c9b98e 17px 18px)}
@@ -233,7 +243,9 @@ body.touch #wAmmo{font-size:26px}
   <div id="toasts"></div>
   <div id="banner"></div>
   <div id="hint"></div>
-  <div id="storyHud" hidden><div id="sObj"></div><div id="sNotes"></div></div>
+  <div id="storyHud" hidden><div id="sObj"></div><div id="sNotes"></div><div id="sSay"></div></div>
+  <div id="sArrow" hidden><i>▲</i><span id="sDist"></span></div>
+  <div id="polaroid" hidden><img id="polImg" alt="фото"><div>Улика №5 · Свити в форме</div></div>
   <div id="madHud" hidden><div id="score">0</div><div id="combo"></div></div>
   <div id="phrase"></div>
 </div>
@@ -271,6 +283,7 @@ body.touch #wAmmo{font-size:26px}
     <p class="sub">Физическая гор-песочница от первого и третьего лица. Рэгдоллы, отстрел конечностей, артериальные фонтаны, лужи крови, которые растекаются под телами, и зомби, которые пришли за вами.</p>
     <button class="btn primary" id="resumeBtn" hidden>Продолжить<small>Вернуться на полигон</small></button>
     <button class="btn" id="madOffBtn" hidden style="width:100%;margin-bottom:10px">Прийти в себя<small>Выключить безумие</small></button>
+    <button class="btn" id="contStory" hidden style="width:100%;margin-bottom:10px">Продолжить главу 1<small id="contWhere"></small></button>
     <button class="btn primary" id="playStory" style="width:100%;margin-bottom:10px">Сюжет · Глава 1<small>«Преступница Свити». Награда за её устранение — 50 000 $</small></button>
     <div class="modes">
       <button class="btn" id="playSandbox">Песочница<small>Спавните людей, зомби и манекены. Делайте что хотите.</small></button>
@@ -349,6 +362,7 @@ body.touch #wAmmo{font-size:26px}
 <div id="cut" hidden><div id="faceov"><svg viewBox="0 0 400 500" aria-hidden="true"><path d="M50 500 C30 350 80 150 200 128 C320 150 370 350 350 500 Z" fill="#c4937a"/><path d="M62 236 C52 80 330 52 344 236 C300 150 110 150 62 236 Z" fill="#1b1008"/><g id="eyes" style="transform-box:fill-box;transform-origin:center"><ellipse cx="150" cy="250" rx="38" ry="28" fill="#f3e9e0"/><ellipse cx="250" cy="250" rx="38" ry="28" fill="#f3e9e0"/><circle cx="150" cy="252" r="12" fill="#050505"/><circle cx="250" cy="252" r="12" fill="#050505"/><path d="M116 236 l-12 -8 M184 236 l12 -8 M216 236 l-12 -8 M284 236 l12 -8" stroke="#b00000" stroke-width="2.5"/></g><path d="M200 270 l-10 36 h18" fill="none" stroke="#7a4a36" stroke-width="5" stroke-linecap="round"/><ellipse id="mouth" cx="200" cy="352" rx="58" ry="14" fill="#1a0202" style="transform-box:fill-box;transform-origin:center"/></svg></div><div class="cbar ctop"></div><div class="cbar cbot"><div class="who" id="cutWho">Вы</div><div id="cutText"></div><div class="skip">нажмите — пропустить</div></div></div>
 <div id="scream" hidden>AAAAAAAAAA</div>
 <div id="flash"></div>
+<div id="chapter"><small>ГЛАВА 1</small><b>Преступница Свити</b></div>
 <div id="love"><span>❤</span></div>
 <div id="choice" hidden><div class="ct">Свити в прицеле</div><div class="cb"><button id="chMarry">Пожениться</button><button id="chShoot">Стрелять</button></div><div class="cbar"><i id="chBar"></i></div></div>
 <div id="speed"></div>
@@ -730,6 +744,7 @@ const Sound = {
   gravThrow() { if (!this.ok()) return; const t = this.ctx.currentTime, o = this.out(0.9, 0.7), os = this.osc('sine', t, 170, 38, 0.35), g = this.env(t, 0.003, 1, 0.35); os.connect(g); g.connect(o); const n = this.noise(t, 0.3), bp = this.filt('bandpass', 900, 0.8), g2 = this.env(t, 0.002, 0.8, 0.28); bp.frequency.setValueAtTime(2400, t); bp.frequency.exponentialRampToValueAtTime(300, t + 0.28); n.connect(bp); bp.connect(g2); g2.connect(o); },
   cough(vol = 0.5) { if (!this.ok() || vol < 0.04) return; const t0 = this.ctx.currentTime, o = this.out(vol, 0.3); for (let i = 0; i < 3; i++) { const t = t0 + i * rand(0.16, 0.22), n = this.noise(t, 0.14), bp = this.filt('bandpass', rand(480, 780), 1.4), g = this.env(t, 0.004, 0.9 - i * 0.2, 0.13); n.connect(bp); bp.connect(g); g.connect(o); const os = this.osc('sawtooth', t, rand(130, 165), 85, 0.1), lp = this.filt('lowpass', 480), g2 = this.env(t, 0.004, 0.32, 0.1); os.connect(lp); lp.connect(g2); g2.connect(o); } const w = this.noise(t0 + 0.55, 0.3), wb = this.filt('bandpass', 1900, 5), we = this.env(t0 + 0.55, 0.06, 0.18, 0.25); w.connect(wb); wb.connect(we); we.connect(o); },
   gurgle(vol = 0.4) { if (!this.ok() || vol < 0.04) return; const c = this.ctx, t = c.currentTime, o = this.out(vol, 0.3), n = this.noise(t, 1.0), bp = this.filt('bandpass', 360, 3), g = c.createGain(); g.gain.value = 0.2; const lfo = c.createOscillator(); lfo.type = 'square'; lfo.frequency.value = rand(10, 15); const lg = c.createGain(); lg.gain.value = 0.5; lfo.connect(lg); lg.connect(g.gain); const e = this.env(t, 0.05, 0.9, 0.9); n.connect(bp); bp.connect(g); g.connect(e); e.connect(o); lfo.start(t); lfo.stop(t + 1); const w = this.noise(t + 0.35, 0.6), hp = this.filt('bandpass', rand(2000, 2800), 7), we = this.env(t + 0.35, 0.12, 0.3, 0.45); hp.frequency.setValueAtTime(1600, t + 0.35); hp.frequency.linearRampToValueAtTime(2900, t + 0.9); w.connect(hp); hp.connect(we); we.connect(o); },
+  crowd(vol = 0.5) { if (!this.ok()) return; const c = this.ctx, t = c.currentTime, o = this.out(vol, 0.8), d = rand(1.2, 2), n = this.noise(t, d), bp = this.filt('bandpass', rand(700, 1100), 0.7), g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.8, t + 0.25); g.gain.exponentialRampToValueAtTime(0.0001, t + d); n.connect(bp); bp.connect(g); g.connect(o); for (let i = 0; i < 4; i++) this.voice('scream', vol * 0.25); },
   kiss() { if (!this.ok()) return; const t = this.ctx.currentTime, o = this.outClear(0.6, 0.3), n = this.noise(t, 0.08), bp = this.filt('bandpass', 2600, 3), g = this.env(t, 0.002, 0.9, 0.07); n.connect(bp); bp.connect(g); g.connect(o); const os = this.osc('sine', t + 0.02, 900, 300, 0.06), g2 = this.env(t + 0.02, 0.002, 0.5, 0.06); os.connect(g2); g2.connect(o); },
   shutter() { if (!this.ok()) return; const t = this.ctx.currentTime, o = this.outClear(0.5, 0.2); for (const d of [0, 0.09]) { const n = this.noise(t + d, 0.04), hp = this.filt('highpass', 2000), g = this.env(t + d, 0.001, 0.8, 0.04); n.connect(hp); hp.connect(g); g.connect(o); } },
   windLoop(level) { if (!this.ok()) return; if (!this.windG) { const c = this.ctx, src = c.createBufferSource(); src.buffer = this.noiseBuf; src.loop = true; const bp = this.filt('bandpass', 500, 0.6), lp = this.filt('lowpass', 1600), g = c.createGain(); g.gain.value = 0; src.connect(bp); bp.connect(lp); lp.connect(g); g.connect(this.master); src.start(); const lfo = c.createOscillator(); lfo.frequency.value = 0.21; const lg = c.createGain(); lg.gain.value = 160; lfo.connect(lg); lg.connect(bp.frequency); lfo.start(); this.windG = g; this.windBp = bp; this.windL = -1; } if (Math.abs(level - this.windL) < 0.015) return; this.windL = level; const t = this.ctx.currentTime; this.windG.gain.setTargetAtTime(Math.min(1.2, level) * 0.55, t, 0.25); this.windBp.frequency.setTargetAtTime(360 + level * 1100, t, 0.3); },
@@ -1827,6 +1842,7 @@ function addSvityExtras(npc, L) {
   const hl = new THREE.Mesh(SV_LONG, SV_LONG_MAT); hl.castShadow = true; head.add(hl);
   const bang = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.07, 0.035), SV_HAIR_MAT); bang.position.set(0, 0.072, 0.104); bang.rotation.x = -0.28; head.add(bang);
   if (head.children[0]) { head.children[0].scale.set(1.28, 1.28, 1.06); head.children[0].position.y = -0.004; }
+  if (L.phone) { const ph = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.14, 0.01), std({ color: 0x15161a, roughness: 0.3, metalness: 0.6 })); ph.position.set(0, -0.16, 0.035); ph.rotation.x = -0.4; npc.parts.lArmR.mesh.add(ph); const sc = new THREE.Mesh(new THREE.PlaneGeometry(0.065, 0.125), new THREE.MeshBasicMaterial({ color: 0x8ac8ff })); sc.position.z = -0.006; sc.rotation.y = Math.PI; ph.add(sc); }
   if (L.svity === 'street') { if (!SV_LOGO) SV_LOGO = toTex(textCanvas([{ t: 'СВИТИ', s: 120 }], 512, 160, null, '#f2b33a')); const lg = new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.075), new THREE.MeshBasicMaterial({ map: SV_LOGO, transparent: true })); lg.position.set(0, -0.03, 0.117); torso.add(lg); }
   if (L.svity === 'gala') { const st = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.42, 0.01), goldMat); st.position.set(0.03, -0.02, 0.112); torso.add(st); const st2 = st.clone(); st2.scale.set(1.1, 0.5, 1); st2.position.set(0.02, 0, 0.11); npc.parts.pelvis.mesh.add(st2); }
 }
@@ -1834,7 +1850,7 @@ function applyLookKind(L, k) {
   if (k === 'worker') { L.shirt = pick([0xff6a10, 0xffa000, 0xe85a0a]); L.pants = pick([0x2a3550, 0x3a3a38, 0x2c3a2a]); L.sleeves = 'long'; L.hardhat = pick([0xf2c200, 0xf2f2ee, 0xff7a00, 0xf2c200]); L.hair = null; }
   else if (k === 'office') { L.shirt = pick([0xe8eef4, 0xc8daf0, 0xf4f4f0, 0xd0d6dc, 0x9ab0c8]); L.pants = pick([0x1c1e22, 0x2a2d33, 0x22252c]); L.sleeves = 'long'; if (Math.random() < 0.6) L.tie = pick([0x7a1020, 0x1a2a5a, 0x111111, 0x2a4a2a]); }
   else if (k === 'guard') { L.shirt = 0x1a1d24; L.pants = 0x15171c; L.helmet = false; L.cap = true; L.hair = null; }
-  else if (k.startsWith('svity')) { L.skin = 0xeec6aa; L.hair = SV_HAIR_MAT; L.svity = k.slice(6); L.sleeves = L.svity === 'gala' ? 'none' : L.svity === 'cop' ? 'short' : 'long'; L.shirt = L.svity === 'cop' ? 0x1b2236 : 0x121216; L.pants = L.svity === 'cop' ? 0x161c2c : 0x121216; L.badge = L.svity === 'cop'; }
+  else if (k.startsWith('svity')) { L.skin = 0xeec6aa; L.hair = SV_HAIR_MAT; L.svity = k.slice(6); L.sleeves = L.svity === 'gala' ? 'none' : L.svity === 'cop' ? 'short' : 'long'; L.shirt = L.svity === 'cop' ? 0x1b2236 : 0x121216; L.pants = L.svity === 'cop' ? 0x161c2c : 0x121216; L.badge = L.svity === 'cop'; L.phone = L.svity === 'street'; }
   else if (k === 'cop') { L.shirt = 0x1b2236; L.pants = 0x161c2c; L.sleeves = 'short'; L.cap = true; L.badge = true; }
   else if (k === 'fan') { L.shirt = pick([0xc8a040, 0x8a1a3a, 0xf0f0ea, 0x1a3a6a, 0x5a1a6a, 0xd84a7a]); L.pants = pick([0x1a1a1e, 0x2a2420, 0xf0f0ea]); L.sleeves = 'long'; }
   else if (k === 'baby') { L.shirt = 0xa8d0f0; L.pants = 0xa8d0f0; L.sleeves = 'long'; L.hair = null; }
@@ -2432,6 +2448,7 @@ class Humanoid {
       tg('torso', 0.6 + Math.sin(t * 2.2) * 0.06, 0, 0); tg('head', 0.35, Math.sin(t) * 0.15, 0);
       tg('uArmL', -0.6, 0, 0.1); tg('uArmR', -0.6, 0, -0.1); tg('lArmL', -1.2, 0, 0); tg('lArmR', -1.2, 0, 0);
     }
+    if (pose === 'stand' && this.look.phone && !this.scripted && !(this.panic > 0)) { tg('uArmR', -1.35, 0.4, -0.2); tg('lArmR', -1.45, 0, 0); tg('head', 0.12, -0.35, 0); }
     // coughing jerks the chest and head forward
     if (this.coughT > 0) { const ck = Math.abs(Math.sin((1 - this.coughT / 0.55) * Math.PI * 3)) * (this.coughT / 0.55); T.torso[0] += ck * 0.28; T.head[0] += ck * 0.35; }
     // the body snaps away from the bullet
@@ -3406,9 +3423,9 @@ function updateMadness(dt, now) {
 /* procedural synthwave loop for the madness */
 const mtof = (n) => 440 * Math.pow(2, (n - 69) / 12);
 const Music = {
-  on: false, bpm: 116,
-  start() {
-    if (!Sound.ok() || this.on) return; const c = Sound.ctx;
+  on: false, bpm: 116, pop: false,
+  start(pop = false) {
+    if (!Sound.ok() || this.on) return; const c = Sound.ctx; this.pop = pop; this.bpm = pop ? 124 : 116;
     this.bus = c.createGain(); this.bus.gain.setValueAtTime(0.0001, c.currentTime); this.bus.gain.exponentialRampToValueAtTime(0.55, c.currentTime + 2.5); this.bus.connect(Sound.master);
     this.dly = c.createDelay(1); this.dly.delayTime.value = 60 / this.bpm * 0.75; this.fb = c.createGain(); this.fb.gain.value = 0.38; this.dly.connect(this.fb); this.fb.connect(this.dly); this.dly.connect(this.bus);
     this.on = true; this.step = 0; this.next = c.currentTime + 0.12; this.t0 = this.next;
@@ -3419,7 +3436,9 @@ const Music = {
   env(t, a, pk, d) { return Sound.env(t, a, pk, d); },
   play(s, t, sd) {
     const c = Sound.ctx, bus = this.bus, i = s % 16, bar = Math.floor(s / 16) % 4;
-    const prog = [[57, 60, 64], [53, 57, 60], [50, 53, 57], [52, 56, 59]], ch = prog[bar];
+    const prog = this.pop ? [[60, 64, 67], [55, 59, 62], [57, 60, 64], [53, 57, 60]] : [[57, 60, 64], [53, 57, 60], [50, 53, 57], [52, 56, 59]], ch = prog[bar];
+    if (this.pop && (i === 2 || i === 10 || i === 14)) { const n = Sound.noise(t, 0.05), f = Sound.filt('highpass', 5000), g = this.env(t, 0.001, 0.2, 0.05); n.connect(f); f.connect(g); g.connect(bus); }
+    if (this.pop && i % 4 === 2) { const nn = ch[(i >> 2) % 3] + 24, o = Sound.osc('triangle', t, mtof(nn), mtof(nn), sd * 1.6), g = this.env(t, 0.004, 0.09, sd * 1.5); o.connect(g); g.connect(bus); g.connect(this.dly); }
     if (i % 4 === 0) { const o = Sound.osc('sine', t, 150, 42, 0.22); const g = this.env(t, 0.002, 0.9, 0.22); o.connect(g); g.connect(bus); }
     if (i === 4 || i === 12) { const n = Sound.noise(t, 0.16); const f = Sound.filt('bandpass', 1700, 0.8); const g = this.env(t, 0.002, 0.45, 0.15); n.connect(f); f.connect(g); g.connect(bus); g.connect(Sound.verbIn); }
     if (i % 2 === 0) { const n = Sound.noise(t, 0.04); const f = Sound.filt('highpass', 7500); const g = this.env(t, 0.001, i % 4 === 2 ? 0.16 : 0.08, 0.035); n.connect(f); f.connect(g); g.connect(bus); }
@@ -3828,7 +3847,7 @@ function buildGala() {
   floorMesh(std({ color: 0x7a0a12, map: TEX.cloth, roughness: 0.9 }), 3, HZ * 2 - 6, 0, 3, 0.004);
   addStaticBox(0, 0.4, -HZ + 2.5, 12, 0.8, 5, std({ map: texRep(TEX.wood, 4, 2), color: 0x5a3a28, roughness: 0.5 }));
   const curt = new THREE.Mesh(new THREE.PlaneGeometry(14, 7), std({ color: 0x8a0a1a, map: TEX.cloth, roughness: 0.85 })); curt.position.set(0, 3.6, -HZ + 0.05); addMesh(curt);
-  addSign([{ t: 'УЖИН ПРИНЦЕССЫ', s: 110 }, { t: 'ВСТРЕЧА С ФАНАТАМИ', s: 60 }], 8, 1.8, 0, 5.6, -HZ + 0.08, 0, 'rgba(240,190,80,0.95)');
+  addSign([{ t: 'УЖИН ПРИНЦЕССЫ', s: 92 }, { t: 'ВСТРЕЧА С ФАНАТАМИ', s: 52 }], 8, 1.8, 0, 5.6, -HZ + 0.08, 0, 'rgba(240,190,80,0.95)');
   addStaticBox(0, 1.5, HZ - 1.5, 14, 3, 3, std({ color: 0x4a1a14, roughness: 0.7 }));
   const BB = batcher(), cloth = std({ color: 0xf2eee6, roughness: 0.8 }), dark = std({ color: 0x2a1a10, roughness: 0.6 }), flame = new THREE.MeshBasicMaterial({ color: 0xffc070 });
   BB.box(goldMat, 0, 3.95, HZ - 3, 14, 0.06, 0.06); for (let x = -7; x <= 7; x += 1) BB.cyl(goldMat, x, 3.5, HZ - 3, 0.02, 0.02, 1, 6);
@@ -3875,22 +3894,59 @@ function renderNotes() { $('sNotes').innerHTML = story.notes.length ? '<b>БЛО
 function storyReset() {
   Object.assign(story, { on: false, stage: '', cut: null, zoom: false, tv: false, noFire: false, showAvatar: false, gun: true, svity: null, desk: null, notes: [] });
   for (const e of story.extras) e.dispose(); story.extras.length = 0;
-  $('storyHud').hidden = true; $('scope').hidden = true; $('choice').hidden = true; $('love').classList.remove('on'); $('photoBtn').hidden = true; $('complainBtn').hidden = true; $('sNotes').innerHTML = '';
+  $('storyHud').hidden = true; $('sArrow').hidden = true; $('polaroid').hidden = true; $('sSay').textContent = ''; $('chapter').classList.remove('on'); $('scope').hidden = true; $('choice').hidden = true; $('love').classList.remove('on'); $('photoBtn').hidden = true; $('complainBtn').hidden = true; $('sNotes').innerHTML = '';
   worldTs = 1; hideGhost(); subOff(); try { speechSynthesis.cancel(); } catch (e) {}
 }
-function startStory() {
+function startStory(cp = null) {
   Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'story'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true;
-  story.on = true; W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0; selectWeapon(0);
+  story.on = true; W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0; selectWeapon(cp ? 1 : 0);
   $('resumeBtn').hidden = true; startGame.fromWaves = true;
-  cutIntro();
+  if (cp === 'police' || cp === 'gala') { story.notes = SV_NOTES.slice(); if (cp === 'gala') story.notes.push('Фото в форме полицейского — есть'); (cp === 'gala' ? storyGala : storyPolice)(); renderNotes(); return; }
+  saveCp(null); cutIntro();
 }
+const CP_NAME = { police: 'с участка полиции', gala: 'с ужина принцессы' };
+function saveCp(cp) { try { if (cp) localStorage.setItem('myasorubka-story', cp); else localStorage.removeItem('myasorubka-story'); } catch (e) {} syncCont(); }
+function loadCp() { try { return localStorage.getItem('myasorubka-story'); } catch (e) { return null; } }
+function syncCont() { const cp = loadCp(); $('contStory').hidden = !CP_NAME[cp]; if (CP_NAME[cp]) $('contWhere').textContent = 'Продолжить ' + CP_NAME[cp]; }
+$('contStory').onclick = () => startStory(loadCp());
+// things she says when you are close, like a blogger on a live stream
+const SV_SAY = {
+  street: ['Всем привет, с вами Свити! Ставьте лайки!', 'Подписывайтесь, сегодня будет взрывной контент!', 'Ой, какой милый город… пока что.', 'Чего уставился? Автограф потом!', 'Этот ролик наберёт миллион. Или город сгорит.'],
+  photo: ['Гражданин, проходите, тут не на что смотреть.', 'Я при исполнении. Не мешайте.', 'Сегодня я арестую кого-нибудь. Просто так.', 'Форма мне идёт, правда?'],
+  complain: ['Жалуйтесь, жалуйтесь… Мне всё равно поверят.', 'Ну что, сфоткал? Красивая получилась?'],
+  'gala-find': ['Спасибо, что пришли на мой ужин!', 'Вы все — мои самые любимые фанаты!', 'Кто это там такой симпатичный?'],
+};
+function svSay(st) {
+  const L = SV_SAY[st], sv = story.svity; if (!L || !sv || !sv.alive) return;
+  story.sayCd = (story.sayCd || 0) - 0.25;
+  if (story.sayCd > 0 || Math.hypot(sv.pos.x - player.pos.x, sv.pos.z - player.pos.z) > 7) return;
+  story.sayCd = rand(6, 9); const t = pick(L); $('sSay').textContent = 'Свити: ' + t; speakAs(t, 1.35, 1.05);
+  clearTimeout(story.sayTimer); story.sayTimer = setTimeout(() => { $('sSay').textContent = ''; }, 4200);
+}
+function targetArrow(p) {
+  const el = $('sArrow'); if (!p) { if (!el.hidden) el.hidden = true; return; }
+  const dx = p.x - player.pos.x, dz = p.z - player.pos.z, d = Math.hypot(dx, dz), fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw), rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw);
+  const ang = Math.atan2(dx * rx + dz * rz, dx * fx + dz * fz);
+  el.hidden = false; el.firstElementChild.style.transform = `rotate(${ang.toFixed(3)}rad)`; $('sDist').textContent = Math.round(d) + ' м';
+}
+const snapRT = new THREE.WebGLRenderTarget(320, 180); snapRT.texture.colorSpace = THREE.SRGBColorSpace;
+function snapshot() {
+  const w = 320, h = 180, buf = new Uint8Array(w * h * 4), asp = camera.aspect; camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setRenderTarget(snapRT); renderer.clear(); renderWorld(); renderer.readRenderTargetPixels(snapRT, 0, 0, w, h, buf); renderer.setRenderTarget(null);
+  camera.aspect = asp; camera.updateProjectionMatrix();
+  const c = makeCanvas(w, h), g = c.getContext('2d'), id = g.createImageData(w, h);
+  for (let y = 0; y < h; y++) id.data.set(buf.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4);
+  g.putImageData(id, 0, 0); return c.toDataURL('image/jpeg', 0.85);
+}
+function showPolaroid(url) { $('polImg').src = url; const p = $('polaroid'); p.hidden = false; p.style.opacity = 1; clearTimeout(story.polT); story.polT = setTimeout(() => { p.style.opacity = 0; setTimeout(() => { p.hidden = true; }, 600); }, 4500); }
 function seatAvatar(x, z, pose) { player.pos.set(x, 0, z); player.yaw = Math.PI; player.pitch = 0; player.vel.set(0, 0, 0); avatar.pos.copy(player.pos); avatar.pose = pose; avatar.poseDur = Infinity; avatar.poseT = 0; avatar.poseRate = 1000; avatar.animate(0.02); avatar.poseRate = 8; }
 /* ----- scenes ----- */
 function cutIntro() {
   storyMap('home'); tvSetup('wanted'); seatAvatar(0, -HZ + 0.6, 'sit');
   story.showAvatar = true; story.gun = false;
   runCut([
-    [0.3, () => sub('Глава 1', 'Преступница Свити')],
+    [0.1, () => $('chapter').classList.add('on')],
+    [2.2, () => { $('chapter').classList.remove('on'); sub('', 'Вечер. Вы дома, по телевизору новости.'); }],
     [2.4, () => line('Новости', 'Внимание! Внимание! Появилась опасная преступница.', 1.0, 1.0)],
     [5.6, () => line('Новости', 'Опасность — 10 из 10. За её устранение герою будет выплачено 50 000 $.', 1.0, 1.05)],
     [10.4, () => line('Новости', 'Времени мало: она быстро всё разрушает под прикрытием — якобы она блогер.', 1.0, 1.05)],
@@ -3917,7 +3973,7 @@ function addNote() {
   if (story.notes.length >= SV_NOTES.length) { story.stage = 'street-done'; $('sObj').textContent = 'Приметы записаны. Её видели в участке полиции…'; later(2, () => { fadeOut(); later(1.2, storyPolice); }); }
 }
 function storyPolice() {
-  storyMap('police');
+  storyMap('police'); saveCp('police');
   for (let i = 0; i < 6; i++) spawnNPC('human', rand(-5, 10), rand(-7, 7), undefined, 'cop');
   const d = story.desk = spawnNPC('human', 8, -7.3, 0, 'cop'); d.pos.set(8, 0, -7.3); d.yaw = 0; d.scripted = true;
   const sv = story.svity = spawnNPC('human', rand(-3, 4), rand(-5, 6), 0, 'svity-cop'); sv.protect = true;
@@ -3934,7 +3990,7 @@ function seen(p, maxD, cosMin) {
 function storyPhoto() {
   if (story.stage !== 'photo') return; flashScreen('#fff', 450); Sound.shutter();
   const sv = story.svity;
-  if (sv && sv.alive && seen(_a.copy(svAim(sv)).setY(_a.y - 0.35), 20, 0.93)) { story.stage = 'complain'; toast('Снимок сделан'); story.notes.push('Фото в форме полицейского — есть'); renderNotes(); $('sObj').textContent = 'Отнесите жалобу в дежурную часть (стойка у дальней стены справа)'; }
+  if (sv && sv.alive && seen(_a.copy(svAim(sv)).setY(_a.y - 0.35), 20, 0.93)) { try { showPolaroid(snapshot()); } catch (e) {} story.stage = 'complain'; toast('Снимок сделан'); story.notes.push('Фото в форме полицейского — есть'); renderNotes(); $('sObj').textContent = 'Отнесите жалобу в дежурную часть (стойка у дальней стены справа)'; }
   else toast('Мимо — Свити не в кадре');
 }
 function storyComplain() {
@@ -3949,7 +4005,7 @@ function storyComplain() {
   ], () => { if (d) { d.yaw = Math.atan2(player.pos.x - d.pos.x, player.pos.z - d.pos.z); camSet(9.6, 1.75, -3.4, 8, 1.55, -7.3); } }, 16.2, storyGala);
 }
 function storyGala() {
-  storyMap('gala');
+  storyMap('gala'); saveCp('gala');
   for (let i = 0; i < 12; i++) spawnNPC('human', rand(-12, 12), rand(-7, 9), undefined, 'fan');
   const sv = story.svity = spawnNPC('human', 0, -5.5, Math.PI, 'svity-gala'); sv.protect = true; sv.idleT = 999; sv.wander = { x: 0, z: -5.5 };
   setStage('gala-find', 'Ужин принцессы. Найдите Свити среди гостей');
@@ -3976,15 +4032,15 @@ function cutKiss() {
 }
 function cutDance() {
   const sv = story.svity; sv.pos.set(0, 0.8, -HZ + 2.6); sv.yaw = 0; sv.pose = 'dance'; sv.poseDur = Infinity; sv.speed = 0;
-  for (const n of npcs) if (n !== sv && n.alive) { n.wander = { x: rand(-6, 6), z: rand(-6, -3) }; n.idleT = 0; }
-  fadeIn(); Music.start();
+  let fi = 0; for (const n of npcs) if (n !== sv && n.alive) { n.scripted = true; n.pos.set(-4.5 + (fi % 6) * 1.8 + rand(-0.3, 0.3), 0, -HZ + 6.2 + Math.floor(fi / 6) * 1.6 + rand(-0.3, 0.3)); n.yaw = Math.PI + rand(-0.3, 0.3); n.pose = 'dance'; n.poseDur = Infinity; n.speed = 0; fi++; }
+  fadeIn(); Music.start(true); Sound.crowd(0.6);
   const cams = [[-4.5, -8], [4.5, -8], [-8, -6.5], [8, -6.5]];
   runCut([
     [0.4, () => sub('', 'Свити выходит на сцену. Десятки камер, вспышки, крики фанатов.')],
     [3.6, () => line('Вы', 'Я люблю её… Но у меня есть работа.', 0.55, 0.95)],
     [6.4, fadeOut],
   ], (t) => {
-    camSet(Math.sin(t * 0.3) * 2.5, 1.4, -HZ + 8.5, 0, 1.9, -HZ + 2.6);
+    camSet(Math.sin(t * 0.3) * 2.5, 2.6, -HZ + 11.5, 0, 1.7, -HZ + 2.6);
     if (Math.random() < 0.25) { const [x, z] = pick(cams); spawnSprite(TEX.soft, _a.set(x, 1.55, z), { color: 0xffffff, additive: true, size: 0.9, grow: 0.4, life: 0.12 }); }
   }, 7.6, () => {
     player.pos.set(0, 3, HZ - 1.6); player.yaw = 0; player.pitch = -0.05; player.vel.set(0, 0, 0); player.onGround = true; fadeIn();
@@ -3998,6 +4054,7 @@ function chooseShoot() { if (story.stage !== 'choice') return; story.stage = 'en
 function chooseMarry() { if (story.stage !== 'choice') return; story.stage = 'end'; closeChoice(); cutWedding(); }
 for (const [id, fn] of [['chShoot', () => chooseShoot()], ['chMarry', () => chooseMarry()]]) { const b = $(id), h = (e) => { e.preventDefault(); e.stopPropagation(); fn(); }; b.addEventListener('touchstart', h, { passive: false }); b.addEventListener('click', h); }
 function killSvity() {
+  for (const n of npcs) if (n.alive && n !== story.svity) { n.pose = 'stand'; n.poseDur = 0; }
   const sv = story.svity; sv.protect = false; sv.scripted = false;
   const H = sv.parts.head, hp = svAim(sv).clone(), dir = hp.clone().sub(eye.position).normalize();
   tracer(muzzleWorld(new V3()), hp); Sound.shot('rifle', 1.3); shake = Math.max(shake, 0.4);
@@ -4053,6 +4110,7 @@ function cutWedding() {
   }, 13.6, startHunted);
 }
 function startHunted() {
+  for (const n of npcs) if (n.alive && n !== story.svity) { n.scripted = false; n.pose = 'stand'; n.poseDur = 0; n.panic = 20; }
   const sv = story.svity; sv.pose = 'stand'; sv.poseDur = 0; sv.scripted = false; sv.ally = true; sv.pos.set(1.4, 0, -HZ + 6.6); sv.yaw = Math.PI;
   avatar.pose = 'stand'; avatar.poseDur = 0; player.pos.set(0, 0, -HZ + 7); player.yaw = Math.PI; player.pitch = 0; fadeIn();
   story.showAvatar = false; story.gun = true; W.ammo = WEAPONS.map((w) => w.mag || 0); selectWeapon(2); W.switchT = 0;
@@ -4074,6 +4132,7 @@ function cutBaby() {
   ], (t) => { const k = clamp(t / 11, 0, 1); camSet(1.8 - k * 0.9, 1.5, 0.9, 0, 0.6, -1.4); }, 12.6, () => showEnd(false));
 }
 function showEnd(good) {
+  saveCp(null);
   const k = stats.kills - story.killBase;
   storyReset(); mode = 'story'; Music.stop();
   document.body.classList.remove('playing'); state = 'over';
@@ -4087,13 +4146,14 @@ function updateStory(dt) {
   const sv = story.svity, st = story.stage;
   story.hudT -= dt; const tick = story.hudT <= 0; if (tick) story.hudT = 0.25;
   if (tick) { $('photoBtn').hidden = st !== 'photo'; $('complainBtn').hidden = !(st === 'complain' && Math.hypot(player.pos.x - 8, player.pos.z + 5) < 2.6); }
+  if (tick) { svSay(st); targetArrow((st === 'street' || st === 'photo' || st === 'gala-find') && sv && sv.alive ? sv.pos : st === 'complain' ? _b.set(8, 0, -5) : null); }
   if (st === 'street' && sv && sv.alive) {
     const hp = svAim(sv), d = hp.distanceTo(eye.position);
     if (seen(hp, 9, 0.96)) { story.noteT += dt; if (story.noteT > 1.1) { story.noteT = 0; addNote(); } } else story.noteT = Math.max(0, story.noteT - dt);
     if (tick && story.stage === 'street') $('sObj').textContent = `Найдите Свити и держите её в прицеле (приметы ${story.notes.length}/4) · до неё ${Math.round(d)} м` + (story.noteT > 0.05 ? ' · записываю…' : '');
   } else if (st === 'photo' && sv && tick) $('sObj').textContent = `Найдите Свити в форме и сфотографируйте её (кнопка «Фото») · до неё ${Math.round(sv.pos.distanceTo(player.pos))} м`;
   else if (st === 'gala-find' && sv) { if (Math.hypot(sv.pos.x - player.pos.x, sv.pos.z - player.pos.z) < 4.2) cutKiss(); }
-  else if (st === 'snipe' && sv) { if (seen(svAim(sv), 45, 0.99975)) story.aimT += dt; else story.aimT = Math.max(0, story.aimT - dt); if (story.aimT > 0.45) openChoice(); }
+  else if (st === 'snipe' && sv) { story.swayT = (story.swayT || 0) + dt; player.yaw += Math.sin(story.swayT * 1.3) * 0.00045; player.pitch += Math.cos(story.swayT * 1.7) * 0.00035; if (Math.random() < dt * 0.25) Sound.crowd(0.35); if (seen(svAim(sv), 45, 0.99975)) story.aimT += dt; else story.aimT = Math.max(0, story.aimT - dt); if (story.aimT > 0.45) openChoice(); }
   else if (st === 'choice') { story.choiceT -= dt; $('chBar').style.width = Math.max(0, story.choiceT / 5 * 100) + '%'; if (story.choiceT <= 0) chooseMarry(); }
   else if (st === 'hunted') {
     const k = stats.kills - story.killBase, al = npcs.filter((n) => n.type === 'soldier' && n.alive).length;
@@ -4201,7 +4261,7 @@ function frame(now) {
   // auto-quality: drop to fast mode if the frame rate stays low
   fpsAcc += rdt; fpsN++; if (fpsAcc > 2) { const fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; if (fps < 28 && settings.quality === 'high' && state === 'play') { lowFpsT++; if (lowFpsT >= 3) { settings.quality = 'low'; syncChips(); applyQuality(); toast('Графика: быстрая'); } } else lowFpsT = 0; }
 }
-loadMap(settings.map); populateSandbox(); placePills(); syncChips(); buildWard(); applyLook(); buildGhost();
+loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost();
 $('loading').remove();
 window.__gameReady = true;
 window.__game = { storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
