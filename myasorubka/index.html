@@ -335,7 +335,7 @@ body.touch #wAmmo{font-size:26px}
 
 <div id="spawn" class="overlay" hidden>
   <div class="panel">
-    <div class="eyebrow">Пульт полигона · спавн в точку прицела</div>
+    <div class="eyebrow">Пульт полигона · спавн в точку прицела · внизу раздел «Эксклюзив»</div>
     <div class="spawngrid">
       <button class="btn" data-spawn="human">Человек<small>Гуляет, паникует, сдаётся под прицелом</small></button>
       <button class="btn" data-spawn="zombie">Зомби<small>Идёт на вас и на людей</small></button>
@@ -349,6 +349,10 @@ body.touch #wAmmo{font-size:26px}
       <button class="btn" data-spawn="all">Очистить всё<small>Полигон с нуля</small></button>
       <button class="btn" data-spawn="soldier">Солдат<small>Стреляет в вас с дистанции</small></button>
       <button class="btn" data-spawn="pills">Таблетки<small>Пузырёк на полу в прицеле</small></button>
+      <button class="btn" data-spawn="x-svity-street">Свити · Уличная<small id="xs1"></small></button>
+      <button class="btn" data-spawn="x-svity-cop">Свити · Полицейская<small id="xs2"></small></button>
+      <button class="btn" data-spawn="x-svity-gala">Свити · Вечерняя<small id="xs3"></small></button>
+      <button class="btn" data-spawn="x-gagarin">Воскреситель «Гагарин»<small id="xs4"></small></button>
       <button class="btn" data-spawn="kill">Суицид<small>Кат-сцена и возрождение</small></button>
     </div>
     <div class="row" style="margin-top:16px">
@@ -1849,7 +1853,18 @@ const goldMat = std({ color: 0xd8a838, metalness: 0.9, roughness: 0.3, envMapInt
 const SV_HAIR_MAT = std({ color: 0x24150e, roughness: 0.75 });
 const SV_LONG = (() => { const g = new THREE.CylinderGeometry(0.136, 0.172, 0.46, 22, 6, true, Math.PI * 0.32, Math.PI * 1.36); g.translate(0, -0.13, -0.008); const p = g.attributes.position, col = new Float32Array(p.count * 3), a = new THREE.Color(0x24150e), b = new THREE.Color(0xbc5a2a), c = new THREE.Color(); for (let i = 0; i < p.count; i++) { const k = clamp((0.04 - p.getY(i)) / 0.36, 0, 1); c.copy(a).lerp(b, k * k); col.set([c.r, c.g, c.b], i * 3); } g.setAttribute('color', new THREE.BufferAttribute(col, 3)); return g; })();
 const SV_LONG_MAT = std({ vertexColors: true, roughness: 0.7, side: THREE.DoubleSide });
-let SV_LOGO = null;
+let SV_LOGO = null, GG_WING = null;
+function addGagarin(npc) {
+  const head = npc.parts.head.mesh, torso = npc.parts.torso.mesh;
+  if (!GG_WING) GG_WING = toTex(wingCanvas());
+  const eyeM = new THREE.MeshBasicMaterial({ color: 0xff9a2a });
+  for (const sx of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 10), eyeM); e.position.set(sx * 0.05, 0.015, 0.098); e.scale.set(1, 1.1, 0.5); head.add(e); }
+  const capM = std({ map: toTex(plaidCanvas('#4f8f52', '#cfe6c4')), roughness: 0.7 }), cp = new THREE.Mesh(new THREE.SphereGeometry(0.132, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.45), capM); cp.position.y = 0.03; cp.scale.set(1, 0.85, 1.05); head.add(cp);
+  const halo = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.01, 8, 32), new THREE.MeshBasicMaterial({ color: 0xffffff })); halo.position.set(0, 0.02, -0.07); head.add(halo);
+  const wm = new THREE.MeshBasicMaterial({ map: GG_WING, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, opacity: 0.9 });
+  for (const sx of [-1, 1]) { const w = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.9), wm); w.scale.x = sx; w.position.set(sx * 0.46, 0.1, -0.16); w.rotation.y = sx * 0.35; torso.add(w); }
+  const glow = new THREE.PointLight(0x7a5aff, 2.2, 3.5, 2); glow.position.set(0, 0.1, -0.3); torso.add(glow);
+}
 function addSvityExtras(npc, L) {
   const head = npc.parts.head.mesh, torso = npc.parts.torso.mesh;
   const hl = new THREE.Mesh(SV_LONG, SV_LONG_MAT); hl.castShadow = true; head.add(hl);
@@ -1864,6 +1879,7 @@ function applyLookKind(L, k) {
   else if (k === 'office') { L.shirt = pick([0xe8eef4, 0xc8daf0, 0xf4f4f0, 0xd0d6dc, 0x9ab0c8]); L.pants = pick([0x1c1e22, 0x2a2d33, 0x22252c]); L.sleeves = 'long'; if (Math.random() < 0.6) L.tie = pick([0x7a1020, 0x1a2a5a, 0x111111, 0x2a4a2a]); }
   else if (k === 'guard') { L.shirt = 0x1a1d24; L.pants = 0x15171c; L.helmet = false; L.cap = true; L.hair = null; }
   else if (k.startsWith('svity')) { L.skin = 0xeec6aa; L.hair = SV_HAIR_MAT; L.svity = k.slice(6); L.sleeves = L.svity === 'gala' ? 'none' : L.svity === 'cop' ? 'short' : 'long'; L.shirt = L.svity === 'cop' ? 0x1b2236 : 0x121216; L.pants = L.svity === 'cop' ? 0x161c2c : 0x121216; L.badge = L.svity === 'cop'; L.phone = L.svity === 'street'; }
+  else if (k === 'gagarin') { L.skin = 0x0b0b0e; L.skinTex = null; L.shirt = 0x0c0c10; L.pants = 0xe07a1a; L.sleeves = 'long'; L.hair = null; L.gagarin = true; L.cap = false; }
   else if (k === 'cop') { L.shirt = 0x1b2236; L.pants = 0x161c2c; L.sleeves = 'short'; L.cap = true; L.badge = true; }
   else if (k === 'fan') { L.shirt = pick([0xc8a040, 0x8a1a3a, 0xf0f0ea, 0x1a3a6a, 0x5a1a6a, 0xd84a7a]); L.pants = pick([0x1a1a1e, 0x2a2420, 0xf0f0ea]); L.sleeves = 'long'; }
   else if (k === 'baby') { L.shirt = 0xa8d0f0; L.pants = 0xa8d0f0; L.sleeves = 'long'; L.hair = null; }
@@ -1913,6 +1929,7 @@ class Humanoid {
     if (L.hardhat) { const hm = std({ color: L.hardhat, roughness: 0.38 }), hh = new THREE.Mesh(GEO.helmet, hm); hh.scale.set(1.06, 1.02, 1.1); hh.position.y = 0.012; hh.castShadow = true; head.add(hh); const br = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.012, 20), hm); br.position.set(0, 0.03, 0.02); head.add(br); }
     if (L.cap) { const cp = new THREE.Mesh(GEO.helmet, capMat); cp.scale.set(1, 0.72, 1.02); head.add(cp); const vz = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.012, 0.08), capMat); vz.position.set(0, 0.03, 0.13); head.add(vz); }
     if (L.svity) addSvityExtras(this, L);
+    if (L.gagarin) addGagarin(this);
     if (L.badge) { const bd = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.055, 0.012), goldMat); bd.position.set(0.085, 0.12, 0.113); this.parts.torso.mesh.add(bd); }
     if (L.tie) { const tm = std({ color: L.tie, roughness: 0.5 }), tie = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.3, 0.012), tm); tie.position.set(0, 0.03, 0.112); this.parts.torso.mesh.add(tie); }
     if (L.rifle) { const gun = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.07, 0.55), rifleMat); gun.position.set(0, 0.02, 0.22); gun.castShadow = true; this.parts.lArmR.mesh.add(gun); }
@@ -3295,7 +3312,8 @@ function gameOver() {
 }
 function resume() { document.body.classList.add('playing'); state = 'play'; $('menu').hidden = true; $('spawn').hidden = true; $('over').hidden = true; $('hud').hidden = false; $('touch').hidden = !isTouch; lockPointer(lockFromClick); lockFromClick = false; }
 function pauseGame() { if (state !== 'play') return; document.body.classList.remove('playing'); state = 'pause'; W.fireHeld = false; $('menu').hidden = false; $('resumeBtn').hidden = false; $('hud').hidden = true; $('touch').hidden = true; if (document.pointerLockElement) document.exitPointerLock(); }
-function openSpawn() { state = 'spawn'; W.fireHeld = false; $('spawn').hidden = false; $('touch').hidden = true; if (document.pointerLockElement) document.exitPointerLock(); }
+function syncExclSpawn() { const ok = (() => { const u = getUn(); return !!(u.good && u.bad); })(); for (let i = 1; i <= 4; i++) { const e = $('xs' + i); e.textContent = ok ? 'Эксклюзив' : '🔒 Пройдите обе концовки главы 1'; e.parentElement.style.opacity = ok ? '' : '.55'; } }
+function openSpawn() { syncExclSpawn(); state = 'spawn'; W.fireHeld = false; $('spawn').hidden = false; $('touch').hidden = true; if (document.pointerLockElement) document.exitPointerLock(); }
 function closeSpawn() { $('spawn').hidden = true; resume(); }
 $('playSandbox').onclick = () => { lockFromClick = true; tryLandscape(); startGame('sandbox'); };
 $('playWaves').onclick = () => { lockFromClick = true; tryLandscape(); startGame('waves'); };
@@ -3308,7 +3326,8 @@ $('spawnClose').onclick = closeSpawn;
 $('spawnMenu').onclick = () => { $('spawn').hidden = true; state = 'play'; pauseGame(); };
 document.querySelectorAll('[data-spawn]').forEach((b) => b.onclick = () => {
   const k = b.dataset.spawn;
-  if (k === 'human' || k === 'zombie' || k === 'dummy' || k === 'soldier') spawnAtAim(k);
+  if (k.startsWith('x-')) { const u = getUn(); if (!(u.good && u.bad)) toast('Закрыто: пройдите обе концовки главы 1'); else { const p = aimPoint(); if (spawnNPC('human', p.x, p.z, Math.atan2(player.pos.x - p.x, player.pos.z - p.z), k.slice(2))) Sound.click(1100, 0.15); } }
+  else if (k === 'human' || k === 'zombie' || k === 'dummy' || k === 'soldier') spawnAtAim(k);
   else if (k === 'horde') for (let i = 0; i < 6; i++) { const [x, z] = edgePoint(); spawnNPC('zombie', x, z); }
   else if (k === 'crowd') { const p = aimPoint(); for (let i = 0; i < 6; i++) spawnNPC('human', p.x + rand(-2.5, 2.5), p.z + rand(-2.5, 2.5)); }
   else if (k === 'crate' || k === 'barrel') { const p = aimPoint(); spawnProp(k, p.x, p.z, 1.5); }
