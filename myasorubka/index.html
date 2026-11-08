@@ -273,6 +273,21 @@ body.touch #wAmmo{font-size:26px}
 #chShoot{background:rgba(120,0,0,.92);border-color:var(--blood-hi)}
 #choice .cbar{width:min(420px,70vw);height:6px;background:rgba(0,0,0,.6)}
 #chBar{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff3e9a,#e4281c)}
+#chArrest{background:rgba(24,60,160,.92);border-color:#6aa8ff}
+#choice button small{display:block;font-size:11px;letter-spacing:.06em;opacity:.85;margin-top:3px;text-transform:none}
+#choice .cb{flex-wrap:wrap;justify-content:center}
+@media (max-width:700px){#choice button{font-size:15px;padding:11px 13px}}
+#sMeter{margin:5px auto 0;width:min(300px,44vw);background:rgba(0,0,0,.55);padding:4px 8px 6px;text-align:left}
+#sMeter small{display:block;font:700 9px var(--ui);letter-spacing:.12em;color:#ffe6a8;margin-top:2px}
+#sMeter b{display:block;height:6px;background:rgba(255,255,255,.12);margin-top:2px}
+#sMeter b i{display:block;height:100%;width:0;transition:width .25s}
+#smP{background:linear-gradient(90deg,#3ac8ff,#9af0ff)}
+#smS{background:linear-gradient(90deg,#ffb020,#e4281c)}
+#paper{position:fixed;left:7%;right:7%;bottom:-3%;height:60%;pointer-events:none;transform:rotate(-1.4deg);background:#e8e0cc;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 3px);box-shadow:0 -10px 30px rgba(0,0,0,.6);color:#1a1612;font-family:Georgia,'Times New Roman',serif;padding:12px 22px;overflow:hidden}
+#paper b{display:block;font:900 clamp(22px,5vw,46px) Georgia,serif;letter-spacing:.06em;border-bottom:3px double #1a1612;text-align:center}
+#paper i{display:block;font-size:12px;text-align:center;margin:4px 0 8px}
+#paper h3{font-size:clamp(14px,2.6vw,22px);margin:0 0 6px}
+#paper p{font-size:13px;line-height:1.35;margin:0 0 6px;columns:2;column-gap:18px}
 #elev{position:absolute;left:50%;top:calc(6px + env(safe-area-inset-top,0px));transform:translateX(-50%);pointer-events:auto;touch-action:none;background:rgba(10,13,16,.86);border:1px solid #4a5866;padding:7px 10px 9px;display:flex;flex-direction:column;gap:6px;align-items:center;font-family:var(--mono);color:#cfe8ff;min-width:250px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
 #elev .ehd{display:flex;align-items:baseline;gap:8px;font-size:11px;color:#8aa0b4;letter-spacing:.14em;text-transform:uppercase}
 #elev .ehd b{font-size:24px;color:#ff9a3a;text-shadow:0 0 10px rgba(255,140,40,.6);font-variant-numeric:tabular-nums}
@@ -293,6 +308,7 @@ body.touch #wAmmo{font-size:26px}
 <div id="vignette"></div>
 <div id="hurt"></div>
 <div id="grain"></div>
+<div id="paper" hidden><div class="np"><b>ВЕЧЕРНИЙ ГОРОД</b><i>№ 1313 · ночной выпуск</i><h3>БЛОГЕР СВИТИ: «МОИ ФАНАТЫ — МОЯ СЕМЬЯ»</h3><p>Звезда сети снова собирает миллионы просмотров. Пропавшие поклонники? «Просто уехали отдыхать», — уверяет её продюсер. Полиция комментариев не даёт. Ужин принцессы пройдёт завтра в 21:00.</p><p>Погода: ночью дождь. Курс: один поцелуй — 50 000 $. Гороскоп: не верьте блогерам.</p></div></div>
 <div id="scope" hidden></div>
 
 <div id="hud" hidden>
@@ -311,7 +327,7 @@ body.touch #wAmmo{font-size:26px}
   <div id="toasts"></div>
   <div id="banner"></div>
   <div id="hint"></div>
-  <div id="storyHud" hidden><div id="sObj"></div><div id="sNotes"></div><div id="sSay"></div></div>
+  <div id="storyHud" hidden><div id="sObj"></div><div id="sMeter" hidden><small>ЗАПИСЬ РАЗГОВОРА</small><b><i id="smP"></i></b><small>ПОДОЗРЕНИЕ</small><b><i id="smS"></i></b></div><div id="sNotes"></div><div id="sSay"></div></div>
   <div id="sArrow" hidden><i>▲</i><span id="sDist"></span></div>
   <div id="polaroid" hidden><img id="polImg" alt="фото"><div>Улика №5 · Свити в форме</div></div>
   <div id="madHud" hidden><div id="score">0</div><div id="combo"></div></div>
@@ -449,6 +465,11 @@ body.touch #wAmmo{font-size:26px}
       <button class="btn" data-spawn="x-svity-street">Свити · Уличная<small id="xs1"></small></button>
       <button class="btn" data-spawn="x-svity-cop">Свити · Полицейская<small id="xs2"></small></button>
       <button class="btn" data-spawn="x-svity-gala">Свити · Вечерняя<small id="xs3"></small></button>
+      <button class="btn" data-spawn="x-svity-cafe">Свити · Тайная встреча<small></small></button>
+      <button class="btn" data-spawn="x-svity-stream">Свити · Стримерша<small></small></button>
+      <button class="btn" data-spawn="x-svity-bride">Свити · Невеста<small></small></button>
+      <button class="btn" data-spawn="x-svity-prison">Свити · Заключённая<small></small></button>
+      <button class="btn" data-spawn="x-producer">Продюсер<small></small></button>
       <button class="btn" data-spawn="x-gagarin">Воскреситель «Гагарин»<small id="xs4"></small></button>
       <button class="btn" data-spawn="kill">Суицид<small>Кат-сцена и возрождение</small></button>
     </div>
@@ -478,7 +499,7 @@ body.touch #wAmmo{font-size:26px}
 <div id="credits" hidden></div>
 <div id="chapter"><small>ГЛАВА 1</small><b>Преступница Свити</b></div>
 <div id="love"><span>❤</span></div>
-<div id="choice" hidden><div class="ct">Свити в прицеле</div><div class="cb"><button id="chMarry">Пожениться</button><button id="chShoot">Стрелять</button></div><div class="cbar"><i id="chBar"></i></div></div>
+<div id="choice" hidden><div class="ct">Свити в прицеле</div><div class="cb"><button id="chMarry">Пожениться</button><button id="chArrest">Арестовать<small id="chEv"></small></button><button id="chShoot">Стрелять</button></div><div class="cbar"><i id="chBar"></i></div></div>
 <div id="speed"></div>
 <div id="rotate">Поверните телефон горизонтально</div>
 <div id="lids"><i class="lt"></i><i class="lb"></i></div>
@@ -1094,6 +1115,11 @@ const MAPS = {
   street: { name: 'Улица', desc: '', story: true, hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildStreet, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   police: { name: 'Участок полиции', desc: '', story: true, hx: 12, hz: 9, h: 3.4, spawn: [0, 7, 0], fog: 0x0b0d10, fogD: 0.03, bg: 0x070809, sun: 0.5, hemi: 0.55, lamp: [0xe8f2ff, 18, 14], lamps: [[-6, 3.1, -4], [6, 3.1, -4], [-6, 3.1, 4], [6, 3.1, 4]], red: [[11.8, 2.6, 0], 0x2a6aff, 4], build: buildPolice, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   flat: { name: 'Квартира Свити', desc: '', story: true, hx: 6, hz: 5, h: 2.8, spawn: [0, 3.6, 0], fog: 0x0a0807, fogD: 0.03, bg: 0x060504, sun: 0.4, hemi: 0.6, lamp: [0xffd0a0, 14, 10], lamps: [[-4, 2.5, -3], [4, 2.5, -3], [-4, 2.5, 3], [4, 2.5, 3]], red: [[0, 2.6, 4.5], 0xff3ad0, 2], build: buildFlat, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  cafe: { name: 'Кафе «Полночь»', desc: '', story: true, hx: 9, hz: 7, h: 3.2, spawn: [-6.8, 5.9, -0.95], fog: 0x120a08, fogD: 0.03, bg: 0x080504, sun: 0.35, hemi: 0.55, lamp: [0xffc890, 14, 11], lamps: [[-5, 2.9, -3.5], [5, 2.9, -3.5], [-5, 2.9, 3.5], [5, 2.9, 3.5]], red: [[-4.5, 2.5, -6.6], 0xff3a8a, 4], build: buildCafe, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  port: { name: 'Порт · Склад №13', desc: '', story: true, hx: 20, hz: 16, h: 30, backdrop: 'night', spawn: [0, 13.8, 0], fog: 0x0a1018, fogD: 0.02, bg: 0x05080c, sun: 0.35, hemi: 0.5, lamp: [0xffb060, 34, 24], lamps: [[-10, 6.2, -2], [10, 6.2, -2], [0, 5.0, -10.5], [0, 6.2, 9]], red: [[-15, 14.6, 12], 0xff2a10, 6], build: buildPort, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  studio: { name: 'Студия «СВИТИ LIVE»', desc: '', story: true, hx: 10, hz: 8, h: 4.6, spawn: [-1.5, 6.8, 0], fog: 0x140814, fogD: 0.02, bg: 0x080408, sun: 0.3, hemi: 0.75, lamp: [0xffd0f0, 16, 14], lamps: [[-6, 4.2, -4], [6, 4.2, -4], [-6, 4.2, 4], [6, 4.2, 4]], red: [[0, 3.4, -7.4], 0xff3aa8, 8], build: buildStudio, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  cell: { name: 'Тюрьма №13', desc: '', story: true, hx: 5, hz: 4, h: 3, spawn: [0.3, 1.1, 0], fog: 0x080a0c, fogD: 0.03, bg: 0x040506, sun: 0.4, hemi: 0.8, lamp: [0xdfe8ff, 18, 11], lamps: [[-3, 2.7, -2], [3, 2.7, -2], [-3, 2.7, 2], [3, 2.7, 2]], red: [[0, 2.3, -3.8], 0x6a8aff, 2], build: buildCell, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  rainbow: { name: 'Радужная дорога', desc: '', story: true, hx: 8, hz: 70, h: 40, spawn: [-0.5, 68, 0], fog: 0x0a0418, fogD: 0.006, bg: 0x02010a, sun: 0.5, hemi: 0.9, lamp: [0xffe0ff, 8, 12], lamps: [[0, 3, 66], [0, 3, 50], [0, 3, 34], [0, 3, 26]], red: [[0, 2.2, 26], 0xffffff, 10], build: buildRainbow, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   gala: { name: 'Ужин принцессы', desc: '', story: true, hx: 16, hz: 14, h: 8, spawn: [0, 9.5, 0], fog: 0x1a0808, fogD: 0.015, bg: 0x0a0404, sun: 0.4, hemi: 0.55, lamp: [0xffd8a0, 40, 22], lamps: [[-8, 7, -6], [8, 7, -6], [-8, 7, 6], [8, 7, 6]], red: [[0, 4, -13], 0xff60a0, 6], build: buildGala, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
 };
 /* ===== the secret map: a floating island under a blood moon, with a third of normal gravity ===== */
@@ -2304,7 +2330,7 @@ function addSvityExtras(npc, L) {
   const mm = new THREE.MeshStandardMaterial({ map: svMouthTex('closed'), transparent: true, depthWrite: false, roughness: 0.5, metalness: 0, envMapIntensity: 0.3, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
   const faceMesh = new THREE.Mesh(svPatch(SVF.phiW, SVF.th0, SVF.th1, 0.1213, 40, 22), fm), mouthMesh = new THREE.Mesh(svPatch(0.8, 1.98, 2.34, 0.1217, 20, 10), mm); head.add(faceMesh); head.add(mouthMesh);
   put(head, new THREE.SphereGeometry(0.0062, 10, 8), P.head.mat, 0, -0.03, 0.1135).scale.set(1, 0.9, 1.3);
-  npc.sv = { face: fm, mouth: mm, base: L.svity === 'gala' ? 'happy' : 'neutral', blinkT: rand(1, 3), blink: 0, cur: 'neutral', curM: 'closed' }; svFaceTex('closed'); svFaceTex(npc.sv.base); svMouthTex('open'); svMouthTex('smile'); if (npc.sv.base === 'happy') { fm.map = svFaceTex('happy'); npc.sv.cur = 'happy'; mm.map = svMouthTex('smile'); npc.sv.curM = 'smile'; }
+  npc.sv = { face: fm, mouth: mm, base: L.svity === 'gala' || L.svity === 'stream' || L.svity === 'bride' ? 'happy' : 'neutral', blinkT: rand(1, 3), blink: 0, cur: 'neutral', curM: 'closed' }; svFaceTex('closed'); svFaceTex(npc.sv.base); svMouthTex('open'); svMouthTex('smile'); if (npc.sv.base === 'happy') { fm.map = svFaceTex('happy'); npc.sv.cur = 'happy'; mm.map = svMouthTex('smile'); npc.sv.curM = 'smile'; }
   // hair: a glossy cap and see-through bangs on the head, wavy ombré locks over the shoulders
   put(head, svCapGeo(), new THREE.MeshStandardMaterial({ map: H.cap, color: 0xb4b4b4, roughness: 0.55, metalness: 0, envMapIntensity: 0.4 }), 0, 0, 0);
   const bg = new THREE.SphereGeometry(0.1285, 30, 16, Math.PI / 2 - 1.12, 2.24, 0.42, 1.02); bg.scale(0.92, 1.07, 1.0); bg.translate(0, 0.004, 0.0); svShape(bg);
@@ -2350,8 +2376,143 @@ function addSvityExtras(npc, L) {
     // the golden feather band on the bodice and a floor-length satin skirt
     const dt = svDressTex(), skirt = new THREE.CylinderGeometry(0.19, 0.285, 0.98, 28, 1, true); skirt.scale(1.04, 1, 0.86);
     put(pelvis, skirt, new THREE.MeshStandardMaterial({ map: dt, roughness: 0.3, metalness: 0.18, side: THREE.DoubleSide, envMapIntensity: 0.9 }), 0, -0.43, 0, 0, Math.PI * 0.72, 0);
+  } else svOutfit2(npc, L, sk, put, logo, setCloth);
+}
+/* ===== new outfits for Svity (café, stream, bride, prison), the Producer, hostages ===== */
+function svBrideTex() {
+  if (SVT.bride) return SVT.bride; const W = 512, H = 512, c = makeCanvas(W, H), g = c.getContext('2d');
+  const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#fbfaf7'); gr.addColorStop(1, '#e9e4dc'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  // satin folds and a lace border along the hem
+  for (let x = 0; x < W; x += 18) { const k = g.createLinearGradient(x, 0, x + 18, 0); k.addColorStop(0, 'rgba(0,0,0,0.05)'); k.addColorStop(0.5, 'rgba(255,255,255,0.35)'); k.addColorStop(1, 'rgba(0,0,0,0.06)'); g.fillStyle = k; g.fillRect(x, 0, 18, H); }
+  g.strokeStyle = 'rgba(200,190,175,0.7)'; g.lineWidth = 2;
+  for (let x = 0; x < W; x += 32) for (const y of [H - 70, H - 40]) { g.beginPath(); g.arc(x + 16, y, 12, 0, Math.PI * 2); g.stroke(); g.beginPath(); g.arc(x + 16, y, 5, 0, Math.PI * 2); g.stroke(); }
+  g.fillStyle = 'rgba(240,200,120,0.55)'; for (let i = 0; i < 160; i++) { g.beginPath(); g.arc(Math.random() * W, Math.random() * (H - 120), 1.3, 0, Math.PI * 2); g.fill(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = MAX_ANISO; return (SVT.bride = t);
+}
+function svStripeTex(a, b, n = 10) {
+  const c = makeCanvas(64, 256), g = c.getContext('2d'); for (let i = 0; i < n; i++) { g.fillStyle = i % 2 ? b : a; g.fillRect(0, i * 256 / n, 64, 256 / n + 1); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+}
+function svOutfit2(npc, L, sk, put, logo, setCloth) {
+  const P = npc.parts, head = P.head.mesh, torso = P.torso.mesh, pelvis = P.pelvis.mesh;
+  const tint = (names, hex, map = TEX.cloth, rough = 0.8, metal = 0) => { for (const n of names) { P[n].mat.color.setHex(hex); P[n].baseColor.setHex(hex); setCloth(n, map, rough, metal); } };
+  const UP4 = ['torso', 'uArmL', 'uArmR', 'lArmL', 'lArmR'], LEGS = ['uLegL', 'uLegR', 'lLegL', 'lLegR'];
+  if (sk === 'cafe') {
+    // a camel trench coat with a belt, black tights, a beret and sunglasses pushed up into the hair
+    const camel = 0xc49466; tint([...UP4, 'pelvis'], camel, TEX.cloth, 0.72); tint(LEGS, 0x16151a, null, 0.45);
+    const coat = std({ color: camel, map: TEX.cloth, roughness: 0.72, side: THREE.DoubleSide }), seam = std({ color: 0x8e623e, roughness: 0.8 }), blk = std({ color: 0x0e0d10, roughness: 0.5 });
+    const hem = new THREE.CylinderGeometry(0.175, 0.245, 0.5, 26, 1, true); hem.scale(1.06, 1, 0.84); put(pelvis, hem, coat, 0, -0.2, 0);
+    put(torso, new THREE.BoxGeometry(0.39, 0.04, 0.235), seam, 0, -0.205, 0); put(torso, new THREE.BoxGeometry(0.05, 0.034, 0.012), goldMat, 0.03, -0.205, 0.121);
+    for (const sd of [-1, 1]) { put(torso, new THREE.BoxGeometry(0.05, 0.22, 0.01), seam, sd * 0.055, 0.12, 0.116, 0, 0, sd * 0.32); put(torso, new THREE.BoxGeometry(0.016, 0.3, 0.008), seam, sd * 0.012, -0.06, 0.117); }
+    for (const y of [0.0, -0.09]) for (const sd of [-1, 1]) put(torso, new THREE.CylinderGeometry(0.009, 0.009, 0.006, 10), blk, sd * 0.045, y, 0.118, Math.PI / 2, 0, 0);
+    for (const sd of [-1, 1]) put(P[sd > 0 ? 'lArmL' : 'lArmR'].mesh, new THREE.CylinderGeometry(0.049, 0.049, 0.03, 12), seam, 0, -0.06, 0);
+    const beret = new THREE.SphereGeometry(0.15, 22, 10, 0, Math.PI * 2, 0, Math.PI * 0.5); beret.scale(1.1, 0.62, 1.1); put(head, beret, std({ color: 0x141216, map: TEX.cloth, roughness: 0.9 }), -0.022, 0.095, -0.012, -0.16, 0, 0.34); put(head, new THREE.TorusGeometry(0.128, 0.01, 6, 28).rotateX(Math.PI / 2), std({ color: 0x0c0b0e, roughness: 0.8 }), -0.012, 0.085, -0.008, -0.16, 0, 0.34);
+    put(head, new THREE.CylinderGeometry(0.007, 0.004, 0.024, 6), blk, -0.055, 0.17, -0.01, 0, 0, 0.3);
+    const lens = std({ color: 0x0a0a0c, roughness: 0.06, metalness: 0.7, envMapIntensity: 1.4 }), fr = std({ color: 0x2a1a10, roughness: 0.3, metalness: 0.4 });
+    for (const sd of [-1, 1]) { const l = put(head, new THREE.CylinderGeometry(0.026, 0.026, 0.006, 16), lens, sd * 0.036, 0.118, 0.094, 1.0, 0, 0); l.scale.set(1, 1, 0.85); }
+    put(head, new THREE.BoxGeometry(0.018, 0.005, 0.005), fr, 0, 0.124, 0.104);
+    logo([{ t: 'СВИТИ', s: 120 }], 0.06, 0.02, -0.075, 0.165, 0.117, '#3a2416');
+  } else if (sk === 'stream') {
+    // a pink oversized hoodie with «LIVE», black leggings, a glowing cat-ear headset with a mic
+    tint([...UP4, 'pelvis'], 0xff8ac4, TEX.cloth, 0.92); tint(LEGS, 0x1c1c24, null, 0.5);
+    const pinkD = std({ color: 0xe0609e, map: TEX.cloth, roughness: 0.92, side: THREE.DoubleSide }), white = std({ color: 0xf6f2f4, roughness: 0.6 });
+    const hem = new THREE.CylinderGeometry(0.2, 0.215, 0.16, 24, 1, true); hem.scale(1.04, 1, 0.82); put(pelvis, hem, pinkD, 0, -0.02, 0);
+    put(torso, new THREE.BoxGeometry(0.24, 0.09, 0.03), pinkD, 0, -0.175, 0.11); // the front pocket
+    for (const sd of [-1, 1]) { put(torso, new THREE.CylinderGeometry(0.004, 0.004, 0.14, 5), white, sd * 0.03, 0.14, 0.118); put(torso, new THREE.SphereGeometry(0.008, 8, 6), white, sd * 0.03, 0.068, 0.12); }
+    const hood = new THREE.TorusGeometry(0.1, 0.035, 8, 20, Math.PI * 1.25); hood.rotateX(Math.PI / 2); hood.rotateY(-Math.PI * 0.12 + Math.PI); put(torso, hood, pinkD, 0, 0.235, -0.01).scale.set(1.15, 1, 1);
+    logo([{ t: '● LIVE', s: 150 }, { t: 'СВИТИ', s: 120 }], 0.17, 0.085, 0, -0.072, 0.1235, '#ff2a4a');
+    for (const n of ['lArmL', 'lArmR']) put(P[n].mesh, new THREE.CylinderGeometry(0.047, 0.047, 0.035, 12), pinkD, 0, -0.07, 0);
+    const hs = std({ color: 0x18181e, roughness: 0.35, metalness: 0.3 }), glow = new THREE.MeshStandardMaterial({ color: 0xff7ac8, emissive: 0xff3aa8, emissiveIntensity: 1.6, roughness: 0.4 });
+    const band = new THREE.TorusGeometry(0.158, 0.012, 6, 26, Math.PI); band.rotateY(Math.PI / 2); put(head, band, hs, 0, 0.0, -0.01).rotation.x = 0.05;
+    for (const sd of [-1, 1]) {
+      put(head, new THREE.CylinderGeometry(0.056, 0.056, 0.04, 18), hs, sd * 0.152, -0.01, -0.01, 0, 0, Math.PI / 2);
+      put(head, new THREE.CylinderGeometry(0.044, 0.044, 0.006, 18), glow, sd * 0.174, -0.01, -0.01, 0, 0, Math.PI / 2);
+      const ear = new THREE.ConeGeometry(0.034, 0.07, 4); put(head, ear, glow, sd * 0.075, 0.145, -0.01, 0, Math.PI / 4, -sd * 0.42);
+    }
+    const mic = []; for (let i = 0; i <= 8; i++) { const t = i / 8; mic.push([-0.16 + t * 0.095, -0.03 - t * 0.05, -0.01 + t * 0.11]); } head.add(svTube(mic, 0.003, hs));
+    put(head, new THREE.SphereGeometry(0.009, 8, 6), std({ color: 0x2a2a30, roughness: 0.9 }), -0.065, -0.082, 0.1);
+  } else if (sk === 'bride') {
+    // a white satin dress to the floor, a veil, a tiara, white gloves and a bouquet of roses
+    const satin = std({ color: 0xf7f4ef, roughness: 0.32, metalness: 0.08, envMapIntensity: 0.8 });
+    tint(['torso', 'pelvis'], 0xf7f4ef, null, 0.32, 0.08);
+    for (const n of ['lArmL', 'lArmR']) { P[n].mat.color.setHex(0xf3efe8); P[n].baseColor.setHex(0xf3efe8); setCloth(n, null, 0.5); }
+    const skirt = new THREE.CylinderGeometry(0.2, 0.36, 0.98, 32, 1, true); skirt.scale(1.04, 1, 0.9);
+    put(pelvis, skirt, new THREE.MeshStandardMaterial({ map: svBrideTex(), roughness: 0.34, metalness: 0.05, side: THREE.DoubleSide, envMapIntensity: 0.8 }), 0, -0.43, 0);
+    const pearl = std({ color: 0xfff8ee, roughness: 0.2, metalness: 0.15 });
+    for (let i = 0; i < 9; i++) { const a = (i / 8 - 0.5) * 2.2; put(torso, new THREE.SphereGeometry(0.0065, 8, 6), pearl, Math.sin(a) * 0.06, 0.262 - Math.cos(a) * 0.035, Math.cos(a) * 0.058 + 0.004); }
+    put(torso, new THREE.BoxGeometry(0.385, 0.03, 0.228), satin, 0, -0.215, 0);
+    put(torso, new THREE.SphereGeometry(0.014, 10, 8), std({ color: 0xf2c870, roughness: 0.25, metalness: 0.7 }), 0, -0.215, 0.118);
+    const tiara = new THREE.TorusGeometry(0.105, 0.005, 6, 26, Math.PI); tiara.rotateX(-Math.PI / 2 + 0.45); put(head, tiara, goldMat, 0, 0.088, 0.01).rotation.z = 0;
+    for (let i = 0; i < 5; i++) { const a = Math.PI * (0.18 + i * 0.16); put(head, new THREE.ConeGeometry(0.007, 0.03 - Math.abs(i - 2) * 0.006, 4), goldMat, Math.cos(a) * 0.105, 0.105 + (2 - Math.abs(i - 2)) * 0.004, Math.sin(a) * 0.105 * 0.9 + 0.01); }
+    put(head, new THREE.SphereGeometry(0.009, 8, 6), std({ color: 0xbfe8ff, roughness: 0.05, metalness: 0.2, emissive: 0x3a7aa0, emissiveIntensity: 0.5 }), 0, 0.118, 0.105);
+    const veil = new THREE.CylinderGeometry(0.11, 0.3, 0.95, 26, 6, true, Math.PI * 0.62, Math.PI * 1.76); veil.translate(0, -0.42, 0);
+    { const p = veil.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i), k = clamp(-y / 0.9, 0, 1); p.setZ(i, p.getZ(i) - k * k * 0.12 + Math.sin(p.getX(i) * 40) * 0.006 * k); } veil.computeVertexNormals(); }
+    const vm = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.3, roughness: 0.6, side: THREE.DoubleSide, depthWrite: false });
+    put(head, veil, vm, 0, 0.08, -0.02).rotation.x = 0.06;
+    // the bouquet in the right hand
+    const bq = new THREE.Group(); bq.position.set(0.0, -0.165, 0.045); P.lArmR.mesh.add(bq);
+    const rose = std({ color: 0xc8102e, roughness: 0.55 }), rose2 = std({ color: 0xf2f0ee, roughness: 0.55 }), leaf = std({ color: 0x2a5a2a, roughness: 0.8 });
+    for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2, r = i ? 0.03 : 0; const m = new THREE.Mesh(new THREE.IcosahedronGeometry(0.02, 0), i % 3 ? rose : rose2); m.position.set(Math.cos(a) * r, 0.02 + (i ? 0 : 0.012), Math.sin(a) * r); bq.add(m); }
+    for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; const m = new THREE.Mesh(new THREE.ConeGeometry(0.014, 0.05, 3), leaf); m.position.set(Math.cos(a) * 0.045, 0.0, Math.sin(a) * 0.045); m.rotation.set(Math.sin(a) * 1.2, 0, -Math.cos(a) * 1.2); bq.add(m); }
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.008, 0.11, 8), leaf); stem.position.y = -0.05; bq.add(stem);
+    const rib = new THREE.Mesh(new THREE.TorusGeometry(0.014, 0.004, 6, 12), satin); rib.rotation.x = Math.PI / 2; rib.position.y = -0.03; bq.add(rib);
+  } else if (sk === 'prison') {
+    // an orange jumpsuit with a number, white tee at the collar, cuffs on the wrists
+    tint([...UP4, 'pelvis', ...LEGS], 0xf26a12, TEX.cloth, 0.9);
+    const white = std({ color: 0xf4f2ee, roughness: 0.8 }), steel = std({ color: 0xc8ccd2, roughness: 0.25, metalness: 0.95 }), dk = std({ color: 0xc8540c, map: TEX.cloth, roughness: 0.9 });
+    put(torso, new THREE.CylinderGeometry(0.052, 0.058, 0.03, 16), white, 0, 0.25, 0);
+    for (const sd of [-1, 1]) put(torso, new THREE.BoxGeometry(0.07, 0.16, 0.01), dk, sd * 0.045, 0.165, 0.113, 0, 0, sd * 0.42);
+    put(torso, new THREE.BoxGeometry(0.012, 0.36, 0.008), dk, 0, -0.04, 0.116);
+    logo([{ t: 'ЗК № 013', s: 130 }], 0.11, 0.035, 0.07, 0.12, 0.1158, '#1a1a1a');
+    put(torso, new THREE.PlaneGeometry(0.26, 0.09), new THREE.MeshBasicMaterial({ map: toTex(textCanvas([{ t: 'ТЮРЬМА №13', s: 120 }], 512, 176, null, '#1a1a1a')), transparent: true }), 0, 0.09, -0.1158, 0, Math.PI, 0);
+    for (const n of ['lArmL', 'lArmR']) { const r = new THREE.Mesh(new THREE.TorusGeometry(0.047, 0.008, 6, 16), steel); r.rotation.x = Math.PI / 2; r.position.y = -0.075; P[n].mesh.add(r); }
   }
 }
+// the man behind her: white suit, black shirt, gold chain, sunglasses and a white fedora
+function addProducerExtras(n) {
+  const P = n.parts, head = P.head.mesh, torso = P.torso.mesh;
+  const put = (parent, geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); parent.add(m); return m; };
+  const blk = std({ color: 0x0b0b0d, roughness: 0.45 }), suit = std({ color: 0xf2efe6, map: TEX.cloth, roughness: 0.62 }), lens = std({ color: 0x050506, roughness: 0.05, metalness: 0.75, envMapIntensity: 1.6 });
+  for (const k of ['torso', 'pelvis', 'uArmL', 'uArmR', 'lArmL', 'lArmR', 'uLegL', 'uLegR', 'lLegL', 'lLegR']) { const m = P[k].mat; m.roughness = 0.62; P[k].baseRough = 0.62; }
+  const v = new THREE.Shape(); v.moveTo(-0.062, 0.245); v.lineTo(0.062, 0.245); v.lineTo(0, 0.02); v.closePath();
+  put(torso, new THREE.ShapeGeometry(v), blk, 0, 0, 0.1125);
+  for (const sd of [-1, 1]) { put(torso, new THREE.BoxGeometry(0.04, 0.25, 0.012), suit, sd * 0.05, 0.125, 0.115, 0, 0, sd * 0.27); put(torso, new THREE.CylinderGeometry(0.009, 0.009, 0.006, 10), std({ color: 0xd8c8a0, roughness: 0.3, metalness: 0.6 }), 0.0, sd > 0 ? -0.02 : -0.1, 0.116, Math.PI / 2, 0, 0); }
+  const pocket = new THREE.Shape(); pocket.moveTo(-0.022, 0); pocket.lineTo(0.022, 0); pocket.lineTo(0.006, 0.026); pocket.lineTo(-0.008, 0.018); pocket.closePath();
+  put(torso, new THREE.ShapeGeometry(pocket), std({ color: 0xc81a2a, roughness: 0.5, side: THREE.DoubleSide }), 0.1, 0.13, 0.1135);
+  const chain = new THREE.TorusGeometry(0.068, 0.0055, 6, 28); put(torso, chain, goldMat, 0, 0.215, 0.05, 1.05, 0, 0);
+  const pend = put(torso, new THREE.BoxGeometry(0.028, 0.034, 0.006), goldMat, 0, 0.15, 0.116); pend.rotation.z = Math.PI / 4;
+  put(torso, new THREE.PlaneGeometry(0.024, 0.024), new THREE.MeshBasicMaterial({ map: toTex(textCanvas([{ t: '$', s: 200 }], 128, 128, null, '#2a1a00')), transparent: true }), 0, 0.15, 0.1195);
+  for (const sd of [-1, 1]) put(head, new RoundedBoxGeometry(0.038, 0.025, 0.006, 2, 0.003), lens, sd * 0.041, 0.02, 0.123, 0, sd * 0.12, 0);
+  put(head, new THREE.BoxGeometry(0.02, 0.004, 0.004), goldMat, 0, 0.027, 0.126);
+  for (const sd of [-1, 1]) put(head, new THREE.BoxGeometry(0.003, 0.004, 0.1), goldMat, sd * 0.1, 0.024, 0.075, 0, -sd * 0.22, 0);
+  const hat = new THREE.Group(); hat.position.set(0, 0.075, -0.004); hat.rotation.set(-0.08, 0, 0.07); head.add(hat);
+  const hatM = std({ color: 0xf4f1ea, map: TEX.cloth, roughness: 0.7 });
+  const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.008, 28), hatM); brim.scale.set(1, 1, 0.92); brim.castShadow = true; hat.add(brim);
+  const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.125, 0.1, 22), hatM); crown.position.y = 0.05; crown.castShadow = true; hat.add(crown);
+  const dent = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 6, 0, Math.PI * 2, 0, Math.PI * 0.25), hatM); dent.scale.set(1, 0.25, 0.9); dent.position.y = 0.098; hat.add(dent);
+  const hb = new THREE.Mesh(new THREE.CylinderGeometry(0.126, 0.126, 0.024, 22), blk); hb.position.y = 0.014; hat.add(hb);
+  const watch = new THREE.Mesh(new THREE.CylinderGeometry(0.047, 0.047, 0.02, 14), goldMat); watch.position.y = -0.07; P.lArmL.mesh.add(watch);
+  n.producer = true;
+}
+// a fan tied to a chair: ropes around the chest and arms, tape over the mouth
+function addHostageBits(n) {
+  const P = n.parts, rope = std({ color: 0x9a7a4a, map: TEX.cloth, roughness: 0.95 }), tape = std({ color: 0x8a8c90, roughness: 0.6 }), out = [];
+  for (const y of [0.06, -0.04, -0.13]) { const g = new THREE.TorusGeometry(0.255, 0.011, 6, 26); g.rotateX(Math.PI / 2); g.scale(1, 1, 0.6); const m = new THREE.Mesh(g, rope); m.position.y = y; P.torso.mesh.add(m); out.push(m); }
+  const t = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.026, 0.012), tape); t.position.set(0, -0.058, 0.108); P.head.mesh.add(t); out.push(t);
+  n.hostageBits = out; n.tied = true;
+}
+function freeHostage(n) { if (n.hostageBits) for (const m of n.hostageBits) if (m.parent) m.parent.remove(m); n.hostageBits = null; n.tied = false; }
+// a phone in the right hand and the arm IK that brings it to the ear; hands cuffed behind the back
+function givePhone(n) {
+  if (n.phoneMesh) { n.phoneMesh.visible = true; return n.phoneMesh; }
+  const g = new THREE.Group(); g.position.set(0.0, -0.16, 0.02); g.rotation.set(0, 0, 0); n.parts.lArmR.mesh.add(g);
+  const b = new THREE.Mesh(new RoundedBoxGeometry(0.038, 0.075, 0.009, 2, 0.004), std({ color: 0x111114, roughness: 0.3, metalness: 0.5 })); g.add(b);
+  const s = new THREE.Mesh(new THREE.PlaneGeometry(0.032, 0.066), new THREE.MeshBasicMaterial({ color: 0x9ad0ff })); s.position.z = 0.0048; g.add(s);
+  return (n.phoneMesh = g);
+}
+const _ikH = new V3();
+function ikPhone(n) { const H = n.parts.head; if (H.gone || !n.handOk('R')) return; H.mesh.localToWorld(_ikH.set(-0.115, -0.01, 0.035)); n.ikArm('R', _ikH, n.ikW ?? 1); }
+function ikCuffed(n) { const pm = n.parts.pelvis.mesh; if (!n.handOk('L') || !n.handOk('R')) return; pm.localToWorld(_ikH.set(0.035, 0.03, -0.17)); n.ikArm('L', _ikH, 1); pm.localToWorld(_ikH.set(-0.035, 0.03, -0.17)); n.ikArm('R', _ikH, 1); }
 /* ===== realism: women and men (40 / 60), faces that blink, look around and frown, springy chest and hair ===== */
 function sexLook(L) {
   L.female = Math.random() < 0.4; L.iris = randi(4);
@@ -2483,11 +2644,16 @@ function bodyFx(n, dt, look) {
   const kb = Math.min(1, dt * 10); F.by += (bY - F.by) * kb; F.bi += (bIn - F.bi) * kb;
   for (let i = 0; i < 2; i++) { const b = F.brows[i], sx = i === 0 ? 1 : -1; b.position.y = 0.046 + F.by + F.bs.x.y; b.rotation.z = -sx * ((n.look.female ? 0.2 : 0.12) + F.bi * 0.5); }
 }
+const SV_COST = {
+  street: { sleeves: 'long', shirt: 0x121216, pants: 0x121216 }, cop: { sleeves: 'short', shirt: 0x1b2236, pants: 0x161c2c }, gala: { sleeves: 'none', shirt: 0x121216, pants: 0x121216 },
+  cafe: { sleeves: 'long', shirt: 0xc49466, pants: 0x16151a }, stream: { sleeves: 'long', shirt: 0xff8ac4, pants: 0x1c1c24 }, bride: { sleeves: 'none', shirt: 0xf7f4ef, pants: 0xf7f4ef }, prison: { sleeves: 'short', shirt: 0xf26a12, pants: 0xf26a12 },
+};
 function applyLookKind(L, k) {
   if (k === 'worker') { L.shirt = pick([0xff6a10, 0xffa000, 0xe85a0a]); L.pants = pick([0x2a3550, 0x3a3a38, 0x2c3a2a]); L.sleeves = 'long'; L.hardhat = pick([0xf2c200, 0xf2f2ee, 0xff7a00, 0xf2c200]); L.hair = null; }
   else if (k === 'office') { L.shirt = pick([0xe8eef4, 0xc8daf0, 0xf4f4f0, 0xd0d6dc, 0x9ab0c8]); L.pants = pick([0x1c1e22, 0x2a2d33, 0x22252c]); L.sleeves = 'long'; if (Math.random() < 0.6) L.tie = pick([0x7a1020, 0x1a2a5a, 0x111111, 0x2a4a2a]); }
   else if (k === 'guard') { L.shirt = 0x1a1d24; L.pants = 0x15171c; L.helmet = false; L.cap = true; L.hair = null; }
-  else if (k.startsWith('svity')) { L.skin = 0xf6d0b6; L.hair = null; L.female = true; L.hairStyle = null; L.svity = k.slice(6); L.sleeves = L.svity === 'gala' ? 'none' : L.svity === 'cop' ? 'short' : 'long'; L.shirt = L.svity === 'cop' ? 0x1b2236 : 0x121216; L.pants = L.svity === 'cop' ? 0x161c2c : 0x121216; L.badge = L.svity === 'cop'; L.phone = L.svity === 'street'; }
+  else if (k.startsWith('svity')) { L.skin = 0xf6d0b6; L.hair = null; L.female = true; L.hairStyle = null; L.svity = k.slice(6); const C = SV_COST[L.svity] || SV_COST.street; L.sleeves = C.sleeves; L.shirt = C.shirt; L.pants = C.pants; L.badge = L.svity === 'cop'; L.phone = L.svity === 'street'; }
+  else if (k === 'producer') { L.female = false; L.skin = 0xe9c3a2; L.skinTex = TEX.skin; L.shirt = 0xf2efe6; L.pants = 0xf2efe6; L.sleeves = 'long'; L.hair = hairMats[0]; L.hairStyle = 'short'; L.lips = null; L.producer = true; L.cap = false; L.helmet = false; L.rifle = false; }
   else if (k === 'gagarin') { L.female = false; L.skin = 0x0b0b0e; L.skinTex = null; L.shirt = 0x0c0c10; L.pants = 0xe07a1a; L.sleeves = 'long'; L.hair = null; L.gagarin = true; L.cap = false; }
   else if (k === 'cop') { L.shirt = 0x1b2236; L.pants = 0x161c2c; L.sleeves = 'short'; L.cap = true; L.badge = true; }
   else if (k === 'fan') { L.shirt = pick([0xc8a040, 0x8a1a3a, 0xf0f0ea, 0x1a3a6a, 0x5a1a6a, 0xd84a7a]); L.pants = pick([0x1a1a1e, 0x2a2420, 0xf0f0ea]); L.sleeves = 'long'; }
@@ -2539,6 +2705,7 @@ class Humanoid {
     if (L.hardhat) { const hm = std({ color: L.hardhat, roughness: 0.38 }), hh = new THREE.Mesh(GEO.helmet, hm); hh.scale.set(1.06, 1.02, 1.1); hh.position.y = 0.012; hh.castShadow = true; head.add(hh); const br = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.012, 20), hm); br.position.set(0, 0.03, 0.02); head.add(br); }
     if (L.cap) { const cp = new THREE.Mesh(GEO.helmet, capMat); cp.scale.set(1, 0.72, 1.02); head.add(cp); const vz = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.012, 0.08), capMat); vz.position.set(0, 0.03, 0.13); head.add(vz); }
     if (L.svity) addSvityExtras(this, L);
+    if (L.producer) addProducerExtras(this);
     if (L.gagarin) addGagarin(this); else if (!L.plastic && !L.svity) { this.mouthOpen = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.03, 0.01), mouthDarkMat); this.mouthOpen.position.set(0, -0.06, 0.103); this.mouthOpen.scale.y = 0.001; head.add(this.mouthOpen); }
     bodyExtras(this, L);
     if (L.badge) { const bd = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.055, 0.012), goldMat); bd.position.set(0.085, 0.12, 0.113); this.parts.torso.mesh.add(bd); }
@@ -3225,7 +3392,8 @@ class Humanoid {
     if (this.gg) this.ggUpdate(dt); if (this.sv) this.svUpdate(dt);
     if (this.coverT > 0 && this.alive && !this.parts.head.gone && this.handOk('L')) this.cmW = Math.min(1, (this.cmW || 0) + dt * 4); else this.cmW = Math.max(0, (this.cmW || 0) - dt * 3);
     if (this.cmW > 0.02) { this.root.updateMatrixWorld(true); this.parts.head.mesh.localToWorld(_ikX.set(0.01, -0.06, 0.135)); this.ikArm('L', _ikX, this.cmW); }
-    if (this.sv && this.look.svity === 'gala') {
+    if (this.ikFn && this.alive) { this.root.updateMatrixWorld(true); this.ikFn(this); }
+    if (this.sv && (this.look.svity === 'gala' || this.look.svity === 'bride') && !this.ikFn) {
       const idle = pose === 'stand' && s < 0.25 && !(this.talkT > 0) && !this.clutch && !this.clutch2 && !this.controlled; this.claspW = clamp((this.claspW || 0) + (idle ? dt * 2.2 : -dt * 4), 0, 1);
       if (this.claspW > 0.02) { this.root.updateMatrixWorld(true); const pm = this.parts.pelvis.mesh; pm.localToWorld(_ikX.set(0.034, 0.15, 0.21)); this.ikArm('L', _ikX, this.claspW); pm.localToWorld(_ikX.set(-0.034, 0.135, 0.205)); this.ikArm('R', _ikX, this.claspW); }
     }
@@ -3655,7 +3823,7 @@ function tryFire(pressed) {
   player.pitch += w.id === 'shotgun' ? 0.05 : w.id === 'rifle' ? 0.012 + Math.random() * 0.006 : 0.025; player.yaw += (Math.random() - 0.5) * (w.id === 'rifle' ? 0.012 : 0.01);
   W.bloom = Math.min(0.05, W.bloom + (w.id === 'rifle' ? 0.006 : 0.004));
   W.flashT = 0.05; muzzleLight.intensity = w.id === 'shotgun' ? 26 : 16;
-  if (w.id === 'bow') Sound.twang(); else Sound.shot(w.id, 0.9); alertHumans(28); if (madness.on) shake = Math.max(shake, 0.12);
+  if (w.id === 'bow') Sound.twang(); else Sound.shot(w.id, 0.9); alertHumans(28); if (w.id !== 'bow' && story.on) story.noise = 1; if (madness.on) shake = Math.max(shake, 0.12);
   if (w.id === 'shotgun') { W.pumpT = 0.5; later(0.35, () => ejectCasing(true)); later(0.25, () => Sound.click(500, 0.2)); } else if (w.id !== 'bow') ejectCasing(false);
   if (W.ammo[W.cur] === 0) later(0.25, startReload);
 }
@@ -4265,7 +4433,8 @@ function gameOver() {
 }
 function resume() { $('cine').classList.remove('on'); if (Music.on && Music.scene && !madness.on) Music.stop(); document.body.classList.add('playing'); state = 'play'; $('menu').hidden = true; $('spawn').hidden = true; $('over').hidden = true; $('hud').hidden = false; $('touch').hidden = !isTouch; lockPointer(lockFromClick); lockFromClick = false; }
 function pauseGame() { if (state !== 'play') return; document.body.classList.remove('playing'); state = 'pause'; W.fireHeld = false; $('menu').hidden = false; $('resumeBtn').hidden = false; $('hud').hidden = true; $('touch').hidden = true; if (document.pointerLockElement) document.exitPointerLock(); }
-function syncExclSpawn() { const ok = (() => { const u = getUn(); return !!(u.good && u.bad); })(); for (let i = 1; i <= 4; i++) { const e = $('xs' + i); e.textContent = ok ? (i === 4 ? 'Бессмертен: пуля, нож и взрыв включают свои кат-сцены' : 'Эксклюзив') : '🔒 Пройдите обе концовки главы 1'; e.parentElement.style.opacity = ok ? '' : '.55'; } }
+function exclNeed(k) { const e = EXCL.find((x) => x[0] === k); return e ? e[3] : k === 'producer' ? ['pawn'] : ['good', 'bad']; }
+function syncExclSpawn() { const u = getUn(); document.querySelectorAll('[data-spawn^="x-"]').forEach((b) => { const k = b.dataset.spawn.slice(2), need = exclNeed(k), ok = need.every((q) => u[q]), sm2 = b.querySelector('small'); if (sm2) sm2.textContent = ok ? (k === 'gagarin' ? 'Бессмертен: пуля, нож и взрыв включают свои кат-сцены' : 'Эксклюзив') : '🔒 ' + need.map((q) => UNL_TXT[q]).join(' + '); b.style.opacity = ok ? '' : '.55'; }); }
 function openSpawn() { syncExclSpawn(); state = 'spawn'; W.fireHeld = false; $('spawn').hidden = false; $('touch').hidden = true; if (document.pointerLockElement) document.exitPointerLock(); }
 function closeSpawn() { $('spawn').hidden = true; resume(); }
 $('playSandbox').onclick = () => { lockFromClick = true; tryLandscape(); startGame('sandbox'); };
@@ -4279,7 +4448,7 @@ $('spawnClose').onclick = closeSpawn;
 $('spawnMenu').onclick = () => { $('spawn').hidden = true; state = 'play'; pauseGame(); };
 document.querySelectorAll('[data-spawn]').forEach((b) => b.onclick = () => {
   const k = b.dataset.spawn;
-  if (k.startsWith('x-')) { const u = getUn(); if (!(u.good && u.bad)) toast('Закрыто: пройдите обе концовки главы 1'); else { const p = aimPoint(); if (spawnNPC('human', p.x, p.z, Math.atan2(player.pos.x - p.x, player.pos.z - p.z), k.slice(2))) Sound.click(1100, 0.15); } }
+  if (k.startsWith('x-')) { const u = getUn(), need = exclNeed(k.slice(2)); if (!need.every((q) => u[q])) toast('Закрыто: ' + need.map((q) => UNL_TXT[q]).join(' + ')); else { const p = aimPoint(); if (spawnNPC('human', p.x, p.z, Math.atan2(player.pos.x - p.x, player.pos.z - p.z), k.slice(2))) Sound.click(1100, 0.15); } }
   else if (k === 'human' || k === 'zombie' || k === 'dummy' || k === 'soldier') spawnAtAim(k);
   else if (k === 'horde') for (let i = 0; i < 6; i++) { const [x, z] = edgePoint(); spawnNPC('zombie', x, z); }
   else if (k === 'crowd') { const p = aimPoint(); for (let i = 0; i < 6; i++) spawnNPC('human', p.x + rand(-2.5, 2.5), p.z + rand(-2.5, 2.5)); }
@@ -4859,7 +5028,7 @@ function buildPolice() {
     const it = new THREE.Group(); addMesh(it); it.visible = false; POL.items = it;
     const cash = std({ color: 0x3a7a3a, roughness: 0.8 }); for (let k = 0; k < 4; k++) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.05, 0.08), cash); m.position.set(LOCKER_X - 0.2 + (k % 2) * 0.17, 1.0 + Math.floor(k / 2) * 0.05, HZ - 0.6); it.add(m); }
     const wig = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 10), std({ color: 0xc8602a, roughness: 0.9 })); wig.scale.y = 0.7; wig.position.set(LOCKER_X + 0.15, 1.45, HZ - 0.62); it.add(wig);
-    const inv = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.11, 0.01), std({ color: 0xff8ac8, roughness: 0.6 })); inv.position.set(LOCKER_X + 0.12, 1.02, HZ - 0.6); inv.rotation.z = 0.2; it.add(inv); }
+    const inv = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.11, 0.01), std({ color: 0xff8ac8, roughness: 0.6 })); inv.position.set(LOCKER_X + 0.12, 1.02, HZ - 0.6); inv.rotation.z = 0.2; it.add(inv); const kc = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.055, 0.004), std({ color: 0x2a6aff, roughness: 0.4, metalness: 0.3 })); kc.position.set(LOCKER_X - 0.05, 1.42, HZ - 0.62); kc.rotation.z = -0.3; it.add(kc); }
   const board = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.2), std({ map: toTex(textCanvas([{ t: 'РАЗЫСКИВАЮТСЯ', s: 70 }, { t: '▢ ▢ ▢ ▢', s: 90 }], 512, 256, '#d8cfb8', '#2a1a10')), roughness: 0.9 })); board.position.set(HX - 0.02, 1.7, -3); board.rotation.y = -Math.PI / 2; addMesh(board);
   BB.flush();
 }
@@ -5293,7 +5462,7 @@ function showCard(small, big, ms = 2600, mini = false) { const c = $('chapter');
 function sub(who, text) { const c = $('cut'); c.classList.remove('ghost'); $('cutWho').textContent = who; story.typ = { text, n: 0, k: -1 }; $('cutText').textContent = ''; c._want = true; if (c.hidden) { c.hidden = false; requestAnimationFrame(() => { if (c._want) c.classList.add('on'); }); } else c.classList.add('on'); }
 function subOff() { story.typ = null; const c = $('cut'); c._want = false; c.classList.remove('on'); setTimeout(() => { if (!c.classList.contains('on')) c.hidden = true; }, 650); }
 function speakAs(text, pitch = 1, rate = 1) { try { if (!window.speechSynthesis) return; const u = new SpeechSynthesisUtterance(text); u.lang = 'ru-RU'; u.pitch = pitch; u.rate = rate; const v = speechSynthesis.getVoices().find((x) => /^ru/i.test(x.lang)); if (v) u.voice = v; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} }
-function speakerOf(who) { return who === 'Свити' ? story.svity : who === 'Дежурный' ? story.desk : who === 'Вы' ? avatar : who === 'Воскреситель' ? story.gg : null; }
+function speakerOf(who) { return who === 'Продюсер' ? story.prod : who === 'Полиция' ? story.copSpk : who === 'Свити' ? story.svity : who === 'Дежурный' ? story.desk : who === 'Вы' ? avatar : who === 'Воскреситель' ? story.gg : null; }
 function line(who, text, pitch, rate) { sub(who, text); { const sp = speakerOf(who); story.spk = sp || null; if (sp) sp.talkT = Math.max(sp.talkT || 0, Math.min(9, text.length * 0.075)); } speakAs(text.replace(/50 000 \$/g, 'пятьдесят тысяч долларов'), pitch, rate); }
 function fadeOut() { $('black').classList.add('on'); }
 function fadeIn() { $('black').classList.remove('on'); }
@@ -5327,10 +5496,11 @@ function storySkip() {
 }
 function storyMap(id) { loadMap(id); respawnPlayer(); }
 function setStage(stage, obj) { story.stage = stage; $('sObj').textContent = obj; $('storyHud').hidden = false; subOff(); resume(); renderNotes(); story.notesOpen = false; story.notesT = NOTE_STAGES.has(stage) && story.notes.length ? 6 : 0; story.noteVis = null; }
-const NOTE_STAGES = new Set(['street', 'photo', 'search', 'complain', 'gala-talk', 'gala-find', 'flat']);
+const NOTE_STAGES = new Set(['street', 'photo', 'search', 'complain', 'gala-talk', 'gala-find', 'flat', 'cafe', 'port', 'studio', 'studio-usb']);
 function renderNotes() { $('sNotes').innerHTML = story.notes.length ? '<b>БЛОКНОТ · СВИТИ</b>' + story.notes.map((n) => '— ' + n).join('<br>') : ''; }
 function storyReset() {
-  Object.assign(story, { on: false, stage: '', cut: null, zoom: false, tv: false, noFire: false, showAvatar: false, gun: true, svity: null, desk: null, notes: [], wp: null, lidT: 0, doorT: 0, lockT: 0, chase: 0, taxi: null, drive: false, svIn: false, svWalk: false, siren: false, talked: new Set(), huntGoal: 12, huntNext: null, huntPts: null, huntFade: true, huntTxt: '', curCase: null });
+  Object.assign(story, { on: false, stage: '', cut: null, zoom: false, tv: false, noFire: false, showAvatar: false, gun: true, svity: null, desk: null, notes: [], wp: null, lidT: 0, doorT: 0, lockT: 0, chase: 0, taxi: null, drive: false, svIn: false, svWalk: false, siren: false, talked: new Set(), huntGoal: 12, huntNext: null, huntPts: null, huntFade: true, huntTxt: '', curCase: null, portAll: false, ev: new Set(), prod: null, guards: [], hostages: [], freed: 0, noise: 0, walk: false, alarm: false, cops: null, copSpk: null, barista: null, boatGo: false });
+  $('sMeter').hidden = true; $('paper').hidden = true; CAFE.paper = false;
   MAPS.home.red[2] = 2.5; $('cine').classList.remove('on'); $('credits').hidden = true; $('actBtn').hidden = true; story.notesOpen = false; story.notesT = 0; story.noteVis = null; story.canNote = null; story.typ = null; story.fov = 0; fxStory.whip = 0; fxStory.grade = 0; story.gg = null; story.spk = null; $('sNotes').hidden = true; $('noteBtn').hidden = true; $('bloodout').style.opacity = 0; LFX.on = false;
   for (const e of story.extras) e.dispose(); story.extras.length = 0;
   $('storyHud').hidden = true; $('sArrow').hidden = true; $('polaroid').hidden = true; $('sSay').textContent = ''; $('chapter').classList.remove('on'); $('scope').hidden = true; $('choice').hidden = true; $('love').classList.remove('on'); $('photoBtn').hidden = true; $('complainBtn').hidden = true; $('sNotes').innerHTML = '';
@@ -5340,11 +5510,11 @@ function startStory(cp = null) {
   Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'story'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true;
   story.on = true; W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0; selectWeapon(cp ? 1 : 0);
   $('resumeBtn').hidden = true; startGame.fromWaves = true;
-  if (cp === 'police' || cp === 'gala') { story.notes = SV_NOTES.slice(); if (cp === 'gala') story.notes.push('Фото в форме полицейского — есть'); (cp === 'gala' ? storyGala : storyPolice)(); renderNotes(); return; }
+  if (CP_FN[cp]) { cpRestore(cp); CP_FN[cp](); renderNotes(); return; }
   saveCp(null); cutIntro();
 }
-const CP_NAME = { police: 'с участка полиции', gala: 'с ужина принцессы' };
-function saveCp(cp) { try { if (cp) localStorage.setItem('myasorubka-story', cp); else localStorage.removeItem('myasorubka-story'); } catch (e) {} syncCont(); }
+const CP_NAME = { cafe: 'с кафе «Полночь»', police: 'с участка полиции', port: 'с порта', studio: 'со студии', gala: 'с ужина принцессы' };
+function saveCp(cp) { cpStore(cp); try { if (cp) localStorage.setItem('myasorubka-story', cp); else localStorage.removeItem('myasorubka-story'); } catch (e) {} syncCont(); }
 function loadCp() { try { return localStorage.getItem('myasorubka-story'); } catch (e) { return null; } }
 function syncCont() { const cp = loadCp(); $('contStory').hidden = !CP_NAME[cp]; if (CP_NAME[cp]) $('contWhere').textContent = 'Продолжить ' + CP_NAME[cp]; }
 $('contStory').onclick = () => startStory(loadCp());
@@ -5506,6 +5676,7 @@ function cutEscape() {
 const FLAT_CLUES = [
   { id: 'laptop', at: [-2.9, -2.6], text: 'Ноутбук: черновики «ролика». «Сегодня — полиция, завтра — ужин. Они верят каждому моему слову».', note: 'Ноутбук: черновики — полиция, потом ужин' },
   { id: 'note', at: [2.7, 2.4], text: 'Записка без подписи: «Приходи на ужин. Поцелуй — 50 000 $. Для своих — бесплатно».', note: 'Записка: она продаёт поцелуи за деньги' },
+  { id: 'photo', at: [3.4, -1.7], text: 'Фото в рамке: Свити и мужчина в белом костюме. На обороте визитка: «Кафе „Полночь“, 21:00. — П.»', note: 'Фото: Свити и тип в белом; визитка кафе «Полночь», 21:00' },
 ];
 function nearClue() { if (!story.flatFound) return null; for (const c of FLAT_CLUES) if (!story.flatFound.has(c.id) && Math.hypot(player.pos.x - c.at[0], player.pos.z - c.at[1]) < 1.9) return c; return null; }
 function flatSearch() {
@@ -5513,9 +5684,9 @@ function flatSearch() {
   story.flatFound.add(c.id); Sound.click(1200, 0.2); story.notes.push(c.note); renderNotes(); story.notesT = 6;
   const n = story.flatFound.size; sub('Вы', c.text); later(4.8, () => { if (story.stage === 'flat' || story.stage === 'flat-done') subOff(); });
   $('sObj').textContent = `Осмотрите квартиру: найдено ${n}/${FLAT_CLUES.length}`;
-  if (n >= FLAT_CLUES.length) { story.stage = 'flat-done'; $('sObj').textContent = 'Улики найдены… пора в полицию'; later(4.2, flatLeave); }
+  if (n >= FLAT_CLUES.length) { story.stage = 'flat-done'; $('sObj').textContent = 'Улики найдены… пора в кафе «Полночь»'; later(4.6, flatLeave); }
 }
-function flatLeave() { fadeOut(); later(1.4, () => { fadeIn(); storyPolice(); }); }
+function flatLeave() { fadeOut(); later(1.4, () => { fadeIn(); storyCafe(); }); }
 function buildFlat() {
   const fl = std({ map: texRep(TEX.wood, 3, 3), color: 0x7a5a40, roughness: 0.7 }), wm = std({ color: 0x4a3f3a, roughness: 0.9 });
   addRoom(fl, std({ color: 0xcfc6b8, roughness: 1 }), [wm, wm]);
@@ -5527,18 +5698,19 @@ function buildFlat() {
   BB.flush();
   addSign([{ t: 'СВИТИ', s: 200 }], 3.2, 1.5, 0, 1.9, -HZ + 0.02, 0, 'rgba(255,90,170,0.95)');
   addSign([{ t: 'БЛОГ', s: 120 }], 0.44, 0.27, -2.9, 0.95, -2.78, 0, 'rgba(120,200,255,0.9)');
+  { const fr = new THREE.Group(); fr.position.set(3.4, 0.56, -2.45); fr.rotation.set(-0.18, 0.15, 0); addMesh(fr); const b = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.3, 0.02), goldMat); b.position.y = 0.15; fr.add(b); const p = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.25), new THREE.MeshBasicMaterial({ map: flatPhotoTex() })); p.position.set(0, 0.15, 0.011); fr.add(p); }
 }
 function storyFlat() {
   storyMap('flat'); story.flatFound = new Set(); story.showAvatar = true; story.gun = false;
   Music.stop(); Music.start('dread'); fadeIn();
   runCut([
-    [0.2, () => showCard('21:05', 'Квартира Свити', 2600, true)],
+    [0.2, () => showCard('20:15', 'Квартира Свити', 2600, true)],
     [3.0, () => sub('', 'Тесная квартира. Пахнет духами и дешёвым кофе.')],
     [6.4, () => line('Вы', 'Она здесь живёт. Значит, здесь есть и улики.', 0.55, 0.95)],
-    [10.2, () => line('Вы', 'Ноутбук на столе и записка у коробки. Проверю.', 0.55, 0.95)],
+    [10.2, () => line('Вы', 'Ноутбук, записка у коробки и фото на комоде. Проверю всё.', 0.55, 0.95)],
   ], (t) => camPath(t, [[0, 0.8, 1.6, 2.6, 0, 1.2, -2.4], [9, 1.4, 1.6, 0.4, -2.9, 1.1, -3.2], [13, 1.2, 1.5, -0.2, 0, 1.0, 0]]), 13.4, () => {
     player.vel.set(0, 0, 0); story.showAvatar = false;
-    setStage('flat', 'Осмотрите квартиру: найдено 0/2. Подойдите к ноутбуку или к записке'); banner('Квартира Свити', 'две улики');
+    setStage('flat', 'Осмотрите квартиру: найдено 0/3. Ноутбук, записка, фото на комоде'); banner('Квартира Свити', 'три улики');
   });
 }
 /* police station: photo, her locker, the complaint */
@@ -5549,7 +5721,7 @@ function storyPolice() {
   const sv = story.svity = spawnNPC('human', rand(-3, 4), rand(-5, 6), 0, 'svity-cop'); sv.protect = true;
   player.pos.set(0, 0, HZ - 1.2); player.yaw = 0; story.showAvatar = true;
   runCut([
-    [0.2, () => showCard('20:35', 'Отделение №7', 2600, true)],
+    [0.2, () => showCard('21:50', 'Отделение №7', 2600, true)],
     [3.0, () => sub('', 'Душно, гудят лампы.')],
     [3.6, () => line('Дежурный', 'Гражданин, вы по какому вопросу?', 0.75, 1.05)],
     [6.8, () => line('Вы', 'Ищу одну… сотрудницу.', 0.55, 0.95)],
@@ -5570,11 +5742,28 @@ function seen(p, maxD, cosMin) {
 function storyPhoto() {
   if (story.stage !== 'photo') return; flashScreen('#fff', 450); Sound.shutter();
   const sv = story.svity;
-  if (sv && sv.alive && seen(_a.copy(svAim(sv)).setY(_a.y - 0.35), 20, 0.93)) { try { showPolaroid(snapshot()); } catch (e) {} story.stage = 'search'; toast('Снимок сделан'); story.notes.push('Фото в форме полицейского — есть'); renderNotes(); story.notesT = 7; $('sObj').textContent = 'Найдите шкафчик Свити у южной стены и обыщите его'; }
+  if (sv && sv.alive && seen(_a.copy(svAim(sv)).setY(_a.y - 0.35), 20, 0.93)) { try { showPolaroid(snapshot()); } catch (e) {} story.stage = 'search'; toast('Снимок сделан'); evAdd('photo'); story.notes.push('Фото в форме полицейского — есть'); renderNotes(); story.notesT = 7; $('sObj').textContent = 'Найдите шкафчик Свити у южной стены и обыщите его'; }
   else toast('Мимо — Свити не в кадре');
 }
 function nearLocker() { return Math.hypot(player.pos.x - LOCKER_X, player.pos.z - (HZ - 1.3)) < 1.8; }
-function storyAct() { if (story.stage === 'search' && nearLocker()) cutSearch(); else if (story.stage === 'flat') flatSearch(); }
+function actInfo(st) {
+  if (st === 'search') return nearLocker() ? 'Обыскать' : null;
+  if (st === 'flat') return nearClue() ? 'Осмотреть' : null;
+  if (st === 'cafe') return CAFE.paper ? 'Убрать газету' : 'Газета';
+  if (st === 'port') return nearHostage() ? 'Освободить' : nearLedger() ? 'Взять книгу' : null;
+  if (st === 'port-done') return null;
+  if (st === 'studio') return nearCable() ? 'Перерезать' : null;
+  if (st === 'studio-usb') return nearConsole() ? 'Вставить флешку' : null;
+  return null;
+}
+function storyAct() {
+  const st = story.stage;
+  if (st === 'search' && nearLocker()) cutSearch(); else if (st === 'flat') flatSearch();
+  else if (st === 'cafe') cafeToggle();
+  else if (st === 'port') { const h = nearHostage(); if (h) portFree(h); else if (nearLedger()) portLedger(); }
+  else if (st === 'studio') cutCable();
+  else if (st === 'studio-usb' && nearConsole()) cutStudioLive();
+}
 function cutSearch() {
   Music.stop(); Music.start('dread');
   story.stage = 'search-cut'; const lz = HZ - 0.56;
@@ -5582,7 +5771,7 @@ function cutSearch() {
     [0.3, () => line('Вы', 'Шкафчик «Свити». Посмотрим…', 0.55, 0.95)],
     [2.8, () => { story.lockT = 0.001; Sound.click(300, 0.4); Sound.thud(0.25); POL.items.visible = true; }],
     [4.6, () => sub('', 'Пачки денег, рыжий парик, сценарии для блога и…')],
-    [8.2, () => { line('Вы', 'Приглашение на «Ужин принцессы». Сегодня вечером.', 0.55, 0.95); story.notes.push('Шкафчик: деньги, парик, приглашение на ужин'); }],
+    [8.2, () => { line('Вы', 'Приглашение на «Ужин принцессы» — завтра вечером. И ключ-карта: «Порт, склад №13».', 0.55, 0.95); story.notes.push('Шкафчик: приглашение на ужин и ключ от склада №13'); }],
   ], (t, dt) => { if (story.lockT > 0) { story.lockT = Math.min(1, story.lockT + dt * 1.5); POL.door.rotation.y = 1.7 * sm(0, 1, story.lockT); } camPath(t, [[0, LOCKER_X - 1.6, 1.75, lz - 2.2, LOCKER_X, 1.2, lz], [12, LOCKER_X - 0.7, 1.45, lz - 1.3, LOCKER_X + 0.15, 1.05, lz]]); }, 12.4, () => setStage('complain', 'Отнесите жалобу в дежурную часть (стойка у дальней стены справа)'));
 }
 function storyComplain() {
@@ -5596,22 +5785,23 @@ function storyComplain() {
     [12.4, () => line('Свити', 'Ой, это же мой фанат! Он просто влюблён, не обращайте внимания.', 1.35, 1.05)],
     [16.6, () => line('Дежурный', 'Видите? Уходите, гражданин.', 0.75, 1.05)],
     [19.4, () => { line('Свити', 'Увидимся на ужине, красавчик…', 1.35, 0.9); Sound.kiss(); }],
-    [22.6, () => line('Вы', 'Полиция мне не верит. Значит, сделаю всё сам… До встречи на ужине.', 0.55, 0.95)],
+    [22.6, () => line('Вы', 'Полиция мне не верит. Значит, сделаю всё сам. Сначала — склад номер тринадцать.', 0.55, 0.95)],
     [27.0, fadeOut],
   ], (t, dt) => {
     if (d) faceNpc(d, player.pos.x, player.pos.z);
     if (story.svIn && walkNpc(sv, 6.8, -7.1, 1.3, dt)) faceNpc(sv, player.pos.x, player.pos.z);
     camPath(t, [[0, 9.6, 1.75, -3.4, 8, 1.55, -7.3], [11.6, 9.3, 1.75, -3.1, 8, 1.55, -7.3], [11.61, 9.8, 2.0, -2.6, 6.8, 1.5, -7.2], [22.4, 9.6, 1.9, -2.8, 7.0, 1.5, -7.1], [22.41, 8.4, 1.62, -5.35, 8, 1.55, -4.6], [28, 8.3, 1.6, -5.25, 8, 1.55, -4.6]]);
-  }, 28.2, storyGala);
+  }, 28.2, () => { fadeIn(); storyPort(); });
 }
 /* the princess's dinner */
 function storyGala() {
   storyMap('gala'); saveCp('gala');
   const fans = []; for (let i = 0; i < 12; i++) { const n = spawnNPC('human', rand(-12, 12), rand(-7, 9), undefined, 'fan'); if (!n) continue; n.scripted = true; const side = i < 6 ? -1 : 1; n.pos.set(side * 2.1, 0, 8 - (i % 6) * 2.4); n.yaw = side < 0 ? Math.PI / 2 : -Math.PI / 2; n.pose = 'dance'; n.poseDur = Infinity; fans.push(n); }
   const sv = story.svity = spawnNPC('human', 0, 10.4, Math.PI, 'svity-gala'); sv.protect = true; sv.scripted = true; sv.pos.set(0, 0, 10.4); sv.yaw = Math.PI;
+  { const pr = story.prod = mkNpc('producer', 4.8, -HZ + 6.8, -Math.PI * 0.8); pr.protect = true; pr.scripted = true; pr.pos.set(4.8, 0, -HZ + 6.8); pr.yaw = -Math.PI * 0.8; }
   player.pos.set(-3.3, 0, 9.4); player.yaw = 0.3; story.showAvatar = true; story.svWalk = false;
   runCut([
-    [0.2, () => showCard('22:10', 'Ужин принцессы', 2600, true)],
+    [0.2, () => showCard('21:00', 'Ужин принцессы', 2600, true)],
     [3.0, () => line('Ведущий', 'Дамы и господа! Добро пожаловать на ужин принцессы!', 0.85, 1.0)],
     [8.0, () => { line('Ведущий', 'Встречайте — несравненная Свити!', 0.85, 1.0); Sound.crowd(0.7); Music.start(true); story.svWalk = true; }],
     [13.0, () => line('Свити', 'Спасибо, мои любимые! Сегодня особенный вечер!', 1.35, 1.05)],
@@ -5628,7 +5818,7 @@ function storyGala() {
     setStage('gala-talk', 'Расспросите гостей о Свити (0/3) — просто подойдите к ним'); banner('Ужин принцессы', 'расспросите гостей');
   });
 }
-function nearestGuest() { let best = null, bd = 1e9; for (const n of npcs) if (n.alive && n.type === 'human' && n !== story.svity && !story.talked.has(n)) { const d = Math.hypot(n.pos.x - player.pos.x, n.pos.z - player.pos.z); if (d < bd) { bd = d; best = n; } } return best; }
+function nearestGuest() { let best = null, bd = 1e9; for (const n of npcs) if (n.alive && n.type === 'human' && n !== story.svity && n !== story.prod && !story.talked.has(n)) { const d = Math.hypot(n.pos.x - player.pos.x, n.pos.z - player.pos.z); if (d < bd) { bd = d; best = n; } } return best; }
 function cutKiss() {
   const sv = story.svity; story.stage = 'kiss'; sv.scripted = true; sv.panic = 0;
   player.yaw = Math.atan2(-(sv.pos.x - player.pos.x), -(sv.pos.z - player.pos.z)); player.pitch = 0;
@@ -5663,7 +5853,7 @@ function cutKiss() {
 }
 function cutDance() {
   const sv = story.svity; sv.pos.set(0, 0.8, -HZ + 2.6); sv.yaw = 0; sv.pose = 'dance'; sv.poseDur = Infinity; sv.speed = 0; story.showAvatar = false;
-  let fi = 0; for (const n of npcs) if (n !== sv && n.alive) { n.scripted = true; n.pos.set(-4.5 + (fi % 6) * 1.8 + rand(-0.3, 0.3), 0, -HZ + 6.2 + Math.floor(fi / 6) * 1.6 + rand(-0.3, 0.3)); n.yaw = Math.PI + rand(-0.3, 0.3); n.pose = 'dance'; n.poseDur = Infinity; n.speed = 0; fi++; }
+  let fi = 0; for (const n of npcs) if (n !== sv && n !== story.prod && n.alive) { n.scripted = true; n.pos.set(-4.5 + (fi % 6) * 1.8 + rand(-0.3, 0.3), 0, -HZ + 6.2 + Math.floor(fi / 6) * 1.6 + rand(-0.3, 0.3)); n.yaw = Math.PI + rand(-0.3, 0.3); n.pose = 'dance'; n.poseDur = Infinity; n.speed = 0; fi++; }
   fadeIn(); Music.start(true); Sound.crowd(0.6);
   const cams = [[-4.5, -8], [4.5, -8], [-8, -6.5], [8, -6.5]], Z = -HZ;
   runCut([
@@ -5685,22 +5875,22 @@ function cutBalcony() {
   story.showAvatar = true; story.gun = false; standAvatar(); fadeIn();
   const c = makeCase(0.9, 3, HZ - 1.3, 'rifle'); story.curCase = c;
   runCut([
-    [0.1, () => showCard('22:48', 'Балкон', 2600, true)],
+    [0.1, () => showCard('21:48', 'Балкон', 2600, true)],
     [0.4, () => sub('', 'Балкон. Отсюда сцена как на ладони.')],
     [3.0, () => { story.lidT = 0.001; Sound.click(400, 0.4); }],
     [4.6, () => line('Вы', 'Пятьдесят тысяч. Один выстрел.', 0.55, 0.9)],
     [8.0, () => { c.gunOn = false; c.gun.visible = false; selectWeapon(2); story.gun = true; Sound.click(700, 0.4); later(0.3, () => Sound.click(1100, 0.35)); }],
-    [9.4, () => line('Вы', 'Прости, Свити…', 0.55, 0.85)],
+    [9.4, () => line('Вы', evCount() >= 3 ? 'Или… наручники. Улик хватит, чтобы её посадить.' : 'Прости, Свити… Улик мало — полиция поверит ей, а не мне.', 0.55, 0.9)],
   ], (t, dt) => { animCase(dt); camPath(t, [[0, 2.2, 4.4, HZ - 0.6, 0, 3.8, HZ - 2], [4.6, 1.7, 4.0, HZ - 0.7, 0.8, 3.2, HZ - 1.4], [4.61, 0.9, 4.65, HZ - 3.2, 0, 4.5, HZ - 1.6], [9.4, 0.7, 4.6, HZ - 3.0, 0, 4.5, HZ - 1.6], [9.41, 0.5, 4.75, HZ - 0.4, 0, 4.4, -HZ + 3], [13, 0.2, 4.65, HZ - 1.2, 0, 4.3, -HZ + 3]]); }, 13, () => {
     story.showAvatar = false; selectWeapon(2); W.switchT = 0; story.zoom = true; story.noFire = true; story.aimT = 0; $('scope').hidden = false;
     setStage('snipe', 'Снайперская винтовка. Возьмите Свити на мушку — в голову');
   });
 }
-function openChoice() { story.stage = 'choice'; story.choiceT = 5; $('choice').hidden = false; worldTs = 0.3; Sound.heartbeat(); }
+function openChoice() { story.stage = 'choice'; story.choiceT = 7; $('chEv').textContent = `улик ${evCount()}/${EVID.length}` + (evCount() >= 3 ? ' ✔' : ' — мало'); $('choice').hidden = false; worldTs = 0.3; Sound.heartbeat(); }
 function closeChoice() { $('choice').hidden = true; worldTs = 1; story.zoom = false; story.noFire = false; $('scope').hidden = true; Music.stop(); }
 function chooseShoot() { if (story.stage !== 'choice') return; story.stage = 'end'; closeChoice(); cutShoot(); }
 function chooseMarry() { if (story.stage !== 'choice') return; story.stage = 'end'; closeChoice(); cutWedding(); }
-for (const [id, fn] of [['chShoot', () => chooseShoot()], ['chMarry', () => chooseMarry()]]) { const b = $(id), h = (e) => { e.preventDefault(); e.stopPropagation(); fn(); }; b.addEventListener('touchstart', h, { passive: false }); b.addEventListener('click', h); }
+for (const [id, fn] of [['chShoot', () => chooseShoot()], ['chMarry', () => chooseMarry()], ['chArrest', () => chooseArrest()]]) { const b = $(id), h = (e) => { e.preventDefault(); e.stopPropagation(); fn(); }; b.addEventListener('touchstart', h, { passive: false }); b.addEventListener('click', h); }
 function killSvity(from) {
   for (const n of npcs) if (n.alive && n !== story.svity) { n.pose = 'stand'; n.poseDur = 0; }
   const sv = story.svity; sv.protect = false; sv.scripted = false;
@@ -5785,12 +5975,12 @@ function cutHomeGood() {
 /* bad ending: the wedding, two fights, the baby, a knock at the door */
 function cutWedding() {
   Music.stop(); Music.start(true);
-  const sv = story.svity; fadeOut(); story.showAvatar = true; story.gun = false; const Z = -HZ;
+  let sv = story.svity; fadeOut(); story.showAvatar = true; story.gun = false; const Z = -HZ;
   let off = null;
   runCut([
     [0.3, () => showCard('СВАДЬБА', 'Свити и вы', 2800)],
     [1.0, () => {
-      player.pos.set(0, 0.8, Z + 3.5); player.yaw = 0; sv.pos.set(0, 0.8, Z + 2.6); sv.yaw = 0; sv.pose = 'hug'; sv.poseDur = Infinity; avatar.pos.copy(player.pos); avatar.pose = 'hug'; avatar.poseDur = Infinity;
+      sv = brideSwap(); player.pos.set(0, 0.8, Z + 3.5); player.yaw = 0; sv.pos.set(0, 0.8, Z + 2.6); sv.yaw = 0; sv.pose = 'hug'; sv.poseDur = Infinity; avatar.pos.copy(player.pos); avatar.pose = 'hug'; avatar.poseDur = Infinity;
       off = npcs.find((n) => n.alive && n !== sv && n.type === 'human'); if (off) { off.scripted = true; off.pose = 'stand'; off.poseDur = 0; off.pos.set(1.5, 0.8, Z + 3.05); off.yaw = -Math.PI / 2; off.speed = 0; }
       fadeIn();
     }],
@@ -5827,7 +6017,7 @@ function cutEscape2() {
 }
 function startHunted2() {
   storyMap('street');
-  const sv = story.svity = spawnNPC('human', 1.5, 20, Math.PI, 'svity-gala'); sv.protect = true; sv.ally = true;
+  const sv = story.svity = spawnNPC('human', 1.5, 20, Math.PI, 'svity-bride'); sv.protect = true; sv.ally = true;
   player.pos.set(0, 0, 22); player.yaw = 0; story.showAvatar = false; story.gun = true; W.ammo = WEAPONS.map((w) => w.mag || 0); selectWeapon(2); W.switchT = 0;
   story.killBase = stats.kills; story.spawned = 0; story.huntT = 2; story.huntGoal = 10; story.huntTxt = 'Улица в огне. Пробейтесь'; story.huntNext = cutBaby;
   setStage('hunted', story.huntTxt + ': 0/10'); banner('Улица', 'охотники повсюду');
@@ -5835,7 +6025,7 @@ function startHunted2() {
 function cutBaby() {
   Music.stop(); Music.start('tender');
   storyMap('home'); tvSetup('hunt'); seatAvatar(-0.7, -HZ + 0.6, 'sit'); story.showAvatar = true; story.gun = false; HOME.case.visible = false; MAPS.home.red[2] = 2.5;
-  const sv = new Humanoid('human', 0.7, -HZ + 0.6, 0, 'svity-gala'); sv.pose = 'sit'; sv.poseDur = Infinity; sv.poseRate = 1000; sv.animate(0.02); sv.poseRate = 8; story.extras.push(sv);
+  const sv = new Humanoid('human', 0.7, -HZ + 0.6, 0, 'svity-street'); sv.pose = 'sit'; sv.poseDur = Infinity; sv.poseRate = 1000; sv.animate(0.02); sv.poseRate = 8; story.extras.push(sv);
   const BB = batcher(), wd = std({ color: 0xe8d8c0, roughness: 0.7 }), cz = 0.2;
   BB.box(wd, 0, 0.36, cz, 1.0, 0.06, 0.6); for (let x = -0.48; x <= 0.48; x += 0.12) for (const z of [cz - 0.28, cz + 0.28]) BB.cyl(wd, x, 0.55, z, 0.012, 0.012, 0.5, 5); for (const [x, z] of [[-0.5, cz - 0.3], [0.5, cz - 0.3], [-0.5, cz + 0.3], [0.5, cz + 0.3]]) BB.cyl(wd, x, 0.4, z, 0.025, 0.025, 0.8, 6); story.crib = BB.flush();
   const baby = new Humanoid('human', 0, cz, Math.PI, 'baby'); baby.root.scale.setScalar(0.34); baby.root.position.y = 0.2; baby.pose = 'sit'; baby.poseDur = Infinity; baby.poseRate = 1000; baby.animate(0.02); baby.poseRate = 8; story.extras.push(baby); story.baby = baby;
@@ -5956,23 +6146,688 @@ function cutGhost() {
     else if (t < 52.7) { story.fov = 54; camSet(0.1, 1.3, 2.6, 0.1, 1.2, 0.3); }
     else if (t < 53.25) { story.fov = 50; avatar.parts.head.mesh.getWorldPosition(tmp2); camSet(tmp2.x, tmp2.y, tmp2.z, gx, 1.5, gz); }
     else { story.fov = 60; const k = clamp((t - 53.25) / 4, 0, 1); camSet(lerp(1.9, 1.5, k), lerp(0.6, 1.2, k), lerp(2.3, 2.1, k), -0.6, 0.45, 0.3); }
-  }, 62.4, () => { hideGhost(); story.fov = 0; fxStory.whip = 0; fxStory.grade = 0; madness.target = 0; worldTs = 1; Sound.muffle(20000); MAPS.home.red[2] = 2.5; story.siren = false; rollCredits(false); });
+  }, 62.4, () => { hideGhost(); story.fov = 0; fxStory.whip = 0; fxStory.grade = 0; madness.target = 0; worldTs = 1; Sound.muffle(20000); MAPS.home.red[2] = 2.5; story.siren = false; cutRainbow(); });
 }
+/* ===================== chapter 1, extended: the café «Полночь», the port, the studio, evidence and new endings ===================== */
+const EVID = [['photo', 'Фото Свити в форме'], ['tape', 'Запись разговора в «Полночи»'], ['ledger', 'Бухгалтерия склада №13'], ['live', 'Правда в прямом эфире']];
+function evCount() { return story.ev ? story.ev.size : 0; }
+function evAdd(id) {
+  if (!story.ev) story.ev = new Set(); if (story.ev.has(id)) return; story.ev.add(id);
+  const e = EVID.find((x) => x[0] === id); toast(`Улика ${story.ev.size}/${EVID.length}: ${e ? e[1] : id}`); Sound.chime();
+}
+const CP_FN = { cafe: () => storyCafe(), police: () => storyPolice(), port: () => storyPort(), studio: () => storyStudio(), gala: () => storyGala() };
+function cpRestore(cp) {
+  let x = null; try { x = JSON.parse(localStorage.getItem('myasorubka-story-x') || 'null'); } catch (e) {}
+  if (x && x.cp === cp) { story.notes = x.notes || []; story.ev = new Set(x.ev || []); return; }
+  story.notes = SV_NOTES.slice(); story.ev = new Set();
+  if (['port', 'studio', 'gala'].includes(cp)) { story.notes.push('Фото в форме полицейского — есть'); story.ev.add('photo'); }
+}
+function cpStore(cp) { try { if (cp) localStorage.setItem('myasorubka-story-x', JSON.stringify({ cp, notes: story.notes, ev: [...(story.ev || [])] })); else localStorage.removeItem('myasorubka-story-x'); } catch (e) {} }
+// a character for a scene, past the crowd limit
+function mkNpc(kind, x, z, yaw = 0, type = 'human') { const n = new Humanoid(type, x, z, yaw, kind); npcs.push(n); targetsDirty = true; return n; }
+function seatNpc(n, x, z, yaw, pose = 'sit') { n.scripted = true; n.pos.set(x, 0, z); n.yaw = yaw; n.speed = 0; n.pose = pose; n.poseDur = Infinity; n.poseT = 0; n.poseRate = 1000; n.animate(0.02); n.poseRate = 8; n.root.position.copy(n.pos); n.root.rotation.y = yaw; return n; }
+function standNpc(n) { n.pose = 'stand'; n.poseDur = 0; }
+function walkPath(n, pts, sp, dt) { if (!pts.length) return true; if (walkNpc(n, pts[0][0], pts[0][1], sp, dt)) pts.shift(); return !pts.length; }
+function headPos(n, out) { const H = n.parts.head; H.mesh.updateMatrixWorld(true); return H.mesh.getWorldPosition(out); }
+function losFrom(a, b) { _cfA.copy(a); _cfD.subVectors(b, a); const d = _cfD.length(); if (d < 0.05) return true; _cfD.multiplyScalar(1 / d); raycaster.set(_cfA, _cfD); raycaster.far = d - 0.3; const hit = raycaster.intersectObjects(envMeshes, false).length > 0; raycaster.far = 150; return !hit; }
+const _cfA = new V3(), _cfD = new V3(), _cfH = new V3(), _cfE = new V3();
+function corrTex() {
+  if (TT.corr) return TT.corr; const c = makeCanvas(256, 128), g = c.getContext('2d'); g.fillStyle = '#b8b8b8'; g.fillRect(0, 0, 256, 128);
+  for (let x = 0; x < 256; x += 12) { const gr = g.createLinearGradient(x, 0, x + 12, 0); gr.addColorStop(0, 'rgba(0,0,0,0.32)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.22)'); gr.addColorStop(1, 'rgba(0,0,0,0.3)'); g.fillStyle = gr; g.fillRect(x, 0, 12, 128); }
+  for (let i = 0; i < 70; i++) { g.fillStyle = `rgba(${90 + Math.random() * 40},${50 + Math.random() * 20},20,${Math.random() * 0.25})`; g.beginPath(); g.arc(Math.random() * 256, Math.random() * 128, Math.random() * 7, 0, Math.PI * 2); g.fill(); }
+  g.strokeStyle = 'rgba(0,0,0,0.5)'; g.lineWidth = 3; g.strokeRect(2, 2, 252, 124);
+  return (TT.corr = toTex(c));
+}
+function container(BB, mats, x, y, z, ry = 0, i = 0) { const m = mats[i % mats.length], L = 6.1, H = 2.6, Wd = 2.44, a = Math.abs(Math.sin(ry)) > 0.5; BB.box(m, x, y + H / 2, z, L, H, Wd, ry); solid(x, y + H / 2, z, a ? Wd : L, H, a ? L : Wd); }
+
+/* ---------- the apartment, third clue: a framed photo with the Producer and the café's card ---------- */
+function flatPhotoTex() {
+  const c = makeCanvas(256, 320), g = c.getContext('2d'); g.fillStyle = '#d8b46a'; g.fillRect(0, 0, 256, 320); g.fillStyle = '#2a1830'; g.fillRect(18, 18, 220, 284);
+  const gr = g.createLinearGradient(0, 18, 0, 300); gr.addColorStop(0, '#ff6aa8'); gr.addColorStop(1, '#3a1a4a'); g.fillStyle = gr; g.fillRect(24, 24, 208, 272);
+  const fig = (x, body, hat) => { g.fillStyle = body; g.beginPath(); g.ellipse(x, 250, 42, 70, 0, 0, Math.PI * 2); g.fill(); g.fillStyle = '#f3c9a8'; g.beginPath(); g.arc(x, 150, 26, 0, Math.PI * 2); g.fill(); if (hat) { g.fillStyle = '#f4f1ea'; g.fillRect(x - 38, 124, 76, 8); g.fillRect(x - 22, 98, 44, 28); g.fillStyle = '#111'; g.fillRect(x - 16, 146, 13, 7); g.fillRect(x + 3, 146, 13, 7); } else { g.fillStyle = '#2a1a14'; g.beginPath(); g.arc(x, 142, 30, Math.PI, 0); g.fill(); g.fillStyle = '#e07a3a'; g.fillRect(x - 30, 150, 8, 48); g.fillRect(x + 22, 150, 8, 48); } };
+  fig(84, '#141418', false); fig(172, '#f4f1ea', true);
+  g.fillStyle = '#fff'; g.font = 'bold 28px sans-serif'; g.textAlign = 'center'; g.fillText('♥', 128, 70);
+  return toTex(c);
+}
+
+/* ---------- the café «Полночь»: eavesdrop on Svity and the Producer ---------- */
+const CAFE = { bx: 6.4, bz: -3.6, r: 3.8, ring: null, paper: false, prog: 0, sus: 0, li: 0, subT: 0, warn: false };
+const CAFE_TALK = [
+  [0.04, 'Продюсер', 'Опаздываешь, звезда. Камеры тебя любят, а я — не очень.'],
+  [0.15, 'Свити', 'Не ворчи. Я была в участке. Форма мне всё ещё идёт.'],
+  [0.26, 'Продюсер', 'Полиция верит тебе. Отлично. Пусть и дальше ищут не там.'],
+  [0.37, 'Свити', 'А что с «товаром»?'],
+  [0.47, 'Продюсер', 'Фанаты, которые «выиграли встречу со Свити», сидят на складе номер тринадцать. В порту.', 'Кафе: «товар» — фанаты на складе №13 в порту'],
+  [0.59, 'Свити', 'Бедняжки. Они так радовались…'],
+  [0.69, 'Продюсер', 'Завтра стрим, вечером ужин принцессы. Один поцелуй — и любой фанат подпишет что угодно.', 'Кафе: завтра стрим, вечером ужин — поцелуй-ловушка'],
+  [0.81, 'Свити', 'А тот, что бегал за мной по улице?'],
+  [0.91, 'Продюсер', 'Сунется — поцелуешь и его. Пешки нам всегда нужны.'],
+];
+function cafeWindowTex() {
+  const c = makeCanvas(512, 256), g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#05070f'); gr.addColorStop(1, '#1a1020'); g.fillStyle = gr; g.fillRect(0, 0, 512, 256);
+  for (let i = 0; i < 46; i++) { const x = Math.random() * 512, y = 60 + Math.random() * 180, r = 6 + Math.random() * 22, col = pick(['255,170,80', '255,80,140', '120,200,255', '255,230,160']); const rg = g.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, `rgba(${col},0.55)`); rg.addColorStop(1, `rgba(${col},0)`); g.fillStyle = rg; g.fillRect(x - r, y - r, r * 2, r * 2); }
+  g.strokeStyle = 'rgba(200,220,255,0.18)'; g.lineWidth = 1; for (let i = 0; i < 160; i++) { const x = Math.random() * 512, y = Math.random() * 256; g.beginPath(); g.moveTo(x, y); g.lineTo(x - 2, y + 10 + Math.random() * 14); g.stroke(); }
+  return toTex(c);
+}
+function buildCafe() {
+  const fl = std({ map: texRep(TEX.wood, 4, 3), color: 0x6a4a34, roughness: 0.55 }), wm = std({ color: 0x1c3434, map: TEX.cloth, roughness: 0.9 }), wm2 = std({ color: 0x3a1c1c, map: TEX.cloth, roughness: 0.9 });
+  addRoom(fl, std({ color: 0x14100e, roughness: 1 }), [wm, wm2]);
+  const BB = batcher(), wood = std({ map: TEX.wood, color: 0x8a5a3a, roughness: 0.45 }), dark = std({ color: 0x1a1210, roughness: 0.5 }), chrome = std({ color: 0xd0d4da, roughness: 0.2, metalness: 0.95 }), red = std({ color: 0x7a1420, map: TEX.cloth, roughness: 0.8 }), cream = std({ color: 0xe8dcc8, roughness: 0.7 });
+  const warm = new THREE.MeshBasicMaterial({ color: 0xffd08a }), glassB = std({ color: 0x2a4a2a, roughness: 0.1, metalness: 0.3, transparent: true, opacity: 0.85 }), glassA = std({ color: 0x6a3a14, roughness: 0.1, metalness: 0.3, transparent: true, opacity: 0.85 });
+  // the bar counter with an espresso machine and bottles
+  BB.box(wood, -4.5, 0.52, -5.9, 7, 1.04, 0.8); BB.box(dark, -4.5, 1.06, -5.9, 7.1, 0.05, 0.9); solid(-4.5, 0.52, -5.9, 7, 1.04, 0.8);
+  BB.box(chrome, -6.4, 1.32, -6.0, 0.7, 0.48, 0.45); BB.box(dark, -6.4, 1.32, -5.76, 0.5, 0.2, 0.02); for (const dx of [-0.15, 0.15]) BB.cyl(chrome, -6.4 + dx, 1.12, -5.72, 0.025, 0.025, 0.08, 8);
+  for (const y of [1.5, 2.05]) { BB.box(wood, -4.5, y, -6.85, 6, 0.04, 0.3); for (let x = -7.2; x <= -1.8; x += 0.32) BB.cyl(Math.random() < 0.5 ? glassB : glassA, x + rand(-0.05, 0.05), y + 0.16, -6.85, 0.04, 0.04, 0.28, 8); }
+  for (let x = -7.5; x <= -1.5; x += 1.2) { BB.cyl(chrome, x, 0.38, -5.1, 0.03, 0.03, 0.76, 6); BB.cyl(red, x, 0.78, -5.1, 0.2, 0.2, 0.07, 14); solid(x, 0.4, -5.1, 0.42, 0.8, 0.42); }
+  // round tables with chairs
+  const TBL = [[-6, 1.2], [-2.8, -1.2], [1.2, -2.2], [3.8, 2.8], [0.5, 5.0], [6.5, 3.5], [-4.2, -3.6], [3.4, -5.6]];
+  for (const [x, z] of TBL) {
+    BB.cyl(dark, x, 0.755, z, 0.46, 0.46, 0.04, 20); BB.cyl(chrome, x, 0.38, z, 0.035, 0.035, 0.74, 8); BB.cyl(chrome, x, 0.015, z, 0.26, 0.28, 0.03, 16); solid(x, 0.39, z, 0.9, 0.78, 0.9);
+    BB.cyl(cream, x + 0.12, 0.8, z - 0.05, 0.035, 0.03, 0.06, 10); BB.geo(warm, new THREE.SphereGeometry(0.03, 8, 6).translate(x - 0.15, 0.8, z + 0.1));
+    for (const [dx, dz, ry] of [[0, 0.78, 0], [0, -0.78, Math.PI]]) { BB.box(red, x + dx, 0.45, z + dz, 0.42, 0.06, 0.42, ry); BB.box(red, x + dx, 0.72, z + dz + (dz > 0 ? 0.2 : -0.2), 0.42, 0.5, 0.05, ry); for (const [lx, lz] of [[-0.17, -0.17], [0.17, -0.17], [-0.17, 0.17], [0.17, 0.17]]) BB.cyl(chrome, x + dx + lx, 0.22, z + dz + lz, 0.015, 0.015, 0.44, 5); solid(x + dx, 0.4, z + dz, 0.44, 0.8, 0.44); }
+    BB.cyl(dark, x, 2.7, z, 0.005, 0.005, 1.0, 4); BB.geo(warm, new THREE.SphereGeometry(0.11, 12, 8).translate(x, 2.15, z)); BB.cyl(dark, x, 2.24, z, 0.05, 0.16, 0.12, 12);
+  }
+  // their booth in the corner: two sofas, a table, a candle
+  const sof = std({ color: 0x4a0e18, map: TEX.cloth, roughness: 0.7 }), bx = CAFE.bx, bz = CAFE.bz;
+  BB.box(dark, bx, 0.75, bz, 1.1, 0.05, 1.0); BB.box(dark, bx, 0.37, bz, 0.12, 0.74, 0.12); solid(bx, 0.38, bz, 1.1, 0.78, 1.0);
+  for (const sd of [-1, 1]) { BB.box(sof, bx, 0.22, bz + sd * 0.95, 1.5, 0.44, 0.55); BB.box(sof, bx, 0.75, bz + sd * 1.26, 1.5, 0.75, 0.16); solid(bx, 0.4, bz + sd * 1.05, 1.5, 0.8, 0.75); }
+  BB.cyl(cream, bx, 0.82, bz, 0.03, 0.03, 0.1, 10); BB.geo(new THREE.MeshBasicMaterial({ color: 0xffb040 }), new THREE.SphereGeometry(0.015, 6, 5).translate(bx, 0.9, bz));
+  for (const sd of [-1, 1]) { BB.cyl(cream, bx + 0.25, 0.8, bz + sd * 0.25, 0.045, 0.035, 0.07, 12); }
+  // plants, a jukebox and the window onto a rainy street
+  for (const [x, z] of [[-8.4, 6.4], [8.4, 6.4], [8.4, -6.4], [-0.6, -6.5]]) { BB.cyl(std({ color: 0x5a3a2a, roughness: 0.8 }), x, 0.3, z, 0.25, 0.2, 0.6, 12); BB.geo(std({ color: 0x2a5a2a, roughness: 0.9 }), new THREE.IcosahedronGeometry(0.55, 1).translate(x, 1.1, z)); solid(x, 0.6, z, 0.6, 1.2, 0.6); }
+  BB.box(std({ color: 0x8a1a3a, roughness: 0.3, metalness: 0.4 }), 8.5, 0.8, 0.4, 0.6, 1.6, 0.9); solid(8.5, 0.8, 0.4, 0.6, 1.6, 0.9);
+  BB.geo(new THREE.MeshBasicMaterial({ color: 0xffa040 }), new THREE.BoxGeometry(0.02, 0.5, 0.6).translate(8.19, 1.2, 0.4));
+  BB.flush();
+  const win = new THREE.Mesh(new THREE.PlaneGeometry(9, 1.9), new THREE.MeshBasicMaterial({ map: cafeWindowTex() })); win.position.set(2.5, 1.7, HZ - 0.03); win.rotation.y = Math.PI; addMesh(win);
+  const fr = batcher(); for (let x = -2; x <= 7; x += 1.5) fr.box(dark, x, 1.7, HZ - 0.05, 0.08, 1.95, 0.06); fr.box(dark, 2.5, 0.72, HZ - 0.05, 9.1, 0.08, 0.08); fr.box(dark, 2.5, 2.68, HZ - 0.05, 9.1, 0.08, 0.08); fr.flush(false, false);
+  addSign([{ t: 'ПОЛНОЧЬ', s: 260 }, { t: 'КАФЕ · 24 ЧАСА', s: 70 }], 4.6, 1.3, -4.5, 2.45, -HZ + 0.03, 0, 'rgba(255,70,150,0.95)');
+  addSign([{ t: 'КОФЕ  ·  ВЫПЕЧКА  ·  ТИШИНА', s: 70 }], 4, 0.3, 8.95, 2.4, 2, -Math.PI / 2, 'rgba(255,220,160,0.9)');
+  const door = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 2.3), std({ color: 0x2a1a12, roughness: 0.6 })); door.position.set(-7.3, 1.15, HZ - 0.03); door.rotation.y = Math.PI; addMesh(door);
+  // the ring that marks where you can hear them
+  const ring = new THREE.Mesh(new THREE.RingGeometry(CAFE.r - 0.12, CAFE.r, 72), new THREE.MeshBasicMaterial({ color: 0x4ad8ff, transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.set(bx, 0.015, bz); ring.visible = false; addMesh(ring); CAFE.ring = ring;
+  const ring2 = new THREE.Mesh(new THREE.RingGeometry(2.0, 2.06, 60), new THREE.MeshBasicMaterial({ color: 0xff4a3a, transparent: true, opacity: 0.25, depthWrite: false, side: THREE.DoubleSide })); ring2.rotation.x = -Math.PI / 2; ring2.position.set(bx, 0.016, bz); ring.add(ring2); ring2.position.set(0, 0, 0.001); ring2.rotation.set(0, 0, 0);
+}
+function storyCafe() {
+  storyMap('cafe'); saveCp('cafe'); Object.assign(CAFE, { paper: false, prog: 0, sus: 0, li: 0, subT: 0, warn: false }); $('paper').hidden = true;
+  story.showAvatar = true; story.gun = false; story.noFire = true;
+  const sv = story.svity = mkNpc('svity-cafe', CAFE.bx, CAFE.bz - 0.92, 0); sv.protect = true; seatNpc(sv, CAFE.bx, CAFE.bz - 0.92, 0);
+  const pr = story.prod = mkNpc('producer', CAFE.bx, CAFE.bz + 0.92, Math.PI); pr.protect = true; seatNpc(pr, CAFE.bx, CAFE.bz + 0.92, Math.PI);
+  // regulars at their tables and a barista
+  for (const [x, z, yaw] of [[-6, 1.98, Math.PI], [-2.8, -1.98, 0], [3.8, 3.58, Math.PI], [0.5, 4.22, 0], [6.5, 4.28, Math.PI], [1.2, -1.42, Math.PI]]) { const n = mkNpc(undefined, x, z, yaw); seatNpc(n, x, z, yaw); }
+  const ba = story.barista = mkNpc('office', -5, -6.6, 0); ba.scripted = true; ba.pos.set(-5, 0, -6.6); ba.bw = [[-7.2, -6.6], [-2.2, -6.6]];
+  player.pos.set(-6.8, 0, HZ - 1.1); player.yaw = -0.95; player.pitch = 0;
+  Music.stop(); Music.start('tender');
+  runCut([
+    [0.2, () => showCard('21:00', 'Кафе «Полночь»', 2600, true)],
+    [3.0, () => sub('', 'Визитка с фото привела вас сюда. Тихий джаз, запах корицы и дождь за окном.')],
+    [7.2, () => line('Вы', 'Вот она. В тренче и берете — думает, её не узнать.', 0.55, 0.95)],
+    [11.4, () => line('Вы', 'А напротив — тот тип в белом с фотографии.', 0.55, 0.95)],
+    [14.8, () => line('Продюсер', 'Ну что, звезда, начнём?', 0.7, 0.95)],
+    [17.4, () => line('Вы', 'Подберусь поближе и послушаю. Только не пялиться и не лезть вплотную.', 0.55, 0.95)],
+  ], (t, dt) => {
+    if (t < 7.2) camPath(t, [[0, -7.6, 2.4, 6.2, 0, 1.3, 0], [7.2, -3, 2.2, 3, 4, 1.0, -2]]);
+    else if (t < 14.8) { const k = (t - 7.2) / 7.6; camSet(CAFE.bx - 1.7 + k * 0.4, 1.25, CAFE.bz + 0.6, CAFE.bx, 1.02, CAFE.bz - (k < 0.55 ? 0.9 : -0.9)); }
+    else if (t < 17.4) camSet(CAFE.bx + 1.5, 1.3, CAFE.bz - 1.6, CAFE.bx, 1.15, CAFE.bz + 0.9);
+    else camPath(t - 17.4, [[0, -6.2, 1.75, HZ + 0.2, -6.8, 1.5, HZ - 1.1], [4, -5.6, 1.8, HZ + 0.4, -6.8, 1.5, HZ - 1.1]]);
+  }, 21.6, () => {
+    player.vel.set(0, 0, 0); story.showAvatar = false; CAFE.ring.visible = true;
+    setStage('cafe', 'Подслушайте разговор: стойте в голубом круге у их столика, но не ближе красного, и не пяльтесь на них');
+    banner('Кафе «Полночь»', 'подслушать · кнопка «Газета» прячет лицо');
+  });
+}
+function cafeToggle() { CAFE.paper = !CAFE.paper; $('paper').hidden = !CAFE.paper; Sound.swoosh(); }
+function updCafe(dt, tick) {
+  const C = CAFE, sv = story.svity, pr = story.prod; if (!sv || !pr) return;
+  const d = Math.hypot(player.pos.x - C.bx, player.pos.z - C.bz), inRing = d < C.r, close = d < 2.05;
+  let stare = false;
+  if (!C.paper && d < 7) { headPos(sv, _cfH); stare = seen(_cfH, 7, 0.978); if (!stare) { headPos(pr, _cfH); stare = seen(_cfH, 7, 0.978); } }
+  const ds = close ? dt / 2.6 : stare ? dt / 5.2 : C.paper ? -dt / 5 : -dt / 9;
+  C.sus = clamp(C.sus + ds, 0, 1);
+  if (inRing && !close) C.prog = Math.min(1, C.prog + dt / (C.paper ? 32 : 26));
+  while (C.li < CAFE_TALK.length && C.prog >= CAFE_TALK[C.li][0]) {
+    const [, who, text, note] = CAFE_TALK[C.li++]; line(who, text, who === 'Свити' ? 1.35 : 0.7, who === 'Свити' ? 1.02 : 0.95); C.subT = Math.max(4.5, text.length * 0.07);
+    if (note) { story.notes.push(note); renderNotes(); story.notesT = 6; Sound.click(1300, 0.2); }
+  }
+  if (C.subT > 0) { C.subT -= dt; if (C.subT <= 0) subOff(); }
+  if (C.sus > 0.55 && !C.warn) { C.warn = true; toast('Свити что-то заподозрила…'); Sound.beat(0.7); } else if (C.sus < 0.3) C.warn = false;
+  { const b = story.barista; if (b && b.bw) { b.bi = b.bi || 0; if (walkNpc(b, b.bw[b.bi][0], b.bw[b.bi][1], 0.7, dt)) b.bi = (b.bi + 1) % b.bw.length; } }
+  C.ring.material.color.setHSL(lerp(0.53, 0, C.sus), 0.9, 0.55); C.ring.material.opacity = 0.25 + Math.sin(performance.now() * 0.004) * 0.08 + (inRing ? 0.15 : 0);
+  if (tick) {
+    $('smP').style.width = Math.round(C.prog * 100) + '%'; $('smS').style.width = Math.round(C.sus * 100) + '%';
+    $('sObj').textContent = close ? 'Слишком близко! Отойдите за красный круг' : stare ? 'Не пяльтесь на них — отведите взгляд или поднимите газету' : inRing ? `Подслушиваете… ${Math.round(C.prog * 100)}%` : 'Подойдите ближе — в голубой круг у их столика';
+  }
+  if (C.sus >= 1) { story.stage = 'cafe-end'; cutCafeEnd(false); }
+  else if (C.prog >= 1 && C.li >= CAFE_TALK.length && C.subT <= 0) { story.stage = 'cafe-end'; cutCafeEnd(true); }
+}
+function cutCafeEnd(ok) {
+  const sv = story.svity, pr = story.prod; CAFE.paper = false; $('paper').hidden = true; $('sMeter').hidden = true; CAFE.ring.visible = false;
+  if (ok) { evAdd('tape'); addUn('cafe'); }
+  story.showAvatar = true; standAvatar(); story.walk = false;
+  const p1 = [[CAFE.bx - 1.0, CAFE.bz + 1.6], [5.5, -2], [-7, 6], [-7.3, 6.9]], p2 = [[CAFE.bx - 1.2, CAFE.bz + 1.9], [5.0, -1.4], [-7.4, 6.2], [-7.3, 6.9]], px = player.pos.x, pz = player.pos.z;
+  const steps = ok ? [
+    [0.3, () => line('Продюсер', 'Всё, мне пора. Склад сам себя не охраняет.', 0.7, 0.95)],
+    [3.8, () => { line('Свити', 'До завтра, босс. Не скучай без меня.', 1.35, 1.0); standNpc(sv); standNpc(pr); story.walk = true; }],
+    [7.6, () => sub('', 'Они уходят. Вы останавливаете запись на телефоне.')],
+    [10.6, () => line('Вы', 'Склад номер тринадцать. Похищенные фанаты. И поцелуй-ловушка на ужине…', 0.55, 0.95)],
+    [15.2, () => line('Вы', 'Запись есть. Теперь — участок. Пусть скажут, кто она такая.', 0.55, 0.95)],
+    [19.0, fadeOut],
+  ] : [
+    [0.2, () => { standNpc(sv); sv.scripted = true; faceNpc(sv, px, pz); line('Свити', 'Ты?! Опять этот фанат! Ты что, подслушиваешь?!', 1.45, 1.1); Sound.beat(1); shake = 0.2; }],
+    [3.8, () => { standNpc(pr); line('Продюсер', 'Тихо, звезда. Не здесь. Уходим.', 0.7, 0.95); }],
+    [7.0, () => { story.walk = true; sub('', 'Они спешно уходят. Запись оборвалась на полуслове.'); }],
+    [10.6, () => line('Вы', 'Чёрт, спалился… Но кое-что я услышал. Пора в участок.', 0.55, 0.95)],
+    [14.4, fadeOut],
+  ];
+  runCut(steps, (t, dt) => {
+    if (story.walk) { walkPath(sv, p1, 1.45, dt); walkPath(pr, p2, 1.45, dt); }
+    if (!story.walk) camSet(CAFE.bx - 2.0, 1.45, CAFE.bz + 1.2, CAFE.bx, 1.05, CAFE.bz);
+    else { const m = sv.pos; camSafe(px + 1.4, 1.7, pz + 1.8, m.x, 1.3, m.z); }
+  }, ok ? 19.8 : 15.2, () => { story.noFire = false; story.gun = true; story.prod = null; storyPolice(); });
+}
+
+/* ---------- the port, warehouse №13: free the hostages, the guards, the ledger ---------- */
+const PORT = { host: [[-5.6, -12.4, 0.35], [-1.6, -13.6, 0], [3.0, -11.6, -0.4]], ledger: [6.9, -14.4], boat: null, gpts: [
+  [[-5, -3.6], [5, -3.6]], [[-12.6, -1.5], [-12.6, 10.5]], [[12.6, -1.5], [12.6, 10.5]], [[-6.5, -8.2], [4.5, -8.2]], [[2.0, -13.9], [-6.5, -14.2]],
+], barrels: [[-3.4, -4.6], [4.2, -6.4], [-9.6, 4.8], [9.2, 6.4]] };
+function makeBoat(x, z) {
+  const g = new THREE.Group(); g.position.set(x, -0.25, z); addMesh(g);
+  const white = std({ color: 0xf2f2f0, roughness: 0.35, metalness: 0.2 }), red = std({ color: 0xc81a1a, roughness: 0.4 }), dk = std({ color: 0x1a1c20, roughness: 0.5 });
+  const hull = new THREE.Mesh(new RoundedBoxGeometry(2.0, 0.6, 5.2, 2, 0.2), white); hull.position.y = 0.05; g.add(hull);
+  const bow = new THREE.Mesh(new THREE.ConeGeometry(1.0, 1.6, 4, 1).rotateX(-Math.PI / 2).rotateZ(Math.PI / 4), white); bow.scale.set(1, 0.42, 1); bow.position.set(0, 0.1, -3.2); g.add(bow);
+  const st = new THREE.Mesh(new THREE.BoxGeometry(2.02, 0.12, 5.0), red); st.position.y = 0.2; g.add(st);
+  const ws = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.45, 0.06), matGlass); ws.position.set(0, 0.6, -0.9); ws.rotation.x = -0.4; g.add(ws);
+  const mot = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.7, 0.42), dk); mot.position.set(0, 0.3, 2.75); g.add(mot);
+  return g;
+}
+function buildPort() {
+  Object.assign(LV, { walls: false, ceil: false });
+  towerTex();
+  floorMesh(std({ map: texRep(TEX.asphalt, 8, 8), color: 0x8a8a90, roughness: 0.9 }), HX * 2, HZ * 2);
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(400, 160), std({ color: 0x061420, roughness: 0.12, metalness: 0.7, envMapIntensity: 1.2 })); water.rotation.x = -Math.PI / 2; water.position.set(0, -0.7, HZ + 80); addMesh(water);
+  for (const sx of [-1, 1]) { const w2 = water.clone(); w2.position.set(sx * (HX + 100), -0.7, 0); w2.scale.set(0.5, 1.4, 1); addMesh(w2); }
+  const BB = batcher(), conc = std({ map: texRep(TEX.wall || TEX.asphalt, 4, 1), color: 0x7a7a74, roughness: 0.9 }), steel = std({ color: 0x3a3e44, roughness: 0.5, metalness: 0.8 }), yel = std({ color: 0xf2b400, roughness: 0.5, metalness: 0.4 }), tire = matRubber;
+  const ct = corrTex(), cm = [matContainer, std({ map: ct, color: 0x2a5a8a, roughness: 0.6, metalness: 0.5 }), std({ map: ct, color: 0x3a7a3a, roughness: 0.6, metalness: 0.5 }), std({ map: ct, color: 0xd09a20, roughness: 0.6, metalness: 0.5 }), std({ map: ct, color: 0x8a8a8a, roughness: 0.6, metalness: 0.5 })];
+  // the pier edge with bollards and tyres
+  BB.box(conc, 0, -0.35, HZ + 0.3, HX * 2 + 40, 0.7, 0.6); BB.box(yel, 0, 0.06, HZ - 0.2, HX * 2, 0.12, 0.3);
+  for (let x = -18; x <= 18; x += 6) { BB.cyl(steel, x, 0.3, HZ - 0.5, 0.16, 0.2, 0.5, 10); solid(x, 0.3, HZ - 0.5, 0.4, 0.6, 0.4); BB.geo(tire, new THREE.TorusGeometry(0.32, 0.1, 8, 16).translate(x + 3, -0.1, HZ + 0.62)); }
+  // warehouse №13: walls, a raised roller door, roof, an office
+  const wh = std({ map: ct, color: 0x6a7076, roughness: 0.7, metalness: 0.45 }), z0 = -HZ, z1 = -5, H = 6;
+  addStaticBox(0, H / 2, z0 - 0.2, 18.4, H, 0.4, wh); addStaticBox(-9.2, H / 2, (z0 + z1) / 2, 0.4, H, z1 - z0, wh); addStaticBox(9.2, H / 2, (z0 + z1) / 2, 0.4, H, z1 - z0, wh);
+  addStaticBox(-6.1, H / 2, z1, 6.2, H, 0.4, wh); addStaticBox(6.1, H / 2, z1, 6.2, H, 0.4, wh); addStaticBox(0, H - 1.0, z1, 6, 2.0, 0.4, wh);
+  BB.box(wh, 0, H + 0.1, (z0 + z1) / 2, 18.8, 0.2, z1 - z0 + 0.4); BB.box(steel, 0, H - 2.15, z1 + 0.1, 6.1, 0.3, 0.55);
+  for (let x = -9; x <= 9; x += 3) BB.box(steel, x, H - 0.25, (z0 + z1) / 2, 0.2, 0.3, z1 - z0);
+  addSign([{ t: 'СКЛАД №13', s: 250 }], 5, 1.0, 0, H + 0.9, z1 + 0.25, 0, 'rgba(255,200,60,0.95)');
+  addSign([{ t: 'ПОСТОРОННИМ ВХОД ВОСПРЕЩЁН', s: 70 }], 3.4, 0.3, -6.1, 2.2, z1 + 0.22, 0, 'rgba(230,80,60,0.9)');
+  // the office booth in the back corner with the ledger on the desk
+  const ofw = std({ color: 0xc8c0b0, roughness: 0.8 }); BB.box(ofw, 5.0, 1.3, -13.6, 0.12, 2.6, 4.6); BB.box(ofw, 7.2, 1.3, -11.3, 4.2, 2.6, 0.12); BB.box(ofw, 7.2, 2.66, -13.6, 4.4, 0.1, 4.8);
+  solid(5.0, 1.3, -14.6, 0.12, 2.6, 2.6); solid(5.0, 1.3, -11.7, 0.12, 2.6, 0.8); solid(7.2, 1.3, -11.3, 4.2, 2.6, 0.12);
+  BB.box(std({ color: 0x5a4030, roughness: 0.6 }), 7.0, 0.4, -14.8, 1.6, 0.8, 0.7); solid(7.0, 0.4, -14.8, 1.6, 0.8, 0.7);
+  BB.box(std({ color: 0x8a1414, roughness: 0.7 }), PORT.ledger[0], 0.83, -14.75, 0.34, 0.06, 0.26);
+  BB.geo(new THREE.MeshBasicMaterial({ color: 0xfff0c0 }), new THREE.SphereGeometry(0.08, 10, 8).translate(7.0, 2.4, -13.6));
+  addSign([{ t: 'ОФИС', s: 200 }], 1.0, 0.3, 6.0, 2.2, -11.22, Math.PI, 'rgba(230,225,215,0.9)');
+  // the hostages' chairs and crates
+  for (const [x, z] of PORT.host) { BB.box(std({ color: 0x3a2a1c, roughness: 0.8 }), x, 0.45, z - 0.05, 0.46, 0.05, 0.46); BB.box(std({ color: 0x3a2a1c, roughness: 0.8 }), x, 0.75, z - 0.27, 0.46, 0.6, 0.05); for (const [lx, lz] of [[-0.2, -0.25], [0.2, -0.25], [-0.2, 0.15], [0.2, 0.15]]) BB.cyl(steel, x + lx, 0.22, z + lz, 0.015, 0.015, 0.44, 5); }
+  for (const [x, z, n] of [[-7.6, -14.6, 3], [-7.6, -11, 2], [-3.8, -7.0, 1], [7.6, -7.2, 2], [1.6, -9.6, 1]]) for (let i = 0; i < n; i++) { BB.box(crateMat, x, 0.45 + i * 0.9, z, 0.9, 0.9, 0.9, i * 0.3); solid(x, 0.45 + i * 0.9, z, 1.0, 0.9, 1.0); }
+  // the yard: stacks of containers make alleys and cover
+  let ci = 0;
+  for (const [x, z, ry, st] of [[-16.5, -12, 0, 2], [-16.5, -6, 0, 1], [-16.5, 2, 0, 2], [-16.5, 8, 0, 1], [16.5, -12, 0, 2], [16.5, -6, 0, 2], [16.5, 2, 0, 1], [16.5, 8, 0, 2], [-8, 1.5, Math.PI / 2, 1], [8.2, 4.5, Math.PI / 2, 1], [-1.2, 7.8, 0, 1], [-14.4, 13.0, 0, 1], [13.6, 13.0, 0, 2]]) {
+    for (let k = 0; k < st; k++) container(BB, cm, x, k * 2.6, z, ry, ci++);
+  }
+  // a crane by the water, lamp posts
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) BB.box(yel, -15 + sx * 1.6, 7, 12 + sz * 1.6, 0.4, 14, 0.4);
+  BB.box(yel, -15, 14.2, 12, 4, 0.5, 4); BB.box(yel, -15, 14.8, 16, 1.0, 0.8, 22); BB.box(std({ color: 0x111111, roughness: 0.6 }), -15, 13.2, 22, 0.08, 3, 0.08);
+  solid(-15, 7, 12, 3.6, 14, 3.6);
+  for (const [x, z] of [[-10, -2], [10, -2], [-10, 10], [10, 10], [0, 1.5]]) { BB.cyl(steel, x, 3.2, z, 0.09, 0.12, 6.4, 8); BB.box(steel, x, 6.4, z, 0.7, 0.12, 0.3); BB.geo(new THREE.MeshBasicMaterial({ color: 0xffc070 }), new THREE.BoxGeometry(0.55, 0.05, 0.22).translate(x, 6.32, z)); solid(x, 3.2, z, 0.25, 6.4, 0.25); }
+  BB.flush();
+  PORT.boat = makeBoat(10, HZ + 3.2);
+}
+function nearHostage() { if (!story.hostages) return null; for (const n of story.hostages) if (n.tied && n.alive && Math.hypot(n.pos.x - player.pos.x, n.pos.z - player.pos.z) < 1.5) return n; return null; }
+function nearLedger() { return !story.ev.has('ledger') && Math.hypot(player.pos.x - PORT.ledger[0], player.pos.z - (PORT.ledger[1] + 0.5)) < 1.5; }
+function guardSetup(n, patrol) { n.portGuard = true; n.calm = true; n.patrol = patrol; n.patI = 0; n.idleT = rand(0, 2); n.shootCd = rand(1.4, 2.2); return n; }
+function alertGuards(msg) {
+  let any = false; for (const g of story.guards) if (g.alive && g.calm) { g.calm = false; g.shootCd = rand(0.9, 1.6); any = true; }
+  if (any && !story.alarm) { story.alarm = true; toast(msg); Sound.siren(0.35); banner('ТРЕВОГА', 'охрана вас заметила'); }
+}
+function guardFire(g) {
+  const from = headPos(g, _cfE).clone(); from.y -= 0.15;
+  const hit = Math.random() < 0.34;
+  const to = hit ? eye.position.clone().add(new V3(rand(-0.12, 0.12), rand(-0.3, 0.1), rand(-0.12, 0.12))) : new V3(player.pos.x + rand(-1.6, 1.6), 1.1, player.pos.z + rand(-1.6, 1.6));
+  tracer(from, to); Sound.shot('rifle', 0.45 * dv(from));
+  if (hit) { damagePlayer(rand(5, 8)); shake = Math.max(shake, 0.2); }
+}
+const _soldierThink0 = Humanoid.prototype.soldierThink;
+Humanoid.prototype.soldierThink = function (dt) {
+  if (!this.portGuard) return _soldierThink0.call(this, dt);
+  if (this.calm) {
+    const pt = this.patrol && this.patrol[this.patI % this.patrol.length]; if (!pt) { this.steer(0, 0, 0, dt); return; }
+    const dx = pt[0] - this.pos.x, dz = pt[1] - this.pos.z, d = Math.hypot(dx, dz) || 1;
+    if (d < 0.5) { this.patI++; this.idleT = rand(1.5, 3.5); }
+    if (this.idleT > 0) { this.idleT -= dt; this.steer(0, 0, 0, dt); this.yaw += Math.sin(this.t * 0.7) * dt * 0.4; return; }
+    this.steer(dx / d, dz / d, 0.9, dt); return;
+  }
+  const p = player.pos, dx = p.x - this.pos.x, dz = p.z - this.pos.z, d = Math.hypot(dx, dz) || 1, ok = state === 'play' && !player.dead;
+  this.losT = (this.losT || 0) - dt; if (this.losT <= 0) { this.losT = 0.3; this.los = ok && d < 28 && losFrom(headPos(this, _cfH), eye.position); }
+  const want = !ok ? 0 : (!this.los || d > 12) ? 1.7 : d < 4 ? -0.8 : 0;
+  this.steer(dx / d, dz / d, want, dt);
+  this.yaw += angDiff(this.yaw, Math.atan2(dx, dz)) * Math.min(1, dt * 6);
+  this.shootCd -= dt;
+  if (ok && this.los && this.shootCd <= 0) { this.shootCd = rand(1.1, 1.9); guardFire(this); }
+};
+function storyPort() {
+  storyMap('port'); saveCp('port'); story.showAvatar = true; story.gun = true; story.noFire = false; story.alarm = false; story.noise = 0; story.freed = 0;
+  W.ammo = WEAPONS.map((w) => w.mag || 0); selectWeapon(1); W.switchT = 0;
+  story.hostages = PORT.host.map(([x, z, yaw]) => { const n = mkNpc('fan', x, z, yaw); n.protect = true; seatNpc(n, x, z, yaw); addHostageBits(n); return n; });
+  story.guards = PORT.gpts.map((pts, i) => { const [x, z] = pts[0]; return guardSetup(mkNpc('guard', x, z, 0, 'soldier'), pts); });
+  for (const [x, z] of PORT.barrels) spawnProp('barrel', x, z);
+  const pr = story.prod = mkNpc('producer', 10, HZ + 3.0, Math.PI); pr.protect = true; pr.scripted = true; pr.pos.set(10, 0.15, HZ + 3.0); pr.yaw = Math.PI;
+  player.pos.set(0, 0, HZ - 2.2); player.yaw = 0; player.pitch = 0;
+  Music.stop(); Music.start('dread');
+  runCut([
+    [0.2, () => showCard('00:40 · НОЧЬ', 'Порт · Склад №13', 2800, true)],
+    [3.2, () => sub('', 'Скрип кранов, плеск воды. Ключ-карта из шкафчика жжёт карман.')],
+    [7.0, () => line('Вы', 'Склад номер тринадцать. Внутри — её «товар». Живые люди.', 0.55, 0.95)],
+    [11.2, () => line('Вы', 'Охрана с автоматами. Можно тихо… а можно громко.', 0.55, 0.95)],
+    [14.8, () => line('Продюсер', 'Смотрите в оба. Никто не входит, никто не выходит.', 0.7, 0.95)],
+  ], (t, dt) => {
+    if (t < 7) camPath(t, [[0, -14, 9, 18, 0, 2, -6], [7, -6, 5, 12, 0, 2.4, -6]]);
+    else if (t < 11.2) camPath(t - 7, [[0, 2.2, 1.6, -3.2, -2, 1.0, -12], [4.2, 1.2, 1.5, -5.6, -2, 0.9, -12.6]]);
+    else if (t < 14.8) camSet(-2.8, 1.8, -0.6, -4.5, 1.5, -3.6);
+    else camPath(t - 14.8, [[0, 12.4, 1.6, HZ + 0.6, 10, 1.4, HZ + 3], [4, 11.4, 1.5, HZ + 0.8, 10, 1.4, HZ + 3]]);
+  }, 18.8, () => {
+    player.vel.set(0, 0, 0); story.showAvatar = false;
+    setStage('port', 'Освободите заложников на складе (0/3) · по желанию: бухгалтерия в офисе'); banner('Порт · Склад №13', 'спасите заложников');
+  });
+}
+const HOST_LINES = ['Спасибо! Свити обещала нам встречу… а заперла здесь!', 'Это всё её продюсер! Он забрал наши телефоны!', 'Мы думали, это розыгрыш для стрима… Беги, пока они не вернулись!'];
+function portFree(n) {
+  freeHostage(n); n.protect = false; story.freed++; Sound.click(700, 0.3); Sound.thud(0.2);
+  const tl = HOST_LINES[(story.freed - 1) % HOST_LINES.length]; $('sSay').textContent = 'Заложник: ' + tl; speakAs(tl, rand(0.9, 1.3), 1.1); clearTimeout(story.sayTimer); story.sayTimer = setTimeout(() => { $('sSay').textContent = ''; }, 5000);
+  standNpc(n); n.escape = [[n.pos.x, -6.5], [0, -4], [0, 6], [rand(-3, 3), HZ - 1]]; n.escT = 0;
+  if (story.freed >= 3) { story.notes.push('Склад №13: три фаната спасены'); renderNotes(); if (story.ev.has('ledger')) { story.stage = 'port-done'; $('sObj').textContent = 'Все заложники свободны!'; later(2.2, cutPortEscape); } else { story.portAll = true; toast('Все заложники свободны! Бухгалтерия — в офисе, выход — к причалу'); } }
+}
+function portLedger() { evAdd('ledger'); if (story.portAll) { story.stage = 'port-done'; later(5.4, cutPortEscape); } story.notes.push('Бухгалтерия: «товар — фанаты, оплата — поцелуем». Подпись: Продюсер'); renderNotes(); story.notesT = 7; sub('Вы', 'Бухгалтерия склада: «Товар — фанаты. Оплата — поцелуем Свити». И подпись продюсера.'); later(5, () => { if (story.stage === 'port') subOff(); }); }
+function updPort(dt, tick) {
+  for (const n of story.hostages) if (n.escape) { n.escT += dt; if (walkPath(n, n.escape, 3.0, dt) || n.escT > 14) { n.escape = null; n.dispose(); } }
+  if (story.noise) { story.noise = 0; alertGuards('Выстрел! Охрана поднята по тревоге'); }
+  if (tick && !story.alarm) for (const g of story.guards) if (g.alive && g.calm) {
+    const dx = player.pos.x - g.pos.x, dz = player.pos.z - g.pos.z, d = Math.hypot(dx, dz) || 1, fw = (Math.sin(g.yaw) * dx + Math.cos(g.yaw) * dz) / d;
+    if (d < 2.2 || (d < 10 && fw > 0.3 && losFrom(headPos(g, _cfH), eye.position))) { alertGuards('Охрана заметила вас!'); break; }
+  }
+  if (tick && !story.alarm && story.guards.some((g) => !g.alive && !g.counted && (g.counted = true))) { if (story.guards.filter((g) => g.alive).length && Math.random() < 0.35) alertGuards('Охрана нашла тело!'); }
+  if (story.portAll && player.pos.z > 9) { story.stage = 'port-done'; cutPortEscape(); return; }
+  if (tick) $('sObj').textContent = story.portAll ? 'Заложники свободны! Заберите бухгалтерию в офисе склада — или уходите к причалу' : `Освободите заложников: ${story.freed}/3` + (story.ev.has('ledger') ? ' · бухгалтерия у вас ✔' : ' · по желанию: бухгалтерия в офисе') + (story.alarm ? ' · ТРЕВОГА' : ' · вас не заметили');
+}
+function portTarget() { const h = story.hostages && story.hostages.find((n) => n.tied && n.alive); if (h) return h.pos; if (story.portAll) return _b.set(0, 0, 12); return null; }
+function cutPortEscape() {
+  const pr = story.prod, B = PORT.boat; story.showAvatar = true; standAvatar();
+  for (const g of story.guards) if (g.alive) g.dispose(); for (const n of story.hostages) if (n.escape) n.dispose(); story.portAll = false;
+  givePhone(pr); pr.ikFn = ikPhone; pr.ikW = 1; let bv = 0;
+  player.pos.set(6, 0, HZ - 1.4); player.yaw = Math.atan2(-(10 - 6), -(HZ + 3 - (HZ - 1.4)));
+  runCut([
+    [0.2, () => { sub('', 'У причала взревел мотор. Продюсер!'); Sound.whoosh(); }],
+    [2.6, () => line('Продюсер', 'Звезда, у нас проблема. Твой «фанат» разнёс склад.', 0.7, 0.95)],
+    [6.6, () => sub('Свити (в телефоне)', 'Что?! А товар?!')],
+    [9.0, () => line('Продюсер', 'Товар разбежался. Ничего. Завтра стрим, вечером ужин — поцелуешь его, и он наш.', 0.7, 0.95)],
+    [14.4, () => { story.boatGo = true; Sound.whoosh(); line('Продюсер', 'А нет — так пешки иногда падают с доски.', 0.7, 0.9); }],
+    [18.6, () => line('Вы', 'Удрал… Значит, завтра. Стрим, потом ужин.', 0.55, 0.95)],
+    [22.0, () => line('Вы', 'Испорчу ей эфир. Пусть весь город узнает правду.', 0.55, 0.95)],
+    [25.6, fadeOut],
+  ], (t, dt) => {
+    if (story.boatGo) { bv = Math.min(16, bv + dt * 5); B.position.z += bv * dt; B.position.x += bv * dt * 0.25; B.rotation.z = Math.sin(t * 6) * 0.04; if (Math.random() < 0.8) spawnSprite(TEX.smoke, _a.set(B.position.x, -0.5, B.position.z - 2.4), { color: 0xffffff, size: rand(0.6, 1.2), grow: 2, life: 1.2, opacity: 0.5, vel: new V3(rand(-0.5, 0.5), 0.3, -1) }); }
+    else B.rotation.z = Math.sin(t * 1.4) * 0.03;
+    pr.pos.set(B.position.x, B.position.y + 0.42, B.position.z - 0.3); pr.yaw = Math.PI; pr.ikW = story.boatGo ? Math.max(0, 1 - (t - 14.4)) : 1;
+    if (t < 6.6) camSet(B.position.x - 3.2, 1.8, B.position.z - 4.4, B.position.x, 1.2, B.position.z);
+    else if (t < 14.4) { headPos(pr, _cfH); camSet(_cfH.x + 0.9, _cfH.y + 0.05, _cfH.z - 1.3, _cfH.x, _cfH.y - 0.05, _cfH.z); }
+    else if (t < 18.6) camSet(player.pos.x - 1.4, 2.4, player.pos.z - 2.2, B.position.x, 0.6, B.position.z);
+    else camPath(t - 18.6, [[0, player.pos.x + 1.2, 1.7, player.pos.z + 1.4, player.pos.x, 1.55, player.pos.z], [7, player.pos.x + 0.8, 1.65, player.pos.z + 0.9, player.pos.x, 1.6, player.pos.z]]);
+  }, 26.8, () => { story.boatGo = false; story.prod = null; storyStudio(); });
+}
+
+/* ---------- the studio «СВИТИ LIVE»: cut her camera, microphone and light, then show the truth on air ---------- */
+const STU = { cut: null, tex: null, cv: null, chat: [], t: 0, mode: 'live', con: [-6.6, 3.0], cables: [
+  { id: 'cam', name: 'камера', at: [-2.6, -3.5], path: [[0, 0.06, -3.2], [-1.2, 0.03, -3.35], [-2.6, 0.03, -3.5], [-4.2, 0.03, -5.2], [-4.6, 0.3, -6.9]], say: 'Эй! Что с камерой? Я вас не вижу!' },
+  { id: 'mic', name: 'микрофон', at: [2.6, -4.6], path: [[0.9, 0.78, -5.35], [1.2, 0.03, -5.0], [2.6, 0.03, -4.6], [3.6, 0.03, -5.0], [3.8, 0.7, -5.6]], say: 'Алё? Алё! Меня слышно?! Чат, пишите!' },
+  { id: 'light', name: 'свет', at: [-6.2, -2.7], path: [[-1.7, 0.04, -4.3], [-3.6, 0.03, -3.0], [-6.2, 0.03, -2.7], [-8.6, 0.03, -2.6], [-9.75, 0.6, -2.5]], say: 'Кто выключил свет?! Охрана!' },
+] };
+const STREAM_CHAT = ['zaika_01: СВИТИ ТЫ ЛУЧШАЯ ❤', 'kot_ivan: когда ужин??', 'MAKS: донат 500₽ 💸', 'liza.pink: какая ты милая', 'fan_93: поцелуй меня тоже!!', 'olga_k: а где продюсер?', 'nik: 1 000 000 подписчиков скоро!', 'dima: я приду на ужин 🙈'];
+const TRUTH_CHAT = ['zaika_01: ЧТО??', 'kot_ivan: это правда?!', 'MAKS: склад №13?! похищения?!', 'liza.pink: отписка.', 'fan_93: ПОЛИЦИЯ ГДЕ', 'olga_k: она преступница…', 'nik: я записал экран', 'dima: не пойду на ужин'];
+function drawStream() {
+  const c = STU.cv, g = c.getContext('2d'), W2 = c.width, H2 = c.height, t = STU.t, m = STU.mode;
+  g.fillStyle = '#0a0612'; g.fillRect(0, 0, W2, H2);
+  const vw = 340;
+  if (m === 'nosig') { for (let i = 0; i < 900; i++) { const v = Math.random() * 255 | 0; g.fillStyle = `rgb(${v},${v},${v})`; g.fillRect(Math.random() * vw, Math.random() * H2, 3, 2); } g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(70, 120, 200, 46); g.fillStyle = '#fff'; g.font = 'bold 26px sans-serif'; g.textAlign = 'center'; g.fillText('НЕТ СИГНАЛА', 170, 152); }
+  else if (m === 'truth') {
+    g.fillStyle = '#111'; g.fillRect(0, 0, vw, H2); g.fillStyle = '#ff3a3a'; g.font = 'bold 18px sans-serif'; g.textAlign = 'left'; g.fillText('ПРАВДА О СВИТИ', 14, 30);
+    g.fillStyle = '#f0f0f0'; g.font = '14px sans-serif'; const L = []; if (story.ev.has('tape')) L.push('Запись, кафе «Полночь»:', '«Фанаты сидят на складе №13».', '«Один поцелуй — и подпишет'); if (story.ev.has('tape')) L.push('что угодно».'); if (story.ev.has('ledger')) L.push('', 'Бухгалтерия склада №13:', 'ТОВАР — ФАНАТЫ ×3', 'ОПЛАТА — ПОЦЕЛУЕМ СВИТИ'); L.forEach((s, i) => g.fillText(s, 14, 58 + i * 20));
+  } else {
+    const gr = g.createLinearGradient(0, 0, 0, H2); gr.addColorStop(0, '#ff6ab0'); gr.addColorStop(1, '#5a1a6a'); g.fillStyle = gr; g.fillRect(0, 0, vw, H2);
+    g.fillStyle = 'rgba(255,255,255,.18)'; for (let i = 0; i < 9; i++) { g.font = 24 + (i % 3) * 8 + 'px sans-serif'; g.fillText('♥', (i * 53 + t * 30) % vw, 40 + ((i * 97) % 220)); }
+    g.fillStyle = '#f3c9a8'; g.beginPath(); g.arc(170, 140, 46, 0, Math.PI * 2); g.fill(); g.fillStyle = '#2a1a14'; g.beginPath(); g.arc(170, 126, 52, Math.PI, 0); g.fill(); g.fillStyle = '#e07a3a'; g.fillRect(118, 130, 12, 80); g.fillRect(210, 130, 12, 80);
+    g.fillStyle = '#ff8ac4'; g.beginPath(); g.ellipse(170, 270, 90, 70, 0, Math.PI, 0); g.fill(); g.fillStyle = '#222'; g.beginPath(); g.arc(152, 140, 6, 0, 7); g.arc(188, 140, 6, 0, 7); g.fill();
+    if (m === 'mute') { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(90, 220, 160, 34); g.fillStyle = '#fff'; g.font = 'bold 18px sans-serif'; g.textAlign = 'center'; g.fillText('🔇 НЕТ ЗВУКА', 170, 243); }
+    if (m === 'dark') { g.fillStyle = 'rgba(0,0,0,.82)'; g.fillRect(0, 0, vw, H2); }
+  }
+  g.textAlign = 'left'; g.fillStyle = '#e4281c'; g.fillRect(10, H2 - 30, 64, 22); g.fillStyle = '#fff'; g.font = 'bold 15px sans-serif'; g.fillText('● LIVE', 15, H2 - 14);
+  g.fillStyle = 'rgba(255,255,255,.85)'; g.font = '13px sans-serif'; g.fillText((STU.viewers | 0).toLocaleString('ru-RU') + ' зрителей', 84, H2 - 14);
+  g.fillStyle = '#16101e'; g.fillRect(vw, 0, W2 - vw, H2); g.fillStyle = '#ff8ac4'; g.font = 'bold 14px sans-serif'; g.fillText('ЧАТ', vw + 10, 22);
+  g.font = '12px sans-serif'; STU.chat.slice(-11).forEach((s, i) => { g.fillStyle = m === 'truth' ? '#ffb0a0' : '#e8e0f0'; g.fillText(s.slice(0, 26), vw + 10, 46 + i * 21); });
+  STU.tex.needsUpdate = true;
+}
+function buildStudio() {
+  const fl = std({ color: 0x1a1420, map: texRep(TEX.floor || TEX.tiles, 6, 5), roughness: 0.5 }), wm = std({ color: 0x2a1430, map: TEX.cloth, roughness: 0.9 }), wm2 = std({ color: 0x1a1024, map: TEX.cloth, roughness: 0.9 });
+  addRoom(fl, std({ color: 0x0c0810, roughness: 1 }), [wm, wm2]);
+  const BB = batcher(), dk = std({ color: 0x141418, roughness: 0.45 }), pink = std({ color: 0xff7ac0, roughness: 0.5 }), steel = std({ color: 0x8a8e96, roughness: 0.3, metalness: 0.9 }), glow = new THREE.MeshBasicMaterial({ color: 0xff5ab4 }), glowB = new THREE.MeshBasicMaterial({ color: 0x5ad0ff }), white = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  // the set: a desk with monitors, a gaming chair, LED strips, a ring light, the camera on a tripod
+  BB.box(dk, 0, 0.38, -5.4, 2.6, 0.76, 0.9); solid(0, 0.38, -5.4, 2.6, 0.76, 0.9);
+  for (const sd of [-1, 1]) { const ry = sd * 0.5; BB.box(dk, sd * 0.85, 1.1, -5.35, 0.8, 0.5, 0.05, ry); BB.geo(glowB, new THREE.PlaneGeometry(0.74, 0.44).rotateY(Math.PI + ry).translate(sd * 0.85 - Math.sin(ry) * 0.03, 1.1, -5.35 - Math.cos(ry) * 0.03)); BB.box(dk, sd * 0.85, 0.85, -5.35, 0.06, 0.18, 0.06); }
+  BB.box(dk, 0, 0.79, -5.25, 0.8, 0.03, 0.25); BB.geo(glow, new THREE.BoxGeometry(2.6, 0.02, 0.02).translate(0, 0.02, -4.95));
+  BB.cyl(dk, 0, 0.25, -6.45, 0.3, 0.32, 0.08, 12); BB.box(pink, 0, 0.5, -6.45, 0.62, 0.12, 0.6); BB.box(pink, 0, 1.05, -6.78, 0.6, 1.0, 0.12); BB.box(dk, 0, 1.05, -6.85, 0.5, 0.8, 0.04);
+  BB.cyl(steel, 0.9, 1.0, -5.35, 0.012, 0.012, 0.5, 6); BB.cyl(dk, 0.75, 1.25, -5.15, 0.035, 0.035, 0.12, 10, 0.9, 0);
+  BB.cyl(steel, -1.7, 0.85, -4.3, 0.025, 0.04, 1.7, 8); BB.geo(white, new THREE.TorusGeometry(0.34, 0.035, 8, 32).translate(-1.7, 1.75, -4.3));
+  for (const a of [0, 2.1, 4.2]) BB.cyl(steel, Math.sin(a) * 0.28, 0.55, -3.2 + Math.cos(a) * 0.28, 0.012, 0.012, 1.15, 5, Math.cos(a) * 0.26, -Math.sin(a) * 0.26);
+  BB.box(dk, 0, 1.15, -3.2, 0.26, 0.2, 0.36); BB.cyl(dk, 0, 1.15, -3.45, 0.07, 0.09, 0.14, 12, Math.PI / 2, 0); BB.geo(new THREE.MeshBasicMaterial({ color: 0xff2020 }), new THREE.SphereGeometry(0.015, 6, 5).translate(0.09, 1.28, -3.1)); solid(0, 0.6, -3.2, 0.6, 1.2, 0.6);
+  // the server rack, the mixer, the wall power panel and the director's console
+  BB.box(dk, -4.6, 1.0, -7.2, 0.8, 2.0, 0.7); for (let y = 0.3; y < 1.9; y += 0.18) BB.geo(Math.random() < 0.5 ? glowB : new THREE.MeshBasicMaterial({ color: 0x40ff80 }), new THREE.BoxGeometry(0.04, 0.03, 0.01).translate(-4.4 + rand(-0.2, 0.2), y, -6.84)); solid(-4.6, 1.0, -7.2, 0.8, 2.0, 0.7);
+  BB.box(dk, 3.8, 0.35, -5.6, 1.0, 0.7, 0.6); BB.box(steel, 3.8, 0.74, -5.6, 0.8, 0.06, 0.45); solid(3.8, 0.35, -5.6, 1.0, 0.7, 0.6);
+  BB.box(std({ color: 0x4a4a52, roughness: 0.5, metalness: 0.6 }), -HX + 0.12, 1.0, -2.5, 0.12, 0.8, 0.6);
+  const [cx, cz] = STU.con; BB.box(dk, cx, 0.42, cz, 1.6, 0.84, 0.8); BB.box(steel, cx, 0.86, cz, 1.5, 0.04, 0.7, 0, -0.2); for (let i = 0; i < 12; i++) BB.geo(pick([glow, glowB, white]), new THREE.BoxGeometry(0.06, 0.02, 0.06).translate(cx - 0.6 + (i % 6) * 0.24, 0.9, cz - 0.15 + Math.floor(i / 6) * 0.25)); solid(cx, 0.42, cz, 1.6, 0.84, 0.8);
+  addSign([{ t: 'РЕЖИССЁРСКИЙ ПУЛЬТ', s: 80 }], 1.6, 0.22, cx, 1.35, cz - 0.42, 0, 'rgba(230,225,215,0.9)');
+  // a sofa, plush hearts, posters, green screen, LED lines on the walls
+  BB.box(pink, 5.5, 0.3, 4.6, 2.6, 0.6, 0.9); BB.box(pink, 5.5, 0.75, 5.0, 2.6, 0.7, 0.2); solid(5.5, 0.4, 4.7, 2.6, 0.8, 1.0);
+  for (const [x, z] of [[4.8, 4.4], [6.2, 4.4]]) BB.geo(std({ color: 0xff4a8a, roughness: 0.9 }), new THREE.SphereGeometry(0.2, 10, 8).translate(x, 0.75, z));
+  BB.box(std({ color: 0x20c040, roughness: 0.9 }), 6.6, 1.6, -HZ + 0.06, 3.4, 3.2, 0.05);
+  for (const y of [0.15, 3.9]) { BB.geo(glow, new THREE.BoxGeometry(HX * 2, 0.03, 0.03).translate(0, y, -HZ + 0.04)); BB.geo(glowB, new THREE.BoxGeometry(0.03, 0.03, HZ * 2).translate(-HX + 0.04, y, 0)); }
+  BB.flush();
+  addSign([{ t: 'СВИТИ', s: 300 }, { t: '● LIVE', s: 120 }], 4.4, 1.6, 0, 3.0, -HZ + 0.05, 0, 'rgba(255,80,170,0.98)');
+  addSign([{ t: '1 000 000', s: 200 }, { t: 'ПОДПИСЧИКОВ — СКОРО!', s: 70 }], 2.6, 1.0, -HX + 0.03, 2.4, 2.0, Math.PI / 2, 'rgba(255,220,120,0.9)');
+  // cables on the floor with a yellow marker where to cut
+  const cab = std({ color: 0x0a0a0c, roughness: 0.6 }); STU.cut = new Set(); STU.mk = {};
+  for (const C of STU.cables) {
+    const pts = C.path.map((p) => new V3(p[0], p[1], p[2])), cur = new THREE.CatmullRomCurve3(pts), m = new THREE.Mesh(new THREE.TubeGeometry(cur, 60, 0.028, 6, false), cab); m.castShadow = true; addMesh(m); C.mesh = m;
+    const mk = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.36, 32), new THREE.MeshBasicMaterial({ color: 0xffd040, transparent: true, opacity: 0.8, side: THREE.DoubleSide, depthWrite: false })); mk.rotation.x = -Math.PI / 2; mk.position.set(C.at[0], 0.02, C.at[1]); addMesh(mk); STU.mk[C.id] = mk;
+  }
+  // the big wall screen with the live stream
+  STU.cv = makeCanvas(512, 288); STU.tex = toTex(STU.cv); STU.chat = STREAM_CHAT.slice(0, 5); STU.mode = 'live'; STU.viewers = 12403;
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.48), new THREE.MeshBasicMaterial({ map: STU.tex })); scr.position.set(HX - 0.075, 2.3, -0.6); scr.rotation.y = -Math.PI / 2; addMesh(scr);
+  const fr = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.6, 4.55), std({ color: 0x0a0a0c, roughness: 0.4 })); fr.position.set(HX - 0.02, 2.3, -0.6); addMesh(fr);
+  drawStream();
+}
+function nearCable() { if (!STU.cut) return null; for (const C of STU.cables) if (!STU.cut.has(C.id) && Math.hypot(player.pos.x - C.at[0], player.pos.z - C.at[1]) < 1.3) return C; return null; }
+function nearConsole() { return Math.hypot(player.pos.x - STU.con[0], player.pos.z - (STU.con[1] + 0.8)) < 1.5; }
+function cableTarget() { const C = STU.cables.find((c) => !STU.cut.has(c.id)); return C ? _b.set(C.at[0], 0, C.at[1]) : null; }
+function storyStudio() {
+  storyMap('studio'); saveCp('studio'); story.showAvatar = true; story.gun = true; story.noFire = false; story.alarm = false; story.noise = 0;
+  const sv = story.svity = mkNpc('svity-stream', 0, -6.25, 0); sv.protect = true; seatNpc(sv, 0, -6.25, 0);
+  story.guards = [guardSetup(mkNpc('guard', -7.4, 0.4, Math.PI / 2, 'soldier'), [[-7.4, 0.4], [-3.4, 0.4]]), guardSetup(mkNpc('guard', 7.4, -2.6, 0, 'soldier'), [[7.4, -2.6], [7.4, 3.2]])];
+  for (const g of story.guards) g.studio = true;
+  player.pos.set(-1.5, 0, HZ - 1.2); player.yaw = 0; player.pitch = 0;
+  Music.stop(); Music.start(true);
+  runCut([
+    [0.2, () => showCard('НА СЛЕДУЮЩИЙ ДЕНЬ · 18:30', 'Студия «СВИТИ LIVE»', 2800, true)],
+    [3.2, () => line('Свити', 'Всем приве-ет! С вами Свити, и мы в прямом эфире!', 1.4, 1.05)],
+    [7.0, () => line('Свити', 'Сегодня вечером — ужин принцессы! Самым преданным — мой поцелуй!', 1.4, 1.05)],
+    [11.2, () => line('Вы', 'Камера, микрофон, свет. Три кабеля — и её эфир мёртв.', 0.55, 0.95)],
+    [15.0, () => line('Вы', evCount() > 1 ? 'А потом — флешку в пульт. Пусть зрители увидят правду.' : 'Жаль, правды показать нечем… Но эфир я ей сорву.', 0.55, 0.95)],
+  ], (t, dt) => {
+    STU.t += dt; if (Math.random() < dt * 2) { STU.chat.push(pick(STREAM_CHAT)); STU.viewers += rand(5, 60); drawStream(); }
+    if (t < 7) camPath(t, [[0, 0, 1.25, -4.4, 0, 1.15, -6.25], [7, 0.3, 1.3, -4.1, 0, 1.12, -6.25]]);
+    else if (t < 11.2) camSet(HX - 4.2, 2.1, 2.2, HX, 2.3, -0.6);
+    else camPath(t - 11.2, [[0, -1.0, 1.7, HZ + 0.3, -1.5, 1.55, HZ - 1.2], [7.6, -2.0, 1.75, HZ + 0.2, -1.5, 1.55, HZ - 1.2]]);
+  }, 19.0, () => {
+    player.vel.set(0, 0, 0); story.showAvatar = false; Music.stop();
+    setStage('studio', 'Перережьте кабели стрима: камера, микрофон, свет (0/3) — жёлтые метки на полу'); banner('Студия «СВИТИ LIVE»', 'сорвать прямой эфир');
+  });
+}
+function cutCable() {
+  const C = nearCable(); if (!C) return; STU.cut.add(C.id); Sound.click(300, 0.5); sparks(_a.set(C.at[0], 0.08, C.at[1]), 30, UP, 3); Sound.zap(0.5);
+  const mk = STU.mk[C.id]; if (mk) mk.visible = false; C.mesh.material = std({ color: 0x3a1a1a, roughness: 0.7 });
+  const n = STU.cut.size; STU.mode = C.id === 'cam' ? 'nosig' : STU.mode === 'nosig' ? 'nosig' : C.id === 'mic' ? 'mute' : 'dark';
+  if (C.id === 'light') { for (const l of lamps) l.intensity *= 0.35; redLight.intensity = 2; }
+  STU.chat.push(pick(['zaika_01: ?? что случилось', 'MAKS: лаги', 'kot_ivan: F5 F5 F5', 'liza.pink: свити ты где'])); drawStream();
+  $('sSay').textContent = 'Свити: ' + C.say; speakAs(C.say, 1.45, 1.1); clearTimeout(story.sayTimer); story.sayTimer = setTimeout(() => { $('sSay').textContent = ''; }, 4500);
+  if (n === 1) for (const g of story.guards) if (g.alive && g.calm) { g.patrol = [[C.at[0] + 1, C.at[1] + 1.5], g.patrol[0]]; g.patI = 0; g.idleT = 0; }
+  $('sObj').textContent = `Перережьте кабели стрима (${n}/3)`;
+  if (n >= 3) {
+    story.stage = 'studio-cut';
+    if (story.ev.has('tape') || story.ev.has('ledger')) later(1.6, () => setStage('studio-usb', 'Эфир ослеп и онемел… Вставьте флешку с уликами в режиссёрский пульт'));
+    else later(1.6, () => cutStudioEnd(false));
+  }
+}
+function updStudio(dt, tick) {
+  STU.t += dt; if (Math.random() < dt * 1.5) { STU.chat.push(pick(STREAM_CHAT)); STU.viewers += rand(5, 40); drawStream(); }
+  if (story.noise) { story.noise = 0; alertGuards('Выстрел! Охрана студии подняла тревогу'); }
+  if (tick && !story.alarm) for (const g of story.guards) if (g.alive && g.calm) {
+    const dx = player.pos.x - g.pos.x, dz = player.pos.z - g.pos.z, d = Math.hypot(dx, dz) || 1, fw = (Math.sin(g.yaw) * dx + Math.cos(g.yaw) * dz) / d;
+    if (d < 1.8 || (d < 6 && fw > 0.45 && losFrom(headPos(g, _cfH), eye.position))) { alertGuards('Охрана Свити заметила вас!'); $('sSay').textContent = 'Свити: Охрана! Это он! Тот самый фанат!'; speakAs('Охрана! Это он!', 1.5, 1.15); break; }
+  }
+  if (tick && story.stage === 'studio') $('sObj').textContent = `Перережьте кабели стрима (${STU.cut.size}/3)` + (story.alarm ? ' · ТРЕВОГА' : '');
+}
+function cutStudioLive() {
+  story.stage = 'studio-live'; const sv = story.svity; story.showAvatar = true; standAvatar(); for (const g of story.guards) if (g.alive) g.dispose();
+  STU.mode = 'truth'; STU.chat = []; drawStream(); evAdd('live'); addUn('studio');
+  runCut([
+    [0.2, () => { sub('', 'Вы вставляете флешку. На всех экранах — ваш файл.'); Sound.click(900, 0.4); }],
+    [3.0, () => { if (story.ev.has('tape')) line('Продюсер', '(запись) …Фанаты сидят на складе номер тринадцать. Один поцелуй — и подпишут что угодно.', 0.7, 0.95); else sub('', 'На экране — бухгалтерия склада №13: «Товар — фанаты. Оплата — поцелуем».'); }],
+    [8.6, () => { STU.chatGo = true; Sound.crowd(0.5); }],
+    [10.0, () => { standNpc(sv); line('Свити', 'Выключите это! ВЫКЛЮЧИТЕ НЕМЕДЛЕННО!', 1.5, 1.2); shake = 0.3; }],
+    [13.4, () => { faceNpc(sv, player.pos.x, player.pos.z); line('Свити', 'Ты… Это опять ты! Ты испортил мне всё!', 1.45, 1.1); }],
+    [17.0, () => line('Свити', 'Ничего. Вечером ужин принцессы. Приходи… Я поцелую тебя — и ты забудешь, кто ты.', 1.35, 0.95)],
+    [22.6, () => { Sound.kiss(); line('Вы', 'Весь город это видел, Свити. Увидимся на ужине.', 0.55, 0.95); }],
+    [26.6, fadeOut],
+  ], (t, dt) => {
+    STU.t += dt; if (STU.chatGo && Math.random() < dt * 6) { STU.chat.push(pick(TRUTH_CHAT)); STU.viewers = Math.max(400, STU.viewers - rand(80, 300)); drawStream(); }
+    if (t < 8.6) camSet(STU.con[0] + 1.2, 1.5, STU.con[1] + 1.6, STU.con[0], 0.9, STU.con[1]);
+    else if (t < 10) camSet(HX - 3.8, 2.0, 1.6, HX, 2.3, -0.6);
+    else if (t < 22.6) { headPos(sv, _cfH); camSet(_cfH.x + 0.5, _cfH.y + 0.05, _cfH.z + 1.5, _cfH.x, _cfH.y - 0.05, _cfH.z); }
+    else camSet(player.pos.x + 1.2, 1.7, player.pos.z + 1.6, player.pos.x, 1.55, player.pos.z);
+  }, 27.8, () => { STU.chatGo = false; storyGala(); });
+}
+function cutStudioEnd() {
+  story.stage = 'studio-live'; const sv = story.svity; story.showAvatar = true; standAvatar(); for (const g of story.guards) if (g.alive) g.dispose(); addUn('studio');
+  runCut([
+    [0.2, () => sub('', 'Камера, микрофон и свет мертвы. Эфир сорван.')],
+    [2.8, () => { standNpc(sv); line('Свити', 'Что происходит?! Мои зрители!', 1.45, 1.15); }],
+    [6.0, () => { faceNpc(sv, player.pos.x, player.pos.z); line('Свити', 'Ты! Опять ты?! Ты сорвал мой эфир!', 1.45, 1.1); shake = 0.25; }],
+    [9.6, () => line('Свити', 'Ну ничего. Вечером ужин принцессы. Приходи, мой фанат… Я тебя поцелую.', 1.35, 0.95)],
+    [14.4, () => line('Вы', 'Жаль, показать зрителям нечего. Но эфир я ей сорвал.', 0.55, 0.95)],
+    [18.0, fadeOut],
+  ], (t) => { if (t < 6) camSet(HX - 3.8, 2.0, 1.6, HX, 2.3, -0.6); else { headPos(sv, _cfH); camSet(_cfH.x + 0.6, _cfH.y + 0.05, _cfH.z + 1.6, _cfH.x, _cfH.y - 0.05, _cfH.z); } }, 19.2, storyGala);
+}
+
+/* ---------- the third choice: arrest her ---------- */
+function chooseArrest() { if (story.stage !== 'choice') return; story.stage = 'end'; closeChoice(); (evCount() >= 3 ? cutArrest : cutPawn)(); }
+function copSquad(n = 4) { const cops = []; for (let i = 0; i < n; i++) { const sd = i % 2 ? 1 : -1, c = mkNpc('cop', sd * 7.6, HZ - 1.2 - Math.floor(i / 2) * 0.9, Math.PI); c.scripted = true; c.pos.set(sd * 7.6, 0, HZ - 1.2 - Math.floor(i / 2) * 0.9); cops.push(c); } story.cops = cops; story.copSpk = cops[0]; return cops; }
+function sirenFx(t) { redLight.color.setHex(Math.sin(t * 9) > 0 ? 0xff2020 : 0x2050ff); redLight.intensity = 12; }
+function cutArrest() {
+  const sv = story.svity, Z = -HZ; story.showAvatar = true; story.gun = false; standAvatar(); player.pitch = 0;
+  for (const n of npcs) if (n.alive && n !== sv) { n.pose = 'stand'; n.poseDur = 0; }
+  const pr = story.prod; let cops = null, siren = false, run = false, held = false;
+  sv.scripted = true; standNpc(sv); sv.yaw = 0;
+  const hold = () => { held = true; sv.pos.set(0, 0, Z + 5.8); sv.yaw = 0; sv.ikFn = ikCuffed; if (cops) { cops[0].pos.set(-0.62, 0, Z + 5.95); cops[1].pos.set(0.62, 0, Z + 5.95); cops[0].yaw = cops[1].yaw = 0.15; cops[1].yaw = -0.15; } };
+  runCut([
+    [0.2, () => line('Вы', 'Нет. Пусть её судят. По закону.', 0.55, 0.9)],
+    [3.2, () => { sub('', 'Вы опускаете винтовку и набираете номер отделения №7…'); Sound.click(1400, 0.2); later(0.25, () => Sound.click(1100, 0.2)); }],
+    [5.6, () => line('Вы', 'Говорит тот самый «фанат». Запись, бухгалтерия склада, фото — всё у меня. Приезжайте на ужин принцессы.', 0.55, 1.0)],
+    [11.6, () => { siren = true; Sound.siren(0.6); later(2, () => Sound.siren(0.6)); later(4, () => Sound.siren(0.6)); cops = copSquad(4); Music.stop(); for (const n of npcs) if (n.alive && n !== sv && n !== pr && !cops.includes(n)) { n.scripted = false; n.panic = 12; } }],
+    [12.8, () => line('Полиция', 'Всем оставаться на местах! Полиция!', 0.8, 1.1)],
+    [16.0, () => { sv.svExpr = 'shock'; line('Свити', 'Что?! Вы что, я же своя! Я офицер Свити!', 1.45, 1.1); }],
+    [19.8, () => line('Полиция', story.ev.has('live') ? 'Своя? Весь город видел твой стрим. Ты арестована.' : 'Улик хватает. Свити, вы арестованы.', 0.8, 1.0)],
+    [23.4, () => { hold(); Sound.click(600, 0.5); later(0.2, () => Sound.click(900, 0.4)); if (pr && pr.alive) { run = true; pr.scripted = true; standNpc(pr); line('Продюсер', 'Это всё она! Я просто продюсер!', 0.75, 1.15); } }],
+    [27.0, () => { if (pr && pr.alive) { run = false; pr.pose = 'surrender'; pr.poseDur = Infinity; pr.poseT = 0; } player.pos.set(0.15, 0, Z + 7.5); player.yaw = 0; sv.svExpr = null; line('Вы', 'Игра окончена, Свити.', 0.55, 0.9); }],
+    [30.4, () => line('Свити', 'Ты же… ты же меня любил.', 1.3, 0.85)],
+    [33.6, () => line('Вы', 'Любил. Поэтому и не выстрелил.', 0.55, 0.85)],
+    [37.2, fadeOut],
+  ], (t, dt) => {
+    if (siren) sirenFx(t);
+    if (cops) cops.forEach((c, i) => { if (held && i < 2) return; const tx = i < 2 ? (i ? 0.9 : -0.9) : (i === 2 ? 3.6 : 6.0), tz = i < 2 ? Z + 6.6 : Z + 8.4; if (walkNpc(c, tx, tz, 3.4, dt)) faceNpc(c, i < 2 ? 0 : (pr ? pr.pos.x : 0), i < 2 ? Z + 2 : (pr ? pr.pos.z : 0)); });
+    if (run && pr) walkNpc(pr, 8.4, Z + 9.6, 3.4, dt);
+    if (t < 11.6) { const k = sm(0, 11.6, t); camSet(lerp(1.6, 1.0, k), 4.5, HZ - lerp(0.8, 0.4, k), 0, 4.2, HZ - 2.6); return; }
+    if (t < 16) { camSet(-2.2, 2.6, Z + 9.5, 1.5, 1.4, HZ - 3); return; }
+    headPos(sv, _cfH);
+    if (t < 19.8) { camSet(_cfH.x + 0.45, _cfH.y + 0.02, _cfH.z + 1.25, _cfH.x, _cfH.y - 0.04, _cfH.z); return; }
+    if (t < 23.4) { camSet(2.6, 1.7, Z + 9.6, 0, 1.5, Z + 4.6); return; }
+    if (t < 25.2) { camSet(1.4, 1.45, Z + 8.0, 0, 1.15, Z + 5.8); return; }
+    if (t < 27) { if (pr) { headPos(pr, _cfE); camSet(_cfE.x - 2.2, 1.9, _cfE.z + 2.0, _cfE.x, 1.4, _cfE.z); } return; }
+    const ah = avatar ? avatar.parts.head.mesh.getWorldPosition(_cfE) : _cfE.set(player.pos.x, 1.6, player.pos.z);
+    if (t < 30.4) { camSet(2.4, 1.6, Z + 6.6, 0.1, 1.45, Z + 6.6); return; }
+    if (t < 33.6) { camSet(ah.x + 0.32, ah.y + 0.06, ah.z + 0.55, _cfH.x, _cfH.y - 0.03, _cfH.z); return; }
+    camSet(_cfH.x - 0.3, _cfH.y + 0.05, _cfH.z - 0.5, ah.x, ah.y - 0.03, ah.z);
+  }, 38.4, () => { redLight.intensity = 0; sv.ikFn = null; cutJustice(); });
+}
+function buildCell() {
+  const fl = std({ map: texRep(TEX.floor || TEX.tiles, 3, 3), color: 0x6a6e72, roughness: 0.8 }), wm = std({ map: texRep(TEX.wall || TEX.cloth, 2, 1), color: 0x8a8e88, roughness: 0.95 });
+  addRoom(fl, std({ color: 0x5a5e60, roughness: 1 }), [wm, wm]);
+  const BB = batcher(), steel = std({ color: 0x3a3e44, roughness: 0.35, metalness: 0.9 }), bunk = std({ color: 0x4a5a3a, map: TEX.cloth, roughness: 0.9 });
+  for (let x = -HX + 0.1; x <= HX - 0.1; x += 0.16) if (Math.abs(x - 2.6) > 0.5) BB.cyl(steel, x, WALL_H / 2, 0, 0.018, 0.018, WALL_H, 6);
+  for (const y of [0.15, 1.2, WALL_H - 0.15]) BB.box(steel, 0, y, 0, HX * 2, 0.06, 0.06);
+  solid(-0.2, WALL_H / 2, 0, HX * 2 - 1.4, WALL_H, 0.1); solid(HX - 0.3, WALL_H / 2, 0, 0.6, WALL_H, 0.1);
+  for (let x = 2.15; x <= 3.05; x += 0.16) BB.cyl(steel, x, WALL_H / 2, -0.05, 0.018, 0.018, WALL_H, 6); solid(2.6, WALL_H / 2, -0.05, 1.0, WALL_H, 0.1);
+  BB.box(steel, -3.6, 0.45, -2.6, 1.9, 0.08, 0.8); BB.box(bunk, -3.6, 0.53, -2.6, 1.85, 0.1, 0.75); for (const [x, z] of [[-4.5, -2.25], [-2.7, -2.25], [-4.5, -2.95], [-2.7, -2.95]]) BB.cyl(steel, x, 0.22, z, 0.02, 0.02, 0.44, 5); solid(-3.6, 0.3, -2.6, 1.9, 0.6, 0.8);
+  BB.cyl(std({ color: 0xd8d8d0, roughness: 0.3 }), 3.8, 0.22, -3.3, 0.2, 0.18, 0.44, 12); solid(3.8, 0.22, -3.3, 0.4, 0.44, 0.4);
+  BB.box(std({ color: 0x5a3a2a, roughness: 0.7 }), 0, 0.4, 2.6, 1.6, 0.06, 0.6); solid(0, 0.4, 2.6, 1.6, 0.8, 0.6);
+  BB.geo(new THREE.MeshBasicMaterial({ color: 0x9ab8ff }), new THREE.PlaneGeometry(0.8, 0.5).translate(0, 2.2, -HZ + 0.02)); for (let x = -0.3; x <= 0.3; x += 0.15) BB.cyl(steel, x, 2.2, -HZ + 0.05, 0.012, 0.012, 0.5, 5);
+  BB.flush();
+  addSign([{ t: 'ТЮРЬМА №13', s: 200 }, { t: 'КАМЕРА 13', s: 90 }], 2.4, 0.8, 0, 2.3, HZ - 0.02, Math.PI, 'rgba(230,225,215,0.85)');
+}
+function cutJustice() {
+  storyMap('cell'); story.showAvatar = true; story.gun = false; Music.stop(); Music.start('tender');
+  const sv = story.svity = mkNpc('svity-prison', -3.4, -2.6, 0); seatNpc(sv, -3.4, -2.25, 0);
+  player.pos.set(0.3, 0, 1.1); player.yaw = 0; standAvatar();
+  let walk = false;
+  runCut([
+    [0.2, () => showCard('СПУСТЯ МЕСЯЦ', 'Тюрьма №13', 2800)],
+    [3.0, () => line('Новости', 'Блогер Свити и её продюсер осуждены. Все похищенные фанаты вернулись домой.', 1.0, 1.05)],
+    [8.4, () => line('Новости', 'Герой, собравший улики, отдал награду пострадавшим.', 1.0, 1.05)],
+    [12.6, () => { standNpc(sv); walk = true; line('Свити', 'Пришёл всё-таки… Мой самый упрямый фанат.', 1.3, 0.95); }],
+    [17.0, () => line('Вы', 'Пришёл вернуть тебе это. Удостоверение. Ты обронила его в первый вечер.', 0.55, 0.95)],
+    [22.2, () => line('Свити', 'Оставь себе. На память о том, кто меня победил.', 1.3, 0.95)],
+    [26.4, () => { line('Свити', 'Я выйду. И первым делом поцелую тебя. Бесплатно.', 1.35, 0.9); Sound.kiss(); }],
+    [31.0, () => line('Вы', '…Я подожду.', 0.55, 0.85)],
+    [34.2, fadeOut],
+  ], (t, dt) => {
+    if (walk && walkNpc(sv, 0.3, -0.55, 1.0, dt)) faceNpc(sv, player.pos.x, player.pos.z);
+    if (t < 12.6) camPath(t, [[0, 3.4, 2.4, 3.2, -3.4, 0.8, -2.4], [12.6, 2.4, 1.9, 2.0, -3.4, 0.9, -2.4]]);
+    else if (t < 22.2) { headPos(sv, _cfH); camSet(1.4, 1.65, 1.6, _cfH.x, _cfH.y - 0.05, _cfH.z); }
+    else if (t < 31) { headPos(sv, _cfH); camSet(_cfH.x + 0.35, _cfH.y + 0.02, _cfH.z + 0.95, _cfH.x, _cfH.y - 0.03, _cfH.z); }
+    else camPath(t - 31, [[0, -2.6, 2.2, 2.8, 0.3, 1.2, 0.2], [4, -3.2, 2.6, 3.4, 0.3, 1.2, 0.2]]);
+  }, 35.4, () => rollCredits('justice'));
+}
+function cutPawn() {
+  const sv = story.svity, Z = -HZ; story.showAvatar = true; story.gun = true; standAvatar(); player.pitch = 0;
+  for (const n of npcs) if (n.alive && n !== sv) { n.pose = 'stand'; n.poseDur = 0; }
+  const pr = story.prod; let cops = null, siren = false;
+  runCut([
+    [0.2, () => line('Вы', 'Нет. Пусть её судят. Звоню в полицию.', 0.55, 0.9)],
+    [3.2, () => { sub('', 'Вы набираете номер отделения №7…'); Sound.click(1400, 0.2); }],
+    [5.4, () => line('Вы', 'Свити — преступница! Она на ужине принцессы. Приезжайте!', 0.55, 1.0)],
+    [9.6, () => { siren = true; Sound.siren(0.6); later(2, () => Sound.siren(0.6)); cops = copSquad(4); Music.stop(); for (const n of npcs) if (n.alive && n !== sv && n !== pr && !cops.includes(n)) { n.scripted = false; n.panic = 12; } }],
+    [11.0, () => line('Полиция', 'Полиция! Кто звонил?', 0.8, 1.1)],
+    [13.8, () => { sv.pose = 'stop'; sv.poseDur = Infinity; sv.poseT = 0; line('Свити', 'Офицер Свити, отделение номер семь! Вон он, на балконе — со снайперской винтовкой!', 1.45, 1.1); }],
+    [19.4, () => { line('Полиция', 'Бросай оружие! Руки за голову!', 0.8, 1.15); story.gun = false; avatar.pose = 'surrender'; avatar.poseDur = Infinity; avatar.poseT = 0; }],
+    [22.8, () => line('Вы', 'Но улики… У меня есть улики!', 0.55, 1.05)],
+    [26.0, () => { if (pr && pr.alive) { faceNpc(pr, player.pos.x, player.pos.z); pr.scripted = true; } line('Продюсер', 'Улики? Пара бумажек против лучшего офицера города? Уведите его.', 0.7, 0.95); }],
+    [31.0, fadeOut],
+  ], (t, dt) => {
+    if (siren) sirenFx(t);
+    if (cops) cops.forEach((c, i) => { const tx = (i % 2 ? 1 : -1) * (1.2 + Math.floor(i / 2) * 1.4), tz = HZ - 3.8; if (walkNpc(c, tx, tz, 3.2, dt)) faceNpc(c, player.pos.x, player.pos.z); });
+    if (t < 9.6) { camSet(1.4, 4.5, HZ - 0.5, 0, 4.2, HZ - 2.6); return; }
+    if (t < 13.8) { camSet(0, 3.0, HZ - 4.6, 0, 1.3, Z + 8); return; }
+    if (t < 19.4) { headPos(sv, _cfH); camSet(_cfH.x - 1.0, _cfH.y + 0.1, _cfH.z + 2.0, _cfH.x, _cfH.y - 0.1, _cfH.z); return; }
+    if (t < 26) { camSet(player.pos.x + 2.4, 4.0, player.pos.z - 2.8, player.pos.x, 3.9, player.pos.z); return; }
+    if (pr) { headPos(pr, _cfE); camSet(_cfE.x + 0.8, _cfE.y + 0.05, _cfE.z + 1.4, _cfE.x, _cfE.y - 0.05, _cfE.z); }
+  }, 32.2, () => { redLight.intensity = 0; cutPawnCell(); });
+}
+function cutPawnCell() {
+  storyMap('cell'); story.showAvatar = true; story.gun = false; Music.stop(); Music.start('dread');
+  seatAvatar(-3.6, -2.3, 'sit');
+  const pr = story.prod = mkNpc('producer', 1.0, 1.4, Math.PI); pr.scripted = true; pr.pos.set(1.0, 0, 1.4); pr.yaw = Math.PI;
+  const sv = story.svity = mkNpc('svity-gala', -0.6, 1.9, Math.PI); sv.scripted = true; sv.pos.set(-0.6, 0, 1.9); sv.yaw = Math.PI;
+  runCut([
+    [0.2, () => showCard('ТЮРЬМА №13', 'Камера 13', 2800)],
+    [3.0, () => sub('', 'Восемь лет — за «покушение на офицера полиции». Улик оказалось слишком мало.')],
+    [7.4, () => line('Продюсер', 'Знаешь, что самое смешное? Ты сделал за нас всю работу.', 0.7, 0.95)],
+    [11.8, () => line('Продюсер', 'Склад пуст, свидетелей нет, а у Свити — миллион новых подписчиков.', 0.7, 0.95)],
+    [16.4, () => { line('Продюсер', 'Ты был отличной пешкой.', 0.6, 0.85); Sound.laugh({ pitch: 0.7, n: 4, gap: 0.2, dist: 0.4, vol: 0.5, pause: 0.4 }); }],
+    [20.0, () => { sv.svExpr = 'kiss'; line('Свити', 'Пока-пока, мой фанат! Не забудь подписаться!', 1.4, 1.05); Sound.kiss(); later(1.2, () => { sv.svExpr = 'happy'; }); }],
+    [24.2, () => line('Вы', '…Я ещё выйду. И тогда улик хватит.', 0.55, 0.9)],
+    [28.4, fadeOut],
+  ], (t, dt) => {
+    if (t > 20.6) { walkNpc(sv, -3.6, 3.4, 1.0, dt); walkNpc(pr, 3.8, 3.3, 1.0, dt); }
+    if (t < 7.4) camPath(t, [[0, 1.8, 2.3, -1.2, -3.6, 0.8, -2.3], [7.4, 0.9, 2.0, -1.6, -3.6, 0.8, -2.3]]);
+    else if (t < 20) { headPos(pr, _cfH); camSet(_cfH.x - 0.55, _cfH.y - 0.02, _cfH.z - 2.1, _cfH.x, _cfH.y - 0.04, _cfH.z); }
+    else if (t < 24.2) { headPos(sv, _cfH); camSet(_cfH.x + 0.45, _cfH.y + 0.02, _cfH.z - 1.9, _cfH.x, _cfH.y - 0.03, _cfH.z); }
+    else { avatar.parts.head.mesh.getWorldPosition(_cfH); camSet(_cfH.x + 0.9, _cfH.y + 0.1, _cfH.z + 0.9, _cfH.x, _cfH.y - 0.05, _cfH.z); }
+  }, 29.6, () => rollCredits('pawn'));
+}
+
+/* ---------- the epilogue of the bad ending: a rainbow road in space ---------- */
+function buildRainbow() {
+  Object.assign(LV, { walls: false, ceil: false });
+  const cols = [0xff2a2a, 0xff8a1a, 0xffe02a, 0x3ad84a, 0x2ad8ff, 0x3a6aff, 0xb04aff], BB = batcher(), mats = cols.map((c) => new THREE.MeshBasicMaterial({ color: c }));
+  // the road: seven stripes, straight under the walk and then curving away into the stars
+  const N = 140, roadW = 3.5, sw = roadW / 7;
+  for (let i = 0; i < N; i++) {
+    const z = HZ - i * 1.0, k = Math.max(0, (HZ - 46 - z) / 50), x = Math.sin(k * 2.2) * k * 14, y = -Math.max(0, k * k * 6) + Math.sin(k * 5) * k * 2;
+    for (let s = 0; s < 7; s++) BB.geo(mats[s], new THREE.BoxGeometry(sw, 0.06, 1.02).translate(x - roadW / 2 + sw * (s + 0.5), y - 0.03, z));
+  }
+  BB.flush(true, false);
+  // stars, glowing planets, a portal of light at the far end
+  const sp = new Float32Array(3000 * 3); for (let i = 0; i < 3000; i++) { const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, r = rand(60, 140), s = Math.sqrt(1 - u * u); sp[i * 3] = Math.cos(a) * s * r; sp[i * 3 + 1] = u * r * 0.7; sp[i * 3 + 2] = Math.sin(a) * s * r; }
+  const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(sp, 3)); const stars = new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.35, sizeAttenuation: true, fog: false })); addMesh(stars);
+  for (const [x, y, z, r, c] of [[-30, 14, -40, 7, 0xff6ab0], [38, -8, -20, 11, 0x4a8aff], [16, 22, 30, 4, 0xffd06a], [-46, -18, 10, 9, 0x6aff9a]]) { const m = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), new THREE.MeshBasicMaterial({ color: c, fog: false })); m.position.set(x, y, z); addMesh(m); const h = new THREE.Mesh(new THREE.SphereGeometry(r * 1.25, 24, 16), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); h.position.copy(m.position); addMesh(h); }
+  const portal = new THREE.Mesh(new THREE.TorusGeometry(2.6, 0.35, 12, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, fog: false })); portal.position.set(0, 2.2, HZ - 44); addMesh(portal); RBW.portal = portal;
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(2.5, 40), new THREE.MeshBasicMaterial({ color: 0xfff6e0, transparent: true, opacity: 0.85, fog: false })); disc.position.copy(portal.position); addMesh(disc); RBW.disc = disc;
+}
+const RBW = { portal: null, disc: null };
+function cutRainbow() {
+  storyMap('rainbow'); story.showAvatar = true; story.gun = false; Music.stop(); Music.start('tender'); fxStory.grade = 0; madness.target = 0; madness.amt = 0;
+  player.pos.set(-0.5, 0, HZ - 2); player.yaw = 0; standAvatar();
+  const sv = new Humanoid('human', 0.6, HZ - 2, Math.PI, 'svity-bride'); sv.scripted = true; story.extras.push(sv); story.svity = sv;
+  let walk = false;
+  runCut([
+    [0.2, () => showCard('', 'Где-то между жизнью и смертью', 3200, true)],
+    [3.6, () => sub('', 'Белая тишина. Звёзды. Под ногами — радуга, уходящая в бесконечность.')],
+    [7.8, () => { walk = true; line('Свити', 'Где мы?.. Мы умерли?', 1.3, 0.9); }],
+    [11.6, () => line('Вы', 'Не знаю. Но ты со мной. Идём.', 0.55, 0.9)],
+    [15.4, () => ggSay('Я возрождал тебя всё время…', 2.6)],
+    [19.6, () => ggSay('Возрожу и сейчас. Но теперь — по моим правилам.', 3.4)],
+    [24.4, () => { flashScreen('#ffffff', 1400); Sound.whoosh(); Sound.chime(); }],
+    [25.6, () => showCard('ПРОДОЛЖЕНИЕ СЛЕДУЕТ', 'Глава 2 · Воскреситель', 3800)],
+    [29.6, fadeOut],
+  ], (t, dt) => {
+    if (walk) { walkPlayer(-0.5, HZ - 40, 1.25, dt); const ax = avatar ? avatar.pos : player.pos; walkNpc(sv, 0.6, ax.z - 0.1, 1.25, dt); }
+    sv.root.position.copy(sv.pos); sv.root.rotation.y = sv.yaw;
+    if (RBW.portal) { RBW.portal.rotation.z += dt * 0.6; RBW.portal.scale.setScalar(1 + Math.sin(t * 2) * 0.03); }
+    if (Math.random() < dt * 30) spawnSprite(TEX.soft, _a.set(rand(-6, 6), rand(-2, 6), player.pos.z - rand(2, 20)), { color: pick([0xff6ab0, 0xffe02a, 0x2ad8ff, 0xffffff]), additive: true, size: rand(0.03, 0.09), grow: 0.5, life: rand(1, 2.5), opacity: 0.8, vel: new V3(0, rand(0.1, 0.4), 0) });
+    const pz = player.pos.z;
+    if (t < 7.8) camPath(t, [[0, 6, 4, pz + 9, 0, 0.8, pz - 6], [7.8, 3.5, 2.6, pz + 5, 0, 1.0, pz - 2]]);
+    else if (t < 15.4) camSet(2.6, 1.6, pz - 2.6, 0, 1.3, pz);
+    else if (t < 24.4) { const a = (t - 15.4) * 0.12; camSet(Math.sin(a) * 9, 4 + a * 2, pz + Math.cos(a) * 9, 0, 1, pz - 8); }
+    else camSet(0, 2.0, pz + 4, 0, 2.2, HZ - 44);
+  }, 30.8, () => rollCredits(false));
+}
+function brideSwap() { const old = story.svity; if (!old || old.look.svity === 'bride') return old; const nb = new Humanoid('human', old.pos.x, old.pos.z, old.yaw, 'svity-bride'); nb.protect = true; nb.scripted = old.scripted; npcs.push(nb); targetsDirty = true; old.dispose(); story.svity = nb; return nb; }
+SV_SAY.studio = ['Чат, всем приве-ет! Ставьте сердечки!', 'Донат на пятьсот — спасибо, зайка!', 'Сегодня вечером ужин принцессы! Самым преданным — поцелуй!', 'Кто это там ходит? Охрана, проверьте!', 'Миллион подписчиков — уже почти!'];
 function rollCredits(good) {
-  fadeOut(); const el = $('credits');
-  el.innerHTML = '<div class="roll"><h2>Мясорубка</h2>Глава 1 · Преступница Свити' + [['Герой', 'Вы'], ['Свити', 'Свити'], [good ? 'Президент' : 'Ребёнок', good ? 'Президент' : 'Сын героя'], ['Дежурный', 'Сержант Петров'], ...(good ? [] : [['Воскреситель', 'Призрак']]), ['Фанаты, охотники, спецназ', 'Массовка']].map(([a, b]) => `<b>${a}</b>${b}`).join('') + `<b>${good ? 'Награда' : 'Финал'}</b>${good ? '50 000 $' : 'Продолжение следует…'}<b>Спасибо</b>за игру!</div>`;
+  const kind = good === true ? 'good' : good === false ? 'bad' : good; fadeOut(); const el = $('credits');
+  const cast = [['Герой', 'Вы'], ['Свити', 'Свити'], ['Продюсер', 'Человек в белом'], ...(kind === 'good' ? [['Президент', 'Президент']] : kind === 'bad' ? [['Ребёнок', 'Сын героя'], ['Воскреситель', 'Призрак']] : [['Полиция', 'Отделение №7']]), ['Дежурный', 'Сержант Петров'], ['Заложники', 'Фанаты со склада №13'], ['Фанаты, охрана, спецназ', 'Массовка']];
+  const fin = { good: ['Награда', '50 000 $'], bad: ['Финал', 'Продолжение следует…'], justice: ['Приговор', 'Свити — за решёткой'], pawn: ['Приговор', 'Вы — за решёткой'] }[kind] || ['Финал', '…'];
+  el.innerHTML = '<div class="roll"><h2>Мясорубка</h2>Глава 1 · Преступница Свити' + cast.map(([a, b]) => `<b>${a}</b>${b}`).join('') + `<b>${fin[0]}</b>${fin[1]}<b>Спасибо</b>за игру!</div>`;
   el.hidden = false; subOff();
-  runCut([[0.1, () => {}]], null, 16, () => { el.hidden = true; showEnd(good); });
+  runCut([[0.1, () => {}]], null, 16, () => { el.hidden = true; showEnd(kind); });
 }
-const EXCL = [['svity-street', 'Свити · Уличная', 'Чёрная кофта «СВИТИ», рыжие кончики волос'], ['svity-cop', 'Свити · Полицейская', 'Форма, значок и рация'], ['svity-gala', 'Свити · Вечерняя', 'Чёрное платье с золотым узором']];
+const EXCL = [['svity-street', 'Свити · Уличная', 'Чёрная кофта «СВИТИ», рыжие кончики волос', ['good', 'bad']], ['svity-cop', 'Свити · Полицейская', 'Форма, значок и рация', ['good', 'bad']], ['svity-gala', 'Свити · Вечерняя', 'Чёрное платье с золотым узором', ['good', 'bad']],
+  ['svity-cafe', 'Свити · Тайная встреча', 'Тренч, берет и очки — кафе «Полночь»', ['cafe']], ['svity-stream', 'Свити · Стримерша', 'Розовое худи и наушники с ушками', ['studio']], ['svity-bride', 'Свити · Невеста', 'Белое платье, фата и букет', ['bad']], ['svity-prison', 'Свити · Заключённая', 'Оранжевая роба № 013', ['justice']]];
+const UNL_TXT = { good: 'хорошая концовка', bad: 'плохая концовка', cafe: 'подслушать в кафе незамеченным', studio: 'сорвать стрим', justice: 'концовка «Правосудие»', pawn: 'концовка «Пешка»' };
+function exclOk(e, u = getUn()) { return e[3].every((k) => u[k]); }
 function getUn() { try { return JSON.parse(localStorage.getItem('myasorubka-unlocks') || '{}'); } catch (e) { return {}; } }
 function addUn(k) { const u = getUn(); u[k] = true; try { localStorage.setItem('myasorubka-unlocks', JSON.stringify(u)); } catch (e) {} }
-function skinOk(id) { const u = getUn(); return id === 'default' || (u.good && u.bad && EXCL.some((e) => e[0] === id)); }
+function skinOk(id) { if (id === 'default') return true; const e = EXCL.find((x) => x[0] === id); return !!e && exclOk(e); }
 function renderExcl() {
-  const u = getUn(), all = !!(u.good && u.bad);
-  $('exclInfo').textContent = `Концовки главы 1: хорошая ${u.good ? '✅' : '⬜'} · плохая ${u.bad ? '✅' : '⬜'}. Пройдите обе, и костюмы Свити станут вашими.`;
-  $('exclGrid').innerHTML = EXCL.map(([id, name, d]) => { const on = settings.skin === id && all; return `<button class="btn" data-skin="${id}" ${all ? '' : 'disabled style="opacity:.5"'}>${all ? '' : '🔒 '}${name}<small>${all ? (on ? '✔ Надето · нажмите, чтобы снять' : d) : 'Закрыто'}</small></button>`; }).join('');
-  $('exclGrid').querySelectorAll('[data-skin]').forEach((b) => b.onclick = () => { if (!all) return; settings.skin = settings.skin === b.dataset.skin ? 'default' : b.dataset.skin; saveSettings(); renderExcl(); Sound.click(1200, 0.2); });
+  const u = getUn();
+  $('exclInfo').textContent = 'Концовки главы 1: ' + [['good', 'хорошая'], ['bad', 'плохая'], ['justice', '«Правосудие»'], ['pawn', '«Пешка»']].map(([k, n]) => `${n} ${u[k] ? '✅' : '⬜'}`).join(' · ') + '. Каждый костюм открывается своим достижением.';
+  $('exclGrid').innerHTML = EXCL.map((e) => { const [id, name, d] = e, ok = exclOk(e, u), on = settings.skin === id && ok; return `<button class="btn" data-skin="${id}" ${ok ? '' : 'disabled style="opacity:.5"'}>${ok ? '' : '🔒 '}${name}<small>${ok ? (on ? '✔ Надето · нажмите, чтобы снять' : d) : 'Нужно: ' + e[3].map((k) => UNL_TXT[k]).join(' + ')}</small></button>`; }).join('');
+  $('exclGrid').querySelectorAll('[data-skin]').forEach((b) => b.onclick = () => { const e = EXCL.find((x) => x[0] === b.dataset.skin); if (!e || !exclOk(e)) return; settings.skin = settings.skin === b.dataset.skin ? 'default' : b.dataset.skin; saveSettings(); renderExcl(); Sound.click(1200, 0.2); });
 }
 $('exclBtn').onclick = () => { Sound.init(); renderExcl(); $('excl').hidden = false; };
 $('exclClose').onclick = () => { $('excl').hidden = true; };
@@ -6041,7 +6896,7 @@ function wpBuildSample() {
   wpInit(); wpDrop(); const k = spc.kind; window.__spForce = true;
   try {
     if (isPropK(k)) { const s = propCfgScale(k), isB = k === 'barrel', m = new THREE.Mesh(isB ? barrelGeo : crateGeo, isB ? barrelMat : crateMat); m.scale.setScalar(s); m.position.y = (isB ? 0.45 : 0.4) * s; WP.scene.add(m); WP.prop = m; }
-    else { const type = k === 'svity' || k === 'gagarin' ? 'human' : k, kind = k === 'svity' ? pick(['svity-street', 'svity-cop', 'svity-gala']) : k === 'gagarin' ? 'gagarin' : undefined; const f = new Humanoid(type, 0, 0, 0, kind); scene.remove(f.root); WP.scene.add(f.root); f.root.position.set(0, 0, 0); f.scripted = true; f.pose = 'stand'; f.poseDur = Infinity; f.poseRate = 1000; f.animate(0.02); f.poseRate = 8; WP.fig = f; }
+    else { const type = k === 'svity' || k === 'gagarin' ? 'human' : k, kind = k === 'svity' ? pick(EXCL.filter((e) => e[0].startsWith('svity')).map((e) => e[0])) : k === 'gagarin' ? 'gagarin' : undefined; const f = new Humanoid(type, 0, 0, 0, kind); scene.remove(f.root); WP.scene.add(f.root); f.root.position.set(0, 0, 0); f.scripted = true; f.pose = 'stand'; f.poseDur = Infinity; f.poseRate = 1000; f.animate(0.02); f.poseRate = 8; WP.fig = f; }
   } finally { window.__spForce = false; }
   wpFrame();
 }
@@ -6174,33 +7029,45 @@ function admEnding(kind) {
     if (performance.now() - t0 > 90000 || state === 'menu') return clearInterval(iv);
     if (story.cut) { story.lastSkip = 0; storySkip(); return; }
     if (state !== 'play') return;
-    if (phase === 0 && /^gala/.test(story.stage || '')) { phase = 1; if (kind === 'bad') { story.stage = 'choice'; chooseMarry(); clearInterval(iv); } else cutBalcony(); }
-    else if (phase === 1 && story.stage === 'snipe') { clearInterval(iv); if (kind === 'good') { story.stage = 'choice'; chooseShoot(); } }
+    if (phase === 0 && /^gala/.test(story.stage || '')) { phase = 1; if (kind === 'justice') story.ev = new Set(EVID.map((e) => e[0])); else if (kind === 'pawn') story.ev = new Set(['photo']); if (kind === 'bad') { story.stage = 'choice'; chooseMarry(); clearInterval(iv); } else cutBalcony(); }
+    else if (phase === 1 && story.stage === 'snipe') { clearInterval(iv); if (kind === 'good') { story.stage = 'choice'; chooseShoot(); } else if (kind === 'justice' || kind === 'pawn') { story.stage = 'choice'; chooseArrest(); } }
   }, 150);
 }
 function admFinale() {
   admClose(); Sound.init(); startStory(); const t0 = performance.now();
   setTimeout(() => { cutBaby(); const iv = setInterval(() => { if (performance.now() - t0 > 90000 || state === 'menu') return clearInterval(iv); if (story.cut) { story.lastSkip = 0; storySkip(); } else if (state === 'play' && story.stage === 'hunted') { clearInterval(iv); startSwatFight(); setTimeout(cutGhost, 400); } }, 150); }, 300);
 }
+function admRainbow() { admClose(); Sound.init(); startStory(); setTimeout(() => cutRainbow(), 300); }
 function admPick(name) { const f = $('admFile'); f.onchange = async () => { const file = f.files[0]; f.value = ''; if (!file) return; Sound.init(); try { const buf = await Sound.ctx.decodeAudioData(await file.arrayBuffer()); Sound.clipSet(name, buf); toast('Звук загружен: ' + file.name.slice(0, 24)); Sound.myLaugh(name); } catch (e) { toast('Не удалось прочитать звук'); } }; f.click(); }
 const admUn = () => { renderExcl(); syncExclSpawn(); admRender(); Sound.click(1200, 0.2); };
 function admItems(tab) {
   const u = getUn(), on = (v) => (v ? 'ВКЛ' : 'выкл');
   if (tab === 'end') return [
-    { sec: `Награды · хорошая ${u.good ? '✅' : '⬜'} · плохая ${u.bad ? '✅' : '⬜'}` },
+    { sec: `Награды · хорошая ${u.good ? '✅' : '⬜'} · плохая ${u.bad ? '✅' : '⬜'} · правосудие ${u.justice ? '✅' : '⬜'} · пешка ${u.pawn ? '✅' : '⬜'}` },
     { l: 'Активировать хорошую', s: 'Отметить концовку пройденной', f: () => { addUn('good'); admUn(); } },
     { l: 'Активировать плохую', s: 'Отметить концовку пройденной', f: () => { addUn('bad'); admUn(); } },
-    { l: 'Активировать обе', s: 'Все костюмы Свити и бессмертный воскреситель', f: () => { addUn('good'); addUn('bad'); admUn(); } },
+    { l: 'Активировать обе', s: 'Три костюма Свити и бессмертный воскреситель', f: () => { addUn('good'); addUn('bad'); admUn(); } },
+    { l: 'Активировать «Правосудие»', s: 'Костюм заключённой', f: () => { addUn('justice'); admUn(); } },
+    { l: 'Активировать «Пешка»', s: 'Продюсер в спавне', f: () => { addUn('pawn'); admUn(); } },
+    { l: 'Кафе и студия', s: 'Костюмы тайной встречи и стримерши', f: () => { addUn('cafe'); addUn('studio'); admUn(); } },
+    { l: 'Активировать всё', s: 'Все 7 костюмов и Продюсер', f: () => { for (const k of ['good', 'bad', 'justice', 'pawn', 'cafe', 'studio']) addUn(k); admUn(); } },
     { l: 'Сбросить концовки', s: 'Снова закрыть эксклюзив', f: () => { try { localStorage.removeItem('myasorubka-unlocks'); } catch (e) {} if (EXCL.some((e) => e[0] === settings.skin)) { settings.skin = 'default'; saveSettings(); } admUn(); } },
     { sec: 'Смотреть концовки' },
     { l: 'Хорошая концовка', s: 'Выстрел, президент, деньги, титры', f: () => admEnding('good') },
     { l: 'Плохая: свадьба', s: 'Свадьба, затем охота за вами', f: () => admEnding('bad') },
     { l: 'Плохая: финал', s: 'Штурм и встреча с воскресителем', f: () => admFinale() },
+    { l: 'Радужная дорога', s: 'Эпилог плохой концовки', f: () => admRainbow() },
+    { l: 'Концовка «Правосудие»', s: 'Арест на ужине, свидание в тюрьме', f: () => admEnding('justice') },
+    { l: 'Концовка «Пешка»', s: 'Улик мало — сажают вас', f: () => admEnding('pawn') },
   ];
   if (tab === 'cut') return [
     { sec: 'Глава 1' },
     { l: 'Вступление', s: 'Новости по телевизору', f: () => { admClose(); startStory(); } },
+    { l: 'Квартира Свити', s: 'Три улики', f: () => { admClose(); startStory(); setTimeout(() => storyFlat(), 300); } },
+    { l: 'Кафе «Полночь»', s: 'Подслушать разговор', f: () => { admClose(); startStory('cafe'); } },
     { l: 'Участок полиции', s: 'Фото, шкафчик, жалоба', f: () => { admClose(); startStory('police'); } },
+    { l: 'Порт · Склад №13', s: 'Заложники, охрана, бухгалтерия', f: () => { admClose(); startStory('port'); } },
+    { l: 'Студия «СВИТИ LIVE»', s: 'Сорвать стрим', f: () => { admClose(); startStory('studio'); } },
     { l: 'Ужин принцессы', s: 'Гала, поцелуй, танец', f: () => { admClose(); startStory('gala'); } },
     { l: 'Балкон и снайпер', s: 'Сцена перед выбором', f: () => admEnding('balcony') },
     { sec: 'Песочница' },
@@ -6214,7 +7081,8 @@ function admItems(tab) {
   if (tab === 'gg') return [
     { sec: 'Воскреситель «Гагарин»' },
     { l: 'Заспавнить воскресителя', s: 'Перед вами', f: () => admSand(() => admGG()) },
-    { l: 'Заспавнить Свити', s: 'Все три костюма', f: () => admSand(() => { admSpawn('svity-street', 5); admSpawn('svity-cop', 6.5); admSpawn('svity-gala', 8); }) },
+    { l: 'Заспавнить Свити', s: 'Все семь костюмов', f: () => admSand(() => { EXCL.filter((e) => e[0].startsWith('svity')).forEach((e, i) => admSpawn(e[0], 4 + i * 1.3)); }) },
+    { l: 'Заспавнить Продюсера', s: 'Белый костюм, золотая цепь', f: () => admSand(() => admSpawn('producer', 4)) },
     { l: 'Поцелуй-ловушка', s: 'Оба на карте = новая сцена', f: () => admKiss() },
     { l: 'Фраза воскресителя', s: 'Случайная из всех', f: () => { const tx = ggQuip(pick(['head', 'boom', 'stab', 'idle', 'kiss'])); toast('Воскреситель: ' + tx); speakAs(tx, 0.3, 0.8); } },
     { sec: 'Смех из ваших записей' },
@@ -6260,14 +7128,20 @@ $('admPad').querySelectorAll('[data-k]').forEach((b) => b.onclick = () => admKey
 $('admBtn').onclick = () => { Sound.init(); adm.in = ''; admRender(); $('admin').hidden = false; };
 $('admClose').onclick = () => admClose();
 
+const ENDS = {
+  good: { t: 'Хорошая концовка', s: () => [['Исход', 'Свити устранена'], ['Попадание', 'в голову'], ['Награда', '50 000 $'], ['Звание', 'Герой']] },
+  bad: { t: 'Плохая концовка', s: () => [['Исход', 'Свадьба со Свити'], ['Убито всего', stats.kills], ['Ребёнок', 'Родился сын'], ['Звание', 'Враг всего мира']] },
+  justice: { t: 'Концовка «Правосудие»', s: () => [['Исход', 'Свити за решёткой'], ['Улики', evCount() + '/' + EVID.length], ['Заложники', 'спасены'], ['Звание', 'Честный герой']] },
+  pawn: { t: 'Концовка «Пешка»', s: () => [['Исход', 'Посадили вас'], ['Улики', evCount() + '/' + EVID.length + ' — мало'], ['Срок', '8 лет'], ['Звание', 'Пешка продюсера']] },
+};
 function showEnd(good) {
-  addUn(good ? 'good' : 'bad'); saveCp(null); fadeIn(); setLids(0); $('cut').hidden = true; $('cut').classList.remove('on', 'ghost'); $('flash').style.opacity = 0; $('sNotes').innerHTML = ''; $('credits').hidden = true; hideGhost();
-  const k = stats.kills - story.killBase;
+  const kind = good === true ? 'good' : good === false ? 'bad' : good, E = ENDS[kind] || ENDS.good, rows = E.s();
+  addUn(kind); saveCp(null); fadeIn(); setLids(0); $('cut').hidden = true; $('cut').classList.remove('on', 'ghost'); $('flash').style.opacity = 0; $('sNotes').innerHTML = ''; $('credits').hidden = true; hideGhost();
   storyReset(); mode = 'story'; Music.stop();
   document.body.classList.remove('playing'); state = 'over';
   document.querySelector('#over .eyebrow').textContent = 'Глава 1 · Преступница Свити';
-  $('overTitle').textContent = good ? 'Хорошая концовка' : 'Плохая концовка';
-  $('overStats').innerHTML = (good ? [['Исход', 'Свити устранена'], ['Попадание', 'в голову'], ['Награда', '50 000 $'], ['Звание', 'Герой']] : [['Исход', 'Свадьба со Свити'], ['Убито всего', stats.kills], ['Ребёнок', 'Родился сын'], ['Звание', 'Враг всего мира']]).map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join('');
+  $('overTitle').textContent = E.t;
+  $('overStats').innerHTML = rows.map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join('');
   $('againBtn').innerHTML = 'Ещё раз<small>Глава 1 сначала</small>';
   $('over').hidden = false; $('hud').hidden = true; $('touch').hidden = true;
 }
@@ -6278,14 +7152,19 @@ function updateStory(dt) {
   if (tick) {
     $('photoBtn').hidden = st !== 'photo';
     $('complainBtn').hidden = !(st === 'complain' && Math.hypot(player.pos.x - 8, player.pos.z + 5) < 2.6);
-    $('actBtn').hidden = !(st === 'search' && nearLocker()) && !(st === 'flat' && nearClue());
-    $('actBtn').textContent = st === 'flat' ? 'Осмотреть' : 'Обыскать';
+    { const a = actInfo(st), b = $('actBtn'); if (b.hidden !== !a) b.hidden = !a; if (a && b.textContent !== a) b.textContent = a; }
+    if ($('sMeter').hidden !== (st !== 'cafe')) $('sMeter').hidden = st !== 'cafe';
+    if (st !== 'cafe' && !$('paper').hidden) { $('paper').hidden = true; CAFE.paper = false; }
     svSay(st);
     let tgt = null;
     if ((st === 'street' || st === 'photo' || st === 'gala-find' || st === 'chase') && sv && sv.alive) tgt = sv.pos;
     else if (st === 'complain') tgt = _b.set(8, 0, -5);
     else if (st === 'search') tgt = _b.set(LOCKER_X, 0, HZ - 1.3);
     else if (st === 'gala-talk') { const g = nearestGuest(); tgt = g ? g.pos : null; }
+    else if (st === 'cafe') tgt = Math.hypot(player.pos.x - CAFE.bx, player.pos.z - CAFE.bz) > CAFE.r ? _b.set(CAFE.bx, 0, CAFE.bz) : null;
+    else if (st === 'port') tgt = portTarget();
+    else if (st === 'studio') tgt = cableTarget();
+    else if (st === 'studio-usb') tgt = _b.set(STU.con[0], 0, STU.con[1] + 0.8);
     targetArrow(tgt);
   }
   if (st === 'street' && sv && sv.alive) {
@@ -6310,7 +7189,10 @@ function updateStory(dt) {
   }
   else if (st === 'gala-find' && sv) { if (Math.hypot(sv.pos.x - player.pos.x, sv.pos.z - player.pos.z) < 4.2) cutKiss(); }
   else if (st === 'snipe' && sv) { story.swayT = (story.swayT || 0) + dt; player.yaw += Math.sin(story.swayT * 1.3) * 0.00045; player.pitch += Math.cos(story.swayT * 1.7) * 0.00035; if (Math.random() < dt * 0.25) Sound.crowd(0.35); if (seen(svAim(sv), 45, 0.99975)) story.aimT += dt; else story.aimT = Math.max(0, story.aimT - dt); if (story.aimT > 0.45) openChoice(); }
-  else if (st === 'choice') { story.choiceT -= dt; $('chBar').style.width = Math.max(0, story.choiceT / 5 * 100) + '%'; if (story.choiceT <= 0) chooseMarry(); }
+  else if (st === 'cafe') updCafe(dt, tick);
+  else if (st === 'port') updPort(dt, tick);
+  else if (st === 'studio' || st === 'studio-usb') updStudio(dt, tick);
+  else if (st === 'choice') { story.choiceT -= dt; $('chBar').style.width = Math.max(0, story.choiceT / 7 * 100) + '%'; if (story.choiceT <= 0) chooseMarry(); }
   else if (st === 'hunted') {
     const k = stats.kills - story.killBase, goal = story.huntGoal || 12, al = npcs.filter((n) => n.type === 'soldier' && n.alive).length;
     story.huntT -= dt;
@@ -6411,7 +7293,7 @@ function frame(now) {
   if (state === 'play' || state === 'pause' || state === 'spawn') updateHud();
   updateScreenBlood(rdt);
   if (story.tv) renderTV(rdt);
-  const showVM = state === 'cutscene' || state === 'sui' || ((state === 'play' || state === 'pause' || state === 'spawn') && !view3() && !player.rag && !player.dead && !story.zoom);
+  const showVM = state === 'cutscene' || state === 'sui' || ((state === 'play' || state === 'pause' || state === 'spawn') && !view3() && !player.rag && !player.dead && !story.zoom && !(story.on && !story.gun && state === 'play'));
   fxStory.whip = fxStory.whip > 0.0006 ? fxStory.whip * Math.exp(-rdt * 8) : 0;
   cine.k = lerp(cine.k, state === 'story' && story.cut ? 1 : 0, Math.min(1, rdt * 2.5)); if (cine.k < 0.004) cine.k = 0;
   { const want = state === 'story' || state === 'cutscene' || state === 'sui'; if (want !== cine.on) { cine.on = want; $('cine').classList.toggle('on', want); } }
@@ -6427,7 +7309,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
