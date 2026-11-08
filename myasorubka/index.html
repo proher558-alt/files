@@ -80,6 +80,12 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(54px,13vw,118px);l
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
 .btn{font-family:var(--ui);font-size:20px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg);background:#1b1311;border:1px solid var(--line);padding:16px 14px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:4px;transition:background .15s,border-color .15s}
 .btn small{font-weight:400;font-size:12px;letter-spacing:.04em;text-transform:none;color:var(--muted)}
+#wardOv{justify-content:flex-end;background:linear-gradient(90deg,rgba(5,4,4,0) 32%,rgba(5,4,4,.86) 52%)}
+#wardOv .panel{width:min(480px,58vw);max-height:calc(100vh - 20px);overflow-y:auto;margin:0}
+@media (max-aspect-ratio:1/1){#wardOv{align-items:flex-end;justify-content:center;background:linear-gradient(180deg,rgba(5,4,4,0) 30%,rgba(5,4,4,.86) 50%)}#wardOv .panel{width:100%;max-height:58vh}}
+.prow{display:grid;grid-template-columns:104px 1fr 44px;align-items:center;gap:8px;margin:5px 0}
+.prow input{width:100%}
+.prow .num{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
 .admdisp{font-family:var(--mono);font-size:34px;letter-spacing:.35em;text-align:center;padding:12px;border:1px solid var(--line);background:#120c0b;margin:8px auto 12px;color:var(--hazard);max-width:360px}
 .admdisp.bad{color:#ff4a3a;border-color:#ff4a3a}
 .admpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:360px;margin:0 auto}
@@ -326,23 +332,7 @@ body.touch #wAmmo{font-size:26px}
       </div>
     </div>
     <p class="mapdesc" id="mapDesc"></p>
-    <div class="row"><span class="lbl">Кровь</span>
-      <div class="chips" id="bloodChips">
-        <button class="chip" data-v="1">×1 Реализм</button>
-        <button class="chip" data-v="3">×3 Много</button>
-        <button class="chip" data-v="8">×8 Кровавая баня</button>
-      </div>
-    </div>
-    <div class="row"><span class="lbl">Графика</span>
-      <div class="chips" id="qualChips">
-        <button class="chip" data-v="high">Высокая · тени</button>
-        <button class="chip" data-v="low">Быстрая</button>
-      </div>
-    </div>
-    <div class="row"><span class="lbl">Обзор</span><input type="range" id="sens" min="0.3" max="2.5" step="0.05"><span id="sensVal" class="num" style="font-family:var(--mono);font-size:13px"></span></div>
-    <div class="row"><span class="lbl">Футболка</span><div class="swatches" data-k="shirt"></div></div>
-    <div class="row"><span class="lbl">Кожа</span><div class="swatches" data-k="skin"></div></div>
-    <div class="row"><span class="lbl">Волосы</span><div class="swatches" data-k="hair"></div></div>
+    <div class="modes"><button class="btn" id="setBtn">Настройки<small>Оригинальные звуки, кровь, графика, обзор</small></button><button class="btn" id="wardBtn">Гардероб<small>Мужской или женский герой, цвета и размеры</small></button></div>
     <div class="touchhelp">Левая половина экрана — ходьба, правая — обзор. «Огонь» держите для автомата и грави-пушки. «Бросок» кидает гранату или швыряет пойманное грави-пушкой, а без цели толкает. «Ближе» и «Дальше» тянут пойманного. «Вид» переключает первое и третье лицо. «Упасть» роняет тело, повторное нажатие поднимает. В небоскрёбе зайдите в лифт: появится пульт этажей.</div>
     <div class="warn"><b>18+</b> · Графическое насилие, расчленение, много крови. Все персонажи вымышлены.</div>
   </div>
@@ -357,6 +347,37 @@ body.touch #wAmmo{font-size:26px}
   <div id="admBody" hidden><div class="chips admtabs" id="admTabs"></div><div class="spawngrid" id="admPane"></div><p class="mapdesc" id="admNote"></p></div>
   <input type="file" id="admFile" accept="audio/*" hidden>
   <div class="row" style="margin-top:16px"><button class="btn primary" id="admClose" style="flex:1">Закрыть</button></div>
+</div></div>
+<div id="setOv" class="overlay" hidden><div class="panel">
+  <div class="eyebrow">Меню</div>
+  <h1 style="font-size:clamp(34px,8vw,64px)">Настройки</h1>
+  <div class="row"><span class="lbl">Оригинальные звуки</span><div class="chips" id="origChips"><button class="chip" data-v="1">Вкл · мой голос</button><button class="chip" data-v="0">Выкл · синтез</button></div></div>
+  <p class="mapdesc">Включено: «Gotta get a grip», смех воскресителя и другие записанные звуки звучат вашим голосом. Выключено: вместо них синтезированные звуки.</p>
+    <div class="row"><span class="lbl">Кровь</span>
+      <div class="chips" id="bloodChips">
+        <button class="chip" data-v="1">×1 Реализм</button>
+        <button class="chip" data-v="3">×3 Много</button>
+        <button class="chip" data-v="8">×8 Кровавая баня</button>
+      </div>
+    </div>
+    <div class="row"><span class="lbl">Графика</span>
+      <div class="chips" id="qualChips">
+        <button class="chip" data-v="high">Высокая · тени</button>
+        <button class="chip" data-v="low">Быстрая</button>
+      </div>
+    </div>
+    <div class="row"><span class="lbl">Обзор</span><input type="range" id="sens" min="0.3" max="2.5" step="0.05"><span id="sensVal" class="num" style="font-family:var(--mono);font-size:13px"></span></div>
+  <div class="row" style="margin-top:16px"><button class="btn primary" id="setClose" style="flex:1">Готово</button></div>
+</div></div>
+<div id="wardOv" class="overlay" hidden><div class="panel">
+  <div class="eyebrow">Гардероб героя</div>
+  <div class="row"><span class="lbl">Персонаж</span><div class="chips" id="genderChips"><button class="chip" data-v="m">Мужской</button><button class="chip" data-v="f">Женский</button></div></div>
+  <div class="row" id="hairRow"><span class="lbl">Причёска</span><div class="chips" id="hairChips"><button class="chip" data-v="long">Длинные</button><button class="chip" data-v="pony">Хвост</button><button class="chip" data-v="bob">Каре</button></div></div>
+    <div class="row"><span class="lbl">Футболка</span><div class="swatches" data-k="shirt"></div></div>
+    <div class="row"><span class="lbl">Кожа</span><div class="swatches" data-k="skin"></div></div>
+    <div class="row"><span class="lbl">Волосы</span><div class="swatches" data-k="hair"></div></div>
+  <div id="propRows"></div>
+  <div class="row" style="margin-top:12px"><button class="btn" id="propReset" style="flex:1">Сбросить размеры</button><button class="btn primary" id="wardClose" style="flex:1">Готово</button></div>
 </div></div>
 <div id="spawn" class="overlay" hidden>
   <div class="panel">
@@ -451,9 +472,9 @@ function randTangent(n, out = new V3()) { randUnit(out); out.addScaledVector(n, 
 function angDiff(a, b) { let d = b - a; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return d; }
 const isTouch = true; // the game is built for phones only
 
-const settings = { blood: 1, quality: isTouch ? 'low' : 'high', sens: 1, map: 'polygon', view: 'fps', skin: 'default', myLaugh: true, god: false, ammo: false };
+const settings = { blood: 1, quality: isTouch ? 'low' : 'high', sens: 1, map: 'polygon', view: 'fps', skin: 'default', myLaugh: true, origSnd: true, god: false, ammo: false };
 try { const s = JSON.parse(localStorage.getItem('myasorubka-settings') || 'null'); if (s) Object.assign(settings, s); } catch (e) {}
-settings.look = Object.assign({ shirt: 0x2b3a55, skin: 0xe2b59a, hair: 0x15100c }, settings.look || {});
+settings.look = Object.assign({ shirt: 0x2b3a55, skin: 0xe2b59a, hair: 0x15100c, gender: 'm', hairStyle: 'long', prop: {} }, settings.look || {}); if (!settings.look.prop) settings.look.prop = {};
 function saveSettings() { try { localStorage.setItem('myasorubka-settings', JSON.stringify(settings)); } catch (e) {} }
 
 const stats = { kills: 0, heads: 0, dism: 0, gibs: 0, liters: 0, wave: 0 };
@@ -688,7 +709,7 @@ const Sound = {
   // the user's own laughs: 'head' = «О! Ха-ха-ха!» (3 s), 'neck' = a long laugh and a phrase (4.1 s); returns the length played, or 0 for the synthesized fallback
   myLaugh(kind, o = {}) {
     const m = { head: ['head', 0, undefined], headLaugh: ['head', 1.05, 1.25], neck: ['neck', 0, undefined], neckLaugh: ['neck', 0, 1.55] }[kind];
-    if (settings.myLaugh === false || !m || !this.clips[m[0]]) return 0; return this.clip(m[0], { offset: m[1], dur: m[2], vol: o.vol ?? 1.15, wet: o.wet ?? 0.15, rate: o.rate ?? 1, delay: o.delay ?? 0 });
+    if (settings.origSnd === false || settings.myLaugh === false || !m || !this.clips[m[0]]) return 0; return this.clip(m[0], { offset: m[1], dur: m[2], vol: o.vol ?? 1.15, wet: o.wet ?? 0.15, rate: o.rate ?? 1, delay: o.delay ?? 0 });
   },
   ok() { return this.ctx && this.ctx.state === 'running'; },
   out(vol, wet = 1) { const g = this.ctx.createGain(); g.gain.value = vol; g.connect(this.master); const s = this.ctx.createGain(); s.gain.value = wet; g.connect(s); s.connect(this.verbIn); return g; },
@@ -766,7 +787,7 @@ const Sound = {
   sawLoop(on) { if (!this.ok()) return; if (!this.sawN) { const c = this.ctx; const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 96; const lfo = c.createOscillator(); lfo.frequency.value = 26; const lg = c.createGain(); lg.gain.value = 9; lfo.connect(lg); lg.connect(o.frequency); const f = this.filt('lowpass', 1100, 3); const g = c.createGain(); g.gain.value = 0; o.connect(f); f.connect(g); g.connect(this.master); o.start(); lfo.start(); this.sawN = g; } this.sawN.gain.setTargetAtTime(on ? 0.22 : 0, this.ctx.currentTime, 0.04); },
   grip() {
     const GRIP_SRC = window.GRIP_SRC;
-    if (GRIP_SRC) { try { const a = new Audio(GRIP_SRC); a.volume = 1; const p = a.play(); if (p && p.catch) p.catch(() => this.gripSynth()); return; } catch (e) {} }
+    if (GRIP_SRC && settings.origSnd !== false) { try { const a = new Audio(GRIP_SRC); a.volume = 1; const p = a.play(); if (p && p.catch) p.catch(() => this.gripSynth()); return; } catch (e) {} }
     this.gripSynth();
   },
   gripSynth() {
@@ -1912,11 +1933,11 @@ const ZSKIN = [0x8c9a7c, 0x7b8872, 0x9a948a, 0x6f7a66, 0xa09a84];
 const ZCLOTH = [0x4a463c, 0x3a3e44, 0x5a4a3a, 0x3e2e2a, 0x6a6a5e];
 const helmMat = std({ color: 0x3b3f2c, roughness: 0.6, metalness: 0.2 }), rifleMat = std({ color: 0x1b1b1b, roughness: 0.5, metalness: 0.6 });
 const TYPES = {
-  human: { hp: 100, partHp: 1, look: () => ({ skin: pick(SKIN), shirt: pick(SHIRT), pants: pick(PANTS), hair: Math.random() < 0.85 ? pick(hairMats) : null, sleeves: pick(['short', 'short', 'long', 'none']), skinTex: TEX.skin, eyes: eyeMat }) },
-  zombie: { hp: 150, partHp: 1.15, look: () => ({ skin: pick(ZSKIN), shirt: pick(ZCLOTH), pants: pick(ZCLOTH), hair: Math.random() < 0.6 ? pick(hairMats) : null, sleeves: pick(['short', 'none', 'long']), skinTex: TEX.zskin, eyes: zEyeMat }) },
+  human: { hp: 100, partHp: 1, look: () => sexLook({ skin: pick(SKIN), shirt: pick(SHIRT), pants: pick(PANTS), hair: Math.random() < 0.85 ? pick(hairMats) : null, sleeves: pick(['short', 'short', 'long', 'none']), skinTex: TEX.skin, eyes: eyeMat }) },
+  zombie: { hp: 150, partHp: 1.15, look: () => sexLook({ skin: pick(ZSKIN), shirt: pick(ZCLOTH), pants: pick(ZCLOTH), hair: Math.random() < 0.6 ? pick(hairMats) : null, sleeves: pick(['short', 'none', 'long']), skinTex: TEX.zskin, eyes: zEyeMat }) },
   dummy: { hp: 220, partHp: 1.3, look: () => ({ plastic: true }) },
-  player: { hp: 100, partHp: 1.15, look: () => { const L = settings.look; return { skin: L.skin, shirt: L.shirt, pants: 0x23262c, hair: std({ color: L.hair, roughness: 0.85, map: TEX.cloth }), sleeves: 'short', skinTex: TEX.skin, eyes: eyeMat }; } },
-  soldier: { hp: 140, partHp: 1.1, look: () => ({ skin: pick(SKIN), shirt: 0x4b5536, pants: 0x3d4530, hair: null, sleeves: 'long', skinTex: TEX.skin, eyes: eyeMat, helmet: true, rifle: true }) },
+  player: { hp: 100, partHp: 1.15, look: () => { const L = settings.look; const f = L.gender === 'f'; return { skin: L.skin, shirt: L.shirt, pants: 0x23262c, hair: std({ color: L.hair, roughness: 0.85, map: TEX.cloth }), sleeves: 'short', skinTex: TEX.skin, eyes: eyeMat, female: f, hairStyle: f ? L.hairStyle || 'long' : 'short', lips: f ? 0xb4605a : null, iris: L.iris || 0, prop: L.prop || null }; } },
+  soldier: { hp: 140, partHp: 1.1, look: () => sexLook({ skin: pick(SKIN), shirt: 0x4b5536, pants: 0x3d4530, hair: null, sleeves: 'long', skinTex: TEX.skin, eyes: eyeMat, helmet: true, rifle: true }) },
 };
 const BLOOD_TINT = new THREE.Color(0x3c0303);
 const LOW_POSE = { down: 1, crawl: 1, kneel: 1, cover: 1 };
@@ -1950,12 +1971,66 @@ function addGagarin(npc) {
   G.maw = new THREE.Mesh(new THREE.PlaneGeometry(0.125, 0.07), decal(T.maw)); G.maw.position.set(0, -0.053, 0.117); G.maw.rotation.x = -0.12; G.maw.scale.y = 0.001; G.maw.visible = false; head.add(G.maw);
   G.crack = new THREE.Mesh(new THREE.PlaneGeometry(0.21, 0.21), decal(T.crack, 0, 0, THREE.AdditiveBlending)); G.crack.material.opacity = 0; G.crack.position.set(0, 0.012, 0.119); head.add(G.crack);
   const pr = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.3), decal(T.hood, 0, 0, THREE.AdditiveBlending)); pr.position.set(0, 0.01, 0.118); torso.add(pr);
-  const capM = std({ map: toTex(plaidCanvas('#4f8f52', '#cfe6c4')), roughness: 0.7 }), cp = new THREE.Mesh(new THREE.SphereGeometry(0.132, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.45), capM); cp.position.y = 0.03; cp.scale.set(1, 0.85, 1.05); head.add(cp);
   G.halo = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.011, 8, 32), new THREE.MeshBasicMaterial({ color: 0xffffff })); G.halo.position.set(0, 0.02, -0.07); head.add(G.halo);
   const wm = new THREE.MeshBasicMaterial({ map: T.wing, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, opacity: 0.9 });
   for (const sx of [-1, 1]) { const w = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.95), wm); w.userData.sx = sx; w.position.set(sx * 0.42, 0.1, -0.16); torso.add(w); G.wings.push(w); }
   const spear = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 1.15, 6), new THREE.MeshBasicMaterial({ color: 0x4a9cff })); spear.position.set(0.02, -0.12, 0.05); spear.rotation.z = -0.15; Pp.lArmR.mesh.add(spear); G.spear = spear;
   G.glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX.soft, color: 0x8a6aff, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false })); G.glow.position.set(0, 0.1, -0.25); G.glow.scale.set(1.9, 2.3, 1); torso.add(G.glow);
+  ggUpgrade(npc);
+}
+/* ===== the resurrector, closer to the reference: newsboy cap with a brim, orange swirls, a white nose, a banded staff, purple sparkles ===== */
+function ggExtraTex() {
+  const T = ggTextures(); if (T.swirl) return T;
+  { const c = makeCanvas(512, 256), g = c.getContext('2d'); g.lineCap = 'round'; g.shadowColor = 'rgba(255,140,30,0.9)'; g.shadowBlur = 10;
+    const spiral = (cx, cy, r0, turns, dir) => { g.beginPath(); for (let i = 0; i <= 80; i++) { const t = i / 80, a = dir * t * turns * 6.283 + Math.PI, r = r0 * (1 - t * 0.85); const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * 0.8; if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.stroke(); };
+    g.strokeStyle = '#ff8a1a'; g.lineWidth = 7; spiral(176, 150, 70, 1.3, 1); spiral(336, 150, 70, 1.3, -1);
+    g.lineWidth = 6; g.beginPath(); g.moveTo(256, 230); g.bezierCurveTo(226, 170, 290, 130, 256, 60); g.stroke(); g.beginPath(); g.moveTo(256, 120); g.quadraticCurveTo(300, 90, 330, 40); g.stroke(); g.beginPath(); g.moveTo(256, 120); g.quadraticCurveTo(212, 90, 182, 40); g.stroke();
+    for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(256 + sx * 120, 230); g.quadraticCurveTo(256 + sx * 200, 200, 256 + sx * 236, 120); g.stroke(); }
+    T.swirl = toTex(c); }
+  { const c = makeCanvas(256), g = c.getContext('2d'); g.fillStyle = '#4a0505'; g.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 70; i++) { g.strokeStyle = `rgba(${randi(80) + 140},${randi(30) + 10},${randi(30) + 10},${rand(0.35, 0.8)})`; g.lineWidth = rand(2, 6); g.beginPath(); const x = rand(0, 256), y = rand(0, 256); g.moveTo(x, y); g.quadraticCurveTo(x + rand(-40, 40), y + rand(-40, 40), x + rand(-70, 70), y + rand(-70, 70)); g.stroke(); }
+    g.fillStyle = '#e6dac2'; for (const [x, y, r] of [[150, 70, 34], [90, 120, 22], [170, 170, 26]]) { g.beginPath(); for (let i = 0; i < 9; i++) { const a = i / 9 * 6.283, rr = r * rand(0.7, 1.1); i ? g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr) : g.moveTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } g.closePath(); g.fill(); }
+    g.strokeStyle = '#6a5a48'; g.lineWidth = 2; for (let i = 0; i < 6; i++) { g.beginPath(); const x = rand(120, 190), y = rand(40, 200); g.moveTo(x, y); g.lineTo(x + rand(-20, 20), y + rand(-20, 20)); g.stroke(); }
+    g.fillStyle = '#120202'; g.beginPath(); g.ellipse(120, 100, 30, 24, 0, 0, 7); g.fill(); g.strokeStyle = '#a01818'; g.lineWidth = 5; g.stroke();
+    g.fillStyle = '#f2ece0'; for (let i = 0; i < 7; i++) g.fillRect(60 + i * 20, 206, 14, 22);
+    g.strokeStyle = '#140202'; g.lineWidth = 12; g.beginPath(); for (let i = 0; i <= 24; i++) { const a = i / 24 * 6.283, r = 118 * rand(0.86, 1); const x = 128 + Math.cos(a) * r, y = 128 + Math.sin(a) * r; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.closePath(); g.stroke();
+    T.gore = toTex(c); }
+  T.star = toTex(starCanvas());
+  return T;
+}
+function ggUpgrade(npc) {
+  const G = npc.gg, T = ggExtraTex(), P = npc.parts, head = P.head.mesh;
+  head.scale.setScalar(1.12);
+  // a newsboy cap: soft crown and a brim, green plaid; it can fly off and be put back
+  const capM = std({ map: toTex(plaidCanvas('#5c9a5e', '#d2ead0')), roughness: 0.75 }), cap = new THREE.Group();
+  const crown = new THREE.Mesh(new THREE.SphereGeometry(0.135, 20, 10, 0, Math.PI * 2, 0, Math.PI * 0.42), capM); crown.scale.set(1.04, 0.62, 1.1); crown.castShadow = true; cap.add(crown);
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(0.132, 0.134, 0.03, 22, 1, true), capM); band.position.y = 0.006; band.scale.set(1.03, 1, 1.08); cap.add(band);
+  const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.008, 18, 1, false, -Math.PI / 2, Math.PI), capM); brim.position.set(0, 0.0, 0.112); brim.rotation.x = 0.16; brim.scale.set(1.25, 1, 0.7); cap.add(brim);
+  const btn = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), capM); btn.position.y = 0.085; cap.add(btn);
+  cap.position.set(0, 0.055, 0.004); cap.rotation.x = 0.1; head.add(cap); G.cap = cap; G.capPos = cap.position.clone(); G.capQ = cap.quaternion.clone();
+  // orange swirls on the forehead and a little white nose, as on the avatar
+  const sw = new THREE.Mesh(new THREE.SphereGeometry(0.1215, 26, 10, Math.PI / 2 - 0.95, 1.9, 0.62, 0.62), new THREE.MeshBasicMaterial({ map: T.swirl, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 })); sw.scale.set(0.9, 1.05, 0.98); head.add(sw); G.swirl = sw;
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.011, 0.024, 3), new THREE.MeshBasicMaterial({ color: 0xf2f2f2 })); nose.rotation.set(Math.PI, 0, 0); nose.position.set(0, -0.016, 0.119); head.add(nose);
+  // the half face that a bullet can tear off (hidden until then) and the knife cut on the throat
+  for (const sd of [-1, 1]) { const g = new THREE.SphereGeometry(0.1222, 18, 14, sd > 0 ? Math.PI / 2 - 0.04 : Math.PI / 2 - 1.25, 1.29, 0.78, 1.55); g.scale(0.9, 1.05, 0.98); const m = new THREE.Mesh(g, std({ map: T.gore, roughness: 0.35, envMapIntensity: 0.6, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 })); m.visible = false; const pv = new THREE.Group(); pv.position.set(sd * 0.055, -0.005, 0.1); m.position.set(-sd * 0.055, 0.005, -0.1); pv.add(m); head.add(pv); (G.gore || (G.gore = {}))[sd] = pv; pv.userData.mesh = m; pv.visible = false; }
+  const slitM = new THREE.MeshBasicMaterial({ color: 0x5a0000 }); G.slit = new THREE.Mesh(new THREE.CylinderGeometry(0.0525, 0.0525, 0.007, 20, 1, true, -1.2, 2.4), slitM); G.slit.position.set(0, -0.112, -0.012); G.slit.visible = false; head.add(G.slit);
+  // the staff: dark blue with light bands, a crystal tip and a pennant
+  const old = G.spear; if (old) old.visible = false;
+  const st = new THREE.Group(); st.position.copy(old ? old.position : new V3(0.02, -0.12, 0.05)); st.rotation.copy(old ? old.rotation : new THREE.Euler(0, 0, -0.15));
+  st.add(new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1.15, 8), std({ color: 0x15307a, roughness: 0.4, metalness: 0.3 })));
+  const bandM = new THREE.MeshBasicMaterial({ color: 0x7ad0ff }); for (let i = -3; i <= 3; i++) { const b = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.02, 8), bandM); b.position.y = i * 0.16; st.add(b); }
+  const tip = new THREE.Mesh(new THREE.OctahedronGeometry(0.04), new THREE.MeshBasicMaterial({ color: 0x9ae4ff })); tip.scale.set(0.7, 1.6, 0.7); tip.position.y = 0.62; st.add(tip);
+  const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.22), new THREE.MeshBasicMaterial({ color: 0x2a5ad8, side: THREE.DoubleSide, transparent: true, opacity: 0.92 })); flag.position.set(0.085, 0.42, 0); st.add(flag); G.flag = flag;
+  P.lArmR.mesh.add(st); G.spear = st;
+  // a small pink candy blade in the other hand
+  const cb = new THREE.Group(); cb.add(new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.2, 0.008), new THREE.MeshBasicMaterial({ color: 0xff6ad8 }))); cb.children[0].position.y = -0.1; const hd = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.07, 8), std({ color: 0x7ae070 })); hd.position.y = 0.03; cb.add(hd); cb.position.set(0, -0.15, 0.04); cb.rotation.x = -1.2; P.lArmL.mesh.add(cb); G.candy = cb;
+  G.sparkT = 0;
+}
+function ggSparkle(npc, dt) {
+  const G = npc.gg; if (!G || npc.regenBusy && !G.sparkAlways) return; G.sparkT -= dt; if (G.sparkT > 0) return; G.sparkT = rand(0.12, 0.35);
+  if (camera.position.distanceToSquared(npc.pos) > 600) return;
+  const T = ggExtraTex(); _a.set(npc.pos.x + rand(-0.6, 0.6), rand(0.6, 2.1), npc.pos.z + rand(-0.6, 0.6));
+  spawnSprite(T.star, _a, { color: pick([0xb24aff, 0xd27aff, 0x8a5aff]), additive: true, size: rand(0.09, 0.22), grow: 0.2, life: rand(0.5, 1.1), vel: new V3(0, rand(0.1, 0.4), 0) });
 }
 /* ===================== Svity: painted face, ombré hair and three outfits, built after the reference photos ===================== */
 const SVT = { face: {}, mouth: {}, hair: null };
@@ -2131,7 +2206,7 @@ function addSvityExtras(npc, L) {
   const put = (parent, geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); m.castShadow = false; parent.add(m); return m; };
   // proportions of a cartoon girl
   head.geometry = GEO.headSv; head.scale.setScalar(1.06); torso.scale.set(0.94, 1, 0.95); for (const n of ['uArmL', 'uArmR', 'lArmL', 'lArmR']) P[n].mesh.scale.set(0.86, 1, 0.86); for (const n of ['uLegL', 'uLegR', 'lLegL', 'lLegR']) P[n].mesh.scale.set(0.9, 1, 0.9);
-  head.children[0].visible = false; head.children[1].visible = false;
+  for (const c of head.children) if (c.userData.face) c.visible = false;
   // painted face: eyes, brows, blush and nose on one patch; the mouth on another
   const fm = new THREE.MeshStandardMaterial({ map: svFaceTex('neutral'), transparent: true, depthWrite: false, roughness: 0.6, metalness: 0, envMapIntensity: 0.3, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   const mm = new THREE.MeshStandardMaterial({ map: svMouthTex('closed'), transparent: true, depthWrite: false, roughness: 0.5, metalness: 0, envMapIntensity: 0.3, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
@@ -2177,7 +2252,7 @@ function addSvityExtras(npc, L) {
   } else if (sk === 'gala') {
     const satin = (n) => { P[n].mat.color.setHex(0x0d0c10); P[n].baseColor.setHex(0x0d0c10); setCloth(n, null, 0.3, 0.2); };
     satin('torso'); satin('pelvis');
-    logo([{ t: 'СВИТИ', s: 190 }], 0.2, 0.075, 0, 0.08, 0.1158, '#f0c25a');
+    logo([{ t: 'СВИТИ', s: 190 }], 0.2, 0.075, 0, -0.035, 0.1158, '#f0c25a');
     const dg = std({ color: 0x0d0c10, roughness: 0.3, metalness: 0.2 }); put(torso, new THREE.CylinderGeometry(0.054, 0.058, 0.045, 18), dg, 0, 0.255, 0);
     put(torso, new THREE.SphereGeometry(0.009, 8, 6), goldMat, 0.0, 0.235, 0.058); for (const dx of [-0.02, 0.02]) put(torso, new THREE.SphereGeometry(0.006, 8, 6), std({ color: 0xf2eee6, roughness: 0.3, metalness: 0.2 }), dx, 0.268, 0.056);
     // the golden feather band on the bodice and a floor-length satin skirt
@@ -2185,15 +2260,137 @@ function addSvityExtras(npc, L) {
     put(pelvis, skirt, new THREE.MeshStandardMaterial({ map: dt, roughness: 0.3, metalness: 0.18, side: THREE.DoubleSide, envMapIntensity: 0.9 }), 0, -0.43, 0, 0, Math.PI * 0.72, 0);
   }
 }
+/* ===== realism: women and men (40 / 60), faces that blink, look around and frown, springy chest and hair ===== */
+function sexLook(L) {
+  L.female = Math.random() < 0.4; L.iris = randi(4);
+  if (L.female) { L.hair = L.hair || pick(hairMats); L.hairStyle = pick(['long', 'long', 'pony', 'bob']); L.lips = pick([0xb4605a, 0xc0505a, 0xa86a60, 0x9a3a46]); }
+  else L.hairStyle = 'short';
+  return L;
+}
+(function faceGeos() {
+  const vc = (g, col) => { const n = g.attributes.position.count, a = new Float32Array(n * 3); for (let i = 0; i < n; i++) a.set(col, i * 3); g.setAttribute('color', new THREE.BufferAttribute(a, 3)); return g; };
+  GEO.eyeballs = [[0.3, 0.17, 0.08], [0.22, 0.42, 0.62], [0.24, 0.4, 0.2], [0.4, 0.43, 0.46]].map((c) => mergeGeometries([vc(new THREE.SphereGeometry(0.017, 12, 10), [0.93, 0.91, 0.87]), vc(new THREE.SphereGeometry(0.0088, 10, 8).translate(0, 0, 0.0122), c), vc(new THREE.SphereGeometry(0.0045, 8, 6).translate(0, 0, 0.0178), [0.02, 0.02, 0.02])]));
+  GEO.brow = new THREE.BoxGeometry(0.036, 0.008, 0.01);
+  GEO.mouth = new THREE.BoxGeometry(0.045, 0.008, 0.012);
+  GEO.lips = new THREE.BoxGeometry(0.048, 0.016, 0.012);
+  GEO.hairLong = new THREE.CylinderGeometry(0.118, 0.15, 0.38, 20, 4, true, Math.PI * 0.4, Math.PI * 1.2).translate(0, -0.14, -0.012);
+  GEO.hairBob = new THREE.CylinderGeometry(0.122, 0.135, 0.19, 20, 2, true, Math.PI * 0.36, Math.PI * 1.28).translate(0, -0.05, -0.006);
+  GEO.pony = new THREE.CapsuleGeometry(0.03, 0.17, 4, 10).translate(0, -0.11, 0);
+  GEO.chest = mergeGeometries([1, -1].map((sx) => new THREE.SphereGeometry(0.06, 16, 12).scale(1, 0.92, 0.8).rotateY(sx * 0.18).translate(0.056 * sx, 0, 0)));
+})();
+// a hand with a palm, four fingers and a thumb in one mesh; f stretches the fingers
+const _handGeos = {};
+function handGeo(f = 1) {
+  const key = Math.round(f * 20); if (_handGeos[key]) return _handGeos[key]; f = key / 20;
+  const parts = [new RoundedBoxGeometry(0.072, 0.062, 0.034, 2, 0.012).translate(0, -0.112, 0)];
+  for (let i = 0; i < 4; i++) { const len = 0.03 * f * (i === 0 || i === 3 ? 0.86 : 1), g = new THREE.CapsuleGeometry(0.0078, len, 3, 6); g.translate(0, -len / 2 - 0.0078, 0); g.rotateX(0.18); g.translate(-0.026 + i * 0.0173, -0.142, 0.002); parts.push(g); }
+  const th = new THREE.CapsuleGeometry(0.0085, 0.026 * f, 3, 6); th.translate(0, -0.013 * f - 0.0085, 0); th.rotateZ(0.7); th.rotateY(-0.5); th.translate(0.035, -0.1, 0.012); parts.push(th);
+  return (_handGeos[key] = mergeGeometries(parts.map((g) => (g.index ? g.toNonIndexed() : g))));
+}
+GEO.hand = handGeo(1);
+const _dsMats = new Map();
+function dsMat(m) { let d = _dsMats.get(m); if (!d) { d = m.clone(); d.side = THREE.DoubleSide; _dsMats.set(m, d); } return d; }
+function buildFace(n, L) {
+  const head = n.parts.head.mesh, F = n.fx || (n.fx = {});
+  const tag = (o) => { o.userData.face = true; return o; };
+  F.eyes = []; F.balls = []; F.brows = [];
+  const eg = GEO.eyeballs[L.iris || 0];
+  for (const sx of [1, -1]) { const g = tag(new THREE.Group()); g.position.set(0.04 * sx, 0.018, 0.097); const b = new THREE.Mesh(eg, L.eyes); g.add(b); head.add(g); F.eyes.push(g); F.balls.push(b); }
+  const bm = L.hair || faceMat;
+  for (const sx of [1, -1]) { const b = tag(new THREE.Mesh(GEO.brow, bm)); b.position.set(0.04 * sx, 0.046, 0.106); b.rotation.z = -sx * (L.female ? 0.2 : 0.12); if (L.female) b.scale.set(0.95, 0.6, 1); head.add(b); F.brows.push(b); }
+  const mo = tag(new THREE.Mesh(L.female && L.lips ? GEO.lips : GEO.mouth, L.female && L.lips ? std({ color: L.lips, roughness: 0.45 }) : faceMat)); mo.position.set(0, -0.058, 0.106); head.add(mo);
+  if (L.hair) {
+    const h = tag(new THREE.Mesh(GEO.hair, L.hair)); h.castShadow = true; head.add(h); F.hair = h;
+    const st = L.hairStyle;
+    if (st === 'long' || st === 'bob') { const pv = tag(new THREE.Group()); pv.position.set(0, 0.05, -0.01); const m = new THREE.Mesh(st === 'long' ? GEO.hairLong : GEO.hairBob, dsMat(L.hair)); m.position.set(0, -0.05, 0.01); m.castShadow = true; pv.add(m); head.add(pv); F.hairPv = pv; F.hairLen = m; F.hairBase = 0; }
+    else if (st === 'pony') { const pv = tag(new THREE.Group()); pv.position.set(0, 0.035, -0.112); const m = new THREE.Mesh(GEO.pony, L.hair); m.castShadow = true; pv.add(m); pv.rotation.x = 0.55; head.add(pv); F.hairPv = pv; F.hairLen = m; F.hairBase = 0.55; }
+  }
+  Object.assign(F, { blinkT: rand(0.5, 4), blink: 0, open: 1, gx: 0, gy: 0, sacT: 0, sx: 0, sy: 0, by: 0, bi: 0, deadOpen: rand(0.3, 1), eyeK: L.female ? 1.08 : 1, hs: { x: new V3(), v: new V3() }, bs: { x: new V3(), v: new V3() } });
+  if (L.female) for (const e of F.eyes) e.scale.setScalar(F.eyeK);
+}
+function bodyExtras(n, L) {
+  const P = n.parts, F = n.fx || (n.fx = {});
+  if (L.female && !L.plastic && !L.gagarin) {
+    if (!L.svity) { P.torso.mesh.scale.set(0.9, 1, 0.95); P.pelvis.mesh.scale.set(1.05, 1, 1); for (const k of ['uArmL', 'uArmR', 'lArmL', 'lArmR']) P[k].mesh.scale.set(0.86, 1, 0.86); for (const k of ['uLegL', 'uLegR', 'lLegL', 'lLegR']) P[k].mesh.scale.set(0.93, 1, 0.93); P.head.mesh.scale.setScalar(0.97); }
+    const ch = new THREE.Mesh(GEO.chest, P.torso.mat); ch.position.set(0, L.svity ? 0.075 : 0.07, L.svity ? 0.086 : 0.09); ch.castShadow = true; if (L.svity) ch.scale.setScalar(0.85); P.torso.mesh.add(ch);
+    F.chest = ch; F.chest0 = ch.position.clone(); F.chestK = ch.scale.y; F.cs = { x: new V3(), v: new V3() };
+  }
+  const pr = L.prop || (L.gagarin || L.svity || L.plastic ? null : { build: rand(0.9, 1.12), head: rand(0.95, 1.05) });
+  if (pr) applyProps(n, pr);
+}
+// body proportions from the wardrobe (or a little random variety for everyone else)
+function applyProps(n, pr) {
+  const P = n.parts, F = n.fx || {}, b = pr.build ?? 1, arms = pr.arms ?? 1, legs = pr.legs ?? 1, th = 0.75 + 0.25 * b;
+  const mul = (m, x, y, z) => m.scale.set(m.scale.x * x, m.scale.y * y, m.scale.z * z);
+  const len = (Pt, k) => { Pt.mesh.scale.y *= k; Pt.mesh.position.y *= k; };
+  mul(P.torso.mesh, b, 1, th); mul(P.pelvis.mesh, b, 1, th);
+  for (const s of ['L', 'R']) {
+    const ua = P['uArm' + s], la = P['lArm' + s], ul = P['uLeg' + s], ll = P['lLeg' + s];
+    for (const Pt of [ua, la]) { mul(Pt.mesh, b, 1, b); len(Pt, arms); } la.pivot.position.y *= arms;
+    for (const Pt of [ul, ll]) { mul(Pt.mesh, b, 1, b); len(Pt, legs); } ll.pivot.position.y *= legs;
+    if (la.hand) { const hk = pr.hands ?? 1; la.hand.scale.set(hk / b, hk, hk / b); if ((pr.fingers ?? 1) !== 1) la.hand.geometry = handGeo(pr.fingers); }
+    if (ll.foot) ll.foot.scale.set(1 / b, 1, 1 / b);
+  }
+  n.legK = legs;
+  if (pr.head) P.head.mesh.scale.multiplyScalar(pr.head);
+  if (pr.eyes && F.eyes) { F.eyeK = (F.eyeK || 1) * pr.eyes; for (const e of F.eyes) e.scale.setScalar(F.eyeK); }
+  if (pr.hair && F.hair) { F.hair.scale.multiplyScalar(0.92 + 0.08 * pr.hair); if (F.hairLen) F.hairLen.scale.y = pr.hair; }
+  if (pr.chest && F.chest) { F.chest.scale.multiplyScalar(pr.chest); F.chestK = F.chest.scale.y; }
+  if (pr.height && pr.height !== 1) n.root.scale.setScalar(pr.height);
+}
+const _fxA = new V3(), _fxV = new V3(), _fxAc = new V3(), _fxT = new V3(), _fxQ = new THREE.Quaternion();
+function fxSpring(s, K, C, gain, max, dt) {
+  s.v.x += (-K * s.x.x - C * s.v.x - _fxAc.x * gain) * dt; s.v.y += (-K * s.x.y - C * s.v.y - _fxAc.y * gain) * dt; s.v.z += (-K * s.x.z - C * s.v.z - _fxAc.z * gain) * dt;
+  s.x.addScaledVector(s.v, dt); if (s.x.lengthSq() > max * max) { s.x.setLength(max); s.v.multiplyScalar(0.4); }
+}
+// per frame: blinking, gaze, brows that show pain, fear or anger, and inertia for the chest, hair and brows
+function bodyFx(n, dt) {
+  const F = n.fx, P = n.parts; if (!F || dt <= 1e-4) return;
+  if (camera.position.distanceToSquared(n.pos) > 900 && n.state !== 'dead') { F.prev = null; return; }
+  const src = !P.torso.gone ? P.torso.mesh : !P.head.gone ? P.head.mesh : null; if (!src) return;
+  src.getWorldPosition(_fxA);
+  if (!F.prev) { F.prev = _fxA.clone(); F.vel = new V3(); _fxAc.set(0, 0, 0); }
+  else { _fxV.copy(_fxA).sub(F.prev).divideScalar(dt); _fxAc.copy(_fxV).sub(F.vel).divideScalar(dt); F.vel.copy(_fxV); F.prev.copy(_fxA); if (_fxAc.lengthSq() > 160000) _fxAc.setLength(400); }
+  src.getWorldQuaternion(_fxQ).invert(); _fxAc.applyQuaternion(_fxQ);
+  if (F.chest && !P.torso.gone) { fxSpring(F.cs, 170, 7, 0.4, 0.02, dt); F.chest.position.set(F.chest0.x + F.cs.x.x * 0.3, F.chest0.y + F.cs.x.y, F.chest0.z + F.cs.x.z * 0.6); F.chest.scale.y = F.chestK * (1 - F.cs.x.y * 3); }
+  if (F.hairPv && !P.head.gone) { fxSpring(F.hs, 55, 3, 0.05, 0.6, dt); F.hairPv.rotation.x = F.hairBase - F.hs.x.z * 1.2 + (n.state === 'alive' ? 0 : 0.2); F.hairPv.rotation.z = F.hs.x.x * 1.2; }
+  if (!F.eyes || P.head.gone) return;
+  fxSpring(F.bs, 420, 14, 0.0004, 0.004, dt);
+  const dead = n.state === 'dead', alive = n.state === 'alive', limp = n.state === 'limp';
+  const pain = alive && (n.flinch > 0.25 || !!n.clutch || n.pose === 'choke' || n.pose === 'kneel' || n.pose === 'hop' || n.pose === 'down') || limp;
+  const fear = alive && (n.panic > 0 || n.pose === 'surrender' || n.pose === 'cover');
+  let open = 1, bY = 0, bIn = 0;
+  if (dead) open = F.deadOpen;
+  else {
+    F.blinkT -= dt; if (F.blinkT <= 0) { F.blinkT = rand(2, 6); F.blink = 0.13; }
+    if (F.blink > 0) { F.blink -= dt; open = 0.08; }
+    else if (pain) { open = 0.42; bIn = 0.6; bY = 0.002; }
+    else if (fear) { open = 1.3; bIn = 0.4; bY = 0.007; }
+    if (n.type === 'zombie') { bIn = -0.5; bY = -0.004; open = Math.min(open, 0.9); }
+  }
+  const ke = Math.min(1, dt * (dead ? 2 : 22)); F.open += (open - F.open) * ke;
+  for (const e of F.eyes) { e.scale.y = F.eyeK * Math.max(0.05, F.open); e.scale.x = e.scale.z = F.eyeK; }
+  // gaze: at the player when close, small saccades, a fixed stare when dead
+  let gy = 0, gx = dead ? -0.15 : 0;
+  if (!dead) {
+    F.sacT -= dt; if (F.sacT <= 0) { F.sacT = rand(0.35, 1.8); F.sx = rand(-0.14, 0.14); F.sy = rand(-0.08, 0.08); }
+    if (!n.controlled && n.pos.distanceToSquared(player.pos) < 300) { P.head.mesh.worldToLocal(_fxT.copy(eye.position)); if (_fxT.z > 0.05) { gy = clamp(Math.atan2(_fxT.x, _fxT.z), -0.6, 0.6); gx = clamp(-Math.atan2(_fxT.y - 0.02, _fxT.z), -0.4, 0.4); } }
+    gy += F.sx; gx += F.sy;
+  }
+  const kg = Math.min(1, dt * 18); F.gy += (gy - F.gy) * kg; F.gx += (gx - F.gx) * kg;
+  for (const b of F.balls) b.rotation.set(F.gx, F.gy, 0);
+  const kb = Math.min(1, dt * 10); F.by += (bY - F.by) * kb; F.bi += (bIn - F.bi) * kb;
+  for (let i = 0; i < 2; i++) { const b = F.brows[i], sx = i === 0 ? 1 : -1; b.position.y = 0.046 + F.by + F.bs.x.y; b.rotation.z = -sx * ((n.look.female ? 0.2 : 0.12) + F.bi * 0.5); }
+}
 function applyLookKind(L, k) {
   if (k === 'worker') { L.shirt = pick([0xff6a10, 0xffa000, 0xe85a0a]); L.pants = pick([0x2a3550, 0x3a3a38, 0x2c3a2a]); L.sleeves = 'long'; L.hardhat = pick([0xf2c200, 0xf2f2ee, 0xff7a00, 0xf2c200]); L.hair = null; }
   else if (k === 'office') { L.shirt = pick([0xe8eef4, 0xc8daf0, 0xf4f4f0, 0xd0d6dc, 0x9ab0c8]); L.pants = pick([0x1c1e22, 0x2a2d33, 0x22252c]); L.sleeves = 'long'; if (Math.random() < 0.6) L.tie = pick([0x7a1020, 0x1a2a5a, 0x111111, 0x2a4a2a]); }
   else if (k === 'guard') { L.shirt = 0x1a1d24; L.pants = 0x15171c; L.helmet = false; L.cap = true; L.hair = null; }
-  else if (k.startsWith('svity')) { L.skin = 0xf6d0b6; L.hair = null; L.svity = k.slice(6); L.sleeves = L.svity === 'gala' ? 'none' : L.svity === 'cop' ? 'short' : 'long'; L.shirt = L.svity === 'cop' ? 0x1b2236 : 0x121216; L.pants = L.svity === 'cop' ? 0x161c2c : 0x121216; L.badge = L.svity === 'cop'; L.phone = L.svity === 'street'; }
-  else if (k === 'gagarin') { L.skin = 0x0b0b0e; L.skinTex = null; L.shirt = 0x0c0c10; L.pants = 0xe07a1a; L.sleeves = 'long'; L.hair = null; L.gagarin = true; L.cap = false; }
+  else if (k.startsWith('svity')) { L.skin = 0xf6d0b6; L.hair = null; L.female = true; L.hairStyle = null; L.svity = k.slice(6); L.sleeves = L.svity === 'gala' ? 'none' : L.svity === 'cop' ? 'short' : 'long'; L.shirt = L.svity === 'cop' ? 0x1b2236 : 0x121216; L.pants = L.svity === 'cop' ? 0x161c2c : 0x121216; L.badge = L.svity === 'cop'; L.phone = L.svity === 'street'; }
+  else if (k === 'gagarin') { L.female = false; L.skin = 0x0b0b0e; L.skinTex = null; L.shirt = 0x0c0c10; L.pants = 0xe07a1a; L.sleeves = 'long'; L.hair = null; L.gagarin = true; L.cap = false; }
   else if (k === 'cop') { L.shirt = 0x1b2236; L.pants = 0x161c2c; L.sleeves = 'short'; L.cap = true; L.badge = true; }
   else if (k === 'fan') { L.shirt = pick([0xc8a040, 0x8a1a3a, 0xf0f0ea, 0x1a3a6a, 0x5a1a6a, 0xd84a7a]); L.pants = pick([0x1a1a1e, 0x2a2420, 0xf0f0ea]); L.sleeves = 'long'; }
-  else if (k === 'baby') { L.shirt = 0xa8d0f0; L.pants = 0xa8d0f0; L.sleeves = 'long'; L.hair = null; }
+  else if (k === 'baby') { L.shirt = 0xa8d0f0; L.pants = 0xa8d0f0; L.sleeves = 'long'; L.hair = null; L.female = false; }
 }
 
 let targetsDirty = true;
@@ -2230,10 +2427,10 @@ class Humanoid {
       this.parts[name] = P; this.partList.push(P);
     }
     const head = this.parts.head.mesh;
-    if (!L.plastic) { head.add(new THREE.Mesh(GEO.eyes, L.eyes)); head.add(new THREE.Mesh(GEO.face, faceMat)); if (L.hair) { const h = new THREE.Mesh(GEO.hair, L.hair); h.castShadow = true; head.add(h); } }
+    if (!L.plastic && !L.svity && !L.gagarin) buildFace(this, L);
     for (const s of ['L', 'R']) {
-      const la = this.parts['lArm' + s]; const hand = new THREE.Mesh(GEO.hand, L.sleeves === 'long' && !L.plastic ? skinM : la.mat); hand.castShadow = true; la.mesh.add(hand);
-      const ll = this.parts['lLeg' + s]; const foot = new THREE.Mesh(GEO.foot, L.plastic ? ll.mat : shoeMat); foot.castShadow = true; ll.mesh.add(foot);
+      const la = this.parts['lArm' + s]; const hand = new THREE.Mesh(GEO.hand, L.sleeves === 'long' && !L.plastic ? skinM : la.mat); hand.castShadow = true; la.mesh.add(hand); la.hand = hand;
+      const ll = this.parts['lLeg' + s]; const foot = new THREE.Mesh(GEO.foot, L.plastic ? ll.mat : shoeMat); foot.castShadow = true; ll.mesh.add(foot); ll.foot = foot;
     }
     if (!L.plastic) this.parts.pelvis.mesh.add(new THREE.Mesh(GEO.belt, beltMat));
     if (L.helmet) head.add(new THREE.Mesh(GEO.helmet, helmMat));
@@ -2241,6 +2438,7 @@ class Humanoid {
     if (L.cap) { const cp = new THREE.Mesh(GEO.helmet, capMat); cp.scale.set(1, 0.72, 1.02); head.add(cp); const vz = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.012, 0.08), capMat); vz.position.set(0, 0.03, 0.13); head.add(vz); }
     if (L.svity) addSvityExtras(this, L);
     if (L.gagarin) addGagarin(this); else if (!L.plastic && !L.svity) { this.mouthOpen = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.03, 0.01), mouthDarkMat); this.mouthOpen.position.set(0, -0.06, 0.103); this.mouthOpen.scale.y = 0.001; head.add(this.mouthOpen); }
+    bodyExtras(this, L);
     if (L.badge) { const bd = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.055, 0.012), goldMat); bd.position.set(0.085, 0.12, 0.113); this.parts.torso.mesh.add(bd); }
     if (L.tie) { const tm = std({ color: L.tie, roughness: 0.5 }), tie = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.3, 0.012), tm); tie.position.set(0, 0.03, 0.112); this.parts.torso.mesh.add(tie); }
     if (L.rifle) { const gun = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.07, 0.55), rifleMat); gun.position.set(0, 0.02, 0.22); gun.castShadow = true; this.parts.lArmR.mesh.add(gun); }
@@ -2275,7 +2473,7 @@ class Humanoid {
     const jw = C.mesh.localToWorld(jl.clone()); Pp.mesh.updateMatrixWorld(); const pa = Pp.mesh.worldToLocal(jw.clone());
     const ax = new CANNON.Vec3(d.axis[0], d.axis[1], d.axis[2]); ax.normalize();
     const bd = new V3(d.c[0] - d.j[0], d.c[1] - d.j[1], d.c[2] - d.j[2]).normalize();
-    const con = new CANNON.ConeTwistConstraint(Pp.body, C.body, { pivotA: cv(pa), pivotB: cv(jl), axisA: ax, axisB: cv(bd), angle: d.cone, twistAngle: d.twist, collideConnected: false, maxForce: 1e6 });
+    const con = new CANNON.ConeTwistConstraint(Pp.body, C.body, { pivotA: cv(pa), pivotB: cv(jl), axisA: ax, axisB: cv(bd), angle: C.broken ? 2.6 : d.cone, twistAngle: C.broken ? 2.4 : d.twist, collideConnected: false, maxForce: 1e6 });
     world.addConstraint(con); C.constraint = con;
   }
   die(cause) {
@@ -2333,7 +2531,7 @@ class Humanoid {
     if (mo !== S.curM) { S.curM = mo; S.mouth.map = svMouthTex(mo); }
   }
   ggUpdate(dt) {
-    const G = this.gg; if (!G) return; const k = 1 - Math.exp(-16 * dt), t = this.t;
+    const G = this.gg; if (!G) return; const k = 1 - Math.exp(-16 * dt), t = this.t; ggSparkle(this, dt);
     if (this.ggClip) { const c = this.ggClip, el = (performance.now() - c.t0) / 1000; if (el > c.len + 0.15) { this.ggClip = null; this.ggMouth = 0.3; } else this.ggMouth = 0.12 + 0.88 * Math.min(1, Sound.clipLevel(c.name, el + c.off) * 1.25); }
     if (state === 'play' && mode !== 'story' && !this.regenBusy && !this.scripted && !this.controlled) {
       this.quipT = (this.quipT ?? rand(10, 18)) - dt;
@@ -2553,7 +2751,7 @@ class Humanoid {
     ua.pivot.quaternion.slerp(_ikQ, w); la.pivot.quaternion.slerp(_ikQ2, w);
   }
   update(dt) {
-    this.t += dt;
+    this.t += dt; if (this.fx) bodyFx(this, dt);
     if (this.state === 'dead') { this.updateDead(dt); return; }
     if (this.state === 'limp') { this.updateLimp(dt); return; }
     if (this.controlled) {
@@ -2711,6 +2909,7 @@ class Humanoid {
         tg('torso', -ap * 0.22 + s * 0.02 + (this.crouch || 0) * 0.3, -pry * 0.9 + 0.12, 0); tg('head', -ap * 0.5, -0.12, 0);
         this.ikLeft = false;
         if (this.relaxed) { tg('uArmL', sw * amp * 0.9, 0, 0.07); tg('uArmR', -sw * amp * 0.9, 0, -0.07); tg('lArmL', -0.2 - Math.max(0, sw) * amp * 0.6, 0, 0); tg('lArmR', -0.2 - Math.max(0, -sw) * amp * 0.6, 0, 0); tg('torso', s * 0.03, -sw * 0.1 * amp, 0); tg('head', 0, 0, 0); }
+        else if (w.fists) { const k = W.punchT > 0 ? Math.sin((1 - W.punchT / 0.26) * Math.PI) : 0, R = !!W.punchSide; tg('uArmR', -1.15 - (R ? k * 0.55 : 0), 0, -0.3 + (R ? k * 0.25 : 0)); tg('lArmR', -1.85 + (R ? k * 1.7 : 0), 0, 0); tg('uArmL', -1.15 - (!R ? k * 0.55 : 0), 0, 0.3 - (!R ? k * 0.25 : 0)); tg('lArmL', -1.85 + (!R ? k * 1.7 : 0), 0, 0); }
         else if (w.melee) { const k = W.swingT > 0 ? Math.sin((1 - W.swingT / 0.32) * Math.PI) : 0; tg('uArmR', -0.85 - ap * 0.5 - k * 1.3, -k * 0.7, -0.25 + k * 0.7); tg('lArmR', -0.9 + k * 0.7, 0, 0); tg('uArmL', sw * amp * 0.8, 0, 0.1); tg('lArmL', -0.35, 0, 0); }
         else if (w.thrown) { const k = W.throwT > 0 ? Math.sin((1 - W.throwT / 0.45) * Math.PI) : 0; tg('uArmR', -1.1 - ap * 0.5 - k * 1.5, 0, -0.25); tg('lArmR', -0.7 + k * 0.5, 0, 0); tg('uArmL', -0.5, 0, 0.25); tg('lArmL', -0.6, 0, 0); }
         else { tg('uArmR', -1.52 - ap * 0.78 - W.recoil * 0.12, 0.12, -0.1); tg('lArmR', -0.1, 0, 0); tg('uArmL', -1.3 - ap * 0.75, -0.2, 0.5); tg('lArmL', -1.0, 0, 0); this.ikLeft = true; }
@@ -2853,6 +3052,37 @@ class Humanoid {
       tg('uLegL', -0.5, 0, 0.1); tg('uLegR', 0.28, 0, -0.1); tg('lLegL', 0.55, 0, 0); tg('lLegR', 0.1, 0, 0);
       tg('torso', 0.3 - lm * 0.1, 0.28, 0); tg('head', -0.05 - lm * 0.5 + Math.sin(t * 22) * 0.06 * lm, Math.sin(t * 9) * 0.1 * lm, Math.sin(t * 14) * 0.06 * lm);
       tg('uArmR', -1.62, 0, -0.04); tg('lArmR', -0.03, 0, 0); tg('uArmL', 0.5 + lm * 0.6, 0, 0.5 + lm * 0.5); tg('lArmL', -0.3, 0, 0);
+    } else if (pose === 'capcatch' || pose === 'capput' || pose === 'capfix') {
+      // the resurrector reaches up for his cap, puts it back on and straightens it, laughing
+      const lm = this.ggMouth || 0, sh = Math.sin(t * 24) * 0.04 * lm;
+      py = 1.0; prx = -0.03; pry = 0; prz = Math.sin(t * 6) * 0.03 * lm;
+      tg('uLegL', 0.02, 0, 0.07); tg('uLegR', -0.02, 0, -0.07); tg('lLegL', 0.06, 0, 0); tg('lLegR', 0.06, 0, 0);
+      tg('torso', -0.12 + sh, 0.1, 0); tg('head', pose === 'capcatch' ? -0.35 + sh * 2 : -0.05, pose === 'capcatch' ? 0.1 : 0, 0);
+      if (pose === 'capcatch') { tg('uArmL', -2.85, 0, 0.25); tg('lArmL', -0.3, 0, 0); }
+      else if (pose === 'capput') { tg('uArmL', -2.65, 0, 0.55); tg('lArmL', -1.65, 0, 0); }
+      else { tg('uArmL', -2.05 + Math.sin(t * 11) * 0.06, 0, 0.42); tg('lArmL', -2.05, 0, 0); }
+      tg('uArmR', 0.12, 0, -0.12); tg('lArmR', -0.25, 0, 0);
+    } else if (pose === 'punchwind' || pose === 'punch') {
+      const pp = pose === 'punch';
+      py = 0.98; prx = pp ? 0.16 : 0.05; pry = pp ? 0.35 : -0.4; prz = 0;
+      tg('uLegL', pp ? -0.55 : -0.3, 0, 0.1); tg('uLegR', pp ? 0.35 : 0.2, 0, -0.1); tg('lLegL', pp ? 0.5 : 0.35, 0, 0); tg('lLegR', 0.15, 0, 0);
+      tg('torso', pp ? 0.22 : 0.05, pp ? 0.3 : -0.35, 0); tg('head', 0, pp ? -0.25 : 0.3, 0);
+      if (pp) { tg('uArmL', -1.6, 0, -0.08); tg('lArmL', -0.04, 0, 0); } else { tg('uArmL', 0.55, 0, 0.4); tg('lArmL', -1.95, 0, 0); }
+      tg('uArmR', 0.25, 0, -0.15); tg('lArmR', -0.4, 0, 0);
+    } else if (pose === 'neckhold') {
+      // both hands on the cut throat, hunched and trembling; a snicker shakes the shoulders
+      const sn = this.snicker || 0, tr = Math.sin(t * 31) * 0.012 + Math.sin(t * 27) * 0.035 * sn;
+      py = 0.96; prx = 0.08; pry = 0; prz = tr;
+      tg('uLegL', -0.12, 0, 0.09); tg('uLegR', 0.05, 0, -0.09); tg('lLegL', 0.3, 0, 0); tg('lLegR', 0.22, 0, 0);
+      tg('torso', 0.28 + tr, 0, 0); tg('head', 0.32 + tr * 2, Math.sin(t * 2.1) * 0.08, 0.12);
+      tg('uArmL', -0.78 + tr, 0, -0.52); tg('lArmL', -2.0, 0, 0); tg('uArmR', -0.78 - tr, 0, 0.52); tg('lArmR', -2.0, 0, 0);
+    } else if (pose === 'tada') {
+      // hands off the neck, palms open, head thrown back to show the wound closing
+      const lm = this.ggMouth || 0, sh = Math.sin(t * 24) * 0.05 * lm;
+      py = 1.0 - Math.abs(Math.sin(t * 12)) * 0.02 * lm; prx = -0.06; pry = Math.sin(t * 3) * 0.08; prz = Math.sin(t * 6) * 0.04 * lm;
+      tg('uLegL', -0.05, 0, 0.12); tg('uLegR', 0.05, 0, -0.12); tg('lLegL', 0.1, 0, 0); tg('lLegR', 0.1, 0, 0);
+      tg('torso', -0.2 + sh, 0, 0); tg('head', -0.5 + sh * 2, 0.22, 0.28);
+      tg('uArmL', -0.6 + Math.sin(t * 9) * 0.12, 0, 1.15); tg('lArmL', -1.3, 0, 0); tg('uArmR', -0.6 - Math.sin(t * 9) * 0.12, 0, -1.15); tg('lArmR', -1.3, 0, 0);
     } else if (pose === 'kneel') {
       // on the knees, doubled over, both hands on the belly wound
       py = 0.6; prx = 0.08; pry = 0; prz = Math.sin(t * 1.4) * 0.03;
@@ -2878,7 +3108,7 @@ class Humanoid {
     const k = 1 - Math.exp(-this.poseRate * dt);
     for (const n of ORDER) {
       if (n === 'pelvis') continue; const P = p[n], a = T[n]; if (!a || !P.attached || P.gone || P.body) continue;
-      P.cur.x += (a[0] - P.cur.x) * k; P.cur.y += (a[1] - P.cur.y) * k; P.cur.z += (a[2] - P.cur.z) * k; P.pivot.rotation.set(P.cur.x, P.cur.y, P.cur.z);
+      P.cur.x += (a[0] - P.cur.x) * k; P.cur.y += (a[1] - P.cur.y) * k; P.cur.z += (a[2] - P.cur.z) * k; if (P.kink) P.pivot.rotation.set(P.cur.x + P.kink.x, P.cur.y, P.cur.z + P.kink.z); else P.pivot.rotation.set(P.cur.x, P.cur.y, P.cur.z);
     }
     const pc = this.pelvisCur, kp = 1 - Math.exp(-this.poseRate * 1.3 * dt);
     if (py < pc.y - 0.12 || this.pvy < 0) {
@@ -2887,7 +3117,7 @@ class Humanoid {
       if (pc.y <= py) { pc.y = py; if (this.pvy < -1.6 && this.alive) { Sound.thud(dv(this.pos) * Math.min(1, -this.pvy * 0.25)); shake = Math.max(shake, 0.04); } this.pvy = 0; }
     } else { this.pvy = 0; pc.y += (py - pc.y) * kp; }
     pc.x += (prx - pc.x) * k; pc.ry += (pry - pc.ry) * k; pc.z += (prz - pc.z) * k;
-    p.pelvis.pivot.position.y = pc.y; p.pelvis.pivot.rotation.set(pc.x, pc.ry, pc.z);
+    p.pelvis.pivot.position.y = pc.y * (this.legK || 1); p.pelvis.pivot.rotation.set(pc.x, pc.ry, pc.z);
     if (this.gg) this.ggUpdate(dt); if (this.sv) this.svUpdate(dt);
     if (this.sv && this.look.svity === 'gala') {
       const idle = pose === 'stand' && s < 0.25 && !(this.talkT > 0) && !this.clutch && !this.clutch2 && !this.controlled; this.claspW = clamp((this.claspW || 0) + (idle ? dt * 2.2 : -dt * 4), 0, 1);
@@ -3004,6 +3234,7 @@ let shake = 0, hurtFlash = 0;
 function damagePlayer(d) {
   if (state !== 'play' || player.dead || settings.god) return;
   player.hp -= d; player.lastHurt = 0; hurtFlash = Math.min(1, hurtFlash + 0.6); shake = Math.max(shake, 0.3); Sound.hurt(); screenBlood(0.35);
+  if (avatar && avatar.state === 'alive' && d > 6 && Math.random() < 0.45) { const P = avatar.parts[pick(['torso', 'torso', 'uArmL', 'uArmR', 'uLegL', 'uLegR'])]; if (P && !P.gone) { const q = randomSurface(P, new V3()); tearCloth(avatar, P, q, q.clone().normalize(), rand(0.05, 0.09), 0.8); bloody(P, 0.08); } }
   if (avatar && avatar.state === 'alive' && view3()) { const P = avatar.parts[pick(['torso', 'torso', 'uArmL', 'uArmR', 'pelvis', 'uLegL', 'uLegR'])]; if (!P.gone) { const wp = P.mesh.getWorldPosition(new V3()); bloodSpray(wp, randUnit(new V3()), 16, 0.6, 1, 3, 0.005, 0.012); addWoundLocal(P, randomSurface(P, _a), _b.copy(_a).normalize(), rand(0.05, 0.08)); bloody(P, 0.12); } }
   if (player.hp <= 0) { player.hp = 0; player.dead = true; player.deathT = 0; player.fall = 0; releaseGrab(false); Sound.ring(3); Sound.muffle(800);
     if (avatar && avatar.living) { if (avatar.state === 'alive') { avatar.vel.copy(player.vel); avatar.root.position.copy(player.pos); avatar.root.rotation.y = player.yaw + Math.PI; } avatar.die('player'); }
@@ -3013,7 +3244,7 @@ function damagePlayer(d) {
   }
 }
 function respawnPlayer() {
-  const sp = MAPS[mapId].spawn; player.dead = false; player.suicide = false; player.fall = 0; player.fallK = 0; player.deathT = 0; player.rag = false; player.getup = 0; player.lastFall = 0;
+  const sp = MAPS[mapId].spawn; player.broken = null; player.dead = false; player.suicide = false; player.fall = 0; player.fallK = 0; player.deathT = 0; player.rag = false; player.getup = 0; player.lastFall = 0;
   $('black').classList.remove('on'); $('black').style.opacity = ''; Sound.muffle(20000); setLids(0); $('hud').hidden = false; $('touch').hidden = !isTouch;
   player.hp = 100; player.pos.set(sp[0] + rand(-1.5, 1.5), 0, sp[1]); pushOutAABBs(player.pos, 0.4, 0); player.vel.set(0, 0, 0); player.yaw = sp[2]; player.pitch = 0;
   fallFx.ts = 1; fallFx.slowT = 0; fallFx.k = 0; makeAvatar();
@@ -3033,7 +3264,7 @@ function makeAvatar() {
 }
 const HELD = {};
 const HOLD_Q = new THREE.Quaternion(0, Math.SQRT1_2, Math.SQRT1_2, 0);
-const GRIP = { pistol: [0, -0.06, 0.05], shotgun: [0, -0.05, 0.1], rifle: [0, -0.07, 0.085], machete: [0, -0.02, 0], grenade: [0, 0, 0], grab: [0, -0.05, 0.02], flame: [0, -0.07, 0.08], saw: [0, -0.08, 0.1], bow: [0, -0.07, 0.05] };
+const GRIP = { fists: [0, 0, 0], pistol: [0, -0.06, 0.05], shotgun: [0, -0.05, 0.1], rifle: [0, -0.07, 0.085], machete: [0, -0.02, 0], grenade: [0, 0, 0], grab: [0, -0.05, 0.02], flame: [0, -0.07, 0.08], saw: [0, -0.08, 0.1], bow: [0, -0.07, 0.05] };
 const GRIP2 = { pistol: [0, -0.07, 0.03], shotgun: [0, -0.012, -0.22], rifle: [0, -0.02, -0.24], grab: [0, -0.02, -0.12], flame: [0, -0.02, -0.25], saw: [0, 0.05, -0.15], bow: [0, -0.03, -0.22] };
 function heldModel(id) {
   if (HELD[id]) return HELD[id];
@@ -3072,8 +3303,9 @@ function updateAvatar(dt) {
     if (A.heldId !== curW().id) attachHeld();
   }
   A.update(dt);
-  if (A.held) A.held.visible = state !== 'story' || story.gun;
-  A.relaxed = state === 'story' && !story.gun;
+  if (A.held) A.held.visible = (state !== 'story' || story.gun) && !ward.open;
+  A.relaxed = (state === 'story' && !story.gun) || ward.open;
+  if (ward.open) return;
   if (state === 'story') { setAvatarVis(story.showAvatar, true); return; }
   const vis = state === 'play' || state === 'pause' || state === 'spawn' || state === 'over';
   setAvatarVis(vis && (view3() || A.state !== 'alive'), view3() || !(A.parts.head.body && !A.parts.head.gone));
@@ -3175,7 +3407,7 @@ function updatePlayer(dt) {
   if (!inputOn) { mx = 0; mz = 0; }
   const ml = Math.hypot(mx, mz); if (ml > 1) { mx /= ml; mz /= ml; }
   const sprint = touch.moveId !== null && ml > 0.92;
-  const sp = (sprint ? 7.2 : 4.6) * (madness.on ? 1.15 : 1);
+  const sp = (sprint ? 7.2 : 4.6) * (madness.on ? 1.15 : 1) * (player.broken && player.broken.leg ? 0.5 : 1);
   const fwx = -Math.sin(player.yaw), fwz = -Math.cos(player.yaw), rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw);
   const wx = (fwx * -mz + rx * mx) * sp, wz = (fwz * -mz + rz * mx) * sp;
   const acc = player.onGround ? 12 : 2.5;
@@ -3221,6 +3453,7 @@ const WEAPONS = [
   { id: 'flame', name: 'Огнемёт', mag: 100, reload: 2.4, rate: 0.055, auto: true, range: 7, dmg: 9, spread: 0.1, pellets: 1, pen: 3, force: 14 },
   { id: 'saw', name: 'Бензопила', melee: true, auto: true, rate: 0.11, dmg: 60 },
   { id: 'bow', name: 'Арбалет', mag: 1, reload: 1.6, rate: 0.9, auto: false, spread: 0.002, pellets: 1, dmg: 150, pen: 2, force: 90 },
+  { id: 'fists', name: 'Кулаки', melee: true, fists: true, rate: 0.34, dmg: 14 },
 ];
 const W = { cur: 0, ammo: WEAPONS.map((w) => w.mag || 0), cd: 0, reloadT: 0, switchT: 0, recoil: 0, bloom: 0, fireHeld: false, swingT: 0, throwT: 0, swayX: 0, swayY: 0, flashT: 0, pumpT: 0, machBlood: 0 };
 const vmRoot = new THREE.Group(); vmCamera.add(vmRoot);
@@ -3271,6 +3504,7 @@ const MUZZLE = {};
   g = new THREE.Group(); g.add(box(0.05, 0.06, 0.22, vmMat.metal, 0, 0, 0)); g.add(cyl(0.012, 0.02, 0.34, vmMat.metal, 0, 0, -0.27, Math.PI / 2)); g.add(cyl(0.035, 0.035, 0.26, vmMat.olive, -0.04, 0.02, 0.12)); g.add(cyl(0.035, 0.035, 0.26, vmMat.olive, 0.04, 0.02, 0.12)); g.add(box(0.05, 0.1, 0.05, vmMat.poly, 0, -0.07, 0.08, -0.2)); const pil = new THREE.Mesh(new THREE.SphereGeometry(0.016, 10, 8), vmMat.glow); pil.position.set(0, -0.01, -0.45); g.add(pil); g.add(box(0.03, 0.08, 0.05, vmMat.wood, 0, -0.07, -0.02)); g.add(arm(1, 0, -0.06, 0.1)); g.add(arm(-1, 0, -0.03, -0.2)); g.position.set(0.13, -0.15, -0.46); MODELS.flame = g; MUZZLE.flame = new V3(0, 0, -0.5);
   g = new THREE.Group(); g.add(box(0.07, 0.1, 0.3, vmMat.poly, 0, 0, 0)); g.add(box(0.05, 0.06, 0.26, vmMat.olive, 0, 0.06, -0.02)); g.add(box(0.035, 0.04, 0.35, vmMat.metal, 0, 0.02, -0.3)); const sp = new THREE.Group(); sp.rotation.x = Math.PI / 2; sp.position.set(0, 0.03, -0.62); const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.012, 20), vmMat.steel); sp.add(disc); g.add(sp); g.userData.blade = disc; g.add(box(0.05, 0.1, 0.05, vmMat.poly, 0, -0.08, 0.1)); g.add(arm(1, 0, -0.07, 0.12)); g.add(arm(-1, 0, -0.04, -0.2)); g.position.set(0.14, -0.16, -0.5); MODELS.saw = g; MUZZLE.saw = new V3(0, 0, -0.6);
   g = new THREE.Group(); g.add(box(0.045, 0.07, 0.55, vmMat.wood, 0, 0, -0.1)); g.add(box(0.8, 0.025, 0.03, vmMat.poly, 0, 0, -0.4)); g.add(box(0.012, 0.012, 0.8, vmMat.metal, 0, 0.03, -0.1)); g.add(box(0.003, 0.003, 0.7, vmMat.steel, 0, 0, -0.45)); g.add(cyl(0.005, 0.005, 0.3, vmMat.metal, 0, 0.03, -0.3, Math.PI / 2)); g.add(box(0.03, 0.09, 0.05, vmMat.poly, 0, -0.07, 0.05, -0.2)); g.add(arm(1, 0, -0.06, 0.08)); g.add(arm(-1, 0, -0.03, -0.22)); g.position.set(0.14, -0.14, -0.5); MODELS.bow = g; MUZZLE.bow = new V3(0, 0.03, -0.6);
+  { const fg = new THREE.Group(); const mk = (sx) => { const f = new THREE.Group(); f.userData.isArm = true; f.add(box(0.074, 0.064, 0.09, vmMat.glove, 0, 0, 0)); for (let i = 0; i < 4; i++) f.add(box(0.016, 0.021, 0.028, vmMat.glove, -0.027 + i * 0.018, 0.026, -0.038)); f.add(box(0.022, 0.03, 0.05, vmMat.glove, sx * -0.038, -0.006, -0.012, 0, 0, sx * 0.3)); const sl = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.3, 4, 10), vmMat.sleeve); sl.position.set(sx * 0.015, -0.05, 0.2); sl.rotation.set(1.3, 0, 0); f.add(sl); f.position.set(sx * 0.15, -0.19, -0.42); f.scale.setScalar(0.82); f.rotation.set(0.12, -sx * 0.22, sx * 0.35); f.userData.base = f.position.clone(); fg.add(f); return f; }; fg.userData.fr = mk(1); fg.userData.fl = mk(-1); MODELS.fists = fg; MUZZLE.fists = new V3(); }
   for (const k in MODELS) { MODELS[k].visible = false; vmRoot.add(MODELS[k]); MODELS[k].userData.base = MODELS[k].position.clone(); }
   { const gm = new THREE.MeshBasicMaterial({ color: 0x6ad8ff }); MODELS.grab.userData.ring.material = gm; MODELS.grab.userData.core.material = gm; }
 })();
@@ -3299,6 +3533,7 @@ function tryFire(pressed) {
   const w = curW(); if (W.cd > 0 || W.switchT > 0 || player.dead || story.noFire) return;
   if (w.grab) { if (pressed) startGrab(); return; }
   if (!w.auto && !pressed) return;
+  if (w.fists) { W.cd = w.rate; W.punchT = 0.26; W.punchSide = !W.punchSide; Sound.swoosh(); later(0.08, fistHit); return; }
   if (w.melee) { W.cd = w.rate; W.swingT = 0.32; if (w.id !== 'saw') Sound.swoosh(); later(0.09, meleeHit); return; }
   if (w.thrown) { W.cd = w.rate; W.throwT = 0.45; later(0.15, throwGrenade); return; }
   if (W.reloadT > 0) return;
@@ -3348,6 +3583,117 @@ function shootRay(origin, dir, w, drawTracer) {
   if (drawTracer && w.id !== 'flame') { const ip = end || origin.clone().addScaledVector(dir, 25); for (const n of npcs) if (n.alive && n.type === 'human' && n.pose === 'stand' && n !== lastNpc && Math.hypot(n.pos.x - ip.x, n.pos.z - ip.z) < 2.6 && Math.random() < 0.7) { n.setPose('cover', rand(0.9, 1.8)); n.panic = Math.max(n.panic, 10); } }
 }
 function hitMarker(kill) { const hm = $('hitmark'); hm.className = kill ? 'kill' : ''; hm.style.transition = 'none'; hm.style.opacity = 1; requestAnimationFrame(() => { hm.style.transition = 'opacity .25s'; hm.style.opacity = 0; }); }
+/* ===== realism: clothes tear (fists tear them most), bones break and sometimes poke through the skin ===== */
+const _wf = new V3(), _wg = new V3();
+const TEAR = { tex: null, fr: null, frMat: null, mats: new Map(), n: 0 };
+const SCRAPS = [];
+GEO.boneShard = mergeGeometries([new THREE.CylinderGeometry(0.22, 0.45, 1.3, 6).translate(0, 0.45, 0), new THREE.ConeGeometry(0.25, 0.55, 5).translate(0.07, 1.35, 0.02)]);
+GEO.scrap = new THREE.PlaneGeometry(0.07, 0.045, 2, 1);
+let bruiseMat = null;
+function tearInit() {
+  if (TEAR.tex) return;
+  const rag = (g, cx, cy, r, jag) => { g.beginPath(); for (let i = 0; i <= 30; i++) { const a = i / 30 * 6.283, rr = r * (1 - jag * Math.random()); const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr * 0.82; if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.closePath(); };
+  // the skin that shows through the hole (white, tinted by each body's skin colour), with a scratch or two
+  const c = makeCanvas(128), g = c.getContext('2d'); g.fillStyle = '#fff'; rag(g, 64, 64, 44, 0.3); g.fill();
+  g.strokeStyle = 'rgba(150,30,25,0.55)'; g.lineWidth = 2; for (let i = 0; i < 3; i++) { const x = rand(42, 86), y = rand(46, 82); g.beginPath(); g.moveTo(x, y); g.lineTo(x + rand(-20, 20), y + rand(-9, 9)); g.stroke(); }
+  // the frayed edge: dark threads sticking out around the hole
+  const f = makeCanvas(128), h = f.getContext('2d'); h.lineCap = 'round';
+  for (let i = 0; i < 110; i++) { const a = rand(0, 6.283), r0 = rand(34, 44), r1 = r0 + rand(5, 17); h.strokeStyle = `rgba(${randi(30) + 14},${randi(20) + 10},${randi(16) + 8},${rand(0.6, 0.95)})`; h.lineWidth = rand(1, 2.6); h.beginPath(); h.moveTo(64 + Math.cos(a) * r0, 64 + Math.sin(a) * r0 * 0.82); h.lineTo(64 + Math.cos(a + rand(-0.12, 0.12)) * r1, 64 + Math.sin(a) * r1 * 0.82); h.stroke(); }
+  h.globalCompositeOperation = 'destination-out'; rag(h, 64, 64, 39, 0.22); h.fill();
+  TEAR.tex = new THREE.CanvasTexture(c); TEAR.fr = new THREE.CanvasTexture(f);
+  TEAR.frMat = new THREE.MeshStandardMaterial({ map: TEAR.fr, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3, roughness: 0.95 });
+  const b = makeCanvas(64), bg = b.getContext('2d'), gr = bg.createRadialGradient(32, 32, 2, 32, 32, 30); gr.addColorStop(0, 'rgba(70,20,60,0.75)'); gr.addColorStop(0.5, 'rgba(90,30,70,0.45)'); gr.addColorStop(1, 'rgba(90,40,60,0)'); bg.fillStyle = gr; bg.fillRect(0, 0, 64, 64);
+  bruiseMat = new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(b), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, roughness: 0.6 });
+}
+function tearMat(col) { let m = TEAR.mats.get(col); if (!m) { m = new THREE.MeshStandardMaterial({ map: TEAR.tex, color: col, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, roughness: 0.55 }); TEAR.mats.set(col, m); } return m; }
+function tearCloth(npc, P, local, normal, size, power = 1) {
+  if (!P || P.gone || P.skin || npc.gg || !npc.look || npc.look.plastic) return;
+  tearInit(); P.tearDmg = (P.tearDmg || 0) + power;
+  if (P.def.kind === 'limb' && P.tearDmg > 2.6) { bareLimb(npc, P); return; }
+  if ((P.tears || 0) >= 5 || TEAR.n > 240) return; P.tears = (P.tears || 0) + 1; TEAR.n++;
+  size = Math.min(size, P.def.kind === 'limb' ? 0.065 : 0.12);
+  const g = new THREE.Group(); g.userData.tear = true; g.position.copy(local).addScaledVector(normal, 0.005); g.quaternion.setFromUnitVectors(_e.set(0, 0, 1), normal); g.rotateZ(rand(0, 6.28));
+  const sk = new THREE.Mesh(GEO.wound, tearMat(npc.look.skin ?? 0xe2b59a)); sk.scale.set(size * rand(0.9, 1.5), size, 1); g.add(sk);
+  const fr = new THREE.Mesh(GEO.wound, TEAR.frMat); fr.scale.set(sk.scale.x * 1.28, size * 1.28, 1); fr.position.z = 0.0006; g.add(fr);
+  P.mesh.add(g);
+  if (power > 0.8 && Math.random() < 0.55) clothScrap(P, P.mat.color);
+}
+// a sleeve or a trouser leg torn off completely: the limb shows bare skin
+function bareLimb(npc, P) {
+  if (P.skin || P.bare) return; P.bare = true; P.skin = true; const L = npc.look, old = P.mat.color.clone();
+  for (const c of P.mesh.children.slice()) if (c.userData.tear) P.mesh.remove(c);
+  P.mat.map = L.skinTex || null; P.baseColor.setHex(L.skin ?? 0xe2b59a); P.baseRough = 0.52; P.mat.needsUpdate = true; bloody(P, 0);
+  for (let i = 0; i < 3; i++) clothScrap(P, old);
+  if (P.name.startsWith('uArm')) { const lo = npc.parts['lArm' + P.name.slice(-1)]; if (lo && !lo.skin && lo.attached && !lo.gone) bareLimb(npc, lo); }
+  if (P.name.startsWith('uLeg')) { const lo = npc.parts['lLeg' + P.name.slice(-1)]; if (lo && !lo.skin && lo.attached && !lo.gone) bareLimb(npc, lo); }
+}
+function clothScrap(P, color) {
+  if (SCRAPS.length > 60) { const o = SCRAPS.shift(); scene.remove(o.m); }
+  const m = new THREE.Mesh(GEO.scrap, new THREE.MeshStandardMaterial({ color: color.clone ? color.clone().multiplyScalar(0.95) : color, map: TEX.cloth, roughness: 0.9, side: THREE.DoubleSide }));
+  P.mesh.updateMatrixWorld(); P.mesh.getWorldPosition(m.position); m.position.x += rand(-0.08, 0.08); m.position.y += rand(-0.05, 0.1); m.position.z += rand(-0.08, 0.08); m.rotation.set(rand(0, 6), rand(0, 6), rand(0, 6)); m.castShadow = true; scene.add(m);
+  SCRAPS.push({ m, v: new V3(rand(-0.8, 0.8), rand(0.4, 1.6), rand(-0.8, 0.8)), w: new V3(rand(-6, 6), rand(-6, 6), rand(-6, 6)), t: 0, rest: false });
+}
+function updateScraps(dt) {
+  for (let i = SCRAPS.length - 1; i >= 0; i--) {
+    const o = SCRAPS[i]; o.t += dt;
+    if (!o.rest) { o.v.y -= 4.2 * dt; o.v.multiplyScalar(1 - 1.6 * dt); o.m.position.addScaledVector(o.v, dt); o.m.rotation.x += o.w.x * dt; o.m.rotation.y += o.w.y * dt; o.m.rotation.z += o.w.z * dt; const fy = floorAt(o.m.position.x, o.m.position.z, o.m.position.y) + 0.004; if (o.m.position.y <= fy) { o.m.position.y = fy; o.rest = true; o.m.rotation.set(-Math.PI / 2, 0, rand(0, 6)); } }
+    if (o.t > 40) { scene.remove(o.m); o.m.material.dispose(); SCRAPS.splice(i, 1); }
+  }
+}
+// a broken limb: bent at a wrong angle, floppy in a ragdoll, and in about half the cases the bone pokes out
+function breakBone(npc, P, o = {}) {
+  if (!P || P.gone || !P.attached || P.broken || P.def.kind !== 'limb' || npc.gg || !npc.look || npc.look.plastic) return false;
+  tearInit(); P.broken = true; npc.broken = (npc.broken || 0) + 1;
+  const side = P.name.slice(-1), leg = P.name.includes('Leg'), lower = P.name[0] === 'l', K = lower ? P : npc.parts[P.name.replace(/^u/, 'l')];
+  if (K && !K.gone) K.kink = { x: (leg ? 0.55 : -0.5) + rand(-0.3, 0.3), z: (side === 'L' ? 1 : -1) * rand(0.6, 1.05) };
+  const d = P.def, r = Math.min(d.box[0], d.box[2]) / 2, out = new V3(rand(-1, 1), 0, rand(-0.4, 1)).normalize(), local = new V3(0, rand(-0.25, 0.15) * d.box[1], 0).addScaledVector(out, r * 0.92);
+  const open = o.open ?? Math.random() < 0.55;
+  P.mesh.updateMatrixWorld(); const wp = P.mesh.localToWorld(local.clone());
+  if (open) {
+    const bone = new THREE.Mesh(GEO.boneShard, boneMat); bone.position.copy(local).addScaledVector(out, -0.012); bone.quaternion.setFromUnitVectors(_e.set(0, 1, 0), _wf.copy(out).add(_wg.set(0, rand(-0.7, 0.7), 0)).normalize()); bone.scale.setScalar(r * rand(2.1, 2.7)); bone.castShadow = true; P.mesh.add(bone); P.boneOut = bone;
+    addWoundLocal(P, local, out, r * 2.6); bloody(P, 0.45);
+    bloodSpray(wp, _wf.copy(out).transformDirection(P.mesh.matrixWorld), 34, 0.5, 1, 3.4, 0.004, 0.011); bloodMist(wp, 0.25);
+    if (emitters.length < 90) addEmitter(P.mesh, local, out, { rate: 24, speed: 0.9, dur: rand(6, 12), pulse: true, smin: 0.004, smax: 0.01, spread: 0.3 });
+    if (!P.skin) tearCloth(npc, P, local, out, r * 2.4, 0.5);
+  } else { const br = new THREE.Mesh(GEO.wound, bruiseMat); br.position.copy(local).addScaledVector(out, 0.004); br.quaternion.setFromUnitVectors(_e.set(0, 0, 1), out); br.scale.setScalar(r * 3); P.mesh.add(br); }
+  Sound.crack(dv(wp) * 1.3); Sound.crunch(dv(wp) * 0.8);
+  for (const Q of [P, K]) if (Q && Q.constraint) { Q.constraint.angle = 2.6; Q.constraint.twistAngle = 2.4; }
+  if (npc.alive) {
+    npc.onHit(UP, P); npc.panic = Math.max(npc.panic, 10);
+    if (leg) npc.setPose(npc.type === 'zombie' ? 'crawl' : 'down', Infinity);
+    else { const U = npc.parts['uArm' + side]; U.hp = Math.min(U.hp, U.maxHp * 0.45); }
+  }
+  if (npc.isPlayer) { player.broken = player.broken || {}; player.broken[leg ? 'leg' : 'arm'] = true; toast(leg ? 'Перелом ноги! Вы хромаете' : 'Перелом руки!'); shake = Math.max(shake, 0.5); hurtFlash = 1; }
+  else if (dv(wp) > 0.35) toast((open ? 'Открытый перелом: ' : 'Перелом: ') + d.ru);
+  return true;
+}
+// fists: little damage, but they rip clothes, bruise, knock people down and now and then break a bone
+function fistHit() {
+  const done = new Set();
+  for (let k = -1; k <= 1; k++) {
+    const dir = _a.set(Math.sin(k * 0.12), -0.04, -1).normalize().applyQuaternion(eye.quaternion).clone();
+    raycaster.set(eye.position, dir); raycaster.far = 1.9;
+    const h = raycaster.intersectObjects(getTargets(), false)[0]; if (!h) continue; const ud = h.object.userData;
+    if (ud.kind === 'part') {
+      const npc = ud.npc, P = npc.parts[ud.part]; if (done.has(npc) || !P || P.gone || npc.protect) continue; done.add(npc);
+      if (npc.gg) { gagHit(npc, P, h, dir, curW()); return; }
+      const wasAlive = npc.alive, kind = P.def.kind; P.mesh.updateMatrixWorld(); const local = P.mesh.worldToLocal(h.point.clone()), ln = h.face ? h.face.normal.clone() : new V3(0, 0, 1);
+      tearCloth(npc, P, local, ln, rand(0.075, 0.12), 1.4);
+      if (Math.random() < 0.6) { const q = randomSurface(P, new V3()); tearCloth(npc, P, q, q.clone().normalize(), rand(0.05, 0.09), 1); }
+      tearInit(); if ((P.wounds || 0) < 9) { const br = new THREE.Mesh(GEO.wound, bruiseMat); br.position.copy(local).addScaledVector(ln, 0.004); br.quaternion.setFromUnitVectors(_e.set(0, 0, 1), ln); br.scale.setScalar(rand(0.06, 0.1)); P.mesh.add(br); }
+      const dmg = kind === 'head' ? 20 : 12; P.hp -= dmg * 0.5; bloody(P, kind === 'head' ? 0.12 : 0.04);
+      if (kind === 'head') { bloodSpray(h.point, dir, 14, 0.5, 0.8, 2.6, 0.003, 0.008); if (npc.alive && Math.random() < 0.3) npc.setPose('down', rand(2, 4)); }
+      if (npc.living) { npc.hp -= dmg; if (npc.alive) { npc.onHit(dir, P); npc.pos.x += dir.x * 0.22; npc.pos.z += dir.z * 0.22; if (npc.hp > 0) npc.reactHit(P, dir, local, ln, 'fist'); } }
+      if (kind === 'limb' && Math.random() < 0.08) breakBone(npc, P, { open: Math.random() < 0.3 });
+      if (npc.alive && npc.hp <= 0) npc.die('melee');
+      const T = P.body ? P : null; if (T) { T.body.wakeUp(); T.body.applyImpulse(new CANNON.Vec3(dir.x * 26, 6, dir.z * 26)); }
+      hitMarker(wasAlive && !npc.alive); Sound.thud(1); Sound.crunch(0.35); shake = Math.max(shake, 0.12);
+      return;
+    } else if (ud.kind === 'gib' || ud.kind === 'prop') { ud.body.wakeUp(); ud.body.applyImpulse(cv(dir.clone().multiplyScalar(ud.kind === 'gib' ? 1.2 : 26))); Sound.thud(0.6); return; }
+    else if (ud.kind === 'glass') { if (!ud.glass.strong) shatterGlass(ud.glass, h.point, dir); else Sound.tink(0.4); return; }
+    else if (ud.kind === 'env' && k === 0) { Sound.thud(0.5); shake = Math.max(shake, 0.08); return; }
+  }
+}
 function hitPart(npc, P, h, dir, dmg, w) {
   if (npc.gg && !npc.protect) { gagHit(npc, P, h, dir, w); return; }
   if (npc.protect) { if (performance.now() - (story.warnT || 0) > 2500) { story.warnT = performance.now(); toast('Рано! Нужны доказательства'); } sparks(h.point, 4, hitNormal(h), 2); return; }
@@ -3361,12 +3707,14 @@ function hitPart(npc, P, h, dir, dmg, w) {
   bloodSpray(h.point, dir, 22 * big * (w.id === 'shotgun' ? 0.5 : 1), 0.35, 2.5, 7.5, 0.004, 0.014);
   if (Math.random() < 0.5) bloodMist(h.point, 0.22 * big);
   addWoundLocal(P, local, ln, rand(0.045, 0.075)); bloody(P, 0.1);
+  tearCloth(npc, P, local, ln, w.id === 'shotgun' ? rand(0.05, 0.075) : rand(0.035, 0.05), w.id === 'shotgun' || w.id === 'bow' ? 1 : 0.6);
   if (emitters.length < 90) addEmitter(P.mesh, local, ln, { rate: rand(8, 16) * (madness.on ? 4 : 1), speed: 0.5, dur: rand(4, 10), smin: 0.004, smax: 0.009, spread: 0.4 });
   Sound.splat(dv(h.point));
   if (camera.position.distanceTo(h.point) < 1.6) screenBlood(0.25);
   const mult = kind === 'head' ? 4 : kind === 'limb' ? 0.55 : 1;
   P.hp -= dmg * (madness.on ? 3 : 1);
   if (npc.living) { npc.hp -= dmg * mult * (madness.on ? 1.6 : 1); if (npc.alive) npc.onHit(dir, P); if (npc.hp <= 0) { npc.die('shot'); if (madness.on && Math.random() < (w.id === 'shotgun' || w.id === 'bow' ? 0.9 : 0.5)) madBurst(npc, h.point, dir); if (kind === 'head') { stats.heads++; toast('Хедшот'); } } }
+  if (kind === 'limb' && !P.gone && P.attached && Math.random() < (w.id === 'shotgun' || w.id === 'bow' ? 0.35 : w.id === 'rifle' || w.id === 'pistol' ? 0.1 : 0)) breakBone(npc, P, { open: Math.random() < 0.65 });
   if (P.hp <= 0 && !P.gone) {
     if (kind === 'head') { npc.gib('head', dir, 1); toast('Голова в клочья'); }
     else if (kind === 'limb') { if (w.id === 'shotgun' && P.hp < -20 && Math.random() < 0.5) { npc.gib(P.name, dir, 0.7); toast('В клочья'); } else if (npc.detach(P.name, { dir })) toast('Отстрелено: ' + P.def.ru); }
@@ -3389,7 +3737,7 @@ function meleeHit() {
       if (npc.gg) { gagHit(npc, P, h, dir, curW()); continue; }
       const wasAlive = npc.alive; const cutDir = _b.set(1, 0, 0).applyQuaternion(eye.quaternion).clone();
       bloodSpray(h.point, cutDir, 40, 0.5, 1.5, 5, 0.005, 0.015); bloodMist(h.point, 0.3);
-      P.mesh.updateMatrixWorld(); addWoundLocal(P, P.mesh.worldToLocal(h.point.clone()), h.face ? h.face.normal.clone() : new V3(0, 0, 1), rand(0.08, 0.12)); bloody(P, 0.25);
+      P.mesh.updateMatrixWorld(); addWoundLocal(P, P.mesh.worldToLocal(h.point.clone()), h.face ? h.face.normal.clone() : new V3(0, 0, 1), rand(0.08, 0.12)); bloody(P, 0.25); tearCloth(npc, P, P.mesh.worldToLocal(h.point.clone()), h.face ? h.face.normal.clone() : new V3(0, 0, 1), rand(0.07, 0.1), 1.1);
       if (P.def.kind === 'limb' || P.def.kind === 'head') { const nm = P.attached && P.def.p ? P.name : null; if (nm) { if (npc.alive && P.def.kind === 'head') { npc.hp = 0; } npc.detach(nm, { dir: cutDir }); toast(P.def.kind === 'head' ? 'Обезглавлен' : 'Отрублено: ' + P.def.ru); if (P.def.kind === 'head') stats.heads++; } else { P.hp -= 60; if (P.hp <= 0) npc.gib(P.name, cutDir, 0.6); } }
       else { P.hp -= 60; const lp = P.mesh.worldToLocal(h.point.clone()), ln = h.face ? h.face.normal.clone() : new V3(0, 0, 1); if (npc.alive) { npc.hp -= 60; npc.onHit(dir, P); npc.bleed += 1; if (npc.hp > 0) npc.reactHit(P, dir, lp, ln, 'machete'); } addEmitter(P.mesh, lp, ln, { rate: 50, speed: 1.6, dur: 6, pulse: true }); if (P.def.kind === 'torso' && P.hp < 0 && !npc.alive && Math.random() < 0.5) { const pv = npc.parts.pelvis; if (!pv.gone && P.attached) { npc.detach('torso', { dir: cutDir }); toast('Пополам'); } } }
       if (npc.alive && npc.hp <= 0) npc.die('melee');
@@ -3584,6 +3932,7 @@ function updateViewmodel(dt) {
   if (W.switchT > 0) { W.switchT -= dt; py -= W.switchT * 0.6; rx -= W.switchT * 1.5; }
   if (W.reloadT > 0) { W.reloadT -= dt; const t = 1 - W.reloadT / w.reload; const k = Math.sin(t * Math.PI); rx -= k * 0.7; py -= k * 0.06; rz += k * 0.5; if (m.userData.mag) m.userData.mag.position.y = -Math.sin(Math.min(1, t * 2) * Math.PI) * 0.12; if (W.reloadT <= 0) { W.ammo[W.cur] = w.mag; if (m.userData.mag) m.userData.mag.position.y = 0; } }
   if (W.swingT > 0) { W.swingT -= dt; const t = 1 - W.swingT / 0.32; const k = Math.sin(t * Math.PI); px -= k * 0.25; py += k * 0.05; rz += k * 1.4; rx -= k * 0.4; ry += k * 0.6; }
+  if (w.fists && m.userData.fr) { if (W.punchT > 0) W.punchT -= dt; const t = W.punchT > 0 ? 1 - W.punchT / 0.26 : 1, k = Math.sin(t * Math.PI); for (const f of [m.userData.fr, m.userData.fl]) { const act = (f === m.userData.fr) === !!W.punchSide, b0 = f.userData.base, sg = Math.sign(b0.x); f.position.set(b0.x - (act ? sg * k * 0.11 : 0), b0.y + (act ? k * 0.06 : Math.sin(performance.now() * 0.004 + sg) * 0.005), b0.z - (act ? k * 0.27 : 0)); f.rotation.z = sg * 0.35 - (act ? sg * k * 0.5 : 0); } }
   if (W.throwT > 0) { W.throwT -= dt; const t = 1 - W.throwT / 0.45; const k = Math.sin(t * Math.PI); pz -= k * 0.2; py += k * 0.1; rx -= k * 1.0; m.visible = t < 0.4 || t > 0.9; } else if (w.id === 'grenade') m.visible = true;
   if (m.userData.pump && W.pumpT > 0) { W.pumpT -= dt; m.userData.pump.position.z = -0.22 + Math.sin((1 - W.pumpT / 0.5) * Math.PI) * 0.08; if (m.userData.leftHand) m.userData.leftHand.position.z = Math.sin((1 - Math.max(0, W.pumpT) / 0.5) * Math.PI) * 0.08; }
   if (m.userData.slide) m.userData.slide.position.z = -0.02 + Math.min(0.04, W.recoil * 0.05);
@@ -3660,7 +4009,7 @@ function spawnAtAim(type) { const p = aimPoint(), N = MAPS[mapId].npcs; const n 
 function edgePoint() { for (let i = 0; i < 20; i++) { const side = randi(4), ex = HX - 1.5, ez = HZ - 1.5; const p = side === 0 ? [rand(-ex, ex), -ez] : side === 1 ? [rand(-ex, ex), ez] : side === 2 ? [-ex, rand(-ez, ez)] : [ex, rand(-ez, ez)]; if (Math.hypot(p[0] - player.pos.x, p[1] - player.pos.z) > Math.min(11, HZ)) return p; } return [rand(-HX + 2, HX - 2), -HZ + 2]; }
 function cleanBlood() { for (const L of bloodLayers) L.clear(); dripLayer.clear(); holeLayer.clear(); scorchLayer.clear(); for (const p of pools) scene.remove(p.mesh); pools.length = 0; bp.n = 0; }
 function clearBodies() { for (const n of npcs.slice()) if (!n.alive) n.dispose(); for (const g of gibs.slice()) removeGib(g); for (const G of guts.slice()) removeGuts(G); for (const c of casings) scene.remove(c.m); casings.length = 0; }
-function clearAll() { removeDropGun(); releaseGrab(false); for (const n of npcs.slice()) n.dispose(); clearBodies(); for (const p of props.slice()) removeProp(p); for (const g of grenades) { scene.remove(g.m); world.removeBody(g.b); } grenades.length = 0; cleanBlood(); emitters.length = 0; }
+function clearAll() { for (const o of SCRAPS) scene.remove(o.m); SCRAPS.length = 0; TEAR.n = 0; removeDropGun(); releaseGrab(false); for (const n of npcs.slice()) n.dispose(); clearBodies(); for (const p of props.slice()) removeProp(p); for (const g of grenades) { scene.remove(g.m); world.removeBody(g.b); } grenades.length = 0; cleanBlood(); emitters.length = 0; }
 function spawnCorpse(x, z) { const n = new Humanoid('human', x, z, 0); npcs.push(n); n.root.position.set(x, 1.03, z + 0.92); n.root.rotation.set(-Math.PI / 2, rand(-0.05, 0.05), 0); n.die('prop'); n.twitch = 0; for (const P of n.partList) if (P.def.kind === 'head' || P.name.startsWith('lArm')) P.mat.color.lerp(_col.setHex(0xb8b8b0), 0.4); targetsDirty = true; }
 function spawnMapProps() { for (const [k, x, z, y] of MAPS[mapId].props) spawnProp(k, x, z, y); }
 function populateSandbox() {
@@ -3959,7 +4308,7 @@ function applyLook() {
 }
 const WARD = { shirt: [0x2b3a55, 0x6b1e1e, 0x2f4a2f, 0x8a8a84, 0x1d1d1f, 0xb8a27a], skin: [0xe2b59a, 0xcb9b7e, 0xa87456, 0x7c4f36, 0xf0c8ae, 0x5d3b28], hair: [0x15100c, 0x3a2818, 0x6a4626, 0xbfa76a, 0x8c8070, 0x9a5a26] };
 function buildWard() {
-  document.querySelectorAll('.swatches').forEach((box) => { const k = box.dataset.k; box.innerHTML = WARD[k].map((c) => `<button class="sw" data-c="${c}" style="background:#${c.toString(16).padStart(6, '0')}" aria-label="цвет"></button>`).join(''); box.querySelectorAll('.sw').forEach((b) => b.onclick = () => { settings.look[k] = +b.dataset.c; saveSettings(); applyLook(); markWard(); }); });
+  document.querySelectorAll('.swatches').forEach((box) => { const k = box.dataset.k; box.innerHTML = WARD[k].map((c) => `<button class="sw" data-c="${c}" style="background:#${c.toString(16).padStart(6, '0')}" aria-label="цвет"></button>`).join(''); box.querySelectorAll('.sw').forEach((b) => b.onclick = () => { settings.look[k] = +b.dataset.c; saveSettings(); applyLook(); markWard(); wardRebuild(); }); });
   markWard();
 }
 function markWard() { document.querySelectorAll('.swatches').forEach((box) => { const k = box.dataset.k; box.querySelectorAll('.sw').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.c === settings.look[k]))); }); }
@@ -4359,7 +4708,8 @@ function ggFace(npc) { npc.yaw = Math.atan2(player.pos.x - npc.pos.x, player.pos
 function gagStart(npc) { story.gg = npc; story.fov = 0; npc.regenBusy = true; npc.scripted = true; npc.speed = 0; npc.pose = 'stand'; npc.poseDur = Infinity; npc.poseT = 0; npc.ggMouth = 0; npc.ggGrin = 0; npc.jolt = null; story.showAvatar = false; story.gun = true; ggFace(npc); }
 function gagEnd(npc) {
   worldTs = 1; fxStory.whip = 0; npc.headUp = 0; npc.regenBusy = false; npc.regenUntil = performance.now() + 5000; npc.scripted = false; npc.pose = 'stand'; npc.poseDur = 0; npc.ggMouth = 0; npc.ggGrin = 0; npc.ggRage = 0; npc.ggDim = 0; npc.ggCrack = 0; npc.jolt = null; npc.laughAmp = 1;
-  npc.root.visible = true; npc.root.scale.set(1, 1, 1); npc.idleT = rand(1, 3); LFX.on = false; $('bloodout').style.opacity = 0; story.fov = 0; subOff(); resume();
+  npc.root.visible = true; npc.root.scale.set(1, 1, 1); npc.idleT = rand(1, 3); LFX.on = false; npc.poseRate = 14; npc.snicker = 0;
+  { const G = npc.gg; ggCapHome(npc); for (const sd of [-1, 1]) G.gore[sd].visible = false; for (const e of G.eyes) { e.visible = true; e.scale.set(1, 1, 1); } G.eyePop = 0; G.slit.visible = false; G.spear.visible = true; G.candy.visible = true; for (const P of npc.partList) { P.mesh.visible = true; P.blood = 0; bloody(P, 0); } for (const l of TEND) l.visible = false; } $('bloodout').style.opacity = 0; story.fov = 0; subOff(); resume();
 }
 function ggHead(npc, out) { npc.parts.head.mesh.updateMatrixWorld(true); return npc.parts.head.mesh.getWorldPosition(out); }
 function ggImpact(npc, i, dir) {
@@ -4382,28 +4732,114 @@ function ggHeal(npc) {
 function gagHit(npc, P, h, dir, w) {
   sparks(h.point, 5, hitNormal(h), 3);
   if (state !== 'play' || npc.regenBusy || performance.now() < (npc.regenUntil || 0)) { hitMarker(false); return; }
-  const v = w.melee || w.id === 'flame' ? 'laugh' : w.id === 'shotgun' || w.id === 'bow' ? 'boom' : 'head';
-  gagCut(npc, v, { point: h.point.clone(), dir: dir.clone() });
+  const v = w.fists ? 'head' : w.melee || w.id === 'flame' ? 'laugh' : w.id === 'shotgun' || w.id === 'bow' ? 'boom' : 'head';
+  gagCut(npc, v, { point: h.point.clone(), dir: dir.clone(), blunt: !!w.fists });
 }
 function gagCut(npc, variant, hit) { lfxInit(); if (variant === 'boom') cutRegenBoom(npc, hit); else if (variant === 'laugh') cutRegenLaugh(npc, hit); else cutRegenHead(npc, hit); }
-// like the slow-motion clip: the head is hit again and again, cracks, bleeds, then knits itself back together; the laugh is "О! Ха-ха-ха!"
+// the head shot, after the clip and the retelling: half the face is torn off and the cap flies; he laughs, catches the cap
+// and puts it back on while the face grows back, then dashes over and punches you across the room (-99 HP)
+const GG_PUNCH = ['А теперь — моя очередь.', 'Ты кое-что уронил. Держи сдачу.', 'Моя кепка, между прочим, новая.', 'Лови ответ.'];
+function ggTearFace(npc, side, blunt) {
+  const G = npc.gg, H = npc.parts.head; H.mesh.updateMatrixWorld(true);
+  if (!blunt) {
+    const pv = G.gore[side]; pv.visible = true; pv.userData.mesh.visible = true; pv.scale.setScalar(1); G.goreSide = side; G.eyes[side > 0 ? 1 : 0].visible = false;
+    const c = H.mesh.localToWorld(new V3(side * 0.06, 0, 0.09)), out = new V3(side, 0.25, 0.8).normalize().transformDirection(H.mesh.matrixWorld);
+    spawnChunks('head', c, out.clone().multiplyScalar(2.2), out, 0.8, npc);
+    bloodSpray(c, out, 120, 0.7, 2, 7, 0.004, 0.014); bloodMist(c, 0.6); bloodMist(c, 0.9);
+    if (emitters.length < 90) addEmitter(H.mesh, new V3(side * 0.06, -0.03, 0.09), new V3(side * 0.4, -0.5, 0.8).normalize(), { rate: 40, speed: 0.8, dur: 4.5, pulse: true });
+    Sound.splat(1.3); Sound.crunch(1.1);
+  } else { Sound.thud(1.1); Sound.crunch(0.5); }
+  const cap = G.cap; scene.attach(cap); const f = new V3(Math.sin(npc.yaw), 0, Math.cos(npc.yaw));
+  G.capV = new V3(-side * 0.7 - f.x * 1.1, 3.4, -f.z * 1.1); G.capW = new V3(rand(4, 8), rand(-3, 3), rand(-6, 6)); G.capFly = true; G.capCatch = 0;
+}
+function ggRestoreFace(npc) {
+  const G = npc.gg; for (const sd of [-1, 1]) { G.gore[sd].visible = false; G.gore[sd].scale.setScalar(1); } for (const e of G.eyes) { e.visible = true; } G.eyePop = 1;
+}
+function ggCapHome(npc) { const G = npc.gg, head = npc.parts.head.mesh; if (G.cap.parent !== head) head.attach(G.cap); G.cap.position.copy(G.capPos); G.cap.quaternion.copy(G.capQ); G.capFly = false; G.capCatch = 0; }
+function ggDash(npc) {
+  const from = ggHead(npc, new V3()), d = new V3(npc.pos.x - player.pos.x, 0, npc.pos.z - player.pos.z); const L = d.length() || 1; d.multiplyScalar(1 / L);
+  const x = player.pos.x + d.x * 0.95, z = player.pos.z + d.z * 0.95;
+  ggPlace(npc, x, z, Math.atan2(player.pos.x - x, player.pos.z - z)); npc.pos.y = player.pos.y; npc.root.position.y = player.pos.y;
+  for (const p of [from, ggHead(npc, new V3())]) { spawnSprite(TEX.flash, p, { color: 0xffd060, size: 1.2, grow: 1, life: 0.25, additive: true }); sparks(p, 30, UP, 5); }
+  Sound.zap(0.9); Sound.swoosh(); flashScreen('#fff2c0', 180);
+}
+function ggPunchPlayer(npc) {
+  const d = new V3(player.pos.x - npc.pos.x, 0, player.pos.z - npc.pos.z); if (d.lengthSq() < 1e-4) d.set(Math.sin(npc.yaw), 0, Math.cos(npc.yaw)); d.normalize();
+  if (!settings.god) { player.hp = Math.max(1, player.hp - 99); player.lastHurt = 0; } player.punchGrace = performance.now() + 3200;
+  hurtFlash = 1; shake = 1.5; screenBlood(0.9); flashScreen('#ff2a1a', 280); Sound.thud(1.6); Sound.crunch(1.2); Sound.hurt(); toast('-99 HP');
+  return d;
+}
 function cutRegenHead(npc, hit) {
-  gagStart(npc); worldTs = 0.3; story.fov = 40; const hp = new V3(), f = new V3(), sd = new V3();
+  gagStart(npc); worldTs = 0.35; story.fov = 40; const G = npc.gg, H = npc.parts.head, hp = new V3(), f = new V3(), sd = new V3(), blunt = !!hit.blunt;
+  H.mesh.updateMatrixWorld(true); const lh = H.mesh.worldToLocal(hit.point.clone()), side = hit.side || (lh.x >= 0 ? 1 : -1);
+  let healK = 0, home = 0, punchDir = null;
+  const hand = () => { npc.parts.lArmL.mesh.updateMatrixWorld(true); return npc.parts.lArmL.mesh.localToWorld(_c.set(0, -0.2, 0.03)); };
   runCut([
-    [0.0, () => Sound.beat(0.5)],
-    [0.45, () => ggImpact(npc, 0, hit.dir)], [0.95, () => ggImpact(npc, 1, hit.dir)], [1.5, () => ggImpact(npc, 2, hit.dir)], [2.0, () => ggImpact(npc, 3, hit.dir)], [2.5, () => ggImpact(npc, 4, hit.dir)],
-    [3.4, () => ggHeal(npc)],
-    [4.4, () => { worldTs = 1; npc.ggSlit = 1; }],
-    [5.0, () => { npc.pose = 'laugh'; npc.ggMouth = 1; npc.laughAmp = 0.6; ggLaugh(npc, 'head', { pitch: 0.95, n: 4, gap: 0.22, pause: 0.7, dist: 0.3, vol: 0.85 }); sub('Воскреситель', 'О! Ха-ха-ха!'); }],
-    [7.6, () => { npc.laughAmp = 1; }],
-    [8.4, () => { npc.pose = 'stand'; npc.ggMouth = 0; npc.ggGrin = 1; story.fov = 0; line('Воскреситель', ggQuip('head'), 0.3, 0.8); }],
+    [0.0, () => { ggTearFace(npc, side, blunt); npc.jolt = [-0.35, side * -0.6, side * 0.45]; Sound.beat(0.5); }],
+    [1.3, () => { worldTs = 1; npc.ggSlit = 1; npc.ggGrin = 0.6; }],
+    [1.6, () => { npc.pose = 'capcatch'; npc.poseRate = 9; ggLaugh(npc, 'head', { pitch: 0.95, n: 4, gap: 0.22, pause: 0.7, dist: 0.3, vol: 0.85 }); sub('Воскреситель', 'О! Ха-ха-ха!'); }],
+    [2.35, () => { G.capCatch = 1; }],
+    [2.7, () => { G.capFly = false; G.capCatch = 0; npc.parts.lArmL.mesh.attach(G.cap); Sound.click(500, 0.3); }],
+    [3.05, () => { npc.pose = 'capput'; }],
+    [3.5, () => { npc.parts.head.mesh.attach(G.cap); home = 1; npc.pose = 'capfix'; if (!blunt) { healK = 0.001; Sound.heal(); Sound.steam(0.2); LFX.c.copy(ggHead(npc, new V3())); LFX.r = 0.5; LFX.on = true; } }],
+    [5.0, () => { ggRestoreFace(npc); LFX.on = false; if (!blunt) flashScreen('#ffe9a0', 300); }],
+    [5.35, () => { npc.pose = 'stand'; npc.ggGrin = 1; npc.ggRage = 0.5; ggFace(npc); story.fov = 0; line('Воскреситель', pick(GG_PUNCH), 0.3, 0.8); }],
+    [6.7, () => ggDash(npc)],
+    [6.95, () => { npc.poseRate = 30; npc.pose = 'punchwind'; }],
+    [7.3, () => { npc.poseRate = 90; npc.pose = 'punch'; Sound.swoosh(); }],
+    [7.42, () => { punchDir = ggPunchPlayer(npc); }],
   ], (t, dt) => {
     ggHead(npc, hp); f.set(Math.sin(npc.yaw), 0, Math.cos(npc.yaw)); sd.set(Math.cos(npc.yaw), 0, -Math.sin(npc.yaw));
-    const dist = t < 5 ? lerp(0.7, 0.58, t / 5) : t < 8.4 ? lerp(0.62, 1.2, clamp((t - 5) / 3.4, 0, 1)) : lerp(1.2, 2.6, clamp((t - 8.4) / 2.5, 0, 1)), up = t > 8.4 ? 0.2 * clamp((t - 8.4) / 2, 0, 1) : 0, aa = 0.28;
-    camSet(hp.x + f.x * dist + sd.x * dist * aa, hp.y + 0.02 + up, hp.z + f.z * dist + sd.z * dist * aa, hp.x, hp.y - 0.01 - up * 0.4, hp.z);
-    if (npc.jolt) { const m = Math.exp(-9 * dt); npc.jolt = npc.jolt.map((v) => v * m); camera.position.x += rand(-0.012, 0.012); camera.position.y += rand(-0.012, 0.012); }
-  }, 11.4, () => gagEnd(npc));
+    const dts = dt * worldTs;
+    if (G.capFly) { G.capV.y -= 9.8 * dts; G.cap.position.addScaledVector(G.capV, dts); G.cap.rotation.x += G.capW.x * dts; G.cap.rotation.y += G.capW.y * dts; G.cap.rotation.z += G.capW.z * dts; const fy = floorAt(G.cap.position.x, G.cap.position.z, G.cap.position.y) + 0.06; if (G.cap.position.y < fy) { G.cap.position.y = fy; G.capV.multiplyScalar(0.3); } }
+    if (G.capCatch) G.cap.position.lerp(hand(), Math.min(1, dt * 12));
+    if (home) { const k = Math.min(1, dt * 7); G.cap.position.lerp(G.capPos, k); G.cap.quaternion.slerp(G.capQ, k); if (t < 5.2) G.cap.rotateZ(Math.sin(t * 11) * 0.03); }
+    if (healK > 0 && healK < 1) { healK = Math.min(1, healK + dt / 1.45); const pv = G.gore[side]; pv.scale.setScalar(Math.max(0.03, 1 - healK * healK * (3 - 2 * healK))); if (Math.random() < 0.6) spawnSprite(TEX.soft, H.mesh.localToWorld(_d.set(side * rand(0.02, 0.09), rand(-0.06, 0.06), 0.11)), { color: 0xffd060, additive: true, size: rand(0.04, 0.1), grow: 1, life: 0.35 }); }
+    if (G.eyePop > 0) { G.eyePop = Math.max(0, G.eyePop - dt * 2.5); const e = G.eyes[side > 0 ? 1 : 0], s = 1 + Math.sin((1 - G.eyePop) * Math.PI) * 0.35; e.scale.set(s, s, s); }
+    if (npc.jolt) { const m = Math.exp(-9 * dt); npc.jolt = npc.jolt.map((v) => v * m); }
+    if (t < 1.6) { const d = lerp(0.82, 0.62, t / 1.6); camSet(hp.x + f.x * d + sd.x * side * 0.3, hp.y + 0.02, hp.z + f.z * d + sd.z * side * 0.3, hp.x, hp.y, hp.z); camera.position.x += rand(-0.006, 0.006); }
+    else if (t < 3.5) camSafe(hp.x + f.x * 2.0 + sd.x * 0.35, hp.y - 0.4, hp.z + f.z * 2.0 + sd.z * 0.35, hp.x, hp.y + 0.18, hp.z);
+    else if (t < 5.35) { const d = lerp(1.0, 0.8, (t - 3.5) / 1.85); camSafe(hp.x + f.x * d + sd.x * side * 0.38, hp.y + 0.05, hp.z + f.z * d + sd.z * side * 0.38, hp.x, hp.y + 0.01, hp.z); }
+    else { syncEye(); camera.position.copy(eye.position); camera.lookAt(hp.x, hp.y - 0.06, hp.z); if (t > 7.42) { camera.position.x += rand(-0.035, 0.035); camera.position.y += rand(-0.035, 0.035); } }
+  }, 7.8, () => { gagEnd(npc); if (punchDir && !player.dead) playerRagdoll(punchDir.x * 17, 7, punchDir.z * 17); });
 }
+// the throat cut, after the cartoon clip and the retelling: blood, a cough, fake pain with both hands on the neck,
+// a snicker he cannot hold, then hands off, a laugh, and the cut closing up in gold for everyone to see
+function cutRegenLaugh(npc, hit) {
+  gagStart(npc); story.fov = 42; const G = npc.gg, hp = new V3(), f = new V3(), sd = new V3(), blunt = !!hit.blunt, nk = new V3();
+  const neck = () => { npc.parts.head.mesh.updateMatrixWorld(true); return npc.parts.head.mesh.localToWorld(nk.set(0, -0.112, 0.05)); };
+  runCut([
+    [0.0, () => { if (!blunt) { G.slit.visible = true; G.slit.scale.set(1, 1, 1); G.slit.material.color.setHex(0x5a0000); } npc.jolt = [-0.5, 0.3, 0.25]; const p = neck().clone(); bloodSpray(p, hit.dir.clone().negate().add(_b.set(0, 0.3, 0)).normalize(), 90, 0.6, 1.5, 6, 0.004, 0.012); bloodMist(p, 0.6); Sound.crunch(1); Sound.splat(1.2); worldTs = 0.45; if (emitters.length < 90) addEmitter(npc.parts.head.mesh, new V3(0, -0.115, 0.05), new V3(0, -0.6, 0.8).normalize(), { rate: 45, speed: 1, dur: 5, pulse: true }); bloody(npc.parts.torso, 0.3); }],
+    [0.6, () => { worldTs = 1; npc.pose = 'neckhold'; npc.poseRate = 10; G.spear.visible = false; G.candy.visible = false; }],
+    [1.0, () => npc.cough()],
+    [1.4, () => line('Воскреситель', 'Кха… кха… Ох… как больно…', 0.3, 0.7)],
+    [2.3, () => npc.cough()],
+    [3.1, () => { npc.cough(); line('Воскреситель', 'Я… умираю…', 0.3, 0.62); }],
+    [4.2, () => { npc.snicker = 1; npc.ggMouth = 0.3; Sound.laugh({ n: 2, pitch: 1.05, vol: 0.3, gap: 0.12 }); sub('Воскреситель', 'Пф… хе… хе-хе…'); }],
+    [5.1, () => { npc.snicker = 0; npc.pose = 'tada'; npc.poseRate = 9; npc.ggGrin = 1; npc.ggSlit = 1; G.spear.visible = true; G.candy.visible = true; ggLaugh(npc, 'neck', { pitch: 0.9, n: 8, gap: 0.2, rise: true, vol: 0.85, pause: 0.12, dist: 0.25 }); sub('Воскреситель', 'Ха-ха-ха-ха-ха-ха!'); }],
+    [6.1, () => { if (!blunt) { G.healNeck = 1; Sound.heal(); LFX.c.copy(neck()); LFX.r = 0.35; LFX.on = true; } }],
+    [8.2, () => { LFX.on = false; G.slit.visible = false; }],
+    [9.3, () => { npc.pose = 'stand'; npc.ggMouth = 0; npc.ggRage = 0; story.fov = 34; line('Воскреситель', ggQuip('stab'), 0.3, 0.8); }],
+  ], (t, dt) => {
+    ggHead(npc, hp); f.set(Math.sin(npc.yaw), 0, Math.cos(npc.yaw)); sd.set(Math.cos(npc.yaw), 0, -Math.sin(npc.yaw));
+    if (npc.jolt) { const m = Math.exp(-7 * dt); npc.jolt = npc.jolt.map((v) => v * m); }
+    if (G.healNeck > 0) { G.healNeck = Math.max(0, G.healNeck - dt / 2); const k = G.healNeck; G.slit.scale.y = Math.max(0.02, k); G.slit.material.color.setRGB(0.35 * k + 1 * (1 - k), 0.75 * (1 - k), 0.2 * (1 - k)); if (Math.random() < 0.6) spawnSprite(TEX.soft, neck().clone().add(_b.set(rand(-0.05, 0.05), rand(-0.015, 0.015), rand(-0.01, 0.03))), { color: 0xffd060, additive: true, size: rand(0.04, 0.1), grow: 1, life: 0.4 }); }
+    const n = neck();
+    if (t < 1.0) camSet(hp.x + f.x * 0.62 + sd.x * 0.22, hp.y - 0.08, hp.z + f.z * 0.62 + sd.z * 0.22, n.x, n.y, n.z);
+    else if (t < 4.2) camSafe(hp.x + f.x * 1.7 + sd.x * 0.5, hp.y - 0.25, hp.z + f.z * 1.7 + sd.z * 0.5, hp.x, hp.y - 0.3, hp.z);
+    else if (t < 5.1) camSet(hp.x + f.x * 0.75 + sd.x * 0.2, hp.y + 0.02, hp.z + f.z * 0.75 + sd.z * 0.2, hp.x, hp.y - 0.02, hp.z);
+    else if (t < 6.1) { const a = 0.35 - (t - 5.1) * 0.3; camSafe(hp.x + f.x * 1.9 * Math.cos(a) + sd.x * 1.9 * Math.sin(a), hp.y - 0.2, hp.z + f.z * 1.9 * Math.cos(a) + sd.z * 1.9 * Math.sin(a), hp.x, hp.y - 0.3, hp.z); }
+    else if (t < 8.2) camSet(hp.x + f.x * 0.55 + sd.x * 0.16, hp.y - 0.22, hp.z + f.z * 0.55 + sd.z * 0.16, n.x, n.y, n.z);
+    else if (t < 9.3) camSafe(hp.x + f.x * 1.5 + sd.x * 0.4, hp.y - 0.15, hp.z + f.z * 1.5 + sd.z * 0.4, hp.x, hp.y - 0.2, hp.z);
+    else { const d = lerp(1.2, 0.75, clamp((t - 9.3) / 3.5, 0, 1)); camSafe(hp.x + f.x * d - sd.x * 0.2, hp.y + 0.05, hp.z + f.z * d - sd.z * 0.2, hp.x, hp.y, hp.z); }
+    if (t > 5.1 && t < 9.3) { camera.position.x += rand(-0.006, 0.006); camera.position.y += rand(-0.006, 0.006); }
+  }, 13.2, () => { G.slit.visible = false; G.spear.visible = true; G.candy.visible = true; npc.snicker = 0; gagEnd(npc); });
+}
+// the blast after the clip: blood streams pull back in, a golden starburst, and the body puts itself together part by part
+const TEND = [];
+function tendInit() { if (TEND.length) return; for (let i = 0; i < 14; i++) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)); const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xc80a0a, transparent: true, opacity: 0.9 })); l.frustumCulled = false; l.visible = false; scene.add(l); TEND.push(l); } }
+function tendStart(c) { tendInit(); for (const l of TEND) { l.userData.s = new V3(c.x + rand(-2.6, 2.6), rand(0.05, 1.6), c.z + rand(-2.6, 2.6)); l.userData.c = c.clone(); l.visible = true; } }
+function tendUpdate(k) { for (const l of TEND) { if (!l.visible) continue; const s = l.userData.s, c = l.userData.c, a = l.geometry.attributes.position, e = Math.min(1, k * 1.15); a.setXYZ(0, lerp(s.x, c.x, e), lerp(s.y, c.y, e), lerp(s.z, c.z, e)); a.setXYZ(1, lerp(s.x, c.x, Math.min(1, e + 0.35)), lerp(s.y, c.y, Math.min(1, e + 0.35)), lerp(s.z, c.z, Math.min(1, e + 0.35))); a.needsUpdate = true; if (k >= 1) l.visible = false; } }
 // a blast: red out, blood on the floor from low down, then golden lightning pulls him back together in a cloud of steam
 function cutRegenBoom(npc, hit) {
   gagStart(npc); const c = npc.pos.clone(); c.y = 0.95; const mine = [], bo = $('bloodout');
@@ -4420,40 +4856,25 @@ function cutRegenBoom(npc, hit) {
     [0.7, () => { bo.style.transition = 'opacity 1.4s'; bo.style.opacity = 0; worldTs = 0.7; }],
     [0.9, () => { fxStory.whip = 0.06; }],
     [2.9, () => { worldTs = 1; Sound.rise(2.6); }],
-    [3.4, () => { LFX.c.copy(c); LFX.r = 1.9; LFX.on = true; flashScreen('#ffe9a0', 700); sparks(c, 60, UP, 8); for (let i = 0; i < 6; i++) spawnSprite(TEX.flash, _a.copy(c).add(randUnit(_b).multiplyScalar(0.3)), { color: 0xffd060, size: rand(1.4, 2.8), grow: 1, life: 0.35, additive: true }); }],
+    [3.4, () => { tendStart(c); spawnSprite(ggExtraTex().star, c, { color: 0xffe060, additive: true, size: 3.4, grow: 0.5, life: 0.7 }); spawnSprite(TEX.soft, c, { color: 0xffffff, additive: true, size: 0.6, grow: 7, life: 0.5, opacity: 0.6 }); LFX.c.copy(c); LFX.r = 1.9; LFX.on = true; flashScreen('#ffe9a0', 700); sparks(c, 60, UP, 8); for (let i = 0; i < 6; i++) spawnSprite(TEX.flash, _a.copy(c).add(randUnit(_b).multiplyScalar(0.3)), { color: 0xffd060, size: rand(1.4, 2.8), grow: 1, life: 0.35, additive: true }); }],
     [5.4, () => {
       for (const g of mine) removeGib(g); mine.length = 0; sparks(c, 90, UP, 7); flashScreen('#fff', 800); Sound.heal(); Sound.steam(0.45); Sound.boom();
       for (let i = 0; i < 18; i++) spawnSprite(TEX.smoke, _a.copy(c).add(randUnit(_b).multiplyScalar(0.5)), { color: 0xffffff, size: rand(0.6, 1.2), grow: 2.4, life: rand(1.6, 2.6), opacity: 0.65, vel: new V3(rand(-0.5, 0.5), rand(0.2, 0.9), rand(-0.5, 0.5)) });
-      npc.root.visible = true; npc.root.scale.setScalar(0.3); npc.ggWing = 1; npc.pose = 'limphead';
+      npc.root.visible = true; npc.root.scale.setScalar(1); for (const n of LIMBS) npc.parts[n].mesh.visible = false; for (const P of npc.partList) { P.blood = 0.95; bloody(P, 0); } npc.ggWing = 1; npc.pose = 'limphead';
     }],
+    [5.75, () => { for (const n of ['uArmL', 'uArmR', 'lArmL', 'lArmR']) npc.parts[n].mesh.visible = true; sparks(chestOf(npc, new V3()), 40, UP, 5); flashScreen('#fff2c0', 200); Sound.zap(0.6); }],
+    [6.0, () => { for (const n of ['uLegL', 'uLegR', 'lLegL', 'lLegR']) npc.parts[n].mesh.visible = true; sparks(c.clone().setY(0.4), 40, UP, 5); flashScreen('#fff2c0', 200); Sound.zap(0.6); }],
     [6.2, () => { LFX.on = false; npc.pose = 'laugh'; npc.laughAmp = 0.7; npc.ggGrin = 1; npc.ggSlit = 1; ggLaugh(npc, 'head', { pitch: 0.8, n: 5, gap: 0.2, vol: 0.85, dist: 0.5 }); sub('Воскреситель', 'Ха-ха-ха! Я снова здесь!'); }],
     [9.5, () => { npc.pose = 'stand'; npc.ggMouth = 0; npc.laughAmp = 1; line('Воскреситель', ggQuip('boom'), 0.3, 0.8); }],
   ], (t, dt) => {
     npc.root.rotation.y = npc.yaw; if (t > 6.6) npc.ggWing = lerp(npc.ggWing, 0.6, Math.min(1, dt * 1.5));
-    if (t > 5.4) npc.root.scale.setScalar(Math.min(1, 0.3 + (t - 5.4) * 2.6 + Math.sin((t - 5.4) * 9) * 0.05 * Math.max(0, 1 - (t - 5.4) * 1.5)));
+    if (t >= 3.4 && t < 5.6) tendUpdate((t - 3.4) / 2); if (t > 5.4 && t < 8) for (const P of npc.partList) { P.blood = Math.max(0, 0.95 - (t - 5.4) / 2.2); bloody(P, 0); }
     if (t >= 3.4 && t < 5.4) for (const g of mine) { g.b.wakeUp(); g.b.velocity.set((c.x - g.b.position.x) * 3.2, (c.y - g.b.position.y) * 3.2 + 0.4, (c.z - g.b.position.z) * 3.2); }
     if (t < 0.9) camSafe(c.x + f.x * 1.25 + sd.x * 0.3, 1.1, c.z + f.z * 1.25 + sd.z * 0.3, c.x, 1.0, c.z);
     else if (t < 3.4) { const k = (t - 0.9) / 2.5; camSafe(c.x + f.x * 2.6 + sd.x * (0.5 + k * 0.4), 0.2 + k * 0.08, c.z + f.z * 2.6 + sd.z * (0.5 + k * 0.4), c.x, 0.04, c.z); }
     else { const k = clamp((t - 3.4) / 5, 0, 1), a = (t - 3.4) * 0.22; camSafe(c.x + f.x * lerp(2.8, 3.3, k) * Math.cos(a) + sd.x * (0.9 + 2.8 * Math.sin(a)), lerp(0.3, 1.5, Math.min(1, k * 1.6)), c.z + f.z * lerp(2.8, 3.3, k) * Math.cos(a) + sd.z * (0.9 + 2.8 * Math.sin(a)), c.x, lerp(0.5, 1.0, k), c.z); }
   }, 13.6, () => { for (const g of mine) removeGib(g); npc.root.scale.setScalar(1); gagEnd(npc); });
 }
-// a stab, like the cartoon clip: the head lolls to the side as if dead for a few seconds, then he snaps up in a manic laugh with his hands flailing
-function cutRegenLaugh(npc, hit) {
-  gagStart(npc); story.fov = 46; const hp = new V3(), f = new V3(), sd = new V3(); const cd = hit.dir.clone();
-  runCut([
-    [0.0, () => { npc.pose = 'limphead'; npc.ggDim = 1; npc.ggSlit = 0.2; npc.jolt = [0.25, 0.4, 0.35]; bloodSpray(hit.point, cd, 50, 0.5, 1.5, 5, 0.003, 0.009); bloodMist(hit.point, 0.5); Sound.crunch(1); Sound.splat(1); worldTs = 0.5; }],
-    [0.7, () => { worldTs = 1; }],
-    [3.4, () => { Sound.zap(0.6); flashScreen('#ffe9a0', 260); npc.ggDim = 0; npc.ggSlit = 1; npc.jolt = null; ggHead(npc, hp); spawnSprite(TEX.soft, hp, { color: 0xffd060, additive: true, size: 1.2, grow: 1.2, life: 0.5 }); }],
-    [3.5, () => { npc.pose = 'laugh'; npc.ggMouth = 1; npc.ggRage = 0.4; ggLaugh(npc, 'neck', { pitch: 0.9, n: 8, gap: 0.2, rise: true, vol: 0.85, pause: 0.12, dist: 0.25 }); sub('Воскреситель', 'Ха-ха-ха-ха-ха-ха!'); }],
-    [8.0, () => { npc.pose = 'stand'; npc.ggMouth = 0; npc.ggGrin = 1; npc.ggRage = 0; story.fov = 0; line('Воскреситель', ggQuip('stab'), 0.3, 0.8); }],
-  ], (t, dt) => {
-    ggHead(npc, hp); f.set(Math.sin(npc.yaw), 0, Math.cos(npc.yaw)); sd.set(Math.cos(npc.yaw), 0, -Math.sin(npc.yaw));
-    const d = t < 3.4 ? lerp(1.35, 0.95, t / 3.4) : t < 8.0 ? lerp(0.95, 1.5, clamp((t - 3.4) / 4, 0, 1)) : lerp(1.5, 2.9, clamp((t - 8.0) / 3, 0, 1)), a = t > 3.4 && t < 8.0 ? Math.sin((t - 3.4) * 0.9) * 0.4 : 0;
-    camSet(hp.x + f.x * d * Math.cos(a) + sd.x * (0.35 + d * Math.sin(a)), hp.y + 0.04 + (t > 7.6 ? 0.25 : 0), hp.z + f.z * d * Math.cos(a) + sd.z * (0.35 + d * Math.sin(a)), hp.x, hp.y - 0.1, hp.z);
-    if (t > 3.5 && t < 7.6) { camera.position.x += rand(-0.01, 0.01); camera.position.y += rand(-0.01, 0.01); }
-  }, 12.4, () => gagEnd(npc));
-}
-
 /* ===== sandbox only: Svity tries to kiss the resurrector and gets the staff through her head ===== */
 const KT = { cd: 4, both: 0, busy: false };
 const KISS_SV = { come: ['Ой… какой ты загадочный. Не бойся, я не кусаюсь.', 'Привет, красавчик! Ты один тут такой… особенный?', 'Всем привет! А это — мой новый любимчик.'], close: ['Закрой глаза. Сейчас ты влюбишься в меня по уши.', 'Один поцелуй — и ты мой навсегда.', 'Не дёргайся… я нежно.'] };
@@ -5189,6 +5610,35 @@ function renderExcl() {
 $('exclBtn').onclick = () => { Sound.init(); renderExcl(); $('excl').hidden = false; };
 $('exclClose').onclick = () => { $('excl').hidden = true; };
 
+/* ===== settings (original sounds) and the wardrobe: man or woman, colours and body sizes, with a live preview ===== */
+const ward = { open: false, t: null };
+const PROPS = [['height', 'Рост', 0.85, 1.15], ['build', 'Телосложение', 0.75, 1.35], ['head', 'Голова', 0.8, 1.3], ['eyes', 'Глаза', 0.6, 1.8], ['arms', 'Руки', 0.75, 1.3], ['hands', 'Кисти', 0.7, 1.5], ['fingers', 'Пальцы', 0.5, 1.8], ['legs', 'Ноги', 0.8, 1.25], ['hair', 'Волосы', 0.5, 1.6], ['chest', 'Грудь', 0.6, 1.5]];
+function syncWard() {
+  const L = settings.look, f = L.gender === 'f';
+  $('genderChips').querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === (f ? 'f' : 'm'))));
+  $('hairRow').hidden = !f; $('hairChips').querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === (L.hairStyle || 'long'))));
+  $('propRows').innerHTML = PROPS.filter((p) => p[0] !== 'chest' || f).map(([k, n, a, b]) => `<div class="prow"><span class="lbl">${n}</span><input type="range" min="${a}" max="${b}" step="0.01" value="${L.prop[k] ?? 1}" data-p="${k}" aria-label="${n}"><span class="num">${Math.round((L.prop[k] ?? 1) * 100)}%</span></div>`).join('');
+  $('propRows').querySelectorAll('input').forEach((inp) => inp.oninput = () => { L.prop[inp.dataset.p] = +inp.value; inp.nextElementSibling.textContent = Math.round(+inp.value * 100) + '%'; wardRebuild(); });
+}
+function wardRebuild() { saveSettings(); clearTimeout(ward.t); ward.t = setTimeout(() => { if (!player.rag && !player.dead && (!avatar || avatar.state === 'alive')) { makeAvatar(); if (avatar) avatar.update(0.02); } }, 120); }
+const _wc1 = new V3(), _wc2 = new V3();
+function wardCam(dt) {
+  const A = avatar; if (!A) return; A.root.visible = true; for (const P of A.partList) P.mesh.visible = true;
+  if (state !== 'menu' && state !== 'over') { A.update(Math.min(dt, 0.05)); }
+  const f = _wc1.set(Math.sin(A.yaw), 0, Math.cos(A.yaw)), r = _wc2.set(f.z, 0, -f.x), sc = A.root.scale.y;
+  camera.position.set(A.pos.x + f.x * 2.0, A.pos.y + 1.15 * sc, A.pos.z + f.z * 2.0); camera.lookAt(A.pos.x - r.x * 0.6, A.pos.y + 0.95 * sc, A.pos.z - r.z * 0.6);
+}
+$('wardBtn').onclick = () => { Sound.init(); if (!avatar) makeAvatar(); ward.open = true; syncWard(); markWard(); $('menu').hidden = true; $('wardOv').hidden = false; };
+$('wardClose').onclick = () => { ward.open = false; $('wardOv').hidden = true; $('menu').hidden = false; };
+$('propReset').onclick = () => { settings.look.prop = {}; syncWard(); wardRebuild(); };
+$('genderChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.look.gender = b.dataset.v; syncWard(); wardRebuild(); Sound.click(1000, 0.15); });
+$('hairChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.look.hairStyle = b.dataset.v; syncWard(); wardRebuild(); Sound.click(1000, 0.15); });
+function syncSet() { $('origChips').querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.v === '1') === (settings.origSnd !== false)))); }
+$('setBtn').onclick = () => { Sound.init(); syncSet(); $('setOv').hidden = false; };
+$('setClose').onclick = () => { $('setOv').hidden = true; };
+$('origChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.origSnd = b.dataset.v === '1'; saveSettings(); syncSet(); Sound.click(1000, 0.15); });
+
+
 /* ===== admin panel, code 6508: endings, scene gallery, resurrector, cheats ===== */
 const ADM_CODE = '6508';
 const adm = { in: '', tab: 'end', ok: false };
@@ -5251,7 +5701,7 @@ function admItems(tab) {
     { l: 'Поцелуй-ловушка', s: 'Оба на карте = новая сцена', f: () => admKiss() },
     { l: 'Фраза воскресителя', s: 'Случайная из всех', f: () => { const tx = ggQuip(pick(['head', 'boom', 'stab', 'idle', 'kiss'])); toast('Воскреситель: ' + tx); speakAs(tx, 0.3, 0.8); } },
     { sec: 'Смех из ваших записей' },
-    { l: 'Мой смех в сценах: ' + on(settings.myLaugh !== false), s: 'Выкл — будет синтезированный смех', on: settings.myLaugh !== false, f: () => { settings.myLaugh = settings.myLaugh === false; saveSettings(); admRender(); } },
+    { l: 'Оригинальные звуки: ' + on(settings.origSnd !== false), s: 'Ваш голос в смехе и «Gotta get a grip»', on: settings.origSnd !== false, f: () => { settings.origSnd = settings.origSnd === false; settings.myLaugh = true; saveSettings(); admRender(); } },
     { l: 'Послушать «в голову»', s: 'О! Ха-ха-ха!', f: () => { Sound.init(); setTimeout(() => Sound.myLaugh('head'), 100); } },
     { l: 'Послушать «шея»', s: 'Длинный смех', f: () => { Sound.init(); setTimeout(() => Sound.myLaugh('neck'), 100); } },
     { l: 'Свой звук «в голову»', s: 'Выбрать файл (до перезагрузки)', f: () => admPick('head') },
@@ -5387,9 +5837,11 @@ function processImpacts() {
     const dmg = Math.pow(Math.max(0, v - 8 * vk), 1.7) * 1.3;
     if (npc.isPlayer) {
       if (v > 13) { fallFx.slowT = Math.max(fallFx.slowT, v > 25 ? 1.6 : 0.7); shake = Math.max(shake, Math.min(1.2, v * 0.04)); }
-      if (dmg > 0 && !player.dead) damagePlayer(dmg);
+      if (dmg > 0 && !player.dead && !(player.punchGrace > performance.now())) damagePlayer(dmg);
     } else if (npc.living && dmg > 0 && !npc.gg) { npc.hp -= dmg; if (npc.alive) npc.onHit(UP, e.P); if (npc.hp <= 0) npc.die('fall'); }
     e.P.hp -= dmg * 0.8;
+    if (!npc.gg && !e.P.gone && e.P.def.kind === 'limb' && v > 11 * vk && v <= 20 * vk && Math.random() < 0.6) breakBone(npc, e.P, { open: v > 15 * vk && Math.random() < 0.7 });
+    if (!npc.gg && !e.P.gone && v > 12 && Math.random() < 0.5) { const q = randomSurface(e.P, new V3()); tearCloth(npc, e.P, q, q.clone().normalize(), rand(0.05, 0.09), 0.9); }
     if (npc.gg) { /* the resurrector shrugs off a fall */ }
     else if (v > 30 * vk) burstBody(npc, p, n, v);
     else if (v > 20 * vk) { for (const name of LIMBS) { const P = npc.parts[name]; if (!P.gone && P.attached && (P === e.P || Math.random() < 0.15) && Math.random() < 0.6) npc.detach(name, { dir: n }); } if (v > 25 * vk && !npc.parts.head.gone && Math.random() < 0.3) npc.gib('head', n, 0.7); }
@@ -5408,6 +5860,7 @@ function frame(now) {
     else if (state === 'cutscene') { updatePlayer(rdt); updateCutscene(rawDt); }
     else if (state === 'sui') { updateSuicide(rawDt); }
     else if (state === 'story') updateStoryCut(rawDt);
+    else if ((state === 'menu' || state === 'over') && ward.open && avatar) wardCam(rdt);
     else if (state === 'menu' || state === 'over') { menuT += rdt * 0.08; const r = Math.min(HX, HZ) * 0.72; camera.position.set(Math.sin(menuT) * r, Math.min(5.2, WALL_H - 0.7), Math.cos(menuT) * r); camera.lookAt(0, 1, 0); }
     world.step(1 / 60 * ts, dt, 4); processGlass(); processImpacts();
     if (mapId === 'tower') updateElevator(rdt); else if (mapId === 'site') updateSite(now);
@@ -5418,11 +5871,12 @@ function frame(now) {
     if (state === 'play' || state === 'cutscene' || state === 'spawn') placeCamera(rdt);
     // separation
     for (let i = 0; i < npcs.length; i++) { const a = npcs[i]; if (!a.alive) continue; for (let j = i + 1; j < npcs.length; j++) { const b = npcs[j]; if (!b.alive) continue; const dx = a.pos.x - b.pos.x, dz = a.pos.z - b.pos.z, d = Math.hypot(dx, dz); if (d < 0.55 && d > 1e-4) { const k = (0.55 - d) / d * 0.5; a.pos.x += dx * k; a.pos.z += dz * k; b.pos.x -= dx * k; b.pos.z -= dz * k; a.root.position.copy(a.pos); b.root.position.copy(b.pos); } } }
-    lfxUpdate(dt); updateEmitters(dt); updateBlood(dt); updatePools(dt); updateFx(dt); updateSparks(dt); updateCasings(dt);
+    lfxUpdate(dt); updateEmitters(dt); updateBlood(dt); updatePools(dt); updateFx(dt); updateScraps(dt); updateSparks(dt); updateCasings(dt);
     for (const tr of tracers) if (tr.t > 0) { tr.t -= rdt; if (tr.t <= 0) tr.m.visible = false; }
     for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= dt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
     updateWaves(dt);
   }
+  if (!running && ward.open && avatar) wardCam(rdt);
   shake = Math.max(0, shake - rdt * 1.6); hurtFlash = Math.max(0, hurtFlash - rdt * 1.5);
   if (W.boomT > 0) { W.boomT -= rdt; boomLight.intensity *= Math.pow(0.0005, rdt); } else boomLight.intensity = 0;
   const MP = MAPS[mapId]; const blink = Math.sin(now * 0.004) > 0; redLight.intensity = blink ? MP.red[2] : MP.red[2] * 0.15; if (redLight.userData.bulb) redLight.userData.bulb.material.color.setHex(blink ? redLight.userData.bulbColor : 0x201008);
@@ -5454,7 +5908,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
