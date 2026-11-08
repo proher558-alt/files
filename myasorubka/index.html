@@ -124,6 +124,8 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(54px,13vw,118px);l
 .secrow b{display:block;font-family:var(--ui);letter-spacing:.06em;font-weight:700}
 .secrow small{color:var(--muted);font-size:12px}
 .secrow.got b{color:#7ad06a}
+.hdrow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.xbtn{font-family:var(--ui);font-size:13px;letter-spacing:.06em;background:var(--blood);border-color:var(--blood-hi);color:var(--fg);padding:6px 10px;cursor:pointer;flex:none}
 .admdisp{font-family:var(--mono);font-size:34px;letter-spacing:.35em;text-align:center;padding:12px;border:1px solid var(--line);background:#120c0b;margin:8px auto 12px;color:var(--hazard);max-width:360px}
 .admdisp.bad{color:#ff4a3a;border-color:#ff4a3a}
 .admpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:360px;margin:0 auto}
@@ -389,7 +391,7 @@ body.touch #wAmmo{font-size:26px}
   <div class="row" style="margin-top:16px"><button class="btn primary" id="admClose" style="flex:1">Закрыть</button></div>
 </div></div>
 <div id="setOv" class="overlay" hidden><div class="panel">
-  <div class="eyebrow">Меню</div>
+  <div class="hdrow"><div class="eyebrow">Меню</div><button class="chip xbtn" id="setX">✕ Закрыть</button></div>
   <h1 style="font-size:clamp(34px,8vw,64px)">Настройки</h1>
   <div class="row"><span class="lbl">УЛЬТРА</span><div class="chips" id="ultraChips"><button class="chip" data-v="0">Выкл</button><button class="chip" data-v="1">ULTRA · до 888%</button></div></div>
   <div class="row"><span class="lbl">Оригинальные звуки</span><div class="chips" id="origChips"><button class="chip" data-v="1">Вкл</button><button class="chip" data-v="0">Выкл</button></div></div>
@@ -411,7 +413,7 @@ body.touch #wAmmo{font-size:26px}
   <div class="row" style="margin-top:16px"><button class="btn primary" id="setClose" style="flex:1">Готово</button></div>
 </div></div>
 <div id="wardOv" class="overlay" hidden><div class="wphint">← проведите, чтобы повернуть →</div><div class="panel">
-  <div class="eyebrow">Гардероб героя</div>
+  <div class="hdrow"><div class="eyebrow">Гардероб героя</div><button class="chip xbtn" id="wardX">✕ Закрыть</button></div>
   <div class="row"><span class="lbl">Персонаж</span><div class="chips" id="genderChips"><button class="chip" data-v="m">Мужской</button><button class="chip" data-v="f">Женский</button></div></div>
   <div class="row" id="hairRow"><span class="lbl">Причёска</span><div class="chips" id="hairChips"><button class="chip" data-v="long">Длинные</button><button class="chip" data-v="pony">Хвост</button><button class="chip" data-v="bob">Каре</button></div></div>
     <div class="row"><span class="lbl">Футболка</span><div class="swatches" data-k="shirt"></div></div>
@@ -423,7 +425,7 @@ body.touch #wAmmo{font-size:26px}
 <div id="inv" hidden><div class="invbox"><div class="invhead"><b>Инвентарь</b><button class="chip" id="invClose">Закрыть</button></div><div class="invsec">Оружие</div><div class="invgrid" id="invW"></div><div class="invsec">Предметы</div><div class="invgrid" id="invI"></div><div class="invinfo" id="invInfo"></div></div></div>
 <div id="secOv" class="overlay" hidden><div class="panel"><div class="eyebrow">Тайны полигона</div><h1 style="font-size:clamp(34px,8vw,64px)">Секреты</h1><p class="mapdesc" id="secCount"></p><div id="secList"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="secClose" style="flex:1">Закрыть</button></div></div></div>
 <div id="spOv" class="overlay" hidden><div class="wphint">← проведите, чтобы повернуть →</div><div class="panel">
-  <div class="eyebrow">Общие настройки спавна</div>
+  <div class="hdrow"><div class="eyebrow">Общие настройки спавна</div><button class="chip xbtn" id="spX">✕ Закрыть</button></div>
   <div class="chips sptabs" id="spKinds"></div>
   <div id="spBody"></div>
   <div class="row" style="margin-top:10px"><button class="btn" id="spRoll" style="flex:1">Другой пример</button><button class="btn" id="spReset" style="flex:1">Сбросить</button><button class="btn primary" id="spClose" style="flex:1">Готово</button></div>
@@ -6024,7 +6026,8 @@ function spRender() {
   $('spBody').querySelectorAll('input[data-s]').forEach((inp) => inp.onchange = () => { const key = inp.dataset.s, i = +inp.dataset.i, d = SZ.concat(SZP).find((x) => x[0] === key), v = inp.value.trim() === '' ? null : clamp(Math.round(+inp.value || 0), d[2], ultraHi(d[3])); C.size = C.size || {}; const r = C.size[key] || [null, null]; r[i] = v; if (r[0] != null && r[1] != null && r[0] > r[1]) r.reverse(); if (r[0] == null && r[1] == null) delete C.size[key]; else C.size[key] = r; saveSettings(); spRender(); wpBuildSample(); });
 }
 $('spBtn').onclick = () => { Sound.init(); spc.open = true; spRender(); wpBuildSample(); $('menu').hidden = true; $('spOv').hidden = false; };
-$('spClose').onclick = () => { spc.open = false; spc.dirty = true; wpDrop(); $('spOv').hidden = true; $('menu').hidden = false; };
+const spCloseFn = () => { spc.open = false; spc.dirty = true; wpDrop(); $('spOv').hidden = true; $('menu').hidden = false; };
+$('spClose').onclick = spCloseFn; $('spX').onclick = spCloseFn;
 $('spRoll').onclick = () => { wpBuildSample(); Sound.click(1200, 0.12); };
 $('spReset').onclick = () => { settings.spawnCfg[spc.kind] = {}; saveSettings(); spRender(); wpBuildSample(); };
 $('spOv').addEventListener('pointerdown', (e) => { if (e.target === $('spOv')) WP.drag = { x: e.clientX, r: WP.rot }; });
@@ -6100,13 +6103,14 @@ function wardCam(dt) {
   camera.position.set(A.pos.x + f.x * 2.0, A.pos.y + 1.15 * sc, A.pos.z + f.z * 2.0); camera.lookAt(A.pos.x - r.x * 0.6, A.pos.y + 0.95 * sc, A.pos.z - r.z * 0.6);
 }
 $('wardBtn').onclick = () => { Sound.init(); ward.open = true; wpBuild(); syncWard(); markWard(); $('menu').hidden = true; $('wardOv').hidden = false; };
-$('wardClose').onclick = () => { ward.open = false; wpDrop(); $('wardOv').hidden = true; $('menu').hidden = false; };
+const wardCloseFn = () => { ward.open = false; wpDrop(); $('wardOv').hidden = true; $('menu').hidden = false; };
+$('wardClose').onclick = wardCloseFn; $('wardX').onclick = wardCloseFn;
 $('propReset').onclick = () => { settings.look.prop = {}; syncWard(); wardRebuild(); };
 $('genderChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.look.gender = b.dataset.v; syncWard(); wardRebuild(); Sound.click(1000, 0.15); });
 $('hairChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.look.hairStyle = b.dataset.v; syncWard(); wardRebuild(); Sound.click(1000, 0.15); });
 function syncSet() { $('origChips').querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.v === '1') === (settings.origSnd !== false)))); }
 $('setBtn').onclick = () => { Sound.init(); syncSet(); syncUltra(); $('setOv').hidden = false; };
-$('setClose').onclick = () => { $('setOv').hidden = true; };
+$('setClose').onclick = () => { $('setOv').hidden = true; }; $('setX').onclick = () => { $('setOv').hidden = true; };
 $('origChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.origSnd = b.dataset.v === '1'; saveSettings(); syncSet(); Sound.click(1000, 0.15); });
 function syncUltra() { $('ultraChips').querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.v === '1') === !!settings.ultra))); }
 $('ultraChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.ultra = b.dataset.v === '1'; saveSettings(); syncUltra(); Sound.click(settings.ultra ? 1600 : 700, 0.2); toast(settings.ultra ? 'ULTRA: до 888%' : 'ULTRA выключен'); });
