@@ -106,6 +106,24 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(54px,13vw,118px);l
 .slot .cnt{position:absolute;right:4px;top:3px;font:700 11px var(--mono);color:var(--hazard)}
 .slot.empty{opacity:.38}
 .invinfo{font-size:12px;color:var(--muted);margin-top:8px;min-height:1.2em}
+#spOv{justify-content:flex-end;background:none;padding:8px}
+#spOv .panel{width:min(390px,50vw);max-height:calc(100vh - 16px);overflow-y:auto;margin:0;padding:12px 14px 10px}
+#spOv .row{margin:5px 0;gap:6px 8px}
+#spOv .row .lbl{min-width:62px;font-size:10px;letter-spacing:.1em}
+#spOv .chip{font-size:12px;padding:4px 8px}
+#spOv .sw{width:20px;height:20px}
+#spOv .btn{font-size:13px;padding:9px 8px}
+.sptabs{margin:6px 0 4px}
+.sptabs .chip.on,#spBody .chip.on{background:var(--blood);border-color:var(--blood-hi)}
+.rrow{display:grid;grid-template-columns:74px auto 1fr auto 1fr 14px;align-items:center;gap:5px;margin:3px 0;font-size:11px;color:var(--muted)}
+.rrow .lbl{font-size:10px;letter-spacing:.06em;color:var(--fg)}
+.rrow input{width:100%;min-width:0;background:#120c0b;border:1px solid var(--line);color:var(--fg);font:12px var(--mono);padding:5px}
+.spnote{font-size:11px;color:var(--muted);margin:6px 0 2px}
+@media (max-aspect-ratio:1/1){#spOv{align-items:flex-end;justify-content:center}#spOv .panel{width:100%;max-height:52vh}}
+.secrow{padding:7px 0;border-bottom:1px solid var(--line)}
+.secrow b{display:block;font-family:var(--ui);letter-spacing:.06em;font-weight:700}
+.secrow small{color:var(--muted);font-size:12px}
+.secrow.got b{color:#7ad06a}
 .admdisp{font-family:var(--mono);font-size:34px;letter-spacing:.35em;text-align:center;padding:12px;border:1px solid var(--line);background:#120c0b;margin:8px auto 12px;color:var(--hazard);max-width:360px}
 .admdisp.bad{color:#ff4a3a;border-color:#ff4a3a}
 .admpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:360px;margin:0 auto}
@@ -349,10 +367,12 @@ body.touch #wAmmo{font-size:26px}
         <button class="chip" data-v="roof">Крыша</button>
         <button class="chip" data-v="tower">Небоскрёб · 200 этажей</button>
         <button class="chip" data-v="site">Стройка</button>
+        <button class="chip" data-v="moon" hidden>🌕 Кровавая Луна</button>
       </div>
     </div>
     <p class="mapdesc" id="mapDesc"></p>
-    <div class="modes"><button class="btn" id="setBtn">Настройки<small>Оригинальные звуки, кровь, графика, обзор</small></button><button class="btn" id="wardBtn">Гардероб<small>Мужской или женский герой, цвета и размеры</small></button></div>
+    <div class="modes"><button class="btn" id="wardBtn">Гардероб<small>Мужской или женский герой, цвета и размеры</small></button><button class="btn" id="spBtn">Общие настройки спавна<small>Кто появляется и каких размеров</small></button></div>
+    <div class="modes"><button class="btn" id="setBtn">Настройки<small>Оригинальные звуки, кровь, графика, обзор</small></button><button class="btn" id="secBtn">Секреты<small id="secCount2">Найдите все и откройте секретную карту</small></button></div>
     <div class="touchhelp">Левая половина экрана — ходьба, правая — обзор. «Огонь» держите для автомата и грави-пушки. «Бросок» кидает гранату или швыряет пойманное грави-пушкой, а без цели толкает. «Ближе» и «Дальше» тянут пойманного. «Вид» переключает первое и третье лицо. «Упасть» роняет тело, повторное нажатие поднимает. В небоскрёбе зайдите в лифт: появится пульт этажей.</div>
     <div class="warn"><b>18+</b> · Графическое насилие, расчленение, много крови. Все персонажи вымышлены.</div>
   </div>
@@ -400,6 +420,13 @@ body.touch #wAmmo{font-size:26px}
   <div class="row" style="margin-top:12px"><button class="btn" id="propReset" style="flex:1">Сбросить размеры</button><button class="btn primary" id="wardClose" style="flex:1">Готово</button></div>
 </div></div>
 <div id="inv" hidden><div class="invbox"><div class="invhead"><b>Инвентарь</b><button class="chip" id="invClose">Закрыть</button></div><div class="invsec">Оружие</div><div class="invgrid" id="invW"></div><div class="invsec">Предметы</div><div class="invgrid" id="invI"></div><div class="invinfo" id="invInfo"></div></div></div>
+<div id="secOv" class="overlay" hidden><div class="panel"><div class="eyebrow">Тайны полигона</div><h1 style="font-size:clamp(34px,8vw,64px)">Секреты</h1><p class="mapdesc" id="secCount"></p><div id="secList"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="secClose" style="flex:1">Закрыть</button></div></div></div>
+<div id="spOv" class="overlay" hidden><div class="wphint">← проведите, чтобы повернуть →</div><div class="panel">
+  <div class="eyebrow">Общие настройки спавна</div>
+  <div class="chips sptabs" id="spKinds"></div>
+  <div id="spBody"></div>
+  <div class="row" style="margin-top:10px"><button class="btn" id="spRoll" style="flex:1">Другой пример</button><button class="btn" id="spReset" style="flex:1">Сбросить</button><button class="btn primary" id="spClose" style="flex:1">Готово</button></div>
+</div></div>
 <div id="spawn" class="overlay" hidden>
   <div class="panel">
     <div class="eyebrow">Пульт полигона · спавн в точку прицела · внизу раздел «Эксклюзив»</div>
@@ -1065,6 +1092,46 @@ const MAPS = {
   police: { name: 'Участок полиции', desc: '', story: true, hx: 12, hz: 9, h: 3.4, spawn: [0, 7, 0], fog: 0x0b0d10, fogD: 0.03, bg: 0x070809, sun: 0.5, hemi: 0.55, lamp: [0xe8f2ff, 18, 14], lamps: [[-6, 3.1, -4], [6, 3.1, -4], [-6, 3.1, 4], [6, 3.1, 4]], red: [[11.8, 2.6, 0], 0x2a6aff, 4], build: buildPolice, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   gala: { name: 'Ужин принцессы', desc: '', story: true, hx: 16, hz: 14, h: 8, spawn: [0, 9.5, 0], fog: 0x1a0808, fogD: 0.015, bg: 0x0a0404, sun: 0.4, hemi: 0.55, lamp: [0xffd8a0, 40, 22], lamps: [[-8, 7, -6], [8, 7, -6], [-8, 7, 6], [8, 7, 6]], red: [[0, 4, -13], 0xff60a0, 6], build: buildGala, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
 };
+/* ===== the secret map: a floating island under a blood moon, with a third of normal gravity ===== */
+const MOON = { crystal: null, emberT: 0 };
+function moonCrackTex() {
+  const c = makeCanvas(1024), g = c.getContext('2d'); g.lineCap = 'round'; g.shadowColor = 'rgba(255,60,20,0.9)'; g.shadowBlur = 12;
+  for (let i = 0; i < 46; i++) { let x = rand(0, 1024), y = rand(0, 1024), a = rand(0, 6.28); g.strokeStyle = `rgba(255,${randi(80) + 40},20,${rand(0.5, 0.95)})`; g.lineWidth = rand(1.5, 4); g.beginPath(); g.moveTo(x, y); for (let k = 0; k < 9; k++) { a += rand(-0.7, 0.7); x += Math.cos(a) * rand(16, 46); y += Math.sin(a) * rand(16, 46); g.lineTo(x, y); } g.stroke(); }
+  return toTex(c);
+}
+function moonTex() {
+  const c = makeCanvas(512, 256), g = c.getContext('2d'); g.fillStyle = '#ffb0a0'; g.fillRect(0, 0, 512, 256);
+  for (let i = 0; i < 120; i++) { const x = rand(0, 512), y = rand(0, 256), r = rand(3, 26); const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, 'rgba(120,20,20,0.45)'); gr.addColorStop(1, 'rgba(120,20,20,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+  return toTex(c);
+}
+function buildMoon() {
+  Object.assign(LV, { open: true, walls: false, ceil: false, bounds: null, elev: 60, groundY: -60, wind: 0.25, grav: 0.32 });
+  addDeck(-HX, HX, -HZ, HZ, 0);
+  const fl = std({ map: texRep(TEX.asphalt, 8, 8), color: 0x3a2a2c, roughness: 0.9, envMapIntensity: 0.3 });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(HX * 2, HZ * 2), fl); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; floor.userData.kind = 'env'; addMesh(floor); envMeshes.push(floor);
+  const cr = new THREE.Mesh(new THREE.PlaneGeometry(HX * 2, HZ * 2), new THREE.MeshBasicMaterial({ map: moonCrackTex(), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); cr.rotation.x = -Math.PI / 2; cr.position.y = 0.004; addMesh(cr);
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(HX * 2 + 0.6, 0.8, HZ * 2 + 0.6), std({ color: 0x241819, roughness: 0.95 })); slab.position.y = -0.41; addMesh(slab);
+  const rock = new THREE.Mesh(new THREE.ConeGeometry(HX * 1.42, 24, 9, 3), std({ color: 0x1c1214, roughness: 1, flatShading: true })); rock.rotation.set(Math.PI, 0.3, 0); rock.position.y = -12.8; addMesh(rock);
+  addBody(0, -30.01, 0, HX + 0.3, 30, HZ + 0.3); obstacles.push({ min: new V3(-HX - 0.3, -61, -HZ - 0.3), max: new V3(HX + 0.3, -0.02, HZ + 0.3) });
+  // obsidian pillars with glowing runes in a ring, an altar with a floating blood crystal
+  const obs = std({ color: 0x0c0a10, roughness: 0.15, metalness: 0.3, envMapIntensity: 1.2 }), rune = new THREE.MeshBasicMaterial({ color: 0xff2a1a });
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 + 0.2, x = Math.cos(a) * 12.5, z = Math.sin(a) * 12.5, h = 3 + (i % 3) * 1.6; addStaticBox(x, h / 2, z, 0.9, h, 0.9, obs); for (let k = 0; k < 3; k++) { const s = new THREE.Mesh(new THREE.BoxGeometry(0.93, 0.06, 0.93), rune); s.position.set(x, 0.8 + k * (h - 1.2) / 2, z); addMesh(s); } }
+  addStaticBox(0, 0.55, 0, 2.4, 1.1, 1.4, obs);
+  const crystal = new THREE.Mesh(new THREE.OctahedronGeometry(0.35), new THREE.MeshBasicMaterial({ color: 0xff1a2a })); crystal.position.set(0, 2.0, 0); addMesh(crystal); MOON.crystal = crystal;
+  // the moon, its glow and a sky full of stars
+  const moon = new THREE.Mesh(new THREE.SphereGeometry(30, 32, 20), new THREE.MeshBasicMaterial({ map: moonTex(), color: 0xff5a46, fog: false })); moon.position.set(-58, 52, -104); addMesh(moon);
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX.soft, color: 0xff2a1a, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); glow.position.copy(moon.position); glow.scale.setScalar(140); addMesh(glow);
+  const sp = []; for (let i = 0; i < 700; i++) { const a = rand(0, 6.283), e = rand(0.05, 1.45), r = 140; sp.push(Math.cos(a) * Math.cos(e) * r, Math.sin(e) * r, Math.sin(a) * Math.cos(e) * r); }
+  const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3)); addMesh(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffd8d0, size: 1.6, sizeAttenuation: false, fog: false })));
+}
+function updateMoon(dt, now) {
+  if (mapId !== 'moon' || !MOON.crystal) return;
+  MOON.crystal.rotation.y += dt * 1.2; MOON.crystal.position.y = 2.0 + Math.sin(now * 0.0015) * 0.15;
+  MOON.emberT -= dt; if (MOON.emberT > 0) return; MOON.emberT = 0.08;
+  _a.set(player.pos.x + rand(-9, 9), rand(0, 1.5), player.pos.z + rand(-9, 9));
+  spawnSprite(TEX.soft, _a, { color: pick([0xff5a1a, 0xff2a1a, 0xffa040]), additive: true, size: rand(0.03, 0.08), grow: 0.2, life: rand(2.5, 4.5), vel: new V3(rand(-0.15, 0.15), rand(0.25, 0.6), rand(-0.15, 0.15)) });
+}
+MAPS.moon = { name: 'Кровавая Луна', desc: 'Секретная карта. Парящий остров под кроваво-красной луной, гравитация втрое слабее: тела летают, кровь падает медленно. Здесь живёт воскреситель.', hx: 16, hz: 16, h: 40, spawn: [0, 11, 0], fog: 0x2a0508, fogD: 0.012, bg: 0x14030a, sun: 0.8, hemi: 0.5, lamp: [0xff5a2a, 26, 22], lamps: [[-9, 4, -9], [9, 4, -9], [-9, 4, 9], [9, 4, 9]], red: [[0, 2.2, 0], 0xff1a2a, 6], build: buildMoon, npcs: { human: 3, zombie: 4, soldier: 0 }, props: [['barrel', 6, -6], ['barrel', -6, 6], ['crate', 7, 5], ['crate', -7, -5]], pills: [] };
 function buildRoof() {
   Object.assign(LV, { open: true, walls: false, ceil: false, bounds: null, elev: 120, groundY: -120, wind: 0.35 });
   addDeck(-HX, HX, -HZ, HZ, 0); addDeck(HX, HX + 4.3, -0.45, 0.45, 0);
@@ -1565,22 +1632,22 @@ function loadMap(id) {
   if (id === 'tower' && mapId !== 'tower') { TOWER.floor = 1; ELV.sel = TOWER.top; }
   if (typeof clearAll === 'function' && npcs.length + props.length) clearAll();
   removePills(); clearMap();
-  mapId = MAPS[id] ? id : 'polygon'; const M = MAPS[mapId];
+  mapId = MAPS[id] && (id !== 'moon' || moonOpen()) ? id : 'polygon'; const M = MAPS[mapId];
   if (M.pre) M.pre();
   if (!M.npcs.soldier) M.npcs.soldier = 0;
   HX = M.hx; HZ = M.hz; WALL_H = M.h;
-  Object.assign(LV, { open: false, decks: [], groundY: 0, bounds: [{ x0: -HX, x1: HX, z0: -HZ, z1: HZ }], ceil: true, walls: true, elev: 0, wind: 0 });
+  Object.assign(LV, { open: false, decks: [], groundY: 0, bounds: [{ x0: -HX, x1: HX, z0: -HZ, z1: HZ }], ceil: true, walls: true, elev: 0, wind: 0, grav: 1 });
   scene.fog.color.setHex(M.fog); scene.fog.density = M.fogD; scene.background.setHex(M.bg);
   sun.intensity = M.sun; hemi.intensity = M.hemi;
   const sb = Math.max(HX, HZ) + 4; Object.assign(sun.shadow.camera, { left: -sb, right: sb, top: sb, bottom: -sb }); sun.shadow.camera.updateProjectionMatrix();
   lamps.forEach((l, i) => { l.position.set(...M.lamps[i]); l.color.setHex(M.lamp[0]); l.intensity = M.lamp[1]; l.distance = M.lamp[2]; });
   redLight.position.set(...M.red[0]); redLight.color.setHex(M.red[1]); redLight.intensity = M.red[2];
   windExtra = 0; ELV.riding = false; if (mapId !== 'tower') { ELV.phase = 'idle'; Sound.elevLoop(0); $('elev').hidden = true; ELV.panel = false; }
-  M.build();
+  M.build(); world.gravity.set(0, -9.82 * (LV.grav || 1), 0);
   groundBody.position.y = LV.groundY; groundBody.aabbNeedsUpdate = true;
   camera.far = M.backdrop ? 420 : 160; camera.updateProjectionMatrix();
   setBackdrop(M.backdrop || null, LV.elev, M.own ? M.own() : null);
-  targetsDirty = true;
+  targetsDirty = true; secretPlace();
 }
 
 /* ===================== decals ===================== */
@@ -1651,7 +1718,7 @@ function splat(x, y, z, nx, ny, nz, vx, vy, vz, s) {
   }
 }
 function updateBlood(dt) {
-  const drag = 1 - 0.3 * dt, g = 9.81 * dt;
+  const drag = 1 - 0.3 * dt, g = 9.81 * (LV.grav || 1) * dt;
   for (let i = bp.n - 1; i >= 0; i--) {
     let vx = bp.vx[i] * drag, vy = (bp.vy[i] - g) * drag, vz = bp.vz[i] * drag;
     const x = bp.px[i] + vx * dt, y = bp.py[i] + vy * dt, z = bp.pz[i] + vz * dt, s = bp.s[i];
@@ -2438,6 +2505,7 @@ class Humanoid {
     this.pose = 'stand'; this.poseT = 0; this.poseDur = 0; this.poseRate = 14; this.poseRateT = 0; this.getupT = 0; this.clutch = null; this.clutch2 = null;
     this.hitLocal = new V3(); this.hitKind = ''; this.hurtLeg = 'L'; this.limp = 0; this.wounded = false; this.trailCd = 0; this.pelvisCur = { y: 1.0, x: 0, ry: 0, z: 0 };
     const L = this.look = T.look(); if (lookKind) applyLookKind(L, lookKind);
+    if ((mode !== 'story' || window.__spForce) && type !== 'player') applySpawnCfg(L, type, lookKind);
     let skinM, shirtM, pantsM;
     if (L.plastic) { skinM = shirtM = pantsM = std({ color: 0xcfc0a4, roughness: 0.32, envMapIntensity: 0.6 }); }
     else { skinM = std({ color: L.skin, map: L.skinTex, roughness: 0.52, envMapIntensity: 0.35 }); shirtM = std({ color: L.shirt, map: TEX.cloth, roughness: 0.88 }); pantsM = std({ color: L.pants, map: TEX.cloth, roughness: 0.9 }); }
@@ -3236,12 +3304,12 @@ const barrelMat = std({ map: TEX.barrel, roughness: 0.45, metalness: 0.5, envMap
 const crateGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8), barrelGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.9, 22);
 function spawnProp(kind, x, z, y = null) {
   if (props.length >= 30) removeProp(props[0]);
-  const isB = kind === 'barrel';
-  const m = new THREE.Mesh(isB ? barrelGeo : crateGeo, isB ? barrelMat : crateMat); m.castShadow = true; m.receiveShadow = true; scene.add(m);
-  const b = new CANNON.Body({ mass: isB ? 30 : 25, material: mProp, position: new CANNON.Vec3(x, y ?? (isB ? 0.46 : 0.41), z), collisionFilterGroup: G_PROP, collisionFilterMask: G_STATIC | G_BODY | G_GIB | G_PROP, angularDamping: 0.2 });
-  b.addShape(isB ? new CANNON.Cylinder(0.3, 0.3, 0.9, 12) : new CANNON.Box(new CANNON.Vec3(0.4, 0.4, 0.4))); b.quaternion.setFromEuler(0, rand(0, 6.28), 0);
+  const isB = kind === 'barrel', sc = clamp(propCfgScale(kind), 0.3, 3);
+  const m = new THREE.Mesh(isB ? barrelGeo : crateGeo, isB ? barrelMat : crateMat); m.scale.setScalar(sc); m.castShadow = true; m.receiveShadow = true; scene.add(m);
+  const b = new CANNON.Body({ mass: (isB ? 30 : 25) * Math.min(8, sc * sc * sc), material: mProp, position: new CANNON.Vec3(x, y ?? (isB ? 0.46 : 0.41) * sc, z), collisionFilterGroup: G_PROP, collisionFilterMask: G_STATIC | G_BODY | G_GIB | G_PROP, angularDamping: 0.2 });
+  b.addShape(isB ? new CANNON.Cylinder(0.3 * sc, 0.3 * sc, 0.9 * sc, 12) : new CANNON.Box(new CANNON.Vec3(0.4 * sc, 0.4 * sc, 0.4 * sc))); b.quaternion.setFromEuler(0, rand(0, 6.28), 0);
   world.addBody(b);
-  const pr = { kind, m, body: b, r: isB ? 0.3 : 0.5, hp: isB ? 25 : 999, dead: false };
+  const pr = { kind, m, body: b, r: (isB ? 0.3 : 0.5) * sc, hp: isB ? 25 : 999, dead: false };
   m.userData = { kind: 'prop', prop: pr, body: b }; props.push(pr); targetsDirty = true; return pr;
 }
 function removeProp(pr) { const i = props.indexOf(pr); if (i >= 0) props.splice(i, 1); scene.remove(pr.m); world.removeBody(pr.body); if (grab.body === pr.body) releaseGrab(false); targetsDirty = true; }
@@ -3446,7 +3514,7 @@ function updatePlayer(dt) {
   const acc = player.onGround ? 12 : 2.5;
   player.vel.x = lerp(player.vel.x, wx, Math.min(1, acc * dt)); player.vel.z = lerp(player.vel.z, wz, Math.min(1, acc * dt));
   if (inputOn && touch.jump && player.onGround) { player.vel.y = 5.6; player.onGround = false; touch.jump = false; }
-  player.vel.y -= 17 * dt;
+  player.vel.y -= 17 * (LV.grav || 1) * dt;
   player.pos.addScaledVector(player.vel, dt);
   pushOutAABBs(player.pos, 0.35, player.pos.y);
   for (const n of npcs) if (n.alive) { const dx = player.pos.x - n.pos.x, dz = player.pos.z - n.pos.z, d = Math.hypot(dx, dz); if (d < 0.6 && d > 1e-4) { player.pos.x += dx / d * (0.6 - d); player.pos.z += dz / d * (0.6 - d); } }
@@ -4160,6 +4228,7 @@ function populateSandbox() {
   for (let i = 0; i < N.zombie; i++) spawnNPC('zombie', rand(-HX + 2, HX - 2), rand(-HZ + 1.5, -HZ * 0.5));
   for (let i = 0; i < (N.soldier || 0); i++) spawnNPC('soldier', rand(-HX + 3, HX - 3), rand(-HZ * 0.2, HZ * 0.3), undefined, N.slook);
   for (const [x, z, yaw] of N.dummies || []) spawnNPC('dummy', x, z, yaw);
+  if (mapId === 'moon') spawnNPC('human', 0, 4, Math.PI, 'gagarin');
   spawnMapProps();
 }
 function resetStats() { Object.assign(stats, { kills: 0, heads: 0, dism: 0, gibs: 0, liters: 0, wave: 0 }); }
@@ -4171,7 +4240,7 @@ function startGame(m) {
   W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0; selectWeapon(0); if (W.cur !== 0) selectWeapon(0); slow = false; $('slowmo').hidden = true; invReset(); ADR.t = 0; FL.on = false;
   $('waveLbl').hidden = $('sWave').hidden = m !== 'waves';
   if (m === 'waves') { clearAll(); spawnMapProps(); waveState.intermission = 2.5; waveState.toSpawn = 0; banner('Зомби-волны', 'Приготовьтесь'); }
-  else { if (newMap || !npcs.length || startGame.fromWaves) { clearAll(); populateSandbox(); } banner(MAPS[mapId].name, mapId === 'tower' ? 'лифт — у северной стены' : '«Спавн» — люди, зомби и предметы'); }
+  else { if (newMap || !npcs.length || startGame.fromWaves || spc.dirty) { clearAll(); populateSandbox(); spc.dirty = false; } banner(MAPS[mapId].name, mapId === 'tower' ? 'лифт — у северной стены' : '«Спавн» — люди, зомби и предметы'); }
   placePills();
   startGame.fromWaves = m === 'waves';
   resume();
@@ -5056,7 +5125,7 @@ function cutRegenHead(npc, hit) {
     else if (t < 3.5) camSafe(hp.x + f.x * 2.0 + sd.x * 0.35, hp.y - 0.4, hp.z + f.z * 2.0 + sd.z * 0.35, hp.x, hp.y + 0.18, hp.z);
     else if (t < 5.85) { const d = lerp(1.0, 0.8, (t - 3.5) / 2.35); camSafe(hp.x + f.x * d + sd.x * side * 0.38, hp.y + 0.05, hp.z + f.z * d + sd.z * side * 0.38, hp.x, hp.y + 0.01, hp.z); }
     else { syncEye(); camera.position.copy(eye.position); camera.lookAt(hp.x, hp.y - 0.06, hp.z); if (t > 7.92) { camera.position.x += rand(-0.035, 0.035); camera.position.y += rand(-0.035, 0.035); } }
-  }, 8.3, () => { gagEnd(npc); if (punchDir && !player.dead) playerRagdoll(punchDir.x * 17, 7, punchDir.z * 17); });
+  }, 8.3, () => { gagEnd(npc); if (punchDir && !player.dead) playerRagdoll(punchDir.x * 17, 7, punchDir.z * 17); if (punchDir) secretGet('punch'); });
 }
 // the throat cut, after the cartoon clip and the retelling: blood, a cough, fake pain with both hands on the neck,
 // a snicker he cannot hold, then hands off, a laugh, and the cut closing up in gold for everyone to see
@@ -5212,7 +5281,7 @@ function cutKissTrap(gg, sv) {
     else if (t < 16.5) { const k = (t - 12.8) / 3.7; camSafe(hg.x + dv.x * 1.5 - sd.x * 0.5, hg.y - 0.55 + k * 0.3, hg.z + dv.z * 1.5 - sd.z * 0.5, hg.x, hg.y + 0.05, hg.z); if (t < 16) { camera.position.x += rand(-0.008, 0.008); camera.position.y += rand(-0.008, 0.008); } }
     else if (t < 17.9) camSafe(P.x + sd.x * 3.4 + dv.x * 0.6, 1.25, P.z + sd.z * 3.4 + dv.z * 0.6, M.x, 1.0, M.z);
     else { const k = clamp((t - 17.9) / 4.8, 0, 1), d = lerp(1.5, 0.85, k); camSafe(hg.x + dv.x * d - sd.x * 0.3, hg.y + 0.1, hg.z + dv.z * d - sd.z * 0.3, hg.x, hg.y - 0.02, hg.z); }
-  }, 23, () => { story.svity = null; KT.busy = false; KT.cd = 45; $('love').classList.remove('on'); Music.stop(); worldTs = 1; story.fov = 0; gg.poseRate = 14; gagEnd(gg); });
+  }, 23, () => { secretGet('kiss'); story.svity = null; KT.busy = false; KT.cd = 45; $('love').classList.remove('on'); Music.stop(); worldTs = 1; story.fov = 0; gg.poseRate = 14; gagEnd(gg); });
 }
 function H_drip(ex, sv) { if (!sv.parts || !sv.parts.head) return; sv.parts.head.mesh.updateMatrixWorld(true); sv.parts.head.mesh.localToWorld(ex.set(0, 0.04, -0.12)); bloodSpray(ex, new V3(0, -1, 0), 8, 0.25, 1, 2.5, 0.003, 0.007); }
 /* ----- cutscene runner ----- */
@@ -5876,25 +5945,140 @@ function wpInit() {
   const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 0.88, 48), new THREE.MeshBasicMaterial({ color: 0xd8a400 })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.002; sc.add(ring);
   WP.cam = new THREE.PerspectiveCamera(30, 1, 0.05, 30);
 }
-function wpDrop() { if (WP.fig) { WP.scene.remove(WP.fig.root); WP.fig.dispose(); WP.fig = null; } }
+function wpDrop() { if (WP.fig) { WP.scene.remove(WP.fig.root); WP.fig.dispose(); WP.fig = null; } if (WP.prop) { WP.scene.remove(WP.prop); WP.prop = null; } }
+function wpFrame() { const o = WP.fig ? WP.fig.root : WP.prop; if (!o) return; o.updateMatrixWorld(true); const b = new THREE.Box3().setFromObject(o); WP.h = Math.max(0.3, b.max.y - b.min.y); WP.cy = (b.max.y + b.min.y) / 2; }
 function wpBuild() {
   wpInit(); wpDrop();
   const f = new Humanoid('player', 0, 0, 0, mode !== 'story' && skinOk(settings.skin) && settings.skin !== 'default' ? settings.skin : undefined);
-  scene.remove(f.root); WP.scene.add(f.root); f.root.position.set(0, 0, 0); f.scripted = true; f.relaxed = true; f.pose = 'stand'; f.poseDur = Infinity; f.poseRate = 1000; f.animate(0.02); f.poseRate = 8; WP.fig = f;
+  scene.remove(f.root); WP.scene.add(f.root); f.root.position.set(0, 0, 0); f.scripted = true; f.relaxed = true; f.pose = 'stand'; f.poseDur = Infinity; f.poseRate = 1000; f.animate(0.02); f.poseRate = 8; WP.fig = f; wpFrame();
 }
 function wpRender(dt) {
-  if (!ward.open || !WP.fig) return;
-  const pr = $('wardOv').querySelector('.panel').getBoundingClientRect(), W = innerWidth, H = innerHeight;
+  const open = ward.open || spc.open; if (!open || !(WP.fig || WP.prop)) return;
+  const pr = (spc.open ? $('spOv') : $('wardOv')).querySelector('.panel').getBoundingClientRect(), W = innerWidth, H = innerHeight;
   let x = 0, y = 0, w = W, h = H; if (W >= H) w = Math.max(80, pr.left - 6); else { h = Math.max(80, pr.top - 6); y = H - h; }
-  const f = WP.fig; f.t += dt; f.animate(dt); if (f.fx) bodyFx(f, dt, WP.cam.position);
-  f.root.rotation.y = WP.rot + (WP.drag ? 0 : Math.sin(performance.now() * 0.0005) * 0.25);
-  const sc = f.root.scale.y, asp = w / h, half = 1.12 * sc, dist = half / Math.tan(THREE.MathUtils.degToRad(WP.cam.fov / 2)) / Math.min(1, asp * 1.6);
-  WP.cam.aspect = asp; WP.cam.updateProjectionMatrix(); WP.cam.position.set(0, 1.0 * sc, dist); WP.cam.lookAt(0, 0.93 * sc, 0);
+  const o = WP.fig ? WP.fig.root : WP.prop;
+  if (WP.fig) { const f = WP.fig; f.t += dt; f.animate(dt); if (f.fx) bodyFx(f, dt, WP.cam.position); }
+  o.rotation.y = WP.rot + (WP.drag ? 0 : Math.sin(performance.now() * 0.0005) * 0.25);
+  const asp = w / h, hh = (WP.h || 1.8) * 0.62, cy = WP.cy || 0.9, dist = hh / Math.tan(THREE.MathUtils.degToRad(WP.cam.fov / 2)) / Math.min(1, asp * 1.6) + 0.3;
+  WP.cam.aspect = asp; WP.cam.updateProjectionMatrix(); WP.cam.position.set(0, cy + (WP.h || 1.8) * 0.05, dist); WP.cam.lookAt(0, cy, 0);
   renderer.setScissorTest(true); renderer.setViewport(x, y, w, h); renderer.setScissor(x, y, w, h); renderer.render(WP.scene, WP.cam); renderer.setScissorTest(false); renderer.setViewport(0, 0, W, H);
 }
 $('wardOv').addEventListener('pointerdown', (e) => { if (e.target === $('wardOv')) WP.drag = { x: e.clientX, r: WP.rot }; });
 addEventListener('pointermove', (e) => { if (WP.drag) WP.rot = WP.drag.r + (e.clientX - WP.drag.x) * 0.012; });
 addEventListener('pointerup', () => { WP.drag = null; }); addEventListener('pointercancel', () => { WP.drag = null; });
+/* ===== general spawn settings: how people, zombies, soldiers, dummies, Svity, the resurrector, barrels and crates look when they appear ===== */
+var SPK = [['human', 'Люди'], ['zombie', 'Зомби'], ['soldier', 'Солдаты'], ['dummy', 'Манекены'], ['svity', 'Свити'], ['gagarin', 'Воскреситель'], ['barrel', 'Бочки'], ['crate', 'Ящики']];
+var SZ = [['height', 'Рост', 50, 200], ['build', 'Телосложение', 50, 200], ['head', 'Голова', 30, 300], ['eyes', 'Глаза', 30, 300], ['arms', 'Руки', 50, 200], ['hands', 'Кисти', 30, 300], ['fingers', 'Пальцы', 30, 300], ['legs', 'Ноги', 50, 200], ['hair', 'Волосы', 30, 300], ['chest', 'Грудь', 60, 150]];
+var SZP = [['size', 'Размер', 30, 300]];
+var SPRE = { norm: ['Обычные', {}], big: ['Гиганты', { height: [130, 170], build: [115, 160], hands: [120, 160] }], tiny: ['Малыши', { height: [55, 75], head: [110, 140], eyes: [110, 150] }], heads: ['Головастики', { head: [180, 260], eyes: [140, 220], height: [70, 90], legs: [70, 90] }], chaos: ['Хаос', 'chaos'] };
+var SPREP = { norm: ['Обычные', {}], small: ['Маленькие', { size: [40, 70] }], huge: ['Огромные', { size: [170, 280] }], chaos: ['Хаос', { size: [40, 280] }] };
+var spc = { open: false, kind: 'human' };
+if (!settings.spawnCfg) settings.spawnCfg = {};
+const isPropK = (k) => k === 'barrel' || k === 'crate';
+const _hairCfgMats = {};
+function hairMatOf(c) { return _hairCfgMats[c] || (_hairCfgMats[c] = std({ color: c, roughness: 0.85, map: TEX.cloth })); }
+function spawnKey(type, kind) { if (type === 'player' || kind === 'baby') return null; if (kind && kind.startsWith('svity')) return 'svity'; if (kind === 'gagarin') return 'gagarin'; return type; }
+function cfgRange(r, lo, hi) { if (!r) return null; let a = r[0], b = r[1]; if (a == null && b == null) return null; if (a == null) a = b; if (b == null) b = a; a = clamp(a, lo, hi); b = clamp(b, lo, hi); return a <= b ? [a, b] : [b, a]; }
+function spKeys(k) { const C = settings.spawnCfg[k] || {}; if (isPropK(k)) return SZP; const hum = k === 'human' || k === 'zombie' || k === 'soldier'; return SZ.filter(([key]) => hum ? !(key === 'chest' && C.sex === 'm') : k === 'svity' ? !['eyes', 'hair'].includes(key) : !['eyes', 'hair', 'chest'].includes(key)); }
+function applySpawnCfg(L, type, kind) {
+  const key = spawnKey(type, kind), C = key && settings.spawnCfg && settings.spawnCfg[key]; if (!C) return;
+  if ((key === 'human' || key === 'zombie' || key === 'soldier') && C.sex && C.sex !== 'rand') { const f = C.sex === 'f'; L.female = f; if (f) { L.hair = L.hair || pick(hairMats); if (!L.hairStyle || L.hairStyle === 'short') L.hairStyle = pick(['long', 'long', 'pony', 'bob']); L.lips = L.lips || pick([0xb4605a, 0xc0505a, 0xa86a60]); } else { L.hairStyle = 'short'; L.lips = null; } }
+  if (L.female && C.hs && C.hs !== 'rand' && key !== 'svity') L.hairStyle = C.hs;
+  if (C.shirt != null && !L.plastic && !L.svity && !L.gagarin) L.shirt = C.shirt;
+  if (C.skin != null && !L.plastic && !L.gagarin) L.skin = C.skin;
+  if (C.hair != null && L.hair) L.hair = hairMatOf(C.hair);
+  const pr = {}; let any = false;
+  for (const [k, , lo, hi] of SZ) { const r = cfgRange(C.size && C.size[k], lo, hi); if (r) { pr[k] = rand(r[0], r[1]) / 100; any = true; } }
+  if (any) L.prop = Object.assign(L.prop || (L.plastic || L.svity || L.gagarin ? {} : { build: rand(0.9, 1.12), head: rand(0.95, 1.05) }), pr);
+}
+function propCfgScale(kind) { if (mode === 'story' && !window.__spForce) return 1; const C = settings.spawnCfg[kind], r = cfgRange(C && C.size && C.size.size, 30, 300); return r ? rand(r[0], r[1]) / 100 : 1; }
+// the preview sample on the turntable
+function wpBuildSample() {
+  wpInit(); wpDrop(); const k = spc.kind; window.__spForce = true;
+  try {
+    if (isPropK(k)) { const s = propCfgScale(k), isB = k === 'barrel', m = new THREE.Mesh(isB ? barrelGeo : crateGeo, isB ? barrelMat : crateMat); m.scale.setScalar(s); m.position.y = (isB ? 0.45 : 0.4) * s; WP.scene.add(m); WP.prop = m; }
+    else { const type = k === 'svity' || k === 'gagarin' ? 'human' : k, kind = k === 'svity' ? pick(['svity-street', 'svity-cop', 'svity-gala']) : k === 'gagarin' ? 'gagarin' : undefined; const f = new Humanoid(type, 0, 0, 0, kind); scene.remove(f.root); WP.scene.add(f.root); f.root.position.set(0, 0, 0); f.scripted = true; f.pose = 'stand'; f.poseDur = Infinity; f.poseRate = 1000; f.animate(0.02); f.poseRate = 8; WP.fig = f; }
+  } finally { window.__spForce = false; }
+  wpFrame();
+}
+function spRender() {
+  const k = spc.kind, C = settings.spawnCfg[k] || (settings.spawnCfg[k] = {}), P = isPropK(k), hum = k === 'human' || k === 'zombie' || k === 'soldier';
+  const row = (l, inner) => `<div class="row"><span class="lbl">${l}</span><div class="chips">${inner}</div></div>`, chips = (key, list, cur) => list.map(([v, n]) => `<button class="chip${v === cur ? ' on' : ''}" data-o="${key}" data-v="${v}">${n}</button>`).join('');
+  $('spKinds').innerHTML = SPK.map(([id, n]) => `<button class="chip${id === k ? ' on' : ''}" data-k="${id}">${n}</button>`).join('');
+  let h = '';
+  if (hum) {
+    h += row('Пол', chips('sex', [['rand', 'Случайно 60/40'], ['m', 'Мужчины'], ['f', 'Женщины']], C.sex || 'rand'));
+    if (C.sex !== 'm') h += row('Причёска', chips('hs', [['rand', 'Случайно'], ['long', 'Длинные'], ['pony', 'Хвост'], ['bob', 'Каре']], C.hs || 'rand'));
+    for (const [key, lbl, pal] of [['shirt', 'Одежда', WARD.shirt], ['skin', 'Кожа', k === 'zombie' ? ZSKIN : WARD.skin], ['hair', 'Волосы', WARD.hair]]) h += `<div class="row"><span class="lbl">${lbl}</span><div class="swatches"><button class="chip${C[key] == null ? ' on' : ''}" data-c="${key}" data-v="">Случайно</button>${pal.map((c) => `<button class="sw" data-c="${key}" data-v="${c}" style="background:#${c.toString(16).padStart(6, '0')}" aria-pressed="${C[key] === c}" aria-label="цвет"></button>`).join('')}</div></div>`;
+  }
+  h += row('Пресеты', Object.entries(P ? SPREP : SPRE).map(([id, [n]]) => `<button class="chip" data-pre="${id}">${n}</button>`).join(''));
+  h += '<div class="spnote">Размеры в процентах: 100 — обычный. Каждый новый получит случайный размер от и до. Пусто — как обычно.</div>';
+  for (const [key, lbl, lo, hi] of spKeys(k)) { const r = (C.size || {})[key] || []; h += `<div class="rrow" title="${lo}–${hi} %"><span class="lbl">${lbl}</span><span>от</span><input type="number" inputmode="numeric" min="${lo}" max="${hi}" placeholder="введите размер" data-s="${key}" data-i="0" value="${r[0] ?? ''}"><span>до</span><input type="number" inputmode="numeric" min="${lo}" max="${hi}" placeholder="введите размер" data-s="${key}" data-i="1" value="${r[1] ?? ''}"><span>%</span></div>`; }
+  $('spBody').innerHTML = h;
+  $('spKinds').querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { spc.kind = b.dataset.k; spRender(); wpBuildSample(); Sound.click(900, 0.12); });
+  $('spBody').querySelectorAll('[data-o]').forEach((b) => b.onclick = () => { C[b.dataset.o] = b.dataset.v; saveSettings(); spRender(); wpBuildSample(); });
+  $('spBody').querySelectorAll('[data-c]').forEach((b) => b.onclick = () => { C[b.dataset.c] = b.dataset.v === '' ? null : +b.dataset.v; saveSettings(); spRender(); wpBuildSample(); });
+  $('spBody').querySelectorAll('[data-pre]').forEach((b) => b.onclick = () => { const p = (P ? SPREP : SPRE)[b.dataset.pre][1]; if (p === 'chaos') { C.size = {}; for (const [key, , lo, hi] of spKeys(k)) C.size[key] = [Math.max(lo, 40), Math.min(hi, 250)]; } else C.size = JSON.parse(JSON.stringify(p)); saveSettings(); spRender(); wpBuildSample(); Sound.click(1100, 0.15); });
+  $('spBody').querySelectorAll('input[data-s]').forEach((inp) => inp.onchange = () => { const key = inp.dataset.s, i = +inp.dataset.i, d = SZ.concat(SZP).find((x) => x[0] === key), v = inp.value.trim() === '' ? null : clamp(Math.round(+inp.value || 0), d[2], d[3]); C.size = C.size || {}; const r = C.size[key] || [null, null]; r[i] = v; if (r[0] != null && r[1] != null && r[0] > r[1]) r.reverse(); if (r[0] == null && r[1] == null) delete C.size[key]; else C.size[key] = r; saveSettings(); spRender(); wpBuildSample(); });
+}
+$('spBtn').onclick = () => { Sound.init(); spc.open = true; spRender(); wpBuildSample(); $('menu').hidden = true; $('spOv').hidden = false; };
+$('spClose').onclick = () => { spc.open = false; spc.dirty = true; wpDrop(); $('spOv').hidden = true; $('menu').hidden = false; };
+$('spRoll').onclick = () => { wpBuildSample(); Sound.click(1200, 0.12); };
+$('spReset').onclick = () => { settings.spawnCfg[spc.kind] = {}; saveSettings(); spRender(); wpBuildSample(); };
+$('spOv').addEventListener('pointerdown', (e) => { if (e.target === $('spOv')) WP.drag = { x: e.clientX, r: WP.rot }; });
+/* ===== secrets: a golden skull hidden on every map plus two scenes to witness; all of them open the secret map ===== */
+const SECRETS = [
+  { id: 'polygon', name: 'Череп полигона', hint: 'Полигон: в самом тёмном углу зала', map: 'polygon', pos: [-18.6, -18.6] },
+  { id: 'morgue', name: 'Череп морга', hint: 'Морг: в дальнем углу, у холодильников', map: 'morgue', pos: [7.1, -12.1] },
+  { id: 'parking', name: 'Череп парковки', hint: 'Парковка: в углу, дальше всего от въезда', map: 'parking', pos: [-19, -15] },
+  { id: 'roof', name: 'Череп крыши', hint: 'Крыша: на самом конце доски мойщиков окон', map: 'roof', pos: [21.9, 0], exact: true },
+  { id: 'tower', name: 'Череп небоскрёба', hint: 'Небоскрёб: на крыше, на 200-м этаже', map: 'tower', pos: [13, -13], top: true },
+  { id: 'site', name: 'Череп стройки', hint: 'Стройка: в углу перекрытия над пропастью', map: 'site', pos: [14.2, 14.2] },
+  { id: 'kiss', name: 'Роковой поцелуй', hint: 'Песочница: увидеть, чем кончается поцелуй Свити и воскресителя' },
+  { id: 'punch', name: 'Ответка', hint: 'Получить кулаком от воскресителя' },
+];
+const SEC = { obj: null, def: null };
+function secGot() { try { return JSON.parse(localStorage.getItem('myasorubka-secrets') || '{}'); } catch (e) { return {}; } }
+function moonOpen() { const g = secGot(); return SECRETS.every((s) => g[s.id]); }
+function secretGet(id) {
+  const g = secGot(); if (g[id]) return; g[id] = true; try { localStorage.setItem('myasorubka-secrets', JSON.stringify(g)); } catch (e) {}
+  const s = SECRETS.find((x) => x.id === id), n = SECRETS.filter((x) => g[x.id]).length;
+  Sound.chime(); banner('Секрет найден · ' + n + '/' + SECRETS.length, s ? s.name : '');
+  if (n === SECRETS.length) later(2.6, () => { banner('СЕКРЕТНАЯ КАРТА ОТКРЫТА', '«Кровавая Луна» — выберите её в списке карт'); Sound.rise(2.5); flashScreen('#ff3a2a', 900); });
+  syncSecrets();
+}
+function secretSkull() {
+  const g = new THREE.Group(), gold = std({ color: 0xf2c040, metalness: 0.9, roughness: 0.22, emissive: 0x3a2400, envMapIntensity: 1.4 }), dark = new THREE.MeshBasicMaterial({ color: 0x140c04 });
+  const sk = new THREE.Mesh(new THREE.SphereGeometry(0.12, 18, 14), gold); sk.scale.set(0.9, 1, 1.05); g.add(sk);
+  const jaw = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.05, 0.1), gold); jaw.position.set(0, -0.1, 0.03); g.add(jaw);
+  for (const sx of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), dark); e.position.set(sx * 0.042, 0.0, 0.098); g.add(e); }
+  const no = new THREE.Mesh(new THREE.ConeGeometry(0.016, 0.03, 3), dark); no.rotation.x = Math.PI; no.position.set(0, -0.045, 0.11); g.add(no);
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX.soft, color: 0xffc040, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false })); halo.scale.setScalar(0.9); g.add(halo);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.12, 6, 10, 1, true), new THREE.MeshBasicMaterial({ color: 0xffc040, transparent: true, opacity: 0.12, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); beam.position.y = 3; g.add(beam);
+  return g;
+}
+function secretPlace() {
+  if (SEC.obj) { scene.remove(SEC.obj); SEC.obj = null; SEC.def = null; }
+  const s = SECRETS.find((x) => x.map === mapId); if (!s || secGot()[s.id] || mode === 'story' || (s.top && TOWER.floor !== TOWER.top)) return;
+  const p = s.exact ? new V3(s.pos[0], 0, s.pos[1]) : freeSpot(s.pos[0], s.pos[1]);
+  const o = secretSkull(); o.position.set(p.x, floorAt(p.x, p.z) + 0.45, p.z); scene.add(o); SEC.obj = o; SEC.def = s; SEC.y0 = o.position.y;
+}
+function updateSecrets(dt, now) {
+  const o = SEC.obj; if (!o) return;
+  o.rotation.y += dt * 1.6; o.position.y = SEC.y0 + Math.sin(now * 0.003) * 0.08;
+  if (state === 'play' && !player.dead && Math.hypot(player.pos.x - o.position.x, player.pos.z - o.position.z) < 1.1 && Math.abs(player.pos.y + 0.6 - o.position.y) < 1.7) {
+    sparks(o.position, 40, UP, 4); spawnSprite(TEX.flash, o.position, { color: 0xffc040, size: 1.4, grow: 1, life: 0.3, additive: true });
+    const id = SEC.def.id; scene.remove(o); SEC.obj = null; SEC.def = null; secretGet(id);
+  }
+}
+function syncSecrets() {
+  const g = secGot(), n = SECRETS.filter((x) => g[x.id]).length, open = n === SECRETS.length;
+  $('secCount').textContent = `Найдено ${n} из ${SECRETS.length}`;
+  const chip = document.querySelector('#mapChips [data-v="moon"]'); if (chip) chip.hidden = !open;
+  if ($('secList')) $('secList').innerHTML = SECRETS.map((s) => `<div class="secrow${g[s.id] ? ' got' : ''}"><b>${g[s.id] ? '✅' : '❔'} ${s.name}</b><small>${s.hint}</small></div>`).join('') + `<p class="mapdesc">${open ? 'Секретная карта «Кровавая Луна» открыта: выберите её в списке карт.' : 'Найдите всё, чтобы открыть секретную карту.'}</p>`;
+}
+$('secBtn').onclick = () => { Sound.init(); syncSecrets(); $('secOv').hidden = false; };
+$('secClose').onclick = () => { $('secOv').hidden = true; };
 /* ===== settings (original sounds) and the wardrobe: man or woman, colours and body sizes, with a live preview ===== */
 const ward = { open: false, t: null };
 const PROPS = [['height', 'Рост', 0.85, 1.15], ['build', 'Телосложение', 0.75, 1.35], ['head', 'Голова', 0.8, 1.3], ['eyes', 'Глаза', 0.6, 1.8], ['arms', 'Руки', 0.75, 1.3], ['hands', 'Кисти', 0.7, 1.5], ['fingers', 'Пальцы', 0.5, 1.8], ['legs', 'Ноги', 0.8, 1.25], ['hair', 'Волосы', 0.5, 1.6], ['chest', 'Грудь', 0.6, 1.5]];
@@ -5997,6 +6181,8 @@ function admItems(tab) {
     { l: 'Бессмертие: ' + on(settings.god), s: 'Урон по вам не проходит', on: !!settings.god, f: () => { settings.god = !settings.god; saveSettings(); admRender(); } },
     { l: 'Патроны: ' + on(settings.ammo), s: 'Магазин не пустеет', on: !!settings.ammo, f: () => { settings.ammo = !settings.ammo; saveSettings(); admRender(); } },
     { l: 'Все костюмы', s: 'Открыть эксклюзив', f: () => { addUn('good'); addUn('bad'); admUn(); } },
+    { l: 'Все секреты', s: 'Открыть секретную карту', f: () => { for (const x of SECRETS) secretGet(x.id); admRender(); } },
+    { l: 'Сбросить секреты', s: 'Спрятать черепа снова', f: () => { try { localStorage.removeItem('myasorubka-secrets'); } catch (e) {} if (settings.map === 'moon') { settings.map = 'polygon'; saveSettings(); syncChips(); } syncSecrets(); admRender(); } },
     { sec: 'Песочница' },
     { l: '10 зомби', s: 'Вокруг вас', f: () => admSand(() => { for (let i = 0; i < 10; i++) { const a = i / 10 * 6.283, p = freeSpot(player.pos.x + Math.sin(a) * 7, player.pos.z + Math.cos(a) * 7); spawnNPC('zombie', p.x, p.z, a + 3.14); } }) },
     { l: 'Заселить карту', s: 'Люди и манекены', f: () => admSand(() => populateSandbox()) },
@@ -6155,7 +6341,7 @@ function frame(now) {
     if (state === 'play' || state === 'cutscene' || state === 'spawn') placeCamera(rdt);
     // separation
     for (let i = 0; i < npcs.length; i++) { const a = npcs[i]; if (!a.alive) continue; for (let j = i + 1; j < npcs.length; j++) { const b = npcs[j]; if (!b.alive) continue; const dx = a.pos.x - b.pos.x, dz = a.pos.z - b.pos.z, d = Math.hypot(dx, dz); if (d < 0.55 && d > 1e-4) { const k = (0.55 - d) / d * 0.5; a.pos.x += dx * k; a.pos.z += dz * k; b.pos.x -= dx * k; b.pos.z -= dz * k; a.root.position.copy(a.pos); b.root.position.copy(b.pos); } } }
-    lfxUpdate(dt); updateEmitters(dt); updateBlood(dt); updatePools(dt); updateFx(dt); updateScraps(dt); updateKnives(dt); if (state === 'play') updateAdren(rdt); updateSparks(dt); updateCasings(dt);
+    lfxUpdate(dt); updateEmitters(dt); updateBlood(dt); updatePools(dt); updateFx(dt); updateScraps(dt); updateKnives(dt); updateMoon(dt, now); updateSecrets(rdt, now); if (state === 'play') updateAdren(rdt); updateSparks(dt); updateCasings(dt);
     for (const tr of tracers) if (tr.t > 0) { tr.t -= rdt; if (tr.t <= 0) tr.m.visible = false; }
     for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= dt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
     updateWaves(dt);
@@ -6189,10 +6375,10 @@ function frame(now) {
   // auto-quality: drop to fast mode if the frame rate stays low
   fpsAcc += rdt; fpsN++; if (fpsAcc > 2) { const fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; if (fps < 28 && settings.quality === 'high' && state === 'play') { lowFpsT++; if (lowFpsT >= 3) { settings.quality = 'low'; syncChips(); applyQuality(); toast('Графика: быстрая'); } } else lowFpsT = 0; }
 }
-loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost();
+loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
