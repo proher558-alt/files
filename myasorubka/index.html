@@ -80,12 +80,32 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(54px,13vw,118px);l
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
 .btn{font-family:var(--ui);font-size:20px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg);background:#1b1311;border:1px solid var(--line);padding:16px 14px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:4px;transition:background .15s,border-color .15s}
 .btn small{font-weight:400;font-size:12px;letter-spacing:.04em;text-transform:none;color:var(--muted)}
-#wardOv{justify-content:flex-end;background:linear-gradient(90deg,rgba(5,4,4,0) 32%,rgba(5,4,4,.86) 52%)}
-#wardOv .panel{width:min(480px,58vw);max-height:calc(100vh - 20px);overflow-y:auto;margin:0}
-@media (max-aspect-ratio:1/1){#wardOv{align-items:flex-end;justify-content:center;background:linear-gradient(180deg,rgba(5,4,4,0) 30%,rgba(5,4,4,.86) 50%)}#wardOv .panel{width:100%;max-height:58vh}}
+#wardOv{justify-content:flex-end;background:none;padding:8px}
+#wardOv .panel{width:min(360px,46vw);max-height:calc(100vh - 16px);overflow-y:auto;margin:0;padding:12px 14px 10px}
+#wardOv .row{margin:5px 0;gap:6px 8px}
+#wardOv .row .lbl{min-width:68px;font-size:10px;letter-spacing:.1em}
+#wardOv .chip{font-size:12px;padding:4px 9px}
+#wardOv .sw{width:21px;height:21px}
+#wardOv .btn{font-size:14px;padding:9px 10px}
+#wardOv .prow{grid-template-columns:68px 1fr 36px;margin:1px 0;gap:6px}
+#wardOv .prow .lbl{min-width:0;font-size:10px}
+.wphint{position:fixed;left:12px;bottom:10px;font:11px var(--mono);color:#d8c8c0;opacity:.7;pointer-events:none;letter-spacing:.08em}
+@media (max-aspect-ratio:1/1){#wardOv{align-items:flex-end;justify-content:center}#wardOv .panel{width:100%;max-height:50vh}.wphint{bottom:auto;top:10px}}
 .prow{display:grid;grid-template-columns:104px 1fr 44px;align-items:center;gap:8px;margin:5px 0}
 .prow input{width:100%}
 .prow .num{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+#inv{position:fixed;inset:0;z-index:58;display:flex;align-items:center;justify-content:center;background:rgba(5,4,4,.55);padding:10px}
+#inv[hidden]{display:none}
+.invbox{width:min(660px,96vw);max-height:calc(100vh - 20px);overflow-y:auto;background:var(--panel);border:1px solid var(--line);padding:12px 14px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.invhead{display:flex;justify-content:space-between;align-items:center;font-family:var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--fg)}
+.invsec{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--hazard);text-transform:uppercase;margin:8px 0 4px}
+.invgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:6px}
+.slot{position:relative;background:#1b1311;border:1px solid var(--line);padding:6px 4px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:var(--fg);font-family:var(--ui);font-size:11px;letter-spacing:.04em;text-align:center;min-height:72px}
+.slot svg{width:42px;height:42px;color:#e8ddd4}
+.slot.on{border-color:var(--hazard);background:#2a1d10}
+.slot .cnt{position:absolute;right:4px;top:3px;font:700 11px var(--mono);color:var(--hazard)}
+.slot.empty{opacity:.38}
+.invinfo{font-size:12px;color:var(--muted);margin-top:8px;min-height:1.2em}
 .admdisp{font-family:var(--mono);font-size:34px;letter-spacing:.35em;text-align:center;padding:12px;border:1px solid var(--line);background:#120c0b;margin:8px auto 12px;color:var(--hazard);max-width:360px}
 .admdisp.bad{color:#ff4a3a;border-color:#ff4a3a}
 .admpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:360px;margin:0 auto}
@@ -290,7 +310,7 @@ body.touch #wAmmo{font-size:26px}
   <div id="joy"><i></i></div>
   <div class="tb big" data-act="fire" style="right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))">Огонь</div>
   <div class="tb" data-act="jump" style="right:calc(92px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))">Прыжок</div>
-  <div class="tb" data-act="next" style="right:calc(92px + env(safe-area-inset-right,0px));bottom:calc(70px + env(safe-area-inset-bottom,0px))">Оружие</div>
+  <div class="tb" data-act="next" style="right:calc(92px + env(safe-area-inset-right,0px));bottom:calc(70px + env(safe-area-inset-bottom,0px))">Инвентарь</div>
   <div class="tb small" data-act="reload" style="right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(88px + env(safe-area-inset-bottom,0px))">R</div>
   <div class="tb" data-act="alt" style="right:calc(150px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))">Бросок</div>
   <div class="tb" data-act="fall" style="right:calc(150px + env(safe-area-inset-right,0px));bottom:calc(70px + env(safe-area-inset-bottom,0px))">Упасть</div>
@@ -351,8 +371,8 @@ body.touch #wAmmo{font-size:26px}
 <div id="setOv" class="overlay" hidden><div class="panel">
   <div class="eyebrow">Меню</div>
   <h1 style="font-size:clamp(34px,8vw,64px)">Настройки</h1>
-  <div class="row"><span class="lbl">Оригинальные звуки</span><div class="chips" id="origChips"><button class="chip" data-v="1">Вкл · мой голос</button><button class="chip" data-v="0">Выкл · синтез</button></div></div>
-  <p class="mapdesc">Включено: «Gotta get a grip», смех воскресителя и другие записанные звуки звучат вашим голосом. Выключено: вместо них синтезированные звуки.</p>
+  <div class="row"><span class="lbl">Оригинальные звуки</span><div class="chips" id="origChips"><button class="chip" data-v="1">Вкл</button><button class="chip" data-v="0">Выкл</button></div></div>
+  <p class="mapdesc">Записанные звуки: «Gotta get a grip» и смех воскресителя. Выключено — синтезированные.</p>
     <div class="row"><span class="lbl">Кровь</span>
       <div class="chips" id="bloodChips">
         <button class="chip" data-v="1">×1 Реализм</button>
@@ -369,7 +389,7 @@ body.touch #wAmmo{font-size:26px}
     <div class="row"><span class="lbl">Обзор</span><input type="range" id="sens" min="0.3" max="2.5" step="0.05"><span id="sensVal" class="num" style="font-family:var(--mono);font-size:13px"></span></div>
   <div class="row" style="margin-top:16px"><button class="btn primary" id="setClose" style="flex:1">Готово</button></div>
 </div></div>
-<div id="wardOv" class="overlay" hidden><div class="panel">
+<div id="wardOv" class="overlay" hidden><div class="wphint">← проведите, чтобы повернуть →</div><div class="panel">
   <div class="eyebrow">Гардероб героя</div>
   <div class="row"><span class="lbl">Персонаж</span><div class="chips" id="genderChips"><button class="chip" data-v="m">Мужской</button><button class="chip" data-v="f">Женский</button></div></div>
   <div class="row" id="hairRow"><span class="lbl">Причёска</span><div class="chips" id="hairChips"><button class="chip" data-v="long">Длинные</button><button class="chip" data-v="pony">Хвост</button><button class="chip" data-v="bob">Каре</button></div></div>
@@ -379,6 +399,7 @@ body.touch #wAmmo{font-size:26px}
   <div id="propRows"></div>
   <div class="row" style="margin-top:12px"><button class="btn" id="propReset" style="flex:1">Сбросить размеры</button><button class="btn primary" id="wardClose" style="flex:1">Готово</button></div>
 </div></div>
+<div id="inv" hidden><div class="invbox"><div class="invhead"><b>Инвентарь</b><button class="chip" id="invClose">Закрыть</button></div><div class="invsec">Оружие</div><div class="invgrid" id="invW"></div><div class="invsec">Предметы</div><div class="invgrid" id="invI"></div><div class="invinfo" id="invInfo"></div></div></div>
 <div id="spawn" class="overlay" hidden>
   <div class="panel">
     <div class="eyebrow">Пульт полигона · спавн в точку прицела · внизу раздел «Эксклюзив»</div>
@@ -2010,7 +2031,7 @@ function ggUpgrade(npc) {
   cap.position.set(0, 0.055, 0.004); cap.rotation.x = 0.1; head.add(cap); G.cap = cap; G.capPos = cap.position.clone(); G.capQ = cap.quaternion.clone();
   // orange swirls on the forehead and a little white nose, as on the avatar
   const sw = new THREE.Mesh(new THREE.SphereGeometry(0.1215, 26, 10, Math.PI / 2 - 0.95, 1.9, 0.62, 0.62), new THREE.MeshBasicMaterial({ map: T.swirl, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 })); sw.scale.set(0.9, 1.05, 0.98); head.add(sw); G.swirl = sw;
-  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.011, 0.024, 3), new THREE.MeshBasicMaterial({ color: 0xf2f2f2 })); nose.rotation.set(Math.PI, 0, 0); nose.position.set(0, -0.016, 0.119); head.add(nose);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.011, 0.024, 3), new THREE.MeshBasicMaterial({ color: 0xf2f2f2 })); nose.rotation.set(Math.PI, 0, 0); nose.position.set(0, -0.016, 0.119); head.add(nose); G.nose = nose;
   // the half face that a bullet can tear off (hidden until then) and the knife cut on the throat
   for (const sd of [-1, 1]) { const g = new THREE.SphereGeometry(0.1222, 18, 14, sd > 0 ? Math.PI / 2 - 0.04 : Math.PI / 2 - 1.25, 1.29, 0.78, 1.55); g.scale(0.9, 1.05, 0.98); const m = new THREE.Mesh(g, std({ map: T.gore, roughness: 0.35, envMapIntensity: 0.6, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 })); m.visible = false; const pv = new THREE.Group(); pv.position.set(sd * 0.055, -0.005, 0.1); m.position.set(-sd * 0.055, 0.005, -0.1); pv.add(m); head.add(pv); (G.gore || (G.gore = {}))[sd] = pv; pv.userData.mesh = m; pv.visible = false; }
   const slitM = new THREE.MeshBasicMaterial({ color: 0x5a0000 }); G.slit = new THREE.Mesh(new THREE.CylinderGeometry(0.0525, 0.0525, 0.007, 20, 1, true, -1.2, 2.4), slitM); G.slit.position.set(0, -0.112, -0.012); G.slit.visible = false; head.add(G.slit);
@@ -2317,6 +2338,7 @@ function bodyExtras(n, L) {
   }
   const pr = L.prop || (L.gagarin || L.svity || L.plastic ? null : { build: rand(0.9, 1.12), head: rand(0.95, 1.05) });
   if (pr) applyProps(n, pr);
+  if (!L.plastic && !L.gagarin) F.ts0 = P.torso.mesh.scale.clone();
 }
 // body proportions from the wardrobe (or a little random variety for everyone else)
 function applyProps(n, pr) {
@@ -2338,22 +2360,29 @@ function applyProps(n, pr) {
   if (pr.chest && F.chest) { F.chest.scale.multiplyScalar(pr.chest); F.chestK = F.chest.scale.y; }
   if (pr.height && pr.height !== 1) n.root.scale.setScalar(pr.height);
 }
-const _fxA = new V3(), _fxV = new V3(), _fxAc = new V3(), _fxT = new V3(), _fxQ = new THREE.Quaternion();
+const _fxA = new V3(), _fxV = new V3(), _fxAc = new V3(), _fxT = new V3(), _fxQ = new THREE.Quaternion(), _fxL = new V3();
+// where a face looks: in a cutscene the speaker looks into the camera and the others look at the speaker; in play, at the player when close
+function fxLookAt(n) {
+  if (state === 'story') { const sp = story.spk; if (!sp || sp === n || !sp.parts || sp.parts.head.gone) return camera.position; sp.parts.head.mesh.getWorldPosition(_fxL); return _fxL; }
+  if (!n.controlled && n.pos.distanceToSquared(player.pos) < 300) return eye.position;
+  return null;
+}
 function fxSpring(s, K, C, gain, max, dt) {
   s.v.x += (-K * s.x.x - C * s.v.x - _fxAc.x * gain) * dt; s.v.y += (-K * s.x.y - C * s.v.y - _fxAc.y * gain) * dt; s.v.z += (-K * s.x.z - C * s.v.z - _fxAc.z * gain) * dt;
   s.x.addScaledVector(s.v, dt); if (s.x.lengthSq() > max * max) { s.x.setLength(max); s.v.multiplyScalar(0.4); }
 }
 // per frame: blinking, gaze, brows that show pain, fear or anger, and inertia for the chest, hair and brows
-function bodyFx(n, dt) {
+function bodyFx(n, dt, look) {
   const F = n.fx, P = n.parts; if (!F || dt <= 1e-4) return;
-  if (camera.position.distanceToSquared(n.pos) > 900 && n.state !== 'dead') { F.prev = null; return; }
+  if (!look && camera.position.distanceToSquared(n.pos) > 900 && n.state !== 'dead') { F.prev = null; return; }
   const src = !P.torso.gone ? P.torso.mesh : !P.head.gone ? P.head.mesh : null; if (!src) return;
   src.getWorldPosition(_fxA);
   if (!F.prev) { F.prev = _fxA.clone(); F.vel = new V3(); _fxAc.set(0, 0, 0); }
   else { _fxV.copy(_fxA).sub(F.prev).divideScalar(dt); _fxAc.copy(_fxV).sub(F.vel).divideScalar(dt); F.vel.copy(_fxV); F.prev.copy(_fxA); if (_fxAc.lengthSq() > 160000) _fxAc.setLength(400); }
   src.getWorldQuaternion(_fxQ).invert(); _fxAc.applyQuaternion(_fxQ);
   if (F.chest && !P.torso.gone) { fxSpring(F.cs, 170, 7, 0.4, 0.02, dt); F.chest.position.set(F.chest0.x + F.cs.x.x * 0.3, F.chest0.y + F.cs.x.y, F.chest0.z + F.cs.x.z * 0.6); F.chest.scale.y = F.chestK * (1 - F.cs.x.y * 3); }
-  if (F.hairPv && !P.head.gone) { fxSpring(F.hs, 55, 3, 0.05, 0.6, dt); F.hairPv.rotation.x = F.hairBase - F.hs.x.z * 1.2 + (n.state === 'alive' ? 0 : 0.2); F.hairPv.rotation.z = F.hs.x.x * 1.2; }
+  if (F.hairPv && !P.head.gone) { fxSpring(F.hs, 55, 3, 0.05, 0.6, dt); const sp = F.vel ? Math.hypot(F.vel.x, F.vel.z) : 0, fall = F.vel && F.vel.y < -3 ? clamp((-F.vel.y - 3) / 6, 0, 1) : 0; F.fallK = lerp(F.fallK || 0, fall, Math.min(1, dt * 6)); F.hairPv.rotation.x = F.hairBase - F.hs.x.z * 1.2 + Math.min(0.85, sp * 0.13) - F.fallK * 2.5 + (n.state === 'alive' ? 0 : 0.2); F.hairPv.rotation.z = F.hs.x.x * 1.2; }
+  if (F.ts0 && n.state === 'alive' && !P.torso.gone && !P.torso.body) { const rate = n.panic > 0 || n.speed > 2.5 || n.shock > 0 ? 7.5 : 2.3; F.br = (F.br || 0) + dt * rate; const bb = Math.sin(F.br) * (rate > 3 ? 0.03 : 0.014); P.torso.mesh.scale.set(F.ts0.x * (1 + bb * 0.35), F.ts0.y, F.ts0.z * (1 + bb)); }
   if (!F.eyes || P.head.gone) return;
   fxSpring(F.bs, 420, 14, 0.0004, 0.004, dt);
   const dead = n.state === 'dead', alive = n.state === 'alive', limp = n.state === 'limp';
@@ -2374,7 +2403,8 @@ function bodyFx(n, dt) {
   let gy = 0, gx = dead ? -0.15 : 0;
   if (!dead) {
     F.sacT -= dt; if (F.sacT <= 0) { F.sacT = rand(0.35, 1.8); F.sx = rand(-0.14, 0.14); F.sy = rand(-0.08, 0.08); }
-    if (!n.controlled && n.pos.distanceToSquared(player.pos) < 300) { P.head.mesh.worldToLocal(_fxT.copy(eye.position)); if (_fxT.z > 0.05) { gy = clamp(Math.atan2(_fxT.x, _fxT.z), -0.6, 0.6); gx = clamp(-Math.atan2(_fxT.y - 0.02, _fxT.z), -0.4, 0.4); } }
+    const tgt = look || fxLookAt(n);
+    if (tgt) { P.head.mesh.worldToLocal(_fxT.copy(tgt)); if (_fxT.z > 0.05) { gy = clamp(Math.atan2(_fxT.x, _fxT.z), -0.6, 0.6); gx = clamp(-Math.atan2(_fxT.y - 0.02, _fxT.z), -0.4, 0.4); } }
     gy += F.sx; gx += F.sy;
   }
   const kg = Math.min(1, dt * 18); F.gy += (gy - F.gy) * kg; F.gx += (gx - F.gx) * kg;
@@ -2751,7 +2781,7 @@ class Humanoid {
     ua.pivot.quaternion.slerp(_ikQ, w); la.pivot.quaternion.slerp(_ikQ2, w);
   }
   update(dt) {
-    this.t += dt; if (this.fx) bodyFx(this, dt);
+    this.t += dt; if (this.fx) bodyFx(this, dt); if (this.state === 'alive') { corpseCheck(this, dt); footFx(this); }
     if (this.state === 'dead') { this.updateDead(dt); return; }
     if (this.state === 'limp') { this.updateLimp(dt); return; }
     if (this.controlled) {
@@ -3090,6 +3120,8 @@ class Humanoid {
       tg('torso', 0.6 + Math.sin(t * 2.2) * 0.06, 0, 0); tg('head', 0.35, Math.sin(t) * 0.15, 0);
       tg('uArmL', -0.6, 0, 0.1); tg('uArmR', -0.6, 0, -0.1); tg('lArmL', -1.2, 0, 0); tg('lArmR', -1.2, 0, 0);
     }
+    if (this.alive && T.uArmL && T.uArmR && (this.shock > 0 || this.hp < this.maxHp * 0.35)) { const kk = this.shock > 0 ? 1 : 0.6, tt = this.t; T.uArmL[0] += Math.sin(tt * 37) * 0.045 * kk; T.uArmR[0] += Math.sin(tt * 41 + 1) * 0.045 * kk; if (T.lArmL) T.lArmL[0] += Math.sin(tt * 43 + 2) * 0.07 * kk; if (T.lArmR) T.lArmR[0] += Math.sin(tt * 39 + 3) * 0.07 * kk; if (T.head) T.head[1] += Math.sin(tt * 29) * 0.015 * kk; }
+    if (state === 'story' && this.fx && this.fx.eyes && !this.controlled && T.head && this.alive) { T.head[1] += clamp(this.fx.gy, -0.6, 0.6) * 0.9; T.head[0] += clamp(this.fx.gx, -0.4, 0.4) * 0.5; }
     if (pose === 'stand' && this.look.phone && !this.scripted && !(this.panic > 0)) { tg('uArmR', -1.35, 0.4, -0.2); tg('lArmR', -1.45, 0, 0); tg('head', 0.12, -0.35, 0); }
     if (this.jolt) { T.head[0] += this.jolt[0]; T.head[1] += this.jolt[1]; T.head[2] += this.jolt[2]; T.torso[0] += this.jolt[0] * 0.25; }
     if (this.talkT > 0 && !this.controlled && (pose === 'stand' || pose === 'sit') && T.uArmR && !this.clutch) {
@@ -3119,6 +3151,8 @@ class Humanoid {
     pc.x += (prx - pc.x) * k; pc.ry += (pry - pc.ry) * k; pc.z += (prz - pc.z) * k;
     p.pelvis.pivot.position.y = pc.y * (this.legK || 1); p.pelvis.pivot.rotation.set(pc.x, pc.ry, pc.z);
     if (this.gg) this.ggUpdate(dt); if (this.sv) this.svUpdate(dt);
+    if (this.coverT > 0 && this.alive && !this.parts.head.gone && this.handOk('L')) this.cmW = Math.min(1, (this.cmW || 0) + dt * 4); else this.cmW = Math.max(0, (this.cmW || 0) - dt * 3);
+    if (this.cmW > 0.02) { this.root.updateMatrixWorld(true); this.parts.head.mesh.localToWorld(_ikX.set(0.01, -0.06, 0.135)); this.ikArm('L', _ikX, this.cmW); }
     if (this.sv && this.look.svity === 'gala') {
       const idle = pose === 'stand' && s < 0.25 && !(this.talkT > 0) && !this.clutch && !this.clutch2 && !this.controlled; this.claspW = clamp((this.claspW || 0) + (idle ? dt * 2.2 : -dt * 4), 0, 1);
       if (this.claspW > 0.02) { this.root.updateMatrixWorld(true); const pm = this.parts.pelvis.mesh; pm.localToWorld(_ikX.set(0.034, 0.15, 0.21)); this.ikArm('L', _ikX, this.claspW); pm.localToWorld(_ikX.set(-0.034, 0.135, 0.205)); this.ikArm('R', _ikX, this.claspW); }
@@ -3305,7 +3339,6 @@ function updateAvatar(dt) {
   A.update(dt);
   if (A.held) A.held.visible = (state !== 'story' || story.gun) && !ward.open;
   A.relaxed = (state === 'story' && !story.gun) || ward.open;
-  if (ward.open) return;
   if (state === 'story') { setAvatarVis(story.showAvatar, true); return; }
   const vis = state === 'play' || state === 'pause' || state === 'spawn' || state === 'over';
   setAvatarVis(vis && (view3() || A.state !== 'alive'), view3() || !(A.parts.head.body && !A.parts.head.gone));
@@ -3407,7 +3440,7 @@ function updatePlayer(dt) {
   if (!inputOn) { mx = 0; mz = 0; }
   const ml = Math.hypot(mx, mz); if (ml > 1) { mx /= ml; mz /= ml; }
   const sprint = touch.moveId !== null && ml > 0.92;
-  const sp = (sprint ? 7.2 : 4.6) * (madness.on ? 1.15 : 1) * (player.broken && player.broken.leg ? 0.5 : 1);
+  const sp = (sprint ? 7.2 : 4.6) * (madness.on ? 1.15 : 1) * (player.broken && player.broken.leg ? 0.5 : 1) * (ADR.t > 0 ? 1.3 : 1);
   const fwx = -Math.sin(player.yaw), fwz = -Math.cos(player.yaw), rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw);
   const wx = (fwx * -mz + rx * mx) * sp, wz = (fwz * -mz + rz * mx) * sp;
   const acc = player.onGround ? 12 : 2.5;
@@ -3418,7 +3451,7 @@ function updatePlayer(dt) {
   pushOutAABBs(player.pos, 0.35, player.pos.y);
   for (const n of npcs) if (n.alive) { const dx = player.pos.x - n.pos.x, dz = player.pos.z - n.pos.z, d = Math.hypot(dx, dz); if (d < 0.6 && d > 1e-4) { player.pos.x += dx / d * (0.6 - d); player.pos.z += dz / d * (0.6 - d); } }
   for (const p of props) { const dx = player.pos.x - p.body.position.x, dz = player.pos.z - p.body.position.z, d = Math.hypot(dx, dz), r = 0.35 + p.r; if (d < r && d > 1e-4 && Math.abs(p.body.position.y - player.pos.y - 0.5) < 1.2) { player.pos.x += dx / d * (r - d); player.pos.z += dz / d * (r - d); p.body.wakeUp(); p.body.applyImpulse(new CANNON.Vec3(-dx / d * 6, 0, -dz / d * 6)); } }
-  clampBounds(player.pos, 0.4);
+  clampBounds(player.pos, 0.4); playerFoot(dt);
   let ground = floorAt(player.pos.x, player.pos.z, player.pos.y);
   for (const o of obstacles) if (player.pos.x > o.min.x - 0.1 && player.pos.x < o.max.x + 0.1 && player.pos.z > o.min.z - 0.1 && player.pos.z < o.max.z + 0.1 && o.max.y <= player.pos.y + 0.45) ground = Math.max(ground, o.max.y);
   const vy0 = player.vel.y;
@@ -3693,6 +3726,114 @@ function fistHit() {
     else if (ud.kind === 'glass') { if (!ud.glass.strong) shatterGlass(ud.glass, h.point, dir); else Sound.tink(0.4); return; }
     else if (ud.kind === 'env' && k === 0) { Sound.thud(0.5); shake = Math.max(shake, 0.08); return; }
   }
+}
+/* ===== inventory: weapons and items, each with its own icon; pills go here instead of being swallowed at once ===== */
+const ICON = {
+  pistol: '<path d="M6 20h42l3-4h5v12H40l-3 3v5l-6 18H20l6-18v-5H6z"/>',
+  shotgun: '<path d="M2 25h46v-4h14v9H30l-9 12H8l6-12H2z"/>',
+  rifle: '<path d="M2 26h32l4-4h24v7H40v5h-6l4 14h-8l-4-12h-6L12 40H4l6-10H2z"/>',
+  machete: '<path d="M8 52l7-7 33-33c6-6 12-4 12 2L22 52l-7 5z"/>',
+  grenade: '<ellipse cx="30" cy="40" rx="14" ry="17"/><rect x="25" y="14" width="10" height="9"/><circle cx="43" cy="15" r="5" fill="none" stroke="currentColor" stroke-width="3"/>',
+  grab: '<rect x="4" y="25" width="34" height="13" rx="3"/><rect x="12" y="36" width="8" height="15"/><circle cx="48" cy="31" r="10" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="48" cy="31" r="4"/>',
+  flame: '<rect x="4" y="18" width="13" height="30" rx="4"/><rect x="17" y="29" width="26" height="7"/><path d="M45 33c8-10 3-16 10-21-2 8 7 10 3 21-3 7-13 7-13 0z"/>',
+  saw: '<rect x="2" y="23" width="25" height="19" rx="4"/><path d="M27 27h31a5 5 0 0 1 0 11H27z"/><rect x="6" y="15" width="15" height="6" rx="2"/>',
+  bow: '<rect x="8" y="30" width="46" height="5"/><path d="M40 8q12 24 0 48" fill="none" stroke="currentColor" stroke-width="4"/><path d="M40 8L14 32l26 24" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+  fists: '<path d="M12 28c0-6 4-9 8-9h24c6 0 9 4 9 9v11c0 10-8 17-19 17h-6c-9 0-16-7-16-15z"/><path d="M22 20v11M30 20v11M38 20v11" stroke="#1b1311" stroke-width="2.4"/>',
+  pills: '<rect x="18" y="8" width="28" height="10" rx="2"/><rect x="15" y="19" width="34" height="37" rx="6"/><rect x="21" y="30" width="22" height="13" fill="#1b1311" opacity=".55"/>',
+  medkit: '<rect x="6" y="16" width="52" height="38" rx="5"/><rect x="24" y="9" width="16" height="9" rx="2"/><path d="M28 24h8v9h9v8h-9v9h-8v-9h-9v-8h9z" fill="#c81414"/>',
+  adren: '<path d="M8 56l9-9" stroke="currentColor" stroke-width="4"/><path d="M15 45l27-27 7 7-27 27z"/><path d="M40 16l8-8 8 8-8 8z"/><path d="M50 6l8 8" stroke="currentColor" stroke-width="4"/>',
+  knife: '<path d="M6 58l20-20 5 5-20 20z"/><path d="M29 35L55 7c2 7 0 15-7 21L35 41z"/>',
+  light: '<rect x="4" y="25" width="32" height="14" rx="3"/><path d="M36 21h8l12-9v40l-12-9h-8z"/>',
+};
+const svgIcon = (id) => `<svg viewBox="0 0 64 64" aria-hidden="true" fill="currentColor">${ICON[id] || ''}</svg>`;
+const INV = { pills: 0, medkit: 2, adren: 1, knife: 6, light: 1 };
+const ITEMS = [
+  ['pills', 'Таблетки', 'Странные таблетки. Кто знает, что будет…', () => startCutscene()],
+  ['medkit', 'Аптечка', '+60 HP, вправляет переломы', () => useMedkit()],
+  ['adren', 'Адреналин', '8 секунд: мир замедляется, вы быстрее', () => useAdren()],
+  ['knife', 'Нож', 'Метательный: вонзается в тело и остаётся в нём', () => throwKnife()],
+  ['light', 'Фонарик', 'Свет в темноте: включить или выключить', () => toggleLight()],
+];
+function invReset() { Object.assign(INV, { medkit: 2, adren: 1, knife: 6, light: 1 }); }
+function openInv() { if (state !== 'play' || player.dead || player.rag) return; state = 'inv'; W.fireHeld = false; $('touch').hidden = true; renderInv(); $('inv').hidden = false; Sound.click(900, 0.15); }
+function closeInv() { $('inv').hidden = true; if (state === 'inv') resume(); }
+function renderInv() {
+  $('invW').innerHTML = WEAPONS.map((w, i) => `<button class="slot${i === W.cur ? ' on' : ''}" data-w="${i}">${svgIcon(w.id)}<span>${w.name}</span></button>`).join('');
+  $('invI').innerHTML = ITEMS.map(([id, name]) => `<button class="slot${INV[id] > 0 ? '' : ' empty'}${id === 'light' && FL.on ? ' on' : ''}" data-i="${id}">${svgIcon(id)}<span>${name}</span>${id === 'light' ? '' : `<b class="cnt">×${INV[id]}</b>`}</button>`).join('');
+  $('invInfo').textContent = 'Нажмите на оружие или предмет';
+  $('invW').querySelectorAll('[data-w]').forEach((b) => b.onclick = () => { selectWeapon(+b.dataset.w); closeInv(); });
+  $('invI').querySelectorAll('[data-i]').forEach((b) => b.onclick = () => { const it = ITEMS.find((x) => x[0] === b.dataset.i); if (!(INV[it[0]] > 0)) { $('invInfo').textContent = it[1] + ': пусто. ' + it[2]; Sound.click(300, 0.2); return; } if (it[0] !== 'light') INV[it[0]]--; closeInv(); it[3](); });
+}
+$('invClose').onclick = () => closeInv();
+// a first-aid kit heals and sets broken bones
+function healBones(n) { for (const P of n.partList) { P.broken = false; P.kink = null; if (P.boneOut) { P.mesh.remove(P.boneOut); P.boneOut = null; } if (P.constraint) { P.constraint.angle = P.def.cone; P.constraint.twistAngle = P.def.twist; } } n.broken = 0; }
+function useMedkit() { player.hp = Math.min(100, player.hp + 60); const had = player.broken; player.broken = null; if (avatar) healBones(avatar); Sound.heal(); flashScreen('#7aff9a', 380); toast('Аптечка: +60 HP' + (had ? ' · кости вправлены' : '')); }
+// adrenaline: bullet time
+const ADR = { t: 0 };
+function useAdren() { ADR.t = 8; slow = true; $('slowmo').hidden = false; Sound.heartbeat(); pulseFx = 1; toast('Адреналин: время замедлилось'); }
+function updateAdren(dt) { if (ADR.t > 0) { ADR.t -= dt; if (Math.random() < dt * 1.4) Sound.heartbeat(); if (ADR.t <= 0) { slow = false; $('slowmo').hidden = true; toast('Адреналин закончился'); } } }
+// a throwing knife that spins through the air and stays in whatever it hits
+const knives = [], KN = { geo: null };
+function knifeMesh() {
+  const g = new THREE.Group(); const bl = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.15, 0.003), vmMat.steel); bl.position.y = 0.075; g.add(bl);
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(0.0075, 0.03, 4), vmMat.steel); tip.position.y = 0.165; tip.scale.z = 0.3; g.add(tip);
+  const hd = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.075, 0.012), vmMat.poly); hd.position.y = -0.035; g.add(hd); g.traverse((o) => { if (o.isMesh) o.castShadow = true; }); return g;
+}
+function throwKnife() {
+  const dir = aimDir(new V3()), from = eye.position.clone().addScaledVector(dir, 0.35).add(_d.set(0, -0.05, 0));
+  raycaster.set(eye.position, dir); raycaster.far = 32; const h = raycaster.intersectObjects(getTargets(), false)[0];
+  const to = h ? h.point.clone() : from.clone().addScaledVector(dir, 32), m = knifeMesh(); m.position.copy(from); scene.add(m);
+  const q0 = new THREE.Quaternion().setFromUnitVectors(UP, dir);
+  knives.push({ m, from, to, dir: dir.clone(), q0, t: 0, dur: Math.max(0.06, from.distanceTo(to) / 26), h, done: false, life: 45 }); Sound.swoosh(); W.throwT = 0.3;
+  if (knives.length > 24) { const o = knives.shift(); if (o.m.parent) o.m.parent.remove(o.m); }
+}
+const _knQ = new THREE.Quaternion(), _knX = new V3(1, 0, 0);
+function updateKnives(dt) {
+  for (let i = knives.length - 1; i >= 0; i--) {
+    const k = knives[i];
+    if (k.done) { k.life -= dt; if (k.life <= 0) { if (k.m.parent) k.m.parent.remove(k.m); knives.splice(i, 1); } continue; }
+    k.t += dt; const u = Math.min(1, k.t / k.dur); k.m.position.lerpVectors(k.from, k.to, u);
+    k.m.quaternion.copy(k.q0).multiply(_knQ.setFromAxisAngle(_knX, u >= 1 ? 0 : -k.t * 22));
+    if (u < 1) continue; k.done = true; const h = k.h;
+    if (h && h.object.userData.kind === 'part') { const npc = h.object.userData.npc, P = npc.parts[h.object.userData.part]; if (P && !P.gone) { hitPart(npc, P, h, k.dir, 55, { id: 'knife', melee: true, force: 16 }); if (!P.gone && P.mesh.parent) { k.m.position.copy(h.point).addScaledVector(k.dir, 0.04); P.mesh.attach(k.m); } P.mesh.updateMatrixWorld(); tearCloth(npc, P, P.mesh.worldToLocal(h.point.clone()), h.face ? h.face.normal.clone() : new V3(0, 0, 1), 0.05, 1); Sound.crunch(0.6); } }
+    else if (h) { Sound.tink(0.5); sparks(h.point, 5, hitNormal(h), 2); k.m.position.copy(h.point).addScaledVector(k.dir, -0.05); }
+    else { k.life = 0; }
+  }
+}
+// a flashlight: one spotlight, made up front so turning it on never recompiles shaders
+const FL = { on: false, light: new THREE.SpotLight(0xfff2dc, 0, 30, 0.42, 0.55, 1.3) };
+scene.add(FL.light); scene.add(FL.light.target);
+function toggleLight() { FL.on = !FL.on; Sound.click(FL.on ? 1400 : 700, 0.25); toast(FL.on ? 'Фонарик включён' : 'Фонарик выключен'); }
+function updateLight() { const on = FL.on && (state === 'play' || state === 'pause' || state === 'inv'); FL.light.intensity = on ? 38 : 0; if (on) { FL.light.position.copy(camera.position); camFwd(_d); FL.light.target.position.copy(camera.position).addScaledVector(_d, 6); } }
+/* ===== more realism: a corpse makes people tremble, cover their mouths or throw up; bloody footprints ===== */
+function corpseCheck(n, dt) {
+  n.shock = Math.max(0, (n.shock || 0) - dt); n.coverT = Math.max(0, (n.coverT || 0) - dt);
+  if (n.vomitT > 0) { n.vomitT -= dt; if (n.vomitT > 0 && n.vomitT < 1.6 && !n.parts.head.gone && Math.random() < 0.7) { n.parts.head.mesh.updateMatrixWorld(true); const p = n.parts.head.mesh.localToWorld(_d.set(0, -0.07, 0.12)); spawnSprite(TEX.soft, p, { color: pick([0xa8b030, 0x8a9a28, 0xc0b048]), size: rand(0.03, 0.07), grow: 0.4, life: 1.1, gravity: 9, opacity: 0.9, vel: new V3(Math.sin(n.yaw) * rand(0.6, 1.4), rand(-0.2, 0.4), Math.cos(n.yaw) * rand(0.6, 1.4)) }); } }
+  n.corpseCd = (n.corpseCd ?? rand(0, 0.8)) - dt; if (n.corpseCd > 0) return; n.corpseCd = rand(0.6, 1.1);
+  if (n.type !== 'human' || n.gg || n.sv || n.scripted || n.controlled || n.seenCorpse) return;
+  for (const o of npcs) if (o !== n && o.state === 'dead' && o.pos.distanceToSquared(n.pos) < 49) {
+    n.seenCorpse = true; n.shock = rand(6, 11); n.panic = Math.max(n.panic, 4);
+    if (Math.random() < 0.4) n.coverT = rand(2, 3.5);
+    if (Math.random() < 0.14) { n.vomitT = 2.4; n.setPose('hunch', 2.4); later(0.8, () => { if (n.alive) Sound.cough(dv(n.pos) * 0.9); }); }
+    else if (n.voiceCd < 1.5) { n.voiceCd = rand(2, 3); Sound.voice('scream', dv(n.pos) * 0.5); }
+    break;
+  }
+}
+function footFx(n) {
+  if (!n.alive || n.speed < 0.4 || n.controlled) return;
+  const s = Math.sin(n.phase) >= 0; if (s === n.stepSide) return; n.stepSide = s;
+  for (const p of pools) if (Math.abs(p.y - n.pos.y) < 0.4 && Math.hypot(p.x - n.pos.x, p.z - n.pos.z) < p.r * 0.9) { n.bloodSteps = 10; break; }
+  if (!(n.bloodSteps > 0)) return; n.bloodSteps--;
+  const sd = s ? 1 : -1, cx = Math.cos(n.yaw), cz = -Math.sin(n.yaw), k = 0.45 + n.bloodSteps / 20;
+  _a.set(n.pos.x + cx * sd * 0.1, n.pos.y, n.pos.z + cz * sd * 0.1); _c.set(Math.sin(n.yaw), 0, Math.cos(n.yaw)); addBloodDecal(_a, UP, _c, 0.07 * k, 0.15 * k);
+}
+function playerFoot(dt) {
+  const v = Math.hypot(player.vel.x, player.vel.z); if (!player.onGround || v < 0.5) return;
+  player.stepAcc = (player.stepAcc || 0) + v * dt; if (player.stepAcc < 0.72) return; player.stepAcc = 0; player.stepSide = !player.stepSide;
+  for (const p of pools) if (Math.abs(p.y - player.pos.y) < 0.4 && Math.hypot(p.x - player.pos.x, p.z - player.pos.z) < p.r * 0.9) { player.bloodSteps = 10; break; }
+  if (!(player.bloodSteps > 0)) return; player.bloodSteps--;
+  const sd = player.stepSide ? 1 : -1, cx = Math.cos(player.yaw), cz = -Math.sin(player.yaw), k = 0.45 + player.bloodSteps / 20;
+  _a.set(player.pos.x + cx * sd * 0.1, player.pos.y, player.pos.z + cz * sd * 0.1); _c.set(-Math.sin(player.yaw), 0, -Math.cos(player.yaw)); addBloodDecal(_a, UP, _c, 0.07 * k, 0.15 * k);
 }
 function hitPart(npc, P, h, dir, dmg, w) {
   if (npc.gg && !npc.protect) { gagHit(npc, P, h, dir, w); return; }
@@ -3977,7 +4118,7 @@ document.querySelectorAll('#touch .tb').forEach((b) => {
     if (state !== 'play') return;
     if (act === 'fire') { W.fireHeld = true; tryFire(true); }
     else if (act === 'jump') touch.jump = true;
-    else if (act === 'next') selectWeapon((W.cur + 1) % WEAPONS.length);
+    else if (act === 'next') openInv();
     else if (act === 'reload') startReload();
     else if (act === 'spawn') openSpawn();
     else if (act === 'slow') toggleSlow();
@@ -4009,7 +4150,7 @@ function spawnAtAim(type) { const p = aimPoint(), N = MAPS[mapId].npcs; const n 
 function edgePoint() { for (let i = 0; i < 20; i++) { const side = randi(4), ex = HX - 1.5, ez = HZ - 1.5; const p = side === 0 ? [rand(-ex, ex), -ez] : side === 1 ? [rand(-ex, ex), ez] : side === 2 ? [-ex, rand(-ez, ez)] : [ex, rand(-ez, ez)]; if (Math.hypot(p[0] - player.pos.x, p[1] - player.pos.z) > Math.min(11, HZ)) return p; } return [rand(-HX + 2, HX - 2), -HZ + 2]; }
 function cleanBlood() { for (const L of bloodLayers) L.clear(); dripLayer.clear(); holeLayer.clear(); scorchLayer.clear(); for (const p of pools) scene.remove(p.mesh); pools.length = 0; bp.n = 0; }
 function clearBodies() { for (const n of npcs.slice()) if (!n.alive) n.dispose(); for (const g of gibs.slice()) removeGib(g); for (const G of guts.slice()) removeGuts(G); for (const c of casings) scene.remove(c.m); casings.length = 0; }
-function clearAll() { for (const o of SCRAPS) scene.remove(o.m); SCRAPS.length = 0; TEAR.n = 0; removeDropGun(); releaseGrab(false); for (const n of npcs.slice()) n.dispose(); clearBodies(); for (const p of props.slice()) removeProp(p); for (const g of grenades) { scene.remove(g.m); world.removeBody(g.b); } grenades.length = 0; cleanBlood(); emitters.length = 0; }
+function clearAll() { for (const k of knives) if (k.m.parent) k.m.parent.remove(k.m); knives.length = 0; for (const o of SCRAPS) scene.remove(o.m); SCRAPS.length = 0; TEAR.n = 0; removeDropGun(); releaseGrab(false); for (const n of npcs.slice()) n.dispose(); clearBodies(); for (const p of props.slice()) removeProp(p); for (const g of grenades) { scene.remove(g.m); world.removeBody(g.b); } grenades.length = 0; cleanBlood(); emitters.length = 0; }
 function spawnCorpse(x, z) { const n = new Humanoid('human', x, z, 0); npcs.push(n); n.root.position.set(x, 1.03, z + 0.92); n.root.rotation.set(-Math.PI / 2, rand(-0.05, 0.05), 0); n.die('prop'); n.twitch = 0; for (const P of n.partList) if (P.def.kind === 'head' || P.name.startsWith('lArm')) P.mat.color.lerp(_col.setHex(0xb8b8b0), 0.4); targetsDirty = true; }
 function spawnMapProps() { for (const [k, x, z, y] of MAPS[mapId].props) spawnProp(k, x, z, y); }
 function populateSandbox() {
@@ -4027,7 +4168,7 @@ function startGame(m) {
   Sound.init(); mode = m; resetStats();
   const newMap = mapId !== settings.map; if (newMap) loadMap(settings.map);
   setMadness(false); madness.amt = 0; respawnPlayer();
-  W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0; selectWeapon(0); if (W.cur !== 0) selectWeapon(0); slow = false; $('slowmo').hidden = true;
+  W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0; selectWeapon(0); if (W.cur !== 0) selectWeapon(0); slow = false; $('slowmo').hidden = true; invReset(); ADR.t = 0; FL.on = false;
   $('waveLbl').hidden = $('sWave').hidden = m !== 'waves';
   if (m === 'waves') { clearAll(); spawnMapProps(); waveState.intermission = 2.5; waveState.toSpawn = 0; banner('Зомби-волны', 'Приготовьтесь'); }
   else { if (newMap || !npcs.length || startGame.fromWaves) { clearAll(); populateSandbox(); } banner(MAPS[mapId].name, mapId === 'tower' ? 'лифт — у северной стены' : '«Спавн» — люди, зомби и предметы'); }
@@ -4115,7 +4256,7 @@ function updatePills(now) {
   if (!pills) return;
   const k = Math.sin(now * 0.004); pillLight.intensity = 0.6 + k * 0.4; pillMats.bottle.emissiveIntensity = 1 + k * 0.7;
   if (state !== 'play' || player.dead) return;
-  if (!player.rag && Math.hypot(player.pos.x - pills.pos.x, player.pos.z - pills.pos.z) < 1.1 && Math.abs(player.pos.y - pills.pos.y) < 1.3) startCutscene();
+  if (!player.rag && Math.hypot(player.pos.x - pills.pos.x, player.pos.z - pills.pos.z) < 1.1 && Math.abs(player.pos.y - pills.pos.y) < 1.3) { INV.pills++; removePills(); toast('Таблетки в инвентаре'); Sound.click(1500, 0.3); }
 }
 function speak(text) {
   try {
@@ -4709,7 +4850,7 @@ function gagStart(npc) { story.gg = npc; story.fov = 0; npc.regenBusy = true; np
 function gagEnd(npc) {
   worldTs = 1; fxStory.whip = 0; npc.headUp = 0; npc.regenBusy = false; npc.regenUntil = performance.now() + 5000; npc.scripted = false; npc.pose = 'stand'; npc.poseDur = 0; npc.ggMouth = 0; npc.ggGrin = 0; npc.ggRage = 0; npc.ggDim = 0; npc.ggCrack = 0; npc.jolt = null; npc.laughAmp = 1;
   npc.root.visible = true; npc.root.scale.set(1, 1, 1); npc.idleT = rand(1, 3); LFX.on = false; npc.poseRate = 14; npc.snicker = 0;
-  { const G = npc.gg; ggCapHome(npc); for (const sd of [-1, 1]) G.gore[sd].visible = false; for (const e of G.eyes) { e.visible = true; e.scale.set(1, 1, 1); } G.eyePop = 0; G.slit.visible = false; G.spear.visible = true; G.candy.visible = true; for (const P of npc.partList) { P.mesh.visible = true; P.blood = 0; bloody(P, 0); } for (const l of TEND) l.visible = false; } $('bloodout').style.opacity = 0; story.fov = 0; subOff(); resume();
+  { const G = npc.gg; ggLayersEnd(npc); ggFaceRestore(npc); if (G.gash) G.gash.visible = false; ggCapHome(npc); for (const sd of [-1, 1]) G.gore[sd].visible = false; for (const e of G.eyes) { e.visible = true; e.scale.set(1, 1, 1); } G.eyePop = 0; G.slit.visible = false; G.spear.visible = true; G.candy.visible = true; for (const P of npc.partList) { P.mesh.visible = true; P.blood = 0; bloody(P, 0); } for (const l of TEND) l.visible = false; } $('bloodout').style.opacity = 0; story.fov = 0; subOff(); resume();
 }
 function ggHead(npc, out) { npc.parts.head.mesh.updateMatrixWorld(true); return npc.parts.head.mesh.getWorldPosition(out); }
 function ggImpact(npc, i, dir) {
@@ -4736,25 +4877,138 @@ function gagHit(npc, P, h, dir, w) {
   gagCut(npc, v, { point: h.point.clone(), dir: dir.clone(), blunt: !!w.fists });
 }
 function gagCut(npc, variant, hit) { lfxInit(); if (variant === 'boom') cutRegenBoom(npc, hit); else if (variant === 'laugh') cutRegenLaugh(npc, hit); else cutRegenHead(npc, hit); }
+/* ===== real wounds for the resurrector: half the face torn open down to the skull, a gaping throat, healing in layers ===== */
+const WL = {};
+function woundTex() {
+  if (WL.mus) return WL;
+  const c = makeCanvas(256), g = c.getContext('2d'); g.fillStyle = '#7a0d0d'; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 140; i++) { g.strokeStyle = `rgba(${randi(70) + 170},${randi(40) + 30},${randi(40) + 30},${rand(0.25, 0.6)})`; g.lineWidth = rand(1, 3); const y = rand(0, 256); g.beginPath(); g.moveTo(0, y); g.bezierCurveTo(80, y + rand(-12, 12), 170, y + rand(-12, 12), 256, y + rand(-6, 6)); g.stroke(); }
+  for (let i = 0; i < 10; i++) { g.fillStyle = 'rgba(240,220,200,0.22)'; g.fillRect(rand(0, 256), 0, rand(2, 5), 256); }
+  WL.musTex = new THREE.CanvasTexture(c); WL.musTex.colorSpace = THREE.SRGBColorSpace; WL.musTex.wrapS = WL.musTex.wrapT = THREE.RepeatWrapping;
+  WL.mus = new THREE.MeshStandardMaterial({ map: WL.musTex, roughness: 0.42, envMapIntensity: 0.6 });
+  WL.meat = new THREE.MeshStandardMaterial({ map: WL.musTex, color: 0x8a2020, roughness: 0.1, metalness: 0.05, envMapIntensity: 1.1 });
+  WL.wall = new THREE.MeshStandardMaterial({ map: WL.musTex, color: 0xd06060, roughness: 0.3, side: THREE.DoubleSide });
+  WL.none = new THREE.MeshBasicMaterial({ visible: false });
+  const gc = makeCanvas(256, 64), h = gc.getContext('2d'), gr = h.createLinearGradient(0, 0, 0, 64);
+  gr.addColorStop(0, 'rgba(120,10,10,0)'); gr.addColorStop(0.16, 'rgba(190,30,30,0.95)'); gr.addColorStop(0.38, '#6a0505'); gr.addColorStop(0.5, '#0e0101'); gr.addColorStop(0.62, '#6a0505'); gr.addColorStop(0.84, 'rgba(190,30,30,0.95)'); gr.addColorStop(1, 'rgba(120,10,10,0)');
+  h.fillStyle = gr; h.fillRect(0, 0, 256, 64); h.fillStyle = 'rgba(20,0,0,0.6)'; for (let i = 0; i < 40; i++) h.fillRect(rand(0, 256), rand(26, 38), rand(4, 14), rand(1, 3));
+  WL.gashTex = new THREE.CanvasTexture(gc); WL.gashTex.colorSpace = THREE.SRGBColorSpace;
+  WL.gash = new THREE.MeshStandardMaterial({ map: WL.gashTex, transparent: true, roughness: 0.18, envMapIntensity: 0.9, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, side: THREE.DoubleSide });
+  WL.lip = new THREE.MeshStandardMaterial({ color: 0x9a1414, roughness: 0.25 });
+  return WL;
+}
+const HOLE = { b0: 0.78, b1: 2.3 };
+const holeRange = (side) => (side > 0 ? [Math.PI / 2 - 0.06, Math.PI / 2 + 1.25] : [Math.PI / 2 - 1.25, Math.PI / 2 + 0.06]);
+const holeP = (phi, th, r, out = new V3()) => out.set(-r * Math.cos(phi) * Math.sin(th) * 0.9, r * Math.cos(th) * 1.05, r * Math.sin(phi) * Math.sin(th) * 0.98);
+const _holeGeo = {};
+// the head with one half of the face missing (and the ear on that side)
+function headHoleGeo(side) {
+  if (_holeGeo[side]) return _holeGeo[side];
+  const [a0, a1] = holeRange(side), { b0, b1 } = HOLE, R = 0.12, sc = (g) => g.scale(0.9, 1.05, 0.98);
+  const parts = [sc(new THREE.SphereGeometry(R, 28, 6, 0, Math.PI * 2, 0, b0)), sc(new THREE.SphereGeometry(R, 28, 8, 0, Math.PI * 2, b1, Math.PI - b1)), sc(new THREE.SphereGeometry(R, 22, 12, a1, Math.PI * 2 - (a1 - a0), b0, b1 - b0))];
+  const ear = new THREE.SphereGeometry(0.03, 10, 8); ear.scale(0.35, 1, 0.7); ear.translate(side > 0 ? -0.106 : 0.106, 0, -0.005);
+  const neck = new THREE.CylinderGeometry(0.048, 0.056, 0.12, 14); neck.translate(0, -0.125, -0.012);
+  return (_holeGeo[side] = mergeGeometries([...parts, ear, neck]));
+}
+// what the hole shows: raw flesh in a crater, a torn wall, ragged flaps of skin, skull shards, bare teeth and an eye hanging on its nerve
+function buildFaceWound(npc, side) {
+  const W = woundTex(), T = ggExtraTex(), head = npc.parts.head.mesh, [a0, a1] = holeRange(side), { b0, b1 } = HOLE, grp = new THREE.Group();
+  const cr = new THREE.SphereGeometry(0.083, 16, 12, a0, a1 - a0, b0, b1 - b0); cr.scale(0.9, 1.05, 0.98); grp.add(new THREE.Mesh(cr, std({ map: T.gore, roughness: 0.25, envMapIntensity: 0.8 })));
+  const N = 72, pos = [], uv = [], idx = [], per = (u) => (u < 1 ? [lerp(a0, a1, u), b0] : u < 2 ? [a1, lerp(b0, b1, u - 1)] : u < 3 ? [lerp(a1, a0, u - 2), b1] : [a0, lerp(b1, b0, u - 3)]);
+  for (let i = 0; i <= N; i++) { const [ph, th] = per(i / N * 4), o = holeP(ph, th, 0.1206 + rand(-0.002, 0.006)), n = holeP(ph, th, 0.083); pos.push(o.x, o.y, o.z, n.x, n.y, n.z); uv.push(i / N * 3, 1, i / N * 3, 0); if (i < N) { const k = i * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); } }
+  const wg = new THREE.BufferGeometry(); wg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); wg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); wg.setIndex(idx); wg.computeVertexNormals(); grp.add(new THREE.Mesh(wg, W.wall));
+  // ragged skin flaps hanging over the rim
+  const fp = [], phc = (a0 + a1) / 2, thc = (b0 + b1) / 2;
+  for (let i = 0; i < 11; i++) { const u = rand(0, 4), [ph, th] = per(u), [p2, t2] = per(Math.min(3.999, u + rand(0.05, 0.12))), k = rand(0.18, 0.4); const A = holeP(ph, th, 0.1215), B = holeP(p2, t2, 0.1215), C = holeP(lerp(ph, phc, k), lerp(th, thc, k), 0.118); fp.push(A.x, A.y, A.z, B.x, B.y, B.z, C.x, C.y, C.z); }
+  const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.Float32BufferAttribute(fp, 3)); fg.computeVertexNormals(); grp.add(new THREE.Mesh(fg, new THREE.MeshStandardMaterial({ color: 0x0b0b0e, roughness: 0.7, side: THREE.DoubleSide })));
+  // skull shards along the rim and the teeth of the bared jaw
+  for (let i = 0; i < 8; i++) { const [ph, th] = per(rand(0, 4)), p = holeP(ph, th, 0.11), s = new THREE.Mesh(GEO.boneShard, boneMat); s.position.copy(p); s.quaternion.setFromUnitVectors(_e.set(0, 1, 0), p.clone().normalize().add(_d.set(rand(-0.5, 0.5), rand(-0.5, 0.5), rand(-0.5, 0.5))).normalize()); s.scale.setScalar(rand(0.012, 0.02)); grp.add(s); }
+  const tm = std({ color: 0xf2ece0, roughness: 0.3 });
+  for (let i = 0; i < 6; i++) { const ph = lerp(a0 + (side > 0 ? 0.08 : 0.4), a1 - (side > 0 ? 0.4 : 0.08), i / 5), p = holeP(ph, b1 - 0.24, 0.096), t = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.017, 0.011), tm); t.position.copy(p); t.lookAt(0, p.y, 0); grp.add(t); }
+  // the eye hangs out of its socket on a red nerve and swings
+  const sock = holeP(phc + (side > 0 ? -0.25 : 0.25), 1.42, 0.1), ep = new THREE.Group(); ep.position.copy(sock);
+  const nerve = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.006, 0.07, 6), new THREE.MeshStandardMaterial({ color: 0x9a1010, roughness: 0.4 })); nerve.position.y = -0.035; ep.add(nerve);
+  const ball = new THREE.Group(); ball.position.y = -0.075; ball.add(new THREE.Mesh(new THREE.SphereGeometry(0.03, 14, 10), npc.gg.eyeM)); const ir = new THREE.Mesh(new THREE.SphereGeometry(0.017, 10, 8), new THREE.MeshBasicMaterial({ color: 0xdadde4 })); ir.position.z = 0.02; ir.scale.z = 0.5; ball.add(ir); ep.add(ball);
+  ep.rotation.set(-0.3, 0, side * 0.25); grp.add(ep); grp.userData.eye = ep;
+  head.add(grp); return grp;
+}
+// the healing layers that grow from the middle of the hole: bone, muscle, wet meat and blood, skin
+function faceLayers(npc, side) {
+  const W = woundTex(), head = npc.parts.head.mesh, [a0, a1] = holeRange(side), { b0, b1 } = HOLE, c = holeP((a0 + a1) / 2, (b0 + b1) / 2, 0.12), out = [];
+  for (const [r, mat] of [[0.112, boneMat], [0.1172, W.mus], [0.1192, W.meat], [0.1212, npc.parts.head.mat]]) {
+    const g = new THREE.SphereGeometry(r, 18, 12, a0 - 0.01, a1 - a0 + 0.02, b0 - 0.01, b1 - b0 + 0.02); g.scale(0.9, 1.05, 0.98);
+    const pv = new THREE.Group(); pv.position.copy(c); const m = new THREE.Mesh(g, mat); m.position.copy(c).negate(); pv.add(m); pv.scale.setScalar(0.001); head.add(pv); out.push(pv);
+  }
+  return out;
+}
+function ggFaceRestore(npc) {
+  const G = npc.gg, H = npc.parts.head; H.mesh.geometry = GEO.head;
+  if (G.hole) { H.mesh.remove(G.hole); G.hole = null; } if (G.flayers) { for (const p of G.flayers) H.mesh.remove(p); G.flayers = null; }
+  for (const e of G.eyes) e.visible = true; if (G.nose) G.nose.visible = true; if (G.swirl) G.swirl.visible = true; G.healT = -1;
+}
+// a gaping cut across the throat under the jaw, with swollen red lips
+function buildNeckGash(npc) {
+  const G = npc.gg, W = woundTex();
+  if (!G.gash) {
+    const grp = new THREE.Group(), sc = (g) => g.scale(0.9, 1.05, 0.98), ph0 = Math.PI / 2 - 1.05, phL = 2.1;
+    G.gashMat = W.gash.clone(); G.lipMat = W.lip.clone(); G.lipMat.transparent = true;
+    grp.add(new THREE.Mesh(sc(new THREE.SphereGeometry(0.1217, 28, 3, ph0, phL, 2.2, 0.26)), G.gashMat));
+    for (const a of [2.17, 2.44]) grp.add(new THREE.Mesh(sc(new THREE.SphereGeometry(0.1228, 28, 2, ph0 + 0.08, phL - 0.16, a, 0.05)), G.lipMat));
+    npc.parts.head.mesh.add(grp); G.gash = grp;
+  }
+  G.gash.visible = true; G.gashMat.opacity = 1; G.lipMat.opacity = 1; return G.gash;
+}
+// the blast: every part is rebuilt in layers — sparks of electricity, bone, muscle, meat and blood, then skin
+function ggBones(npc) {
+  const G = npc.gg; if (G.bones) return G.bones; const B = G.bones = {};
+  const lim = (len, r) => mergeGeometries([new THREE.CylinderGeometry(r, r * 0.9, len * 0.86, 8), new THREE.SphereGeometry(r * 1.6, 8, 6).translate(0, len * 0.43, 0), new THREE.SphereGeometry(r * 1.45, 8, 6).translate(0, -len * 0.43, 0)]);
+  for (const n of LIMBS) { const m = new THREE.Mesh(lim(PDEF[n].box[1], n[0] === 'u' ? 0.02 : 0.016), boneMat); m.visible = false; npc.parts[n].mesh.add(m); B[n] = m; }
+  const tor = [new THREE.CylinderGeometry(0.02, 0.022, 0.46, 8).translate(0, 0, -0.07)];
+  for (let i = 0; i < 6; i++) { const t = new THREE.TorusGeometry(0.11 - Math.abs(i - 2) * 0.006, 0.009, 4, 18, Math.PI * 1.3); t.rotateZ(Math.PI / 2 - Math.PI * 0.65); t.rotateX(Math.PI / 2); t.scale(1, 1, 0.8); t.translate(0, 0.15 - i * 0.045, -0.01); tor.push(t); }
+  for (const sx of [-1, 1]) tor.push(new THREE.CylinderGeometry(0.01, 0.01, 0.15, 6).rotateZ(Math.PI / 2 + sx * 0.15).translate(sx * 0.08, 0.2, 0.05));
+  B.torso = new THREE.Mesh(mergeGeometries(tor), boneMat); B.pelvis = new THREE.Mesh(mergeGeometries([new THREE.TorusGeometry(0.085, 0.022, 6, 16).rotateX(Math.PI / 2), new THREE.SphereGeometry(0.03, 8, 6).translate(0.1, -0.03, 0), new THREE.SphereGeometry(0.03, 8, 6).translate(-0.1, -0.03, 0)]), boneMat);
+  const sk = new THREE.SphereGeometry(0.1, 16, 12); sk.scale(0.9, 1.05, 0.98); B.head = new THREE.Mesh(mergeGeometries([sk, new THREE.BoxGeometry(0.11, 0.03, 0.08).translate(0, -0.08, 0.03)]), boneMat);
+  const sockM = new THREE.MeshBasicMaterial({ color: 0x120a08 }); for (const sx of [-1, 1]) { const so = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), sockM); so.position.set(sx * 0.035, 0.012, 0.082); B.head.add(so); }
+  for (const n of ['torso', 'pelvis', 'head']) { B[n].visible = false; npc.parts[n].mesh.add(B[n]); }
+  return B;
+}
+const LAYER_GROUPS = [['torso', 'pelvis'], ['head'], ['uArmL', 'uArmR', 'lArmL', 'lArmR'], ['uLegL', 'uLegR', 'lLegL', 'lLegR']];
+function ggLayersStart(npc) {
+  const G = npc.gg, W = woundTex(); ggBones(npc); G.layers = { st: {} };
+  for (const P of npc.partList) { const m = P.mesh, u = m.userData; u.mat0 = m.material; u.sc0 = m.scale.clone(); u.kids = m.children.map((c) => [c, c.visible]); for (const c of m.children) c.visible = false; m.visible = true; m.material = W.none; }
+}
+function ggLayerSet(npc, P, st) {
+  const m = P.mesh, u = m.userData, bone = npc.gg.bones[P.name], W = woundTex(), wp = m.getWorldPosition(new V3());
+  if (st < 1) { m.material = W.none; if (bone) bone.visible = false; if (st === 0) { sparks(wp, 22, UP, 4); spawnSprite(TEX.flash, wp, { color: 0x9ad8ff, size: 0.45, grow: 1, life: 0.18, additive: true }); Sound.zap(0.3); } }
+  else if (st === 1) { if (bone) bone.visible = true; Sound.crack(0.35); }
+  else if (st === 2) { m.material = W.mus; m.scale.copy(u.sc0).multiplyScalar(0.9); Sound.splat(0.35); }
+  else if (st === 3) { m.material = W.meat; m.scale.copy(u.sc0).multiplyScalar(0.97); bloodSpray(wp, _d.set(0, -1, 0), 10, 0.5, 0.5, 1.5, 0.003, 0.007); }
+  else { m.material = u.mat0; m.scale.copy(u.sc0); for (const [c, v] of u.kids) c.visible = v; if (bone) bone.visible = false; spawnSprite(TEX.smoke, wp, { color: 0xffffff, size: 0.35, grow: 2, life: 0.8, opacity: 0.45 }); }
+}
+function ggLayersUpdate(npc, t) {
+  const L = npc.gg.layers; if (!L) return;
+  LAYER_GROUPS.forEach((grp, gi) => { const st = clamp(Math.floor((t - gi * 0.45) / 0.34), -1, 4); for (const n of grp) { const P = npc.parts[n]; if (L.st[n] !== st) { L.st[n] = st; ggLayerSet(npc, P, st); } } });
+  if (t > 3.2) ggLayersEnd(npc);
+}
+function ggLayersEnd(npc) { const L = npc.gg.layers; if (!L) return; for (const P of npc.partList) if (L.st[P.name] !== 4) ggLayerSet(npc, P, 4); npc.gg.layers = null; }
 // the head shot, after the clip and the retelling: half the face is torn off and the cap flies; he laughs, catches the cap
 // and puts it back on while the face grows back, then dashes over and punches you across the room (-99 HP)
 const GG_PUNCH = ['А теперь — моя очередь.', 'Ты кое-что уронил. Держи сдачу.', 'Моя кепка, между прочим, новая.', 'Лови ответ.'];
 function ggTearFace(npc, side, blunt) {
   const G = npc.gg, H = npc.parts.head; H.mesh.updateMatrixWorld(true);
   if (!blunt) {
-    const pv = G.gore[side]; pv.visible = true; pv.userData.mesh.visible = true; pv.scale.setScalar(1); G.goreSide = side; G.eyes[side > 0 ? 1 : 0].visible = false;
+    H.mesh.geometry = headHoleGeo(side); G.hole = buildFaceWound(npc, side); G.goreSide = side; G.eyes[side > 0 ? 1 : 0].visible = false; if (G.nose) G.nose.visible = false; if (G.swirl) G.swirl.visible = false;
     const c = H.mesh.localToWorld(new V3(side * 0.06, 0, 0.09)), out = new V3(side, 0.25, 0.8).normalize().transformDirection(H.mesh.matrixWorld);
-    spawnChunks('head', c, out.clone().multiplyScalar(2.2), out, 0.8, npc);
-    bloodSpray(c, out, 120, 0.7, 2, 7, 0.004, 0.014); bloodMist(c, 0.6); bloodMist(c, 0.9);
-    if (emitters.length < 90) addEmitter(H.mesh, new V3(side * 0.06, -0.03, 0.09), new V3(side * 0.4, -0.5, 0.8).normalize(), { rate: 40, speed: 0.8, dur: 4.5, pulse: true });
-    Sound.splat(1.3); Sound.crunch(1.1);
+    spawnChunks('head', c, out.clone().multiplyScalar(2.6), out, 1, npc); spawnChunks('head', c, out.clone().multiplyScalar(1.6), out, 0.6, npc);
+    bloodSpray(c, out, 220, 0.8, 2, 8, 0.004, 0.016); bloodMist(c, 0.8); bloodMist(c, 1.1); bloodMist(c, 0.6);
+    for (const [x, y, z, dx, dy, dz, r] of [[side * 0.05, 0, 0.085, side * 0.4, 0, 0.9, 80], [side * 0.05, -0.06, 0.08, side * 0.2, -0.7, 0.6, 60], [side * 0.04, 0.03, 0.09, side * 0.6, 0.3, 0.7, 40]]) if (emitters.length < 95) addEmitter(H.mesh, new V3(x, y, z), new V3(dx, dy, dz).normalize(), { rate: r, speed: 1.1, dur: 4.2, pulse: true });
+    bloody(npc.parts.torso, 0.35); for (let i = 0; i < 7; i++) later(0.25 * i, () => addPool(npc.pos.x + rand(-0.25, 0.25), npc.pos.z + rand(-0.25, 0.25), 0.22));
+    Sound.splat(1.4); Sound.crunch(1.2); Sound.crack(0.8);
   } else { Sound.thud(1.1); Sound.crunch(0.5); }
   const cap = G.cap; scene.attach(cap); const f = new V3(Math.sin(npc.yaw), 0, Math.cos(npc.yaw));
   G.capV = new V3(-side * 0.7 - f.x * 1.1, 3.4, -f.z * 1.1); G.capW = new V3(rand(4, 8), rand(-3, 3), rand(-6, 6)); G.capFly = true; G.capCatch = 0;
 }
-function ggRestoreFace(npc) {
-  const G = npc.gg; for (const sd of [-1, 1]) { G.gore[sd].visible = false; G.gore[sd].scale.setScalar(1); } for (const e of G.eyes) { e.visible = true; } G.eyePop = 1;
-}
+function ggRestoreFace(npc) { const G = npc.gg; ggFaceRestore(npc); for (const sd of [-1, 1]) { G.gore[sd].visible = false; G.gore[sd].scale.setScalar(1); } G.eyePop = 1; }
 function ggCapHome(npc) { const G = npc.gg, head = npc.parts.head.mesh; if (G.cap.parent !== head) head.attach(G.cap); G.cap.position.copy(G.capPos); G.cap.quaternion.copy(G.capQ); G.capFly = false; G.capCatch = 0; }
 function ggDash(npc) {
   const from = ggHead(npc, new V3()), d = new V3(npc.pos.x - player.pos.x, 0, npc.pos.z - player.pos.z); const L = d.length() || 1; d.multiplyScalar(1 / L);
@@ -4772,7 +5026,7 @@ function ggPunchPlayer(npc) {
 function cutRegenHead(npc, hit) {
   gagStart(npc); worldTs = 0.35; story.fov = 40; const G = npc.gg, H = npc.parts.head, hp = new V3(), f = new V3(), sd = new V3(), blunt = !!hit.blunt;
   H.mesh.updateMatrixWorld(true); const lh = H.mesh.worldToLocal(hit.point.clone()), side = hit.side || (lh.x >= 0 ? 1 : -1);
-  let healK = 0, home = 0, punchDir = null;
+  let home = 0, punchDir = null; G.healT = -1;
   const hand = () => { npc.parts.lArmL.mesh.updateMatrixWorld(true); return npc.parts.lArmL.mesh.localToWorld(_c.set(0, -0.2, 0.03)); };
   runCut([
     [0.0, () => { ggTearFace(npc, side, blunt); npc.jolt = [-0.35, side * -0.6, side * 0.45]; Sound.beat(0.5); }],
@@ -4781,35 +5035,36 @@ function cutRegenHead(npc, hit) {
     [2.35, () => { G.capCatch = 1; }],
     [2.7, () => { G.capFly = false; G.capCatch = 0; npc.parts.lArmL.mesh.attach(G.cap); Sound.click(500, 0.3); }],
     [3.05, () => { npc.pose = 'capput'; }],
-    [3.5, () => { npc.parts.head.mesh.attach(G.cap); home = 1; npc.pose = 'capfix'; if (!blunt) { healK = 0.001; Sound.heal(); Sound.steam(0.2); LFX.c.copy(ggHead(npc, new V3())); LFX.r = 0.5; LFX.on = true; } }],
-    [5.0, () => { ggRestoreFace(npc); LFX.on = false; if (!blunt) flashScreen('#ffe9a0', 300); }],
-    [5.35, () => { npc.pose = 'stand'; npc.ggGrin = 1; npc.ggRage = 0.5; ggFace(npc); story.fov = 0; line('Воскреситель', pick(GG_PUNCH), 0.3, 0.8); }],
-    [6.7, () => ggDash(npc)],
-    [6.95, () => { npc.poseRate = 30; npc.pose = 'punchwind'; }],
-    [7.3, () => { npc.poseRate = 90; npc.pose = 'punch'; Sound.swoosh(); }],
-    [7.42, () => { punchDir = ggPunchPlayer(npc); }],
+    [3.5, () => { npc.parts.head.mesh.attach(G.cap); home = 1; npc.pose = 'capfix'; if (!blunt) { G.flayers = faceLayers(npc, side); G.healT = 0; Sound.heal(); Sound.steam(0.2); LFX.c.copy(ggHead(npc, new V3())); LFX.r = 0.5; LFX.on = true; } }],
+    [5.5, () => { ggRestoreFace(npc); LFX.on = false; if (!blunt) flashScreen('#ffe9a0', 300); }],
+    [5.85, () => { npc.pose = 'stand'; npc.ggGrin = 1; npc.ggRage = 0.5; ggFace(npc); story.fov = 0; line('Воскреситель', pick(GG_PUNCH), 0.3, 0.8); }],
+    [7.2, () => ggDash(npc)],
+    [7.45, () => { npc.poseRate = 30; npc.pose = 'punchwind'; }],
+    [7.8, () => { npc.poseRate = 90; npc.pose = 'punch'; Sound.swoosh(); }],
+    [7.92, () => { punchDir = ggPunchPlayer(npc); }],
   ], (t, dt) => {
     ggHead(npc, hp); f.set(Math.sin(npc.yaw), 0, Math.cos(npc.yaw)); sd.set(Math.cos(npc.yaw), 0, -Math.sin(npc.yaw));
     const dts = dt * worldTs;
     if (G.capFly) { G.capV.y -= 9.8 * dts; G.cap.position.addScaledVector(G.capV, dts); G.cap.rotation.x += G.capW.x * dts; G.cap.rotation.y += G.capW.y * dts; G.cap.rotation.z += G.capW.z * dts; const fy = floorAt(G.cap.position.x, G.cap.position.z, G.cap.position.y) + 0.06; if (G.cap.position.y < fy) { G.cap.position.y = fy; G.capV.multiplyScalar(0.3); } }
     if (G.capCatch) G.cap.position.lerp(hand(), Math.min(1, dt * 12));
     if (home) { const k = Math.min(1, dt * 7); G.cap.position.lerp(G.capPos, k); G.cap.quaternion.slerp(G.capQ, k); if (t < 5.2) G.cap.rotateZ(Math.sin(t * 11) * 0.03); }
-    if (healK > 0 && healK < 1) { healK = Math.min(1, healK + dt / 1.45); const pv = G.gore[side]; pv.scale.setScalar(Math.max(0.03, 1 - healK * healK * (3 - 2 * healK))); if (Math.random() < 0.6) spawnSprite(TEX.soft, H.mesh.localToWorld(_d.set(side * rand(0.02, 0.09), rand(-0.06, 0.06), 0.11)), { color: 0xffd060, additive: true, size: rand(0.04, 0.1), grow: 1, life: 0.35 }); }
+    if (G.hole) { const e = G.hole.userData.eye; e.rotation.z = side * 0.25 + Math.sin(t * 6) * 0.35; e.rotation.x = -0.3 + Math.sin(t * 4.3) * 0.25; }
+    if (G.healT >= 0 && G.flayers) { G.healT += dt; const t2 = G.healT - 0.35; for (let i = 0; i < 4; i++) { const k = clamp((t2 - i * 0.42) / 0.42, 0, 1); G.flayers[i].scale.setScalar(Math.max(0.001, k * k * (3 - 2 * k))); } if (G.hole && t2 > 0.6) G.hole.userData.eye.scale.setScalar(Math.max(0.01, 1 - (t2 - 0.6) * 2)); if (Math.random() < 0.7) spawnSprite(TEX.soft, H.mesh.localToWorld(_d.set(side * rand(0.02, 0.09), rand(-0.06, 0.06), 0.11)), { color: t2 < 0 ? 0x9ad8ff : 0xffd060, additive: true, size: rand(0.04, 0.1), grow: 1, life: 0.35 }); if (t2 < 0 && Math.random() < 0.5) sparks(H.mesh.localToWorld(_d.set(side * 0.06, 0, 0.1)), 4, UP, 2); }
     if (G.eyePop > 0) { G.eyePop = Math.max(0, G.eyePop - dt * 2.5); const e = G.eyes[side > 0 ? 1 : 0], s = 1 + Math.sin((1 - G.eyePop) * Math.PI) * 0.35; e.scale.set(s, s, s); }
     if (npc.jolt) { const m = Math.exp(-9 * dt); npc.jolt = npc.jolt.map((v) => v * m); }
     if (t < 1.6) { const d = lerp(0.82, 0.62, t / 1.6); camSet(hp.x + f.x * d + sd.x * side * 0.3, hp.y + 0.02, hp.z + f.z * d + sd.z * side * 0.3, hp.x, hp.y, hp.z); camera.position.x += rand(-0.006, 0.006); }
     else if (t < 3.5) camSafe(hp.x + f.x * 2.0 + sd.x * 0.35, hp.y - 0.4, hp.z + f.z * 2.0 + sd.z * 0.35, hp.x, hp.y + 0.18, hp.z);
-    else if (t < 5.35) { const d = lerp(1.0, 0.8, (t - 3.5) / 1.85); camSafe(hp.x + f.x * d + sd.x * side * 0.38, hp.y + 0.05, hp.z + f.z * d + sd.z * side * 0.38, hp.x, hp.y + 0.01, hp.z); }
-    else { syncEye(); camera.position.copy(eye.position); camera.lookAt(hp.x, hp.y - 0.06, hp.z); if (t > 7.42) { camera.position.x += rand(-0.035, 0.035); camera.position.y += rand(-0.035, 0.035); } }
-  }, 7.8, () => { gagEnd(npc); if (punchDir && !player.dead) playerRagdoll(punchDir.x * 17, 7, punchDir.z * 17); });
+    else if (t < 5.85) { const d = lerp(1.0, 0.8, (t - 3.5) / 2.35); camSafe(hp.x + f.x * d + sd.x * side * 0.38, hp.y + 0.05, hp.z + f.z * d + sd.z * side * 0.38, hp.x, hp.y + 0.01, hp.z); }
+    else { syncEye(); camera.position.copy(eye.position); camera.lookAt(hp.x, hp.y - 0.06, hp.z); if (t > 7.92) { camera.position.x += rand(-0.035, 0.035); camera.position.y += rand(-0.035, 0.035); } }
+  }, 8.3, () => { gagEnd(npc); if (punchDir && !player.dead) playerRagdoll(punchDir.x * 17, 7, punchDir.z * 17); });
 }
 // the throat cut, after the cartoon clip and the retelling: blood, a cough, fake pain with both hands on the neck,
 // a snicker he cannot hold, then hands off, a laugh, and the cut closing up in gold for everyone to see
 function cutRegenLaugh(npc, hit) {
   gagStart(npc); story.fov = 42; const G = npc.gg, hp = new V3(), f = new V3(), sd = new V3(), blunt = !!hit.blunt, nk = new V3();
-  const neck = () => { npc.parts.head.mesh.updateMatrixWorld(true); return npc.parts.head.mesh.localToWorld(nk.set(0, -0.112, 0.05)); };
+  const neck = () => { npc.parts.head.mesh.updateMatrixWorld(true); return npc.parts.head.mesh.localToWorld(holeP(Math.PI / 2, 2.31, 0.124, nk)); };
   runCut([
-    [0.0, () => { if (!blunt) { G.slit.visible = true; G.slit.scale.set(1, 1, 1); G.slit.material.color.setHex(0x5a0000); } npc.jolt = [-0.5, 0.3, 0.25]; const p = neck().clone(); bloodSpray(p, hit.dir.clone().negate().add(_b.set(0, 0.3, 0)).normalize(), 90, 0.6, 1.5, 6, 0.004, 0.012); bloodMist(p, 0.6); Sound.crunch(1); Sound.splat(1.2); worldTs = 0.45; if (emitters.length < 90) addEmitter(npc.parts.head.mesh, new V3(0, -0.115, 0.05), new V3(0, -0.6, 0.8).normalize(), { rate: 45, speed: 1, dur: 5, pulse: true }); bloody(npc.parts.torso, 0.3); }],
+    [0.0, () => { if (!blunt) { buildNeckGash(npc); for (const [ph, r] of [[-0.45, 90], [0, 110], [0.45, 90]]) { const p = holeP(Math.PI / 2 + ph, 2.31, 0.122); if (emitters.length < 95) addEmitter(npc.parts.head.mesh, p, p.clone().normalize().add(_d.set(0, -0.3, 0)).normalize(), { rate: r, speed: 1.6, dur: 6.5, pulse: true }); } { const p = holeP(Math.PI / 2, 2.4, 0.12); if (emitters.length < 95) addEmitter(npc.parts.head.mesh, p, new V3(0, -1, 0.25).normalize(), { rate: 70, speed: 0.5, dur: 7, smin: 0.005, smax: 0.012 }); } for (let i = 0; i < 10; i++) later(0.35 * i, () => addPool(npc.pos.x + rand(-0.2, 0.25), npc.pos.z + rand(-0.15, 0.3), 0.25)); } npc.jolt = [-0.5, 0.3, 0.25]; const p = neck().clone(); bloodSpray(p, hit.dir.clone().negate().add(_b.set(0, 0.3, 0)).normalize(), 90, 0.6, 1.5, 6, 0.004, 0.012); bloodMist(p, 0.6); Sound.crunch(1); Sound.splat(1.2); worldTs = 0.45; if (emitters.length < 90) addEmitter(npc.parts.head.mesh, new V3(0, -0.115, 0.05), new V3(0, -0.6, 0.8).normalize(), { rate: 45, speed: 1, dur: 5, pulse: true }); bloody(npc.parts.torso, 0.3); }],
     [0.6, () => { worldTs = 1; npc.pose = 'neckhold'; npc.poseRate = 10; G.spear.visible = false; G.candy.visible = false; }],
     [1.0, () => npc.cough()],
     [1.4, () => line('Воскреситель', 'Кха… кха… Ох… как больно…', 0.3, 0.7)],
@@ -4818,12 +5073,13 @@ function cutRegenLaugh(npc, hit) {
     [4.2, () => { npc.snicker = 1; npc.ggMouth = 0.3; Sound.laugh({ n: 2, pitch: 1.05, vol: 0.3, gap: 0.12 }); sub('Воскреситель', 'Пф… хе… хе-хе…'); }],
     [5.1, () => { npc.snicker = 0; npc.pose = 'tada'; npc.poseRate = 9; npc.ggGrin = 1; npc.ggSlit = 1; G.spear.visible = true; G.candy.visible = true; ggLaugh(npc, 'neck', { pitch: 0.9, n: 8, gap: 0.2, rise: true, vol: 0.85, pause: 0.12, dist: 0.25 }); sub('Воскреситель', 'Ха-ха-ха-ха-ха-ха!'); }],
     [6.1, () => { if (!blunt) { G.healNeck = 1; Sound.heal(); LFX.c.copy(neck()); LFX.r = 0.35; LFX.on = true; } }],
-    [8.2, () => { LFX.on = false; G.slit.visible = false; }],
+    [8.2, () => { LFX.on = false; if (G.gash) G.gash.visible = false; }],
     [9.3, () => { npc.pose = 'stand'; npc.ggMouth = 0; npc.ggRage = 0; story.fov = 34; line('Воскреситель', ggQuip('stab'), 0.3, 0.8); }],
   ], (t, dt) => {
     ggHead(npc, hp); f.set(Math.sin(npc.yaw), 0, Math.cos(npc.yaw)); sd.set(Math.cos(npc.yaw), 0, -Math.sin(npc.yaw));
     if (npc.jolt) { const m = Math.exp(-7 * dt); npc.jolt = npc.jolt.map((v) => v * m); }
-    if (G.healNeck > 0) { G.healNeck = Math.max(0, G.healNeck - dt / 2); const k = G.healNeck; G.slit.scale.y = Math.max(0.02, k); G.slit.material.color.setRGB(0.35 * k + 1 * (1 - k), 0.75 * (1 - k), 0.2 * (1 - k)); if (Math.random() < 0.6) spawnSprite(TEX.soft, neck().clone().add(_b.set(rand(-0.05, 0.05), rand(-0.015, 0.015), rand(-0.01, 0.03))), { color: 0xffd060, additive: true, size: rand(0.04, 0.1), grow: 1, life: 0.4 }); }
+    if (t < 6 && !blunt) { bloody(npc.parts.torso, dt * 0.09); bloody(npc.parts.pelvis, dt * 0.04); }
+    if (G.healNeck > 0) { G.healNeck = Math.max(0, G.healNeck - dt / 2); const k = G.healNeck; if (G.gash) { G.gashMat.opacity = k; G.lipMat.opacity = k; } if (Math.random() < 0.6) spawnSprite(TEX.soft, neck().clone().add(_b.set(rand(-0.05, 0.05), rand(-0.015, 0.015), rand(-0.01, 0.03))), { color: 0xffd060, additive: true, size: rand(0.04, 0.1), grow: 1, life: 0.4 }); }
     const n = neck();
     if (t < 1.0) camSet(hp.x + f.x * 0.62 + sd.x * 0.22, hp.y - 0.08, hp.z + f.z * 0.62 + sd.z * 0.22, n.x, n.y, n.z);
     else if (t < 4.2) camSafe(hp.x + f.x * 1.7 + sd.x * 0.5, hp.y - 0.25, hp.z + f.z * 1.7 + sd.z * 0.5, hp.x, hp.y - 0.3, hp.z);
@@ -4833,7 +5089,7 @@ function cutRegenLaugh(npc, hit) {
     else if (t < 9.3) camSafe(hp.x + f.x * 1.5 + sd.x * 0.4, hp.y - 0.15, hp.z + f.z * 1.5 + sd.z * 0.4, hp.x, hp.y - 0.2, hp.z);
     else { const d = lerp(1.2, 0.75, clamp((t - 9.3) / 3.5, 0, 1)); camSafe(hp.x + f.x * d - sd.x * 0.2, hp.y + 0.05, hp.z + f.z * d - sd.z * 0.2, hp.x, hp.y, hp.z); }
     if (t > 5.1 && t < 9.3) { camera.position.x += rand(-0.006, 0.006); camera.position.y += rand(-0.006, 0.006); }
-  }, 13.2, () => { G.slit.visible = false; G.spear.visible = true; G.candy.visible = true; npc.snicker = 0; gagEnd(npc); });
+  }, 13.2, () => { if (G.gash) G.gash.visible = false; G.spear.visible = true; G.candy.visible = true; npc.snicker = 0; gagEnd(npc); });
 }
 // the blast after the clip: blood streams pull back in, a golden starburst, and the body puts itself together part by part
 const TEND = [];
@@ -4858,22 +5114,21 @@ function cutRegenBoom(npc, hit) {
     [2.9, () => { worldTs = 1; Sound.rise(2.6); }],
     [3.4, () => { tendStart(c); spawnSprite(ggExtraTex().star, c, { color: 0xffe060, additive: true, size: 3.4, grow: 0.5, life: 0.7 }); spawnSprite(TEX.soft, c, { color: 0xffffff, additive: true, size: 0.6, grow: 7, life: 0.5, opacity: 0.6 }); LFX.c.copy(c); LFX.r = 1.9; LFX.on = true; flashScreen('#ffe9a0', 700); sparks(c, 60, UP, 8); for (let i = 0; i < 6; i++) spawnSprite(TEX.flash, _a.copy(c).add(randUnit(_b).multiplyScalar(0.3)), { color: 0xffd060, size: rand(1.4, 2.8), grow: 1, life: 0.35, additive: true }); }],
     [5.4, () => {
-      for (const g of mine) removeGib(g); mine.length = 0; sparks(c, 90, UP, 7); flashScreen('#fff', 800); Sound.heal(); Sound.steam(0.45); Sound.boom();
-      for (let i = 0; i < 18; i++) spawnSprite(TEX.smoke, _a.copy(c).add(randUnit(_b).multiplyScalar(0.5)), { color: 0xffffff, size: rand(0.6, 1.2), grow: 2.4, life: rand(1.6, 2.6), opacity: 0.65, vel: new V3(rand(-0.5, 0.5), rand(0.2, 0.9), rand(-0.5, 0.5)) });
-      npc.root.visible = true; npc.root.scale.setScalar(1); for (const n of LIMBS) npc.parts[n].mesh.visible = false; for (const P of npc.partList) { P.blood = 0.95; bloody(P, 0); } npc.ggWing = 1; npc.pose = 'limphead';
+      for (const g of mine) removeGib(g); mine.length = 0; sparks(c, 90, UP, 7); flashScreen('#ffe9a0', 300); Sound.heal(); Sound.steam(0.45); Sound.boom();
+      for (let i = 0; i < 5; i++) spawnSprite(TEX.smoke, _a.copy(c).add(randUnit(_b).multiplyScalar(0.5)), { color: 0xffffff, size: rand(0.6, 1.2), grow: 2.4, life: rand(1.6, 2.6), opacity: 0.65, vel: new V3(rand(-0.5, 0.5), rand(0.2, 0.9), rand(-0.5, 0.5)) });
+      npc.root.visible = true; npc.root.scale.setScalar(1); ggLayersStart(npc); npc.ggWing = 1; npc.pose = 'limphead';
     }],
-    [5.75, () => { for (const n of ['uArmL', 'uArmR', 'lArmL', 'lArmR']) npc.parts[n].mesh.visible = true; sparks(chestOf(npc, new V3()), 40, UP, 5); flashScreen('#fff2c0', 200); Sound.zap(0.6); }],
-    [6.0, () => { for (const n of ['uLegL', 'uLegR', 'lLegL', 'lLegR']) npc.parts[n].mesh.visible = true; sparks(c.clone().setY(0.4), 40, UP, 5); flashScreen('#fff2c0', 200); Sound.zap(0.6); }],
-    [6.2, () => { LFX.on = false; npc.pose = 'laugh'; npc.laughAmp = 0.7; npc.ggGrin = 1; npc.ggSlit = 1; ggLaugh(npc, 'head', { pitch: 0.8, n: 5, gap: 0.2, vol: 0.85, dist: 0.5 }); sub('Воскреситель', 'Ха-ха-ха! Я снова здесь!'); }],
-    [9.5, () => { npc.pose = 'stand'; npc.ggMouth = 0; npc.laughAmp = 1; line('Воскреситель', ggQuip('boom'), 0.3, 0.8); }],
+    [8.7, () => { LFX.on = false; npc.pose = 'laugh'; npc.laughAmp = 0.7; npc.ggGrin = 1; npc.ggSlit = 1; ggLaugh(npc, 'head', { pitch: 0.8, n: 5, gap: 0.2, vol: 0.85, dist: 0.5 }); sub('Воскреситель', 'Ха-ха-ха! Я снова здесь!'); }],
+    [12.0, () => { npc.pose = 'stand'; npc.ggMouth = 0; npc.laughAmp = 1; line('Воскреситель', ggQuip('boom'), 0.3, 0.8); }],
   ], (t, dt) => {
     npc.root.rotation.y = npc.yaw; if (t > 6.6) npc.ggWing = lerp(npc.ggWing, 0.6, Math.min(1, dt * 1.5));
-    if (t >= 3.4 && t < 5.6) tendUpdate((t - 3.4) / 2); if (t > 5.4 && t < 8) for (const P of npc.partList) { P.blood = Math.max(0, 0.95 - (t - 5.4) / 2.2); bloody(P, 0); }
+    if (t >= 3.4 && t < 5.6) tendUpdate((t - 3.4) / 2); if (t >= 5.4 && npc.gg.layers) ggLayersUpdate(npc, t - 5.4);
     if (t >= 3.4 && t < 5.4) for (const g of mine) { g.b.wakeUp(); g.b.velocity.set((c.x - g.b.position.x) * 3.2, (c.y - g.b.position.y) * 3.2 + 0.4, (c.z - g.b.position.z) * 3.2); }
     if (t < 0.9) camSafe(c.x + f.x * 1.25 + sd.x * 0.3, 1.1, c.z + f.z * 1.25 + sd.z * 0.3, c.x, 1.0, c.z);
     else if (t < 3.4) { const k = (t - 0.9) / 2.5; camSafe(c.x + f.x * 2.6 + sd.x * (0.5 + k * 0.4), 0.2 + k * 0.08, c.z + f.z * 2.6 + sd.z * (0.5 + k * 0.4), c.x, 0.04, c.z); }
+    else if (t >= 5.4 && t < 8.7) { const a = 0.5 + (t - 5.4) * 0.35; camSafe(c.x + f.x * 1.9 * Math.cos(a) + sd.x * 1.9 * Math.sin(a), 1.15, c.z + f.z * 1.9 * Math.cos(a) + sd.z * 1.9 * Math.sin(a), c.x, 0.95, c.z); }
     else { const k = clamp((t - 3.4) / 5, 0, 1), a = (t - 3.4) * 0.22; camSafe(c.x + f.x * lerp(2.8, 3.3, k) * Math.cos(a) + sd.x * (0.9 + 2.8 * Math.sin(a)), lerp(0.3, 1.5, Math.min(1, k * 1.6)), c.z + f.z * lerp(2.8, 3.3, k) * Math.cos(a) + sd.z * (0.9 + 2.8 * Math.sin(a)), c.x, lerp(0.5, 1.0, k), c.z); }
-  }, 13.6, () => { for (const g of mine) removeGib(g); npc.root.scale.setScalar(1); gagEnd(npc); });
+  }, 16.0, () => { for (const g of mine) removeGib(g); npc.root.scale.setScalar(1); gagEnd(npc); });
 }
 /* ===== sandbox only: Svity tries to kiss the resurrector and gets the staff through her head ===== */
 const KT = { cd: 4, both: 0, busy: false };
@@ -4966,7 +5221,7 @@ function sub(who, text) { const c = $('cut'); c.classList.remove('ghost'); $('cu
 function subOff() { story.typ = null; const c = $('cut'); c._want = false; c.classList.remove('on'); setTimeout(() => { if (!c.classList.contains('on')) c.hidden = true; }, 650); }
 function speakAs(text, pitch = 1, rate = 1) { try { if (!window.speechSynthesis) return; const u = new SpeechSynthesisUtterance(text); u.lang = 'ru-RU'; u.pitch = pitch; u.rate = rate; const v = speechSynthesis.getVoices().find((x) => /^ru/i.test(x.lang)); if (v) u.voice = v; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} }
 function speakerOf(who) { return who === 'Свити' ? story.svity : who === 'Дежурный' ? story.desk : who === 'Вы' ? avatar : who === 'Воскреситель' ? story.gg : null; }
-function line(who, text, pitch, rate) { sub(who, text); { const sp = speakerOf(who); if (sp) sp.talkT = Math.max(sp.talkT || 0, Math.min(9, text.length * 0.075)); } speakAs(text.replace(/50 000 \$/g, 'пятьдесят тысяч долларов'), pitch, rate); }
+function line(who, text, pitch, rate) { sub(who, text); { const sp = speakerOf(who); story.spk = sp || null; if (sp) sp.talkT = Math.max(sp.talkT || 0, Math.min(9, text.length * 0.075)); } speakAs(text.replace(/50 000 \$/g, 'пятьдесят тысяч долларов'), pitch, rate); }
 function fadeOut() { $('black').classList.add('on'); }
 function fadeIn() { $('black').classList.remove('on'); }
 function camSafe(px, py, pz, lx, ly, lz) {
@@ -5003,7 +5258,7 @@ const NOTE_STAGES = new Set(['street', 'photo', 'search', 'complain', 'gala-talk
 function renderNotes() { $('sNotes').innerHTML = story.notes.length ? '<b>БЛОКНОТ · СВИТИ</b>' + story.notes.map((n) => '— ' + n).join('<br>') : ''; }
 function storyReset() {
   Object.assign(story, { on: false, stage: '', cut: null, zoom: false, tv: false, noFire: false, showAvatar: false, gun: true, svity: null, desk: null, notes: [], wp: null, lidT: 0, doorT: 0, lockT: 0, chase: 0, taxi: null, drive: false, svIn: false, svWalk: false, siren: false, talked: new Set(), huntGoal: 12, huntNext: null, huntPts: null, huntFade: true, huntTxt: '', curCase: null });
-  MAPS.home.red[2] = 2.5; $('cine').classList.remove('on'); $('credits').hidden = true; $('actBtn').hidden = true; story.notesOpen = false; story.notesT = 0; story.noteVis = null; story.canNote = null; story.typ = null; story.fov = 0; fxStory.whip = 0; fxStory.grade = 0; story.gg = null; $('sNotes').hidden = true; $('noteBtn').hidden = true; $('bloodout').style.opacity = 0; LFX.on = false;
+  MAPS.home.red[2] = 2.5; $('cine').classList.remove('on'); $('credits').hidden = true; $('actBtn').hidden = true; story.notesOpen = false; story.notesT = 0; story.noteVis = null; story.canNote = null; story.typ = null; story.fov = 0; fxStory.whip = 0; fxStory.grade = 0; story.gg = null; story.spk = null; $('sNotes').hidden = true; $('noteBtn').hidden = true; $('bloodout').style.opacity = 0; LFX.on = false;
   for (const e of story.extras) e.dispose(); story.extras.length = 0;
   $('storyHud').hidden = true; $('sArrow').hidden = true; $('polaroid').hidden = true; $('sSay').textContent = ''; $('chapter').classList.remove('on'); $('scope').hidden = true; $('choice').hidden = true; $('love').classList.remove('on'); $('photoBtn').hidden = true; $('complainBtn').hidden = true; $('sNotes').innerHTML = '';
   worldTs = 1; hideGhost(); subOff(); try { speechSynthesis.cancel(); } catch (e) {}
@@ -5610,6 +5865,36 @@ function renderExcl() {
 $('exclBtn').onclick = () => { Sound.init(); renderExcl(); $('excl').hidden = false; };
 $('exclClose').onclick = () => { $('excl').hidden = true; };
 
+
+/* ===== wardrobe preview: the hero on a turntable of their own, drawn beside the panel so it is always visible ===== */
+const WP = { scene: null, cam: null, fig: null, rot: 0, drag: null, look: new V3() };
+function wpInit() {
+  if (WP.scene) return;
+  const sc = WP.scene = new THREE.Scene(); sc.background = new THREE.Color(0x15110f); sc.environment = scene.environment;
+  sc.add(new THREE.HemisphereLight(0xfff2e8, 0x2a2220, 1.5)); const dl = new THREE.DirectionalLight(0xffffff, 2.4); dl.position.set(1.4, 3, 2.6); sc.add(dl); const rl = new THREE.DirectionalLight(0x9ab8ff, 1.3); rl.position.set(-2.2, 2, -2); sc.add(rl);
+  const fl = new THREE.Mesh(new THREE.CircleGeometry(0.85, 40), new THREE.MeshStandardMaterial({ color: 0x2c2422, roughness: 0.85 })); fl.rotation.x = -Math.PI / 2; sc.add(fl);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 0.88, 48), new THREE.MeshBasicMaterial({ color: 0xd8a400 })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.002; sc.add(ring);
+  WP.cam = new THREE.PerspectiveCamera(30, 1, 0.05, 30);
+}
+function wpDrop() { if (WP.fig) { WP.scene.remove(WP.fig.root); WP.fig.dispose(); WP.fig = null; } }
+function wpBuild() {
+  wpInit(); wpDrop();
+  const f = new Humanoid('player', 0, 0, 0, mode !== 'story' && skinOk(settings.skin) && settings.skin !== 'default' ? settings.skin : undefined);
+  scene.remove(f.root); WP.scene.add(f.root); f.root.position.set(0, 0, 0); f.scripted = true; f.relaxed = true; f.pose = 'stand'; f.poseDur = Infinity; f.poseRate = 1000; f.animate(0.02); f.poseRate = 8; WP.fig = f;
+}
+function wpRender(dt) {
+  if (!ward.open || !WP.fig) return;
+  const pr = $('wardOv').querySelector('.panel').getBoundingClientRect(), W = innerWidth, H = innerHeight;
+  let x = 0, y = 0, w = W, h = H; if (W >= H) w = Math.max(80, pr.left - 6); else { h = Math.max(80, pr.top - 6); y = H - h; }
+  const f = WP.fig; f.t += dt; f.animate(dt); if (f.fx) bodyFx(f, dt, WP.cam.position);
+  f.root.rotation.y = WP.rot + (WP.drag ? 0 : Math.sin(performance.now() * 0.0005) * 0.25);
+  const sc = f.root.scale.y, asp = w / h, half = 1.12 * sc, dist = half / Math.tan(THREE.MathUtils.degToRad(WP.cam.fov / 2)) / Math.min(1, asp * 1.6);
+  WP.cam.aspect = asp; WP.cam.updateProjectionMatrix(); WP.cam.position.set(0, 1.0 * sc, dist); WP.cam.lookAt(0, 0.93 * sc, 0);
+  renderer.setScissorTest(true); renderer.setViewport(x, y, w, h); renderer.setScissor(x, y, w, h); renderer.render(WP.scene, WP.cam); renderer.setScissorTest(false); renderer.setViewport(0, 0, W, H);
+}
+$('wardOv').addEventListener('pointerdown', (e) => { if (e.target === $('wardOv')) WP.drag = { x: e.clientX, r: WP.rot }; });
+addEventListener('pointermove', (e) => { if (WP.drag) WP.rot = WP.drag.r + (e.clientX - WP.drag.x) * 0.012; });
+addEventListener('pointerup', () => { WP.drag = null; }); addEventListener('pointercancel', () => { WP.drag = null; });
 /* ===== settings (original sounds) and the wardrobe: man or woman, colours and body sizes, with a live preview ===== */
 const ward = { open: false, t: null };
 const PROPS = [['height', 'Рост', 0.85, 1.15], ['build', 'Телосложение', 0.75, 1.35], ['head', 'Голова', 0.8, 1.3], ['eyes', 'Глаза', 0.6, 1.8], ['arms', 'Руки', 0.75, 1.3], ['hands', 'Кисти', 0.7, 1.5], ['fingers', 'Пальцы', 0.5, 1.8], ['legs', 'Ноги', 0.8, 1.25], ['hair', 'Волосы', 0.5, 1.6], ['chest', 'Грудь', 0.6, 1.5]];
@@ -5620,7 +5905,7 @@ function syncWard() {
   $('propRows').innerHTML = PROPS.filter((p) => p[0] !== 'chest' || f).map(([k, n, a, b]) => `<div class="prow"><span class="lbl">${n}</span><input type="range" min="${a}" max="${b}" step="0.01" value="${L.prop[k] ?? 1}" data-p="${k}" aria-label="${n}"><span class="num">${Math.round((L.prop[k] ?? 1) * 100)}%</span></div>`).join('');
   $('propRows').querySelectorAll('input').forEach((inp) => inp.oninput = () => { L.prop[inp.dataset.p] = +inp.value; inp.nextElementSibling.textContent = Math.round(+inp.value * 100) + '%'; wardRebuild(); });
 }
-function wardRebuild() { saveSettings(); clearTimeout(ward.t); ward.t = setTimeout(() => { if (!player.rag && !player.dead && (!avatar || avatar.state === 'alive')) { makeAvatar(); if (avatar) avatar.update(0.02); } }, 120); }
+function wardRebuild() { saveSettings(); clearTimeout(ward.t); ward.t = setTimeout(() => { if (ward.open) wpBuild(); if (avatar && !player.rag && !player.dead && avatar.state === 'alive') makeAvatar(); }, 110); }
 const _wc1 = new V3(), _wc2 = new V3();
 function wardCam(dt) {
   const A = avatar; if (!A) return; A.root.visible = true; for (const P of A.partList) P.mesh.visible = true;
@@ -5628,8 +5913,8 @@ function wardCam(dt) {
   const f = _wc1.set(Math.sin(A.yaw), 0, Math.cos(A.yaw)), r = _wc2.set(f.z, 0, -f.x), sc = A.root.scale.y;
   camera.position.set(A.pos.x + f.x * 2.0, A.pos.y + 1.15 * sc, A.pos.z + f.z * 2.0); camera.lookAt(A.pos.x - r.x * 0.6, A.pos.y + 0.95 * sc, A.pos.z - r.z * 0.6);
 }
-$('wardBtn').onclick = () => { Sound.init(); if (!avatar) makeAvatar(); ward.open = true; syncWard(); markWard(); $('menu').hidden = true; $('wardOv').hidden = false; };
-$('wardClose').onclick = () => { ward.open = false; $('wardOv').hidden = true; $('menu').hidden = false; };
+$('wardBtn').onclick = () => { Sound.init(); ward.open = true; wpBuild(); syncWard(); markWard(); $('menu').hidden = true; $('wardOv').hidden = false; };
+$('wardClose').onclick = () => { ward.open = false; wpDrop(); $('wardOv').hidden = true; $('menu').hidden = false; };
 $('propReset').onclick = () => { settings.look.prop = {}; syncWard(); wardRebuild(); };
 $('genderChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.look.gender = b.dataset.v; syncWard(); wardRebuild(); Sound.click(1000, 0.15); });
 $('hairChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.look.hairStyle = b.dataset.v; syncWard(); wardRebuild(); Sound.click(1000, 0.15); });
@@ -5701,7 +5986,7 @@ function admItems(tab) {
     { l: 'Поцелуй-ловушка', s: 'Оба на карте = новая сцена', f: () => admKiss() },
     { l: 'Фраза воскресителя', s: 'Случайная из всех', f: () => { const tx = ggQuip(pick(['head', 'boom', 'stab', 'idle', 'kiss'])); toast('Воскреситель: ' + tx); speakAs(tx, 0.3, 0.8); } },
     { sec: 'Смех из ваших записей' },
-    { l: 'Оригинальные звуки: ' + on(settings.origSnd !== false), s: 'Ваш голос в смехе и «Gotta get a grip»', on: settings.origSnd !== false, f: () => { settings.origSnd = settings.origSnd === false; settings.myLaugh = true; saveSettings(); admRender(); } },
+    { l: 'Оригинальные звуки: ' + on(settings.origSnd !== false), s: 'Записанный смех и «Gotta get a grip»', on: settings.origSnd !== false, f: () => { settings.origSnd = settings.origSnd === false; settings.myLaugh = true; saveSettings(); admRender(); } },
     { l: 'Послушать «в голову»', s: 'О! Ха-ха-ха!', f: () => { Sound.init(); setTimeout(() => Sound.myLaugh('head'), 100); } },
     { l: 'Послушать «шея»', s: 'Длинный смех', f: () => { Sound.init(); setTimeout(() => Sound.myLaugh('neck'), 100); } },
     { l: 'Свой звук «в голову»', s: 'Выбрать файл (до перезагрузки)', f: () => admPick('head') },
@@ -5860,7 +6145,6 @@ function frame(now) {
     else if (state === 'cutscene') { updatePlayer(rdt); updateCutscene(rawDt); }
     else if (state === 'sui') { updateSuicide(rawDt); }
     else if (state === 'story') updateStoryCut(rawDt);
-    else if ((state === 'menu' || state === 'over') && ward.open && avatar) wardCam(rdt);
     else if (state === 'menu' || state === 'over') { menuT += rdt * 0.08; const r = Math.min(HX, HZ) * 0.72; camera.position.set(Math.sin(menuT) * r, Math.min(5.2, WALL_H - 0.7), Math.cos(menuT) * r); camera.lookAt(0, 1, 0); }
     world.step(1 / 60 * ts, dt, 4); processGlass(); processImpacts();
     if (mapId === 'tower') updateElevator(rdt); else if (mapId === 'site') updateSite(now);
@@ -5871,12 +6155,11 @@ function frame(now) {
     if (state === 'play' || state === 'cutscene' || state === 'spawn') placeCamera(rdt);
     // separation
     for (let i = 0; i < npcs.length; i++) { const a = npcs[i]; if (!a.alive) continue; for (let j = i + 1; j < npcs.length; j++) { const b = npcs[j]; if (!b.alive) continue; const dx = a.pos.x - b.pos.x, dz = a.pos.z - b.pos.z, d = Math.hypot(dx, dz); if (d < 0.55 && d > 1e-4) { const k = (0.55 - d) / d * 0.5; a.pos.x += dx * k; a.pos.z += dz * k; b.pos.x -= dx * k; b.pos.z -= dz * k; a.root.position.copy(a.pos); b.root.position.copy(b.pos); } } }
-    lfxUpdate(dt); updateEmitters(dt); updateBlood(dt); updatePools(dt); updateFx(dt); updateScraps(dt); updateSparks(dt); updateCasings(dt);
+    lfxUpdate(dt); updateEmitters(dt); updateBlood(dt); updatePools(dt); updateFx(dt); updateScraps(dt); updateKnives(dt); if (state === 'play') updateAdren(rdt); updateSparks(dt); updateCasings(dt);
     for (const tr of tracers) if (tr.t > 0) { tr.t -= rdt; if (tr.t <= 0) tr.m.visible = false; }
     for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= dt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
     updateWaves(dt);
   }
-  if (!running && ward.open && avatar) wardCam(rdt);
   shake = Math.max(0, shake - rdt * 1.6); hurtFlash = Math.max(0, hurtFlash - rdt * 1.5);
   if (W.boomT > 0) { W.boomT -= rdt; boomLight.intensity *= Math.pow(0.0005, rdt); } else boomLight.intensity = 0;
   const MP = MAPS[mapId]; const blink = Math.sin(now * 0.004) > 0; redLight.intensity = blink ? MP.red[2] : MP.red[2] * 0.15; if (redLight.userData.bulb) redLight.userData.bulb.material.color.setHex(blink ? redLight.userData.bulbColor : 0x201008);
@@ -5902,13 +6185,14 @@ function frame(now) {
     renderer.setRenderTarget(null); const u = fxMat.uniforms; u.uTime.value = now / 1000; u.uAmt.value = madness.amt; u.uBeat.value = madness.beat; u.uHue.value = madness.hue; u.uDeath.value = deathFx; u.uDark.value = darkFx; u.uPulse.value = pulseFx; u.uWhip.value = fxStory.whip; u.uGrade.value = Math.max(fxStory.grade, cine.k * 0.42);
     renderer.clear(); renderer.render(fxScene, fxCam);
   } else { renderer.clear(); renderWorld(); if (showVM) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); } }
+  updateLight(); wpRender(rdt);
   // auto-quality: drop to fast mode if the frame rate stays low
   fpsAcc += rdt; fpsN++; if (fpsAcc > 2) { const fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; if (fps < 28 && settings.quality === 'high' && state === 'play') { lowFpsT++; if (lowFpsT >= 3) { settings.quality = 'low'; syncChips(); applyQuality(); toast('Графика: быстрая'); } } else lowFpsT = 0; }
 }
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
