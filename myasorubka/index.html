@@ -391,6 +391,7 @@ body.touch #wAmmo{font-size:26px}
 <div id="setOv" class="overlay" hidden><div class="panel">
   <div class="eyebrow">Меню</div>
   <h1 style="font-size:clamp(34px,8vw,64px)">Настройки</h1>
+  <div class="row"><span class="lbl">УЛЬТРА</span><div class="chips" id="ultraChips"><button class="chip" data-v="0">Выкл</button><button class="chip" data-v="1">ULTRA · до 888%</button></div></div>
   <div class="row"><span class="lbl">Оригинальные звуки</span><div class="chips" id="origChips"><button class="chip" data-v="1">Вкл</button><button class="chip" data-v="0">Выкл</button></div></div>
   <p class="mapdesc">Записанные звуки: «Gotta get a grip» и смех воскресителя. Выключено — синтезированные.</p>
     <div class="row"><span class="lbl">Кровь</span>
@@ -3304,7 +3305,7 @@ const barrelMat = std({ map: TEX.barrel, roughness: 0.45, metalness: 0.5, envMap
 const crateGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8), barrelGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.9, 22);
 function spawnProp(kind, x, z, y = null) {
   if (props.length >= 30) removeProp(props[0]);
-  const isB = kind === 'barrel', sc = clamp(propCfgScale(kind), 0.3, 3);
+  const isB = kind === 'barrel', sc = clamp(propCfgScale(kind), 0.3, settings.ultra ? 9 : 3);
   const m = new THREE.Mesh(isB ? barrelGeo : crateGeo, isB ? barrelMat : crateMat); m.scale.setScalar(sc); m.castShadow = true; m.receiveShadow = true; scene.add(m);
   const b = new CANNON.Body({ mass: (isB ? 30 : 25) * Math.min(8, sc * sc * sc), material: mProp, position: new CANNON.Vec3(x, y ?? (isB ? 0.46 : 0.41) * sc, z), collisionFilterGroup: G_PROP, collisionFilterMask: G_STATIC | G_BODY | G_GIB | G_PROP, angularDamping: 0.2 });
   b.addShape(isB ? new CANNON.Cylinder(0.3 * sc, 0.3 * sc, 0.9 * sc, 12) : new CANNON.Box(new CANNON.Vec3(0.4 * sc, 0.4 * sc, 0.4 * sc))); b.quaternion.setFromEuler(0, rand(0, 6.28), 0);
@@ -5978,7 +5979,8 @@ const isPropK = (k) => k === 'barrel' || k === 'crate';
 const _hairCfgMats = {};
 function hairMatOf(c) { return _hairCfgMats[c] || (_hairCfgMats[c] = std({ color: c, roughness: 0.85, map: TEX.cloth })); }
 function spawnKey(type, kind) { if (type === 'player' || kind === 'baby') return null; if (kind && kind.startsWith('svity')) return 'svity'; if (kind === 'gagarin') return 'gagarin'; return type; }
-function cfgRange(r, lo, hi) { if (!r) return null; let a = r[0], b = r[1]; if (a == null && b == null) return null; if (a == null) a = b; if (b == null) b = a; a = clamp(a, lo, hi); b = clamp(b, lo, hi); return a <= b ? [a, b] : [b, a]; }
+const ultraHi = (h) => (settings.ultra ? 888 : h);
+function cfgRange(r, lo, hi) { if (!r) return null; hi = ultraHi(hi); let a = r[0], b = r[1]; if (a == null && b == null) return null; if (a == null) a = b; if (b == null) b = a; a = clamp(a, lo, hi); b = clamp(b, lo, hi); return a <= b ? [a, b] : [b, a]; }
 function spKeys(k) { const C = settings.spawnCfg[k] || {}; if (isPropK(k)) return SZP; const hum = k === 'human' || k === 'zombie' || k === 'soldier'; return SZ.filter(([key]) => hum ? !(key === 'chest' && C.sex === 'm') : k === 'svity' ? !['eyes', 'hair'].includes(key) : !['eyes', 'hair', 'chest'].includes(key)); }
 function applySpawnCfg(L, type, kind) {
   const key = spawnKey(type, kind), C = key && settings.spawnCfg && settings.spawnCfg[key]; if (!C) return;
@@ -6013,13 +6015,13 @@ function spRender() {
   }
   h += row('Пресеты', Object.entries(P ? SPREP : SPRE).map(([id, [n]]) => `<button class="chip" data-pre="${id}">${n}</button>`).join(''));
   h += '<div class="spnote">Размеры в процентах: 100 — обычный. Каждый новый получит случайный размер от и до. Пусто — как обычно.</div>';
-  for (const [key, lbl, lo, hi] of spKeys(k)) { const r = (C.size || {})[key] || []; h += `<div class="rrow" title="${lo}–${hi} %"><span class="lbl">${lbl}</span><span>от</span><input type="number" inputmode="numeric" min="${lo}" max="${hi}" placeholder="введите размер" data-s="${key}" data-i="0" value="${r[0] ?? ''}"><span>до</span><input type="number" inputmode="numeric" min="${lo}" max="${hi}" placeholder="введите размер" data-s="${key}" data-i="1" value="${r[1] ?? ''}"><span>%</span></div>`; }
+  for (const [key, lbl, lo, hi] of spKeys(k)) { const r = (C.size || {})[key] || []; h += `<div class="rrow" title="${lo}–${hi} %"><span class="lbl">${lbl}</span><span>от</span><input type="number" inputmode="numeric" min="${lo}" max="${ultraHi(hi)}" placeholder="введите размер" data-s="${key}" data-i="0" value="${r[0] ?? ''}"><span>до</span><input type="number" inputmode="numeric" min="${lo}" max="${ultraHi(hi)}" placeholder="введите размер" data-s="${key}" data-i="1" value="${r[1] ?? ''}"><span>%</span></div>`; }
   $('spBody').innerHTML = h;
   $('spKinds').querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { spc.kind = b.dataset.k; spRender(); wpBuildSample(); Sound.click(900, 0.12); });
   $('spBody').querySelectorAll('[data-o]').forEach((b) => b.onclick = () => { C[b.dataset.o] = b.dataset.v; saveSettings(); spRender(); wpBuildSample(); });
   $('spBody').querySelectorAll('[data-c]').forEach((b) => b.onclick = () => { C[b.dataset.c] = b.dataset.v === '' ? null : +b.dataset.v; saveSettings(); spRender(); wpBuildSample(); });
   $('spBody').querySelectorAll('[data-pre]').forEach((b) => b.onclick = () => { const p = (P ? SPREP : SPRE)[b.dataset.pre][1]; if (p === 'chaos') { C.size = {}; for (const [key, , lo, hi] of spKeys(k)) C.size[key] = [Math.max(lo, 40), Math.min(hi, 250)]; } else C.size = JSON.parse(JSON.stringify(p)); saveSettings(); spRender(); wpBuildSample(); Sound.click(1100, 0.15); });
-  $('spBody').querySelectorAll('input[data-s]').forEach((inp) => inp.onchange = () => { const key = inp.dataset.s, i = +inp.dataset.i, d = SZ.concat(SZP).find((x) => x[0] === key), v = inp.value.trim() === '' ? null : clamp(Math.round(+inp.value || 0), d[2], d[3]); C.size = C.size || {}; const r = C.size[key] || [null, null]; r[i] = v; if (r[0] != null && r[1] != null && r[0] > r[1]) r.reverse(); if (r[0] == null && r[1] == null) delete C.size[key]; else C.size[key] = r; saveSettings(); spRender(); wpBuildSample(); });
+  $('spBody').querySelectorAll('input[data-s]').forEach((inp) => inp.onchange = () => { const key = inp.dataset.s, i = +inp.dataset.i, d = SZ.concat(SZP).find((x) => x[0] === key), v = inp.value.trim() === '' ? null : clamp(Math.round(+inp.value || 0), d[2], ultraHi(d[3])); C.size = C.size || {}; const r = C.size[key] || [null, null]; r[i] = v; if (r[0] != null && r[1] != null && r[0] > r[1]) r.reverse(); if (r[0] == null && r[1] == null) delete C.size[key]; else C.size[key] = r; saveSettings(); spRender(); wpBuildSample(); });
 }
 $('spBtn').onclick = () => { Sound.init(); spc.open = true; spRender(); wpBuildSample(); $('menu').hidden = true; $('spOv').hidden = false; };
 $('spClose').onclick = () => { spc.open = false; spc.dirty = true; wpDrop(); $('spOv').hidden = true; $('menu').hidden = false; };
@@ -6086,7 +6088,7 @@ function syncWard() {
   const L = settings.look, f = L.gender === 'f';
   $('genderChips').querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === (f ? 'f' : 'm'))));
   $('hairRow').hidden = !f; $('hairChips').querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === (L.hairStyle || 'long'))));
-  $('propRows').innerHTML = PROPS.filter((p) => p[0] !== 'chest' || f).map(([k, n, a, b]) => `<div class="prow"><span class="lbl">${n}</span><input type="range" min="${a}" max="${b}" step="0.01" value="${L.prop[k] ?? 1}" data-p="${k}" aria-label="${n}"><span class="num">${Math.round((L.prop[k] ?? 1) * 100)}%</span></div>`).join('');
+  $('propRows').innerHTML = PROPS.filter((p) => p[0] !== 'chest' || f).map(([k, n, a, b]) => `<div class="prow"><span class="lbl">${n}</span><input type="range" min="${a}" max="${settings.ultra ? 8.88 : b}" step="0.01" value="${L.prop[k] ?? 1}" data-p="${k}" aria-label="${n}"><span class="num">${Math.round((L.prop[k] ?? 1) * 100)}%</span></div>`).join('');
   $('propRows').querySelectorAll('input').forEach((inp) => inp.oninput = () => { L.prop[inp.dataset.p] = +inp.value; inp.nextElementSibling.textContent = Math.round(+inp.value * 100) + '%'; wardRebuild(); });
 }
 function wardRebuild() { saveSettings(); clearTimeout(ward.t); ward.t = setTimeout(() => { if (ward.open) wpBuild(); if (avatar && !player.rag && !player.dead && avatar.state === 'alive') makeAvatar(); }, 110); }
@@ -6103,9 +6105,11 @@ $('propReset').onclick = () => { settings.look.prop = {}; syncWard(); wardRebuil
 $('genderChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.look.gender = b.dataset.v; syncWard(); wardRebuild(); Sound.click(1000, 0.15); });
 $('hairChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.look.hairStyle = b.dataset.v; syncWard(); wardRebuild(); Sound.click(1000, 0.15); });
 function syncSet() { $('origChips').querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.v === '1') === (settings.origSnd !== false)))); }
-$('setBtn').onclick = () => { Sound.init(); syncSet(); $('setOv').hidden = false; };
+$('setBtn').onclick = () => { Sound.init(); syncSet(); syncUltra(); $('setOv').hidden = false; };
 $('setClose').onclick = () => { $('setOv').hidden = true; };
 $('origChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.origSnd = b.dataset.v === '1'; saveSettings(); syncSet(); Sound.click(1000, 0.15); });
+function syncUltra() { $('ultraChips').querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.v === '1') === !!settings.ultra))); }
+$('ultraChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.ultra = b.dataset.v === '1'; saveSettings(); syncUltra(); Sound.click(settings.ultra ? 1600 : 700, 0.2); toast(settings.ultra ? 'ULTRA: до 888%' : 'ULTRA выключен'); });
 
 
 /* ===== admin panel, code 6508: endings, scene gallery, resurrector, cheats ===== */
