@@ -6965,18 +6965,20 @@ function u2space(g, W, H, hue = 0) {
   g.fillStyle = '#ffffff'; for (const [x, y, s, a] of ULT.stars) { g.globalAlpha = a; g.fillRect(x * W, y * H, s * W / 900, s * W / 900); } g.globalAlpha = 1;
 }
 function u2cells(g, W, H, ox, oy, sc, col, lw, glow = 12, push = 0, rot = 0) {
-  g.save(); g.strokeStyle = col; g.lineWidth = lw; g.shadowColor = col; g.shadowBlur = glow; g.lineJoin = 'round';
+  g.save(); g.strokeStyle = col; g.lineJoin = 'round';
+  const path = new Path2D();
   for (const c of ULT.cells) {
     let cx = 0, cy = 0; for (const p of c) { cx += p[0]; cy += p[1]; } cx /= c.length; cy /= c.length;
     const dx = (cx - 0.5) * push, dy = (cy - 0.5) * push, s = push ? Math.max(0.15, 1 - push * 0.35) : 1;
-    g.beginPath(); c.forEach((p, i) => { const px = cx + (p[0] - cx) * s * 0.92 + dx, py = cy + (p[1] - cy) * s * 0.92 + dy, ca = Math.cos(rot * (cx - 0.5) * 4), sa = Math.sin(rot * (cx - 0.5) * 4), qx = (px - cx) * ca - (py - cy) * sa + cx, qy = (px - cx) * sa + (py - cy) * ca + cy; const X = ox + (qx - 0.5) * W * sc + W / 2, Y = oy + (qy - 0.5) * H * sc + H / 2; i ? g.lineTo(X, Y) : g.moveTo(X, Y); }); g.closePath(); g.stroke();
+    c.forEach((p, i) => { const px = cx + (p[0] - cx) * s * 0.92 + dx, py = cy + (p[1] - cy) * s * 0.92 + dy, ca = Math.cos(rot * (cx - 0.5) * 4), sa = Math.sin(rot * (cx - 0.5) * 4), qx = (px - cx) * ca - (py - cy) * sa + cx, qy = (px - cx) * sa + (py - cy) * ca + cy; const X = ox + (qx - 0.5) * W * sc + W / 2, Y = oy + (qy - 0.5) * H * sc + H / 2; i ? path.lineTo(X, Y) : path.moveTo(X, Y); }); path.closePath();
   }
+  if (glow) { g.globalAlpha = 0.22; g.lineWidth = lw + glow * 0.6; g.stroke(path); g.globalAlpha = 1; } g.lineWidth = lw; g.stroke(path);
   g.restore();
 }
 function u2bolt(g, x0, y0, x1, y1, col, w, rng, jag = 0.12) {
   const n = 9, d = Math.hypot(x1 - x0, y1 - y0); g.beginPath(); g.moveTo(x0, y0);
   for (let i = 1; i < n; i++) { const t = i / n, nx = -(y1 - y0) / d, ny = (x1 - x0) / d, o = (rng() - 0.5) * d * jag * 2; g.lineTo(x0 + (x1 - x0) * t + nx * o, y0 + (y1 - y0) * t + ny * o); } g.lineTo(x1, y1);
-  g.save(); g.strokeStyle = col; g.shadowColor = col; g.shadowBlur = w * 6; g.lineWidth = w; g.stroke(); g.strokeStyle = '#ffffff'; g.lineWidth = w * 0.35; g.stroke(); g.restore();
+  g.save(); g.strokeStyle = col; g.globalAlpha = 0.25; g.lineWidth = w * 4; g.stroke(); g.globalAlpha = 1; g.lineWidth = w; g.stroke(); g.strokeStyle = '#ffffff'; g.lineWidth = w * 0.35; g.stroke(); g.restore();
 }
 function u2tendrils(g, W, H, rng, n, t, col = '#141218') {
   g.save(); g.strokeStyle = col; g.lineCap = 'round';
@@ -7076,7 +7078,7 @@ function ultFg(kind, lt, k) {
       u2cells(g, W, H, 0, 0, 1.05, '#4af0d8', 2.2, 10, br * 1.6, br * 0.5);
       g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(0, H / 2 - H * 0.05, 0, H / 2 + H * 0.05); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, '#ffffff'); lg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = lg; g.fillRect(0, H / 2 - H * 0.05, W, H * 0.1);
       const cg = g.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, H * 0.35); cg.addColorStop(0, 'rgba(255,255,255,0.9)'); cg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = cg; g.fillRect(0, 0, W, H); g.restore();
-      if (ring > 0 && ring < 1) { g.strokeStyle = `rgba(255,255,255,${1 - ring * 0.5})`; g.lineWidth = H * 0.06 * (1 - ring * 0.5); g.beginPath(); g.ellipse(W / 2, H / 2, H * (0.2 + ring * 0.75), H * (0.2 + ring * 0.75), 0, 0, 7); g.stroke(); }
+      if (ring > 0 && ring < 1) { g.save(); g.shadowColor = '#ffffff'; g.shadowBlur = H * 0.05; g.strokeStyle = `rgba(255,255,255,${1 - ring * 0.3})`; g.lineWidth = H * 0.1 * (1 - ring * 0.4); g.beginPath(); g.ellipse(W / 2, H / 2, H * (0.2 + ring * 0.75), H * (0.2 + ring * 0.75), 0, 0, 7); g.stroke(); g.restore(); }
       break;
     }
     case 'rainbow': {
@@ -7084,7 +7086,7 @@ function ultFg(kind, lt, k) {
       for (let i = 0; i < 30; i++) { const a0 = rr() * Math.PI * 2, wa = 0.06 + rr() * 0.22; g.fillStyle = rr() < 0.15 ? '#08040a' : `hsl(${(rr() * 360) | 0},96%,${50 + rr() * 18}%)`; g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, W, a0 + lt * 0.15, a0 + wa + lt * 0.15); g.closePath(); g.fill(); }
       const wg = g.createRadialGradient(cx, cy, 0, cx, cy, W * 0.45); wg.addColorStop(0, 'rgba(255,255,255,0.95)'); wg.addColorStop(0.35, 'rgba(255,255,255,0.35)'); wg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = wg; g.fillRect(0, 0, W, H);
       const lg = g.createLinearGradient(0, cy - H * 0.06, 0, cy + H * 0.06); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, '#fff'); lg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = lg; g.fillRect(0, cy - H * 0.06, W, H * 0.12);
-      g.strokeStyle = '#3af0d0'; g.lineWidth = 3; g.shadowColor = '#3af0d0'; g.shadowBlur = 8; for (let i = 0; i < 18; i++) { const a = rr() * Math.PI * 2, d = H * (0.3 + rr() * 0.6) * (0.4 + k), s = H * (0.025 + rr() * 0.03); const x = cx + Math.cos(a) * d * 1.6, y = cy + Math.sin(a) * d; g.beginPath(); for (let j = 0; j < 5; j++) { const b = j / 5 * Math.PI * 2 + rr(); g.lineTo(x + Math.cos(b) * s, y + Math.sin(b) * s); } g.closePath(); g.stroke(); } g.shadowBlur = 0;
+      g.strokeStyle = '#3af0d0'; g.lineWidth = 3; for (let i = 0; i < 18; i++) { const a = rr() * Math.PI * 2, d = H * (0.3 + rr() * 0.6) * (0.4 + k), s = H * (0.025 + rr() * 0.03); const x = cx + Math.cos(a) * d * 1.6, y = cy + Math.sin(a) * d; g.beginPath(); for (let j = 0; j < 5; j++) { const b = j / 5 * Math.PI * 2 + rr(); g.lineTo(x + Math.cos(b) * s, y + Math.sin(b) * s); } g.closePath(); g.stroke(); }
       const og = g.createRadialGradient(cx, cy, 0, cx, cy, H * 0.06); og.addColorStop(0, '#000'); og.addColorStop(0.6, '#0a2a30'); og.addColorStop(0.85, '#3af0e0'); og.addColorStop(1, 'rgba(58,240,224,0)'); g.fillStyle = og; g.beginPath(); g.arc(cx, cy, H * 0.06, 0, 7); g.fill();
       if (fl > 0) { g.fillStyle = `rgba(255,255,255,${fl})`; g.fillRect(0, 0, W, H); }
       break;
@@ -7173,16 +7175,16 @@ function ult3d(kind, lt, k, first, dt) {
     case 'eyeFlash': case 'xLaser': ultPose(R, 'stand'); R.ggRage = 1; R.ggDim = 0; ultLight(0.06, 0); cam(0, 1.74, 0.6, 0, 1.73, 0, 40); break;
     case 'darkFace': ultPose(R, 'stand'); R.ggRage = 1; ultLight(lerp(0.05, 0.6, k), lerp(0, 0.4, k)); cam(0, 1.73, lerp(0.62, 0.54, k), 0, 1.72, 0, 40); break;
     case 'face34': case 'face34w': ultPose(R, 'punchwind'); R.yaw = -0.35; R.ggRage = 1; R.ggMouth = 0.35; R.ggGrin = 0.5; cam(0.42, 1.66, 0.55, 0.02, 1.68, 0, 42); break;
-    case 'shout': ultPose(R, 'tada'); R.ggRage = 1; R.ggMouth = 1; R.ggGrin = 0.3; R.laughAmp = 1; cam(0, 1.6, 1.02, 0, 1.58, 0, 68); sh(0.012); break;
+    case 'shout': ultPose(R, 'tada'); R.ggRage = 1; R.ggMouth = 1; R.ggGrin = 0.3; R.laughAmp = 1; cam(0, 1.6, 0.42, 0, 1.73, 0, 76); sh(0.012); break;
     case 'demon': ultPose(R, 'surrender'); R.ggWing = 2.2; R.ggHalo = 1.4; R.ggRage = 0; ULT.eyeWhite = true; ultLight(0.35, 0.15, 0xff3a3a); cam(0, 0.85, 2.0, 0, 1.65, 0, 62); break;
     case 'run': case 'flareSil': { ultPose(R, 'stand'); R.speed = 5.5; R.yaw = Math.PI / 2; R.pos.x = kind === 'run' ? lerp(-0.4, 0.4, k) : 0.5; R.jolt = [0.25, 0, 0]; if (kind === 'flareSil') ultLight(0.15, 0.1, 0xff6a8a); cam(R.pos.x - 0.25, 1.05, 4.3, R.pos.x - 0.1, 0.95, 0, 42); break; }
     case 'dash': ultPose(R, 'stand'); R.speed = 7; R.yaw = Math.PI / 2; R.jolt = [0.5, 0, 0]; R.pos.x = lerp(0.2, 0.5, k); ultLight(1.1, 0.8, 0xffb0d8); cam(R.pos.x - 0.9, 1.0, 3.6, R.pos.x - 1.25, 0.95, 0, 42); break;
-    case 'legsSpace': ultPose(R, 'stand'); R.speed = 5; cam(0, 0.15, 1.5, 0, 0.36, 0, 50); break;
+    case 'legsSpace': ultPose(R, 'stand'); R.speed = 5; cam(0, 0.26, 0.82, 0, 0.42, 0, 56); break;
     case 'haloFlare': ultPose(R, 'stand'); R.ggHalo = 2.2; R.ggRage = 1; ultLight(0.08, 0.05); cam(0, 1.55, 2.4, 0, 1.55, 0, 50); ULT.halo = ultHead(R, _uB).clone().setY(_uB.y + 0.2); break;
     case 'punchHit': {
       R.root.visible = false; story.showAvatar = true; player.pos.set(0, 0, 0); player.yaw = Math.PI; if (A) { A.pose = 'stand'; A.poseDur = 0; A.talkT = 1; A.jolt = [0.1, -0.5 * sm(0, 0.25, k), 0.25 * sm(0, 0.25, k)]; }
-      P.fist.visible = true; P.fist.rotation.set(0, Math.PI, -0.1); P.fist.position.set(lerp(0.75, 0.2, sm(0, 0.3, k)), 1.64, 0.2);
-      cam(0.32, 1.63, 0.98, 0.06, 1.63, 0, 52); sh(0.012); break;
+      P.fist.visible = true; P.fist.rotation.set(0, Math.PI, -0.15); P.fist.position.set(lerp(0.8, 0.27, sm(0, 0.3, k)), 1.56, 0.16);
+      cam(-0.16, 1.68, 1.02, 0.14, 1.62, 0, 52); sh(0.012); break;
     }
     case 'windup': { const p = lt < 0.2 ? 'capcatch' : lt < 0.4 ? 'capput' : 'punchwind'; ultPose(R, p); R.yaw = 0.35; R.ggRage = 0.8; R.ggMouth = 0.3; cam(0.55, 1.55, 2.3, 0, 1.5, 0, 50); break; }
     case 'faceRage': ultPose(R, 'punchwind'); R.ggRage = 1; R.ggMouth = 0.85; R.ggGrin = 0.7; cam(0.12, 1.72, 0.72, 0, 1.7, 0, 44); sh(0.004); break;
@@ -7204,7 +7206,7 @@ function ult3d(kind, lt, k, first, dt) {
     case 'fishFace': ultPose(R, 'punchwind'); R.ggRage = 1; R.ggMouth = 0.9; R.ggGrin = 0.8; ultLight(1.0, 0.9, 0xffb090); cam(0, 1.7, 0.42, 0, 1.7, 0, 95); sh(0.006); break;
     case 'victimRing': case 'victimFace': {
       R.root.visible = false; story.showAvatar = true; player.pos.set(0, 0, 0); player.yaw = Math.PI; if (A) { A.pose = 'stand'; A.poseDur = 0; A.talkT = 1; }
-      if (kind === 'victimRing') cam(-0.5, 1.62, 1.7, -0.42, 1.6, 0, 46); else { cam(0, 1.64, 0.6, 0, 1.63, 0, 44); sh(0.006); } break;
+      if (kind === 'victimRing') cam(-0.26, 1.63, 1.05, -0.17, 1.62, 0, 46); else { cam(0, 1.64, 0.6, 0, 1.63, 0, 44); sh(0.006); } break;
     }
     case 'kickRed': ultPose(R, 'punch'); R.yaw = Math.PI / 2; R.jolt = [0.3, 0, 0]; ultLight(1.0, 0.9, 0xff5a5a); cam(-0.2, 1.05, 3.2, 0.1, 1.0, 0, 46); break;
     case 'craterRise': case 'crater': case 'plume': {
@@ -7237,6 +7239,7 @@ function ultStart() {
   ULT.env = scene.environment;
   { const P = ultProps(); P.fist.visible = P.fist2.visible = P.wave.visible = P.crater.visible = true; try { renderer.compile(scene, camera); } catch (e) {} P.fist.visible = P.fist2.visible = P.wave.visible = P.crater.visible = false; }
   ULT.R.root.visible = true; Music.stop();
+  { const P = ultProps(), R = ULT.R, arm = R.parts.uArmR.mat, sk = R.skinMat; for (const f of [P.fist]) f.children.forEach((m, i) => { m.material = i === 0 ? arm : sk; }); }
   if (settings.origSnd !== false && Sound.ok() && Sound.clips.ult) { const c = Sound.ctx, s = c.createBufferSource(); s.buffer = Sound.clips.ult; const g = c.createGain(); g.gain.value = 1; s.connect(g); g.connect(Sound.master); const t0 = c.currentTime + 0.06; s.start(t0); ULT.src = s; ULT.a0 = t0; }
 }
 function ultStop() {
@@ -7281,7 +7284,7 @@ function cutRainbow() {
   const sv = new Humanoid('human', 0.6, HZ - 2, Math.PI, 'svity-bride'); sv.scripted = true; story.extras.push(sv); story.svity = sv;
   const RZ = 30, R = new Humanoid('human', 0, RZ, 0, 'gagarin'); R.scripted = true; story.extras.push(R); story.gg = R; R.root.visible = false; R.root.scale.setScalar(1.6);
   Object.assign(R, { pose: 'stand', poseDur: Infinity, ggWing: 1.4, ggHalo: 1.3, ggRage: 0, ggSlit: 0.75, ggDim: 0 });
-  const auH = mkAura(0x5ac8ff), auS = mkAura(0xff5ab4), auB = mkAura(0xffffff, 1.5, 5.2);
+  const auH = mkAura(0x5ac8ff, 0.5, 2.3), auS = mkAura(0xff5ab4, 0.5, 2.3), auB = mkAura(0xffffff, 1.05, 4.2);
   let walk = false, run = 0, fly = 0, powers = 0, merged = 0, ry = 9, last = 0;
   const pz = () => player.pos.z;
   runCut([
@@ -7313,8 +7316,8 @@ function cutRainbow() {
     if (fly) { ry = Math.max(1.4, ry - dt * 5); const y = ry + Math.sin(t * 1.4) * 0.12; R.root.position.set(0, y, RZ); R.root.rotation.y = 0; R.pos.set(0, y, RZ); }
     // the auras: blue for the hero, pink for her, one white-rainbow pillar after they join hands
     const pw = powers ? Math.min(1, (t - 44) / 0.6) : 0, mg = merged ? Math.min(1, (t - 53.4) / 0.8) : 0;
-    for (const [m, p] of [[auH, player.pos], [auS, sx()]]) { m.position.set(p.x, m.userData.h / 2, p.z); m.material.opacity = pw * (1 - mg) * (0.55 + Math.sin(t * 17 + p.x * 5) * 0.12); m.rotation.y += dt * 3; m.scale.set(1 + Math.sin(t * 9) * 0.05, 1, 1 + Math.cos(t * 9) * 0.05); }
-    auB.position.set((player.pos.x + sv.pos.x) / 2, auB.userData.h / 2, player.pos.z); auB.material.opacity = mg * (0.6 + Math.sin(t * 13) * 0.12); auB.material.color.setHSL((t * 0.35) % 1, 0.85, 0.7); auB.rotation.y -= dt * 2;
+    for (const [m, p] of [[auH, player.pos], [auS, sx()]]) { m.position.set(p.x, m.userData.h / 2, p.z); m.material.opacity = pw * (1 - mg) * (0.38 + Math.sin(t * 17 + p.x * 5) * 0.1); m.rotation.y += dt * 3; m.scale.set(1 + Math.sin(t * 9) * 0.05, 1, 1 + Math.cos(t * 9) * 0.05); }
+    auB.position.set((player.pos.x + sv.pos.x) / 2, auB.userData.h / 2, player.pos.z); auB.material.opacity = mg * (run ? 0.16 : 0.3) * (1 + Math.sin(t * 13) * 0.25); auB.material.color.setHSL((t * 0.35) % 1, 0.95, 0.6); auB.rotation.y -= dt * 2;
     if (pw > 0 && t - last > 0.03) { last = t; for (const p of mg ? [auB.position] : [player.pos, sx()]) spawnSprite(TEX.soft, _a.set(p.x + rand(-0.5, 0.5), rand(0, 0.6), p.z + rand(-0.5, 0.5)), { color: mg ? new THREE.Color().setHSL(Math.random(), 0.9, 0.65).getHex() : p === player.pos ? 0x6ad8ff : 0xff6ab8, additive: true, size: rand(0.05, 0.14), grow: 0.4, life: rand(0.6, 1.2), opacity: 0.9, vel: new V3(rand(-0.2, 0.2), rand(1.5, 3.5), rand(-0.2, 0.2)) }); }
     if (LFX.on) LFX.c.set((player.pos.x + sv.pos.x) / 2, 1.2, player.pos.z);
     if (run === 1 && Math.random() < 0.6) spawnSprite(TEX.soft, _a.set(rand(-1.5, 1.5), rand(0.2, 2), player.pos.z + rand(1, 3)), { color: 0xffffff, additive: true, size: rand(0.02, 0.05), grow: 6, life: 0.25, opacity: 0.6, vel: new V3(0, 0, 18) });
@@ -7325,7 +7328,7 @@ function cutRainbow() {
     if (t < 7.8) camPath(t, [[0, 6, 4, z + 9, 0, 0.8, z - 6], [7.8, 3.5, 2.6, z + 5, 0, 1.0, z - 2]]);
     else if (t < 15) camSet(2.6, 1.6, z - 2.6, 0, 1.3, z);
     else if (t < 16.4) camSet(1.2, 1.9, z + 4, 0, 2.6, RZ);
-    else if (t < 24.4) camSet(rh.x + 1.6, rh.y - 0.9, rh.z + 4.2, rh.x, rh.y - 0.2, rh.z);
+    else if (t < 24.4) camSet(rh.x + 0.9, rh.y - 0.45, rh.z + 2.5, rh.x, rh.y - 0.15, rh.z);
     else if (t < 30) camSet(-1.6, 1.7, z + 2.4, 0, 2.6, RZ);
     else if (t < 34) { headPos(sv, _cfE); camSet(_cfE.x + 0.45, _cfE.y + 0.02, _cfE.z - 1.35, _cfE.x, _cfE.y - 0.03, _cfE.z); }
     else if (t < 37.8) { const A = avatar; if (A) { A.parts.head.mesh.getWorldPosition(_cfE); camSet(_cfE.x - 0.45, _cfE.y + 0.02, _cfE.z - 1.35, _cfE.x, _cfE.y - 0.03, _cfE.z); } }
