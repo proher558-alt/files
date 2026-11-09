@@ -7951,7 +7951,14 @@ function addMelodieExtras(n) {
   head.traverse((o) => { if (o.isMesh && o.material && o.material.map === H.cap) { o.material.map = MH.cap; o.material.color.setHex(0xffffff); } else if (o.isMesh && o.material && o.material.map === H.bangs) { o.material.map = MH.bangs; o.material.color.setHex(0xffffff); } });
   torso.traverse((o) => { if (o.isMesh && o.material && o.material.vertexColors) { o.material.vertexColors = false; o.material.color.setHex(0xff8cc6); o.material.needsUpdate = true; } });
   // giant cat-ear bows on top of the head
-  for (const sd of [-1, 1]) { const b = put(head, new THREE.ConeGeometry(0.1, 0.19, 4), red, sd * 0.125, 0.19, -0.03, 0, Math.PI / 4, -sd * 0.62); b.scale.set(1.15, 1, 0.4); const i = put(head, new THREE.ConeGeometry(0.06, 0.12, 4), red2, sd * 0.123, 0.18, -0.012, 0, Math.PI / 4, -sd * 0.62); i.scale.set(1.15, 1, 0.4); }
+  // the big bow of the reference: two round loops with a tail, on the side of the head
+  for (const sd of [-1, 1]) { const loop = put(head, new THREE.TorusGeometry(0.075, 0.03, 8, 20), red, sd * 0.13, 0.2, -0.02, 0, 0, sd * 0.5); loop.scale.set(1, 1.25, 0.6); put(head, new THREE.SphereGeometry(0.03, 8, 6), red2, sd * 0.13, 0.2, -0.01); }
+  put(head, new THREE.ConeGeometry(0.05, 0.12, 4), red, -0.07, 0.12, -0.04, 0, 0, 0.5).scale.set(1, 1, 0.4);
+  // black stockings from the boots to the skirt
+  for (const s of ['L', 'R']) put(P['lLeg' + s].mesh, new THREE.CylinderGeometry(0.072, 0.078, 0.34, 14), blk, 0, 0.02, 0);
+  // the gold microphone in the right hand
+  put(P['lArmR'].mesh, new THREE.CylinderGeometry(0.012, 0.012, 0.16, 8), gold, 0, -0.27, 0.02);
+  put(P['lArmR'].mesh, new THREE.SphereGeometry(0.045, 12, 10), gold, 0, -0.36, 0.02);
   put(head, new THREE.SphereGeometry(0.035, 10, 8), red, 0, 0.19, -0.03).scale.set(1.3, 1, 0.7);
   // black crop top with a choker and a heart, bare midriff
   put(torso, new THREE.CylinderGeometry(0.052, 0.058, 0.03, 14), blk, 0, 0.26, 0);
