@@ -6423,7 +6423,9 @@ function storyCafe() {
 }
 function cafeToggle() { CAFE.paper = !CAFE.paper; $('paper').hidden = !CAFE.paper; Sound.swoosh(); }
 function updCafe(dt, tick) {
-  const C = CAFE, sv = story.svity, pr = story.prod; if (!sv || !pr) return;
+  const C = CAFE, sv = story.svity, pr = story.prod;
+  if (story.cafeGG) { const d = Math.hypot(player.pos.x + 4.2, player.pos.z + 3.6); story.cafeNear = d < 4; updCafeTable(dt); }
+  if (!sv || !pr) return;
   const d = Math.hypot(player.pos.x - C.bx, player.pos.z - C.bz), inRing = d < C.r, close = d < 2.05;
   let stare = false;
   if (!C.paper && d < 7) { headPos(sv, _cfH); stare = seen(_cfH, 7, 0.978); if (!stare) { headPos(pr, _cfH); stare = seen(_cfH, 7, 0.978); } }
@@ -8010,11 +8012,48 @@ function updateMelTalk(dt) {
   for (const n of npcs) {
     if (!n.alive || !n.look || !n.look.melodie) continue;
     n.melT = (n.melT ?? rand(2, 4)) - dt; if (n.melT > 0) continue;
-    if (Math.hypot(n.pos.x - player.pos.x, n.pos.z - player.pos.z) > 8) { n.melT = 1; continue; }
-    n.melT = rand(8, 13); const t = pick(MEL_SAY); n.talkT = Math.max(n.talkT || 0, Math.min(6, t.length * 0.07)); toast('Мелоди: ' + t);
+    if (Math.hypot(n.pos.x - player.pos.x, n.pos.z - player.pos.z) > 4) { n.melT = 1; continue; }
+    n.melT = rand(8, 13); const t = pick(MEL_SAY); n.talkT = Math.max(n.talkT || 0, Math.min(6, t.length * 0.07));
     const near = npcs.some((g) => g.gg && g.alive && Math.hypot(g.pos.x - n.pos.x, g.pos.z - n.pos.z) < 6);
-    if (near && melPlay(MEL_NEAR_GG)) { /* the recorded line near the resurrector */ } else speakAs(t, 1.55, 1.12);
+    if (near && melPlay(MEL_NEAR_GG)) { /* the recorded line near the resurrector */ } else { toast('Мелоди: ' + t); speakAs(t, 1.55, 1.12); }
   }
+}
+/* ----- the café's far table: Melodie is in love, the resurrector eats fast, gets messy, is wiped, complains, is calmed ----- */
+const CT_LINES = [
+  [0.5, 'gg', 'Быстрее, паста стынет.', 'Faster, the pasta is getting cold.'],
+  [6.2, 'mel', 'Ой, у тебя соус на лице. Сейчас, сейчас.', "Oh, you've got sauce on your face. Hold still."],
+  [8.6, 'mel', 'Тшш, не дёргайся, милый.', "Shh, don't move, sweetie."],
+  [12.2, 'gg', 'Не трогай меня салфеткой!', "Don't touch me with that napkin!"],
+  [14.6, 'mel', 'Тише, тише, я рядом. Всё хорошо.', "Easy, easy, I'm right here. It's okay."],
+  [19.4, 'gg', 'Ладно… Вкусно, зараза.', "Fine... It's tasty, damn it."],
+  [22.6, 'mel', 'Ты такой загадочный, мой воскресший…', "You're so mysterious, my undead darling…"],
+];
+const CT_PERIOD = 27;
+function ctSay(who, ru, en) {
+  const n = who === 'gg' ? story.cafeGG : story.cafeMel; if (!n) return;
+  n.talkT = Math.max(n.talkT || 0, Math.min(5, ru.length * 0.07));
+  if (story.cafeNear) { $('sSay').textContent = (who === 'gg' ? 'Воскреситель: ' : 'Мелоди: ') + ru + '  /  ' + en; speakAs(ru, who === 'gg' ? 0.3 : 1.45, 1.0); clearTimeout(story.sayTimer); story.sayTimer = setTimeout(() => { $('sSay').textContent = ''; }, 4500); }
+}
+function updCafeTable(dt) {
+  const gg = story.cafeGG, mel = story.cafeMel; if (!gg || !mel || !gg.alive) return;
+  story.ctT = (story.ctT || 0) + dt; const t = story.ctT % CT_PERIOD, cyc = Math.floor(story.ctT / CT_PERIOD);
+  if (story.ctCyc !== cyc) { story.ctCyc = cyc; story.ctDone = new Set(); }
+  for (const [at, who, ru, en] of CT_LINES) if (t >= at && !story.ctDone.has(at)) { story.ctDone.add(at); ctSay(who, ru, en); }
+  // the mess: a sauce spot on the face and the shirt from the moment he starts eating fast
+  if (!gg.sauce) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 6), new THREE.MeshBasicMaterial({ color: 0xb3361a })); m.scale.set(1, 0.6, 0.4); gg.parts.head.mesh.add(m); m.position.set(0.035, -0.06, 0.12); gg.sauce = m; const c = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), new THREE.MeshBasicMaterial({ color: 0xb3361a })); c.scale.set(1, 0.5, 0.3); gg.parts.torso.mesh.add(c); c.position.set(0.08, -0.1, 0.13); gg.sauceBody = c; }
+  gg.sauce.visible = t > 6; gg.sauceBody.visible = t > 7;
+  // a napkin in Melodie's right hand, shown while she wipes
+  if (!mel.napkin) { const nk = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.005, 0.06), std({ color: 0xffffff, roughness: 0.9 })); mel.parts.lArmR.mesh.add(nk); nk.position.set(0, -0.3, 0.02); mel.napkin = nk; }
+  mel.napkin.visible = t >= 8.6 && t < 14.6;
+  // hands: eating (fast fork motion), wiping (her hand at his mouth), calming (her hand on his shoulder), otherwise relaxed
+  const hm = gg.parts.head.mesh; hm.updateMatrixWorld(true);
+  const mouth = hm.localToWorld(new V3(0, -0.07, 0.12)), shoulder = gg.parts.torso.mesh.localToWorld(new V3(-0.22, 0.17, 0.02));
+  const eat = t < 6 || (t >= 19.4 && t < 22.6);
+  gg.ikFn = (n) => { if (eat) { const w = n.parts.head.mesh.localToWorld(new V3(Math.sin(t * 9) * 0.04, -0.12 + Math.sin(t * 7) * 0.02, 0.26)); n.ikArm('R', w, 1); } };
+  mel.ikFn = (n) => { if (t >= 8.6 && t < 12.2) n.ikArm('R', mouth, 1); else if (t >= 12.2 && t < 14.6) n.ikArm('R', mouth, 0.4); else if (t >= 14.6 && t < 19.4) n.ikArm('R', shoulder, 1); };
+  // irritation: a head jolt and a red glow when he complains; calming when her hand is on his shoulder
+  const angry = t >= 12.2 && t < 14.6; gg.ggRage = angry ? 0.6 : 0; gg.jolt = angry ? [0.25 * Math.sin((t - 12.2) * 9), 0, 0] : null;
+  gg.ggMouth = eat && Math.sin(t * 10) > 0 ? 0.6 : 0.05;
 }
 /* ===================== main loop ===================== */
 function resize() { const w = innerWidth, h = innerHeight; renderer.setPixelRatio(settings.quality === 'high' ? Math.min(devicePixelRatio, 1.75) : Math.min(devicePixelRatio, 1)); renderer.setSize(w, h, false); camera.aspect = vmCamera.aspect = w / h; camera.updateProjectionMatrix(); vmCamera.updateProjectionMatrix(); screenBloodResize(); resizeFx(); }
