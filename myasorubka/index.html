@@ -8014,7 +8014,7 @@ function updateMelTalk(dt) {
     if (!n.alive || !n.look || !n.look.melodie) continue;
     n.melT = (n.melT ?? rand(2, 4)) - dt; if (n.melT > 0) continue;
     if (Math.hypot(n.pos.x - player.pos.x, n.pos.z - player.pos.z) > 4) { n.melT = 1; continue; }
-    n.melT = rand(8, 13); const t = pick(MEL_SAY); n.talkT = Math.max(n.talkT || 0, Math.min(6, t.length * 0.07));
+    n.melT = rand(25, 40); const t = pick(MEL_SAY); n.talkT = Math.max(n.talkT || 0, Math.min(6, t.length * 0.07));
     const near = npcs.some((g) => g.gg && g.alive && Math.hypot(g.pos.x - n.pos.x, g.pos.z - n.pos.z) < 6);
     if (near && melPlay(MEL_NEAR_GG)) { /* the recorded line near the resurrector */ } else { toast('Мелоди: ' + t); speakAs(t, 1.55, 1.12); }
   }
@@ -8038,7 +8038,7 @@ function ctSay(who, ru, en, clip) {
 }
 function updCafeTable(dt) {
   const gg = story.cafeGG, mel = story.cafeMel; if (!gg || !mel || !gg.alive) return;
-  story.ctT = (story.ctT || 0) + dt; const t = story.ctT % CT_PERIOD, cyc = Math.floor(story.ctT / CT_PERIOD);
+  story.ctT = (story.ctT || 0) + dt * 0.45; const t = story.ctT % CT_PERIOD, cyc = Math.floor(story.ctT / CT_PERIOD);
   if (story.ctCyc !== cyc) { story.ctCyc = cyc; story.ctDone = new Set(); }
   for (const [at, who, ru, en, clip] of CT_LINES) if (t >= at && !story.ctDone.has(at)) { story.ctDone.add(at); ctSay(who, ru, en, clip); }
   // the mess: a sauce spot on the face and the shirt from the moment he starts eating fast
