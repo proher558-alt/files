@@ -7976,6 +7976,12 @@ function addMelodieExtras(n) {
   // pink boots with a gold bow, and a pink tail
   for (const s of ['L', 'R']) { const ll = P['lLeg' + s], fo = ll.foot; if (fo) fo.material = boot; put(ll.mesh, new THREE.CylinderGeometry(0.068, 0.074, 0.15, 14), boot, 0, -0.12, 0); put(ll.mesh, new THREE.BoxGeometry(0.05, 0.03, 0.02), gold, 0, -0.09, 0.07); }
   const tail = put(pelvis, new THREE.ConeGeometry(0.07, 0.42, 4), red, 0.08, -0.08, -0.26, -2.0, 0.3, 0.3); tail.scale.set(1, 1, 0.35);
+  // the two purple note-cats of the reference, floating beside her
+  const note = std({ color: 0xb23ad8, roughness: 0.4, emissive: 0x3a0a4a, emissiveIntensity: 0.3 });
+  n.notes = [];
+  for (const [sd, y] of [[-1, 0.5], [1, 0.9]]) { const g = new THREE.Group(); g.position.set(sd * 0.55, y, -0.1); torso.parent.add(g); put(g, new THREE.SphereGeometry(0.1, 14, 10), note, 0, 0, 0).scale.set(1, 0.85, 0.8); put(g, new THREE.TorusGeometry(0.07, 0.02, 6, 12), note, 0, 0.08, 0.02, 0, 0, sd * 0.4); put(g, new THREE.ConeGeometry(0.03, 0.08, 4), note, sd * 0.1, 0.1, 0, 0, 0, sd * 0.8); put(g, new THREE.SphereGeometry(0.02, 6, 5), blk, sd * 0.03, 0.01, 0.08); n.notes.push({ g, y, sd }); }
+  // longer pink hair falling past the shoulders, with dark outline strands
+  for (const sd of [-1, 1]) put(head, new THREE.CylinderGeometry(0.02, 0.012, 0.36, 8), pink, sd * 0.13, -0.1, -0.06, 0.08 * sd, 0, 0);
   n.melodie = true;
 }
 // Melodie's recorded lines; the one spoken near the resurrector (mel5 by default, change MEL_NEAR_GG if it is another) plays when he is close
@@ -7989,6 +7995,9 @@ function melPlay(key) {
 }
 // Melodie's own lines: she hums and chats when you stand close
 const MEL_SAY = ['Ла-ла-ла! Сегодня я в голосе!', 'Хочешь, спою тебе? Только не убегай!', 'Эй, не наступи на мой хвост!', 'Бум-бум-бум, музыка внутри меня!', 'Мяу! Ой… то есть ля-ля-ля!', 'Дайте микрофон — и я разнесу весь зал!', 'Ты фанат? Автограф в обмен на улыбку!', 'Тише… я беру самую высокую ноту!', 'Какой красивый бант, правда?', 'Подпевай мне, не стесняйся!'];
+function updateMelNotes(dt) {
+  for (const n of npcs) { if (!n.alive || !n.notes) continue; n.noteT = (n.noteT || 0) + dt; for (const o of n.notes) { o.g.position.y = o.y + Math.sin(n.noteT * 2.2 + o.sd) * 0.06; o.g.rotation.y = Math.sin(n.noteT * 1.4 + o.sd) * 0.4; } }
+}
 function updateMelTalk(dt) {
   for (const n of npcs) {
     if (!n.alive || !n.look || !n.look.melodie) continue;
@@ -8055,7 +8064,7 @@ function frame(now) {
   const ts = (slow ? 0.25 : 1) * worldTs * fallFx.ts * (player.dead && state === 'play' && !(player.lastFall > 0) ? 0.4 : 1), dt = rdt * ts;
   const running = state === 'play' || state === 'spawn' || state === 'menu' || state === 'over' || state === 'cutscene' || state === 'sui' || state === 'story';
   if (running) {
-    if (state === 'play') { updatePlayer(rdt); W.cd -= rdt; if (W.fireHeld && curW().auto) tryFire(false); updateGrab(rdt); updateCat(rdt); updateMelTalk(rdt); }
+    if (state === 'play') { updatePlayer(rdt); W.cd -= rdt; if (W.fireHeld && curW().auto) tryFire(false); updateGrab(rdt); updateCat(rdt); updateMelTalk(rdt); updateMelNotes(rdt); }
     else if (state === 'cutscene') { updatePlayer(rdt); updateCutscene(rawDt); }
     else if (state === 'sui') { updateSuicide(rawDt); }
     else if (state === 'story') updateStoryCut(rawDt);
