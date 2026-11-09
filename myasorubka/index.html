@@ -7971,7 +7971,7 @@ function addMelodieExtras(n) {
   n.melodie = true;
 }
 // Melodie's recorded lines; the one spoken near the resurrector (mel5 by default, change MEL_NEAR_GG if it is another) plays when he is close
-const MEL_NEAR_GG = 'mel5';
+const MEL_NEAR_GG = 'mel4';
 function melBytes(key) { const bin = atob(window.MEL_CLIPS[key].split(',')[1]), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u.buffer; }
 function melPlay(key) {
   if (!Sound.ok() || !window.MEL_CLIPS || !window.MEL_CLIPS[key]) return false; const c = Sound.ctx; Sound.melBuf = Sound.melBuf || {};
