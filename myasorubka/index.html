@@ -8000,7 +8000,7 @@ const MEL_NEAR_GG = 'mel5';
 function melBytes(key) { const bin = atob(window.MEL_CLIPS[key].split(',')[1]), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u.buffer; }
 function melPlay(key) {
   if (!Sound.ok() || !window.MEL_CLIPS || !window.MEL_CLIPS[key]) return false; toast('Мелоди: ' + window.MEL_TITLES[key]); const c = Sound.ctx; Sound.melBuf = Sound.melBuf || {};
-  const go = (buf) => { const src = c.createBufferSource(); src.buffer = buf; const g = Sound.outClear(1, 0.08); src.connect(g); src.start(); };
+  const go = (buf) => { lineBusy(buf.duration); const src = c.createBufferSource(); src.buffer = buf; const g = Sound.outClear(1, 0.08); src.connect(g); src.start(); };
   if (Sound.melBuf[key]) go(Sound.melBuf[key]); else c.decodeAudioData(melBytes(key), (buf) => { Sound.melBuf[key] = buf; go(buf); }, () => {});
   return true;
 }
@@ -8010,22 +8010,23 @@ function updateMelNotes(dt) {
   for (const n of npcs) { if (!n.alive || !n.notes) continue; n.noteT = (n.noteT || 0) + dt; for (const o of n.notes) { o.g.position.y = o.y + Math.sin(n.noteT * 2.2 + o.sd) * 0.06; o.g.rotation.y = Math.sin(n.noteT * 1.4 + o.sd) * 0.4; } }
 }
 // her recorded lines (the same ones as at the café table), each with its Russian subtitle
+// the spawn-menu Melodie has four lines only; the café table has its own lines
 function melPool() {
   const out = []; for (const k of ['mel1', 'mel2', 'mel3', 'mel4']) if (window.MEL_TITLES && window.MEL_TITLES[k]) out.push({ key: k, ru: window.MEL_TITLES[k] });
-  for (const [, who, ru, , clip] of CT_LINES) if (who === 'mel' && clip) out.push({ key: clip, ru });
   return out;
 }
+let lineBusyUntil = 0;
+function lineBusy(sec) { lineBusyUntil = performance.now() + sec * 1000 + 300; }
+function isLineBusy() { return performance.now() < lineBusyUntil; }
 function clipPlay(key) { return melPlay(key) || ctPlay(key); }
 function updateMelTalk(dt) {
   for (const n of npcs) {
-    if (!n.alive || !n.look || !n.look.melodie) continue;
+    if (!n.alive || !n.look || !n.look.melodie || n === story.cafeMel) continue;
     n.melT = (n.melT ?? rand(2, 4)) - dt; if (n.melT > 0) continue;
     if (Math.hypot(n.pos.x - player.pos.x, n.pos.z - player.pos.z) > 4) { n.melT = 1; continue; }
-    n.melT = rand(25, 40); n.talkT = Math.max(n.talkT || 0, 3);
-    const near = npcs.some((g) => g.gg && g.alive && Math.hypot(g.pos.x - n.pos.x, g.pos.z - n.pos.z) < 6);
-    if (near && melPlay(MEL_NEAR_GG)) { toast('Мелоди: ' + (window.MEL_TITLES ? window.MEL_TITLES[MEL_NEAR_GG] : '')); continue; }
-    const pool = melPool(); if (!pool.length) { const t = pick(MEL_SAY); toast('Мелоди: ' + t); speakAs(t, 1.55, 1.12); continue; }
-    const it = pick(pool); toast('Мелоди: ' + it.ru); if (!clipPlay(it.key)) speakAs(it.ru, 1.55, 1.12);
+    n.melT = rand(25, 40);
+    if (isLineBusy()) { n.melT = 2; continue; }
+    const it = pick(melPool()); toast('Мелоди: ' + it.ru); if (!clipPlay(it.key)) speakAs(it.ru, 1.55, 1.12);
   }
 }
 /* ----- the café's far table: Melodie is in love, the resurrector eats fast, gets messy, is wiped, complains, is calmed ----- */
@@ -8039,9 +8040,9 @@ const CT_LINES = [
   [22.6, 'mel', 'Ты такой загадочный, мой воскресший…', "You're so mysterious, my undead darling…", 'c6'],
 ];
 const CT_PERIOD = 27;
-function ctPlay(key) { if (!Sound.ok() || !window.CT_CLIPS || !window.CT_CLIPS[key]) return false; const c = Sound.ctx; Sound.ctBuf = Sound.ctBuf || {}; const go = (buf) => { const src = c.createBufferSource(); src.buffer = buf; src.connect(Sound.outClear(1, 0.08)); src.start(); }; if (Sound.ctBuf[key]) go(Sound.ctBuf[key]); else { const bin = atob(window.CT_CLIPS[key].split(',')[1]), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); c.decodeAudioData(u.buffer, (buf) => { Sound.ctBuf[key] = buf; go(buf); }, () => {}); } return true; }
+function ctPlay(key) { if (!Sound.ok() || !window.CT_CLIPS || !window.CT_CLIPS[key]) return false; const c = Sound.ctx; Sound.ctBuf = Sound.ctBuf || {}; const go = (buf) => { lineBusy(buf.duration); const src = c.createBufferSource(); src.buffer = buf; src.connect(Sound.outClear(1, 0.08)); src.start(); }; if (Sound.ctBuf[key]) go(Sound.ctBuf[key]); else { const bin = atob(window.CT_CLIPS[key].split(',')[1]), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); c.decodeAudioData(u.buffer, (buf) => { Sound.ctBuf[key] = buf; go(buf); }, () => {}); } return true; }
 function ctSay(who, ru, en, clip) {
-  const n = who === 'gg' ? story.cafeGG : story.cafeMel; if (!n) return;
+  const n = who === 'gg' ? story.cafeGG : story.cafeMel; if (!n || isLineBusy()) return;
   n.talkT = Math.max(n.talkT || 0, Math.min(5, ru.length * 0.07));
   if (story.cafeNear) { $('sSay').textContent = (who === 'gg' ? 'Воскреситель: ' : 'Мелоди: ') + ru + '  /  ' + en; if (!ctPlay(clip)) speakAs(ru, who === 'gg' ? 0.3 : 1.45, 1.0); clearTimeout(story.sayTimer); story.sayTimer = setTimeout(() => { $('sSay').textContent = ''; }, 4500); }
 }
