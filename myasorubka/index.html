@@ -7905,8 +7905,8 @@ function paintMelFace(st) {
     const cx = X(sd * 0.46), cy = ey;
     if (!closed) {
       g.fillStyle = '#ffffff'; g.beginPath(); g.ellipse(cx, cy, ew * 0.5, eh * (ang ? 0.38 : shock ? 0.6 : 0.52), 0, 0, 7); g.fill();
-      g.fillStyle = '#0b0910'; g.beginPath(); g.ellipse(cx + sd * ew * 0.1, cy + eh * 0.02, ew * (shock ? 0.1 : 0.2), eh * (shock ? 0.2 : 0.38), 0, 0, 7); g.fill();
-      g.fillStyle = '#ffffff'; g.beginPath(); g.ellipse(cx + sd * ew * 0.05, cy - eh * 0.14, ew * 0.05, eh * 0.08, 0, 0, 7); g.fill();
+      g.fillStyle = '#0b0910'; g.beginPath(); g.ellipse(cx, cy + eh * 0.04, ew * (shock ? 0.1 : 0.19), eh * (shock ? 0.2 : 0.38), 0, 0, 7); g.fill();
+      g.fillStyle = '#ffffff'; g.beginPath(); g.ellipse(cx + ew * 0.05, cy - eh * 0.12, ew * 0.05, eh * 0.08, 0, 0, 7); g.fill();
     }
     g.strokeStyle = '#08060c'; g.lineWidth = eh * 0.22; g.beginPath(); g.moveTo(cx - sd * ew * 0.52, cy + eh * 0.06); g.quadraticCurveTo(cx, cy - eh * (closed ? 0.05 : 0.66), cx + sd * ew * 0.5, cy - eh * 0.05); g.lineTo(cx + sd * ew * 0.78, cy - eh * 0.34); g.stroke();
     g.lineWidth = eh * 0.08; g.beginPath(); g.moveTo(cx - sd * ew * 0.42, cy + eh * 0.2); g.quadraticCurveTo(cx, cy + eh * 0.56, cx + sd * ew * 0.45, cy + eh * 0.12); g.stroke();
@@ -7969,6 +7969,16 @@ function addMelodieExtras(n) {
   const tail = put(pelvis, new THREE.ConeGeometry(0.07, 0.42, 4), red, 0.08, -0.08, -0.26, -2.0, 0.3, 0.3); tail.scale.set(1, 1, 0.35);
   n.melodie = true;
 }
+// Melodie's own lines: she hums and chats when you stand close
+const MEL_SAY = ['Ла-ла-ла! Сегодня я в голосе!', 'Хочешь, спою тебе? Только не убегай!', 'Эй, не наступи на мой хвост!', 'Бум-бум-бум, музыка внутри меня!', 'Мяу! Ой… то есть ля-ля-ля!', 'Дайте микрофон — и я разнесу весь зал!', 'Ты фанат? Автограф в обмен на улыбку!', 'Тише… я беру самую высокую ноту!', 'Какой красивый бант, правда?', 'Подпевай мне, не стесняйся!'];
+function updateMelTalk(dt) {
+  for (const n of npcs) {
+    if (!n.alive || !n.look || !n.look.melodie) continue;
+    n.melT = (n.melT ?? rand(2, 4)) - dt; if (n.melT > 0) continue;
+    if (Math.hypot(n.pos.x - player.pos.x, n.pos.z - player.pos.z) > 8) { n.melT = 1; continue; }
+    n.melT = rand(8, 13); const t = pick(MEL_SAY); n.talkT = Math.max(n.talkT || 0, Math.min(6, t.length * 0.07)); toast('Мелоди: ' + t); speakAs(t, 1.55, 1.12);
+  }
+}
 /* ===================== main loop ===================== */
 function resize() { const w = innerWidth, h = innerHeight; renderer.setPixelRatio(settings.quality === 'high' ? Math.min(devicePixelRatio, 1.75) : Math.min(devicePixelRatio, 1)); renderer.setSize(w, h, false); camera.aspect = vmCamera.aspect = w / h; camera.updateProjectionMatrix(); vmCamera.updateProjectionMatrix(); screenBloodResize(); resizeFx(); }
 addEventListener('resize', resize);
@@ -8025,7 +8035,7 @@ function frame(now) {
   const ts = (slow ? 0.25 : 1) * worldTs * fallFx.ts * (player.dead && state === 'play' && !(player.lastFall > 0) ? 0.4 : 1), dt = rdt * ts;
   const running = state === 'play' || state === 'spawn' || state === 'menu' || state === 'over' || state === 'cutscene' || state === 'sui' || state === 'story';
   if (running) {
-    if (state === 'play') { updatePlayer(rdt); W.cd -= rdt; if (W.fireHeld && curW().auto) tryFire(false); updateGrab(rdt); updateCat(rdt); }
+    if (state === 'play') { updatePlayer(rdt); W.cd -= rdt; if (W.fireHeld && curW().auto) tryFire(false); updateGrab(rdt); updateCat(rdt); updateMelTalk(rdt); }
     else if (state === 'cutscene') { updatePlayer(rdt); updateCutscene(rawDt); }
     else if (state === 'sui') { updateSuicide(rawDt); }
     else if (state === 'story') updateStoryCut(rawDt);
