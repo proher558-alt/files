@@ -477,6 +477,7 @@ body.touch #wAmmo{font-size:26px}
       <button class="btn" data-spawn="all">Очистить всё<small>Полигон с нуля</small></button>
       <button class="btn" data-spawn="soldier">Солдат<small>Стреляет в вас с дистанции</small></button>
       <button class="btn" data-spawn="pills">Таблетки<small>Пузырёк на полу в прицеле</small></button>
+      <button class="btn" data-spawn="melodie">Мелоди<small>Соведущая, розовые волосы и бант</small></button>
       <button class="btn" data-spawn="x-svity-street">Свити · Уличная<small id="xs1"></small></button>
       <button class="btn" data-spawn="x-svity-cop">Свити · Полицейская<small id="xs2"></small></button>
       <button class="btn" data-spawn="x-svity-gala">Свити · Вечерняя<small id="xs3"></small></button>
@@ -4587,6 +4588,7 @@ document.querySelectorAll('[data-spawn]').forEach((b) => b.onclick = () => {
   else if (k === 'horde') for (let i = 0; i < 6; i++) { const [x, z] = edgePoint(); spawnNPC('zombie', x, z); }
   else if (k === 'crowd') { const p = aimPoint(); for (let i = 0; i < 6; i++) spawnNPC('human', p.x + rand(-2.5, 2.5), p.z + rand(-2.5, 2.5)); }
   else if (k === 'crate' || k === 'barrel') { const p = aimPoint(); spawnProp(k, p.x, p.z, 1.5); }
+  else if (k === 'melodie') { const p = aimPoint(); if (spawnNPC('human', p.x, p.z, Math.atan2(player.pos.x - p.x, player.pos.z - p.z), 'melodie')) Sound.click(1100, 0.15); }
   else if (k === 'clean') cleanBlood(); else if (k === 'bodies') clearBodies(); else if (k === 'all') clearAll();
   closeSpawn();
   if (k === 'kill') suicide();
