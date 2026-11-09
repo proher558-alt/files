@@ -7707,7 +7707,7 @@ function showEnd(good) {
 }
 function updateStory(dt) {
   const sv = story.svity, st = story.stage;
-  { const can = NOTE_STAGES.has(st) && story.notes.length > 0; if (story.notesT > 0) story.notesT -= dt; const vis = can && (!!story.notesOpen || story.notesT > 0); if (vis !== story.noteVis) { story.noteVis = vis; $('sNotes').hidden = !vis; } if (can !== story.canNote) { story.canNote = can; $('noteBtn').hidden = !can; } }
+  { const can = NOTE_STAGES.has(st) && story.notes.length > 0; if (story.notesT > 0) story.notesT -= dt; const vis = can && (!!story.notesOpen || (st === 'street' && story.notesT > 0)); if (vis !== story.noteVis) { story.noteVis = vis; $('sNotes').hidden = !vis; } if (can !== story.canNote) { story.canNote = can; $('noteBtn').hidden = !can; } }
   story.hudT -= dt; const tick = story.hudT <= 0; if (tick) story.hudT = 0.25;
   if (tick) {
     $('photoBtn').hidden = st !== 'photo';
