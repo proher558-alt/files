@@ -3954,7 +3954,7 @@ function tryFire(pressed) {
   player.pitch += w.id === 'shotgun' ? 0.05 : w.id === 'rifle' ? 0.012 + Math.random() * 0.006 : 0.025; player.yaw += (Math.random() - 0.5) * (w.id === 'rifle' ? 0.012 : 0.01);
   W.bloom = Math.min(0.05, W.bloom + (w.id === 'rifle' ? 0.006 : 0.004));
   W.flashT = 0.05; muzzleLight.intensity = w.id === 'shotgun' ? 26 : 16;
-  if (w.id === 'bow') Sound.twang(); else Sound.shot(w.id, 0.9); alertHumans(28); if (w.id !== 'bow' && story.on) story.noise = 1; if (madness.on) shake = Math.max(shake, 0.12);
+  if (w.id === 'bow') Sound.twang(); else Sound.shot(w.id === 'sawgun' ? 'pistol' : w.id, 0.9); alertHumans(28); if (w.id !== 'bow' && story.on) story.noise = 1; if (madness.on) shake = Math.max(shake, 0.12);
   if (w.id === 'shotgun') { W.pumpT = 0.5; later(0.35, () => ejectCasing(true)); later(0.25, () => Sound.click(500, 0.2)); } else if (w.id !== 'bow') ejectCasing(false);
   if (W.ammo[W.cur] === 0) later(0.25, startReload);
 }
@@ -3975,7 +3975,7 @@ function shootRay(origin, dir, w, drawTracer) {
     const ud = h.object.userData;
     if (ud.kind === 'part') {
       const npc = ud.npc, P = npc.parts[ud.part]; if (npc === lastNpc || !P || P.gone) continue;
-      hitPart(npc, P, h, dir, dmg, w); lastNpc = npc; end = h.point; if (pen-- <= 0) break; dmg *= 0.55; continue;
+      hitPart(npc, P, h, dir, dmg, w); if (w.id === 'sawgun' && Math.random() < 0.6) embedSaw(P, h.point, dir); lastNpc = npc; end = h.point; if (pen-- <= 0) break; dmg *= 0.55; continue;
     }
     end = h.point;
     if (ud.kind === 'gib') { const b = ud.body; b.wakeUp(); b.applyImpulse(new CANNON.Vec3(dir.x * 2, dir.y * 2 + 1, dir.z * 2)); bloodSpray(h.point, dir, 6, 0.8, 0.5, 2, 0.005, 0.01); Sound.splat(dv(h.point) * 0.5); break; }
@@ -4213,6 +4213,7 @@ function hitPart(npc, P, h, dir, dmg, w) {
   if (w.id === 'flame' && npc.alive) npc.burn = Math.min(6, npc.burn + 1.5);
   const ln = h.face ? h.face.normal.clone() : new V3(0, 0, 1);
   P.mesh.updateMatrixWorld(); const local = P.mesh.worldToLocal(h.point.clone());
+  if (w.id !== 'fists' && !P.gone) { const d = Math.min(1, dmg / 80); addWoundLocal(P, local, ln, 0.03 + d * 0.035); addWoundLocal(P, local.clone().addScaledVector(ln, 0.002), ln, 0.018); bloodSpray(h.point, dir, Math.round(6 + d * 10), 0.5, 0.6, 2, 0.004, 0.01); }
   const wn = ln.clone().transformDirection(P.mesh.matrixWorld);
   const big = kind === 'head' ? 1.4 : 1;
   bloodSpray(h.point, _a.copy(dir).negate().add(wn).normalize(), 8 * big, 0.6, 0.6, 2.4, 0.005, 0.012);
@@ -7783,7 +7784,7 @@ function syncMods() {
   if (M.mikushka) WEAPONS.push({ id: 'mikushka', name: 'Микушка', melee: true, cat: true, rate: 0.7, dmg: 0 });
   if (M.sawgun) WEAPONS.push({ id: 'sawgun', name: 'Пиломёт', mag: 8, rate: 0.45, auto: false, spread: 0.01, pellets: 1, dmg: 70, force: 60, pen: 2, reload: 1.6 });
   if (M.axe) WEAPONS.push({ id: 'axe', name: 'Топор', melee: true, rate: 0.75, dmg: 80 });
-  while (W.ammo.length < WEAPONS.length) W.ammo.push(0); W.ammo.length = WEAPONS.length;
+  while (W.ammo.length < WEAPONS.length) W.ammo.push(WEAPONS[W.ammo.length].mag || 0); W.ammo.length = WEAPONS.length;
   const ni = WEAPONS.findIndex((w) => w.id === id); W.cur = ni < 0 ? 0 : ni;
   for (const k in MODELS) MODELS[k].visible = k === WEAPONS[W.cur].id;
   updateSlots(); if (avatar) attachHeld();
@@ -7873,6 +7874,15 @@ function buildAxe() {
   g.add(arm(1, 0, 0, 0.0)); g.position.set(0.19, -0.2, -0.46); g.rotation.set(-0.7, 0.1, 0.2); g.userData.base = { x: 0.19, y: -0.2, z: -0.46 }; g.visible = false; vmRoot.add(g); return g;
 }
 MODELS.sawgun = buildSawgun(); MODELS.axe = buildAxe();
+/* ----- sawblades that stay stuck in the body; the wounds around them stay too ----- */
+const SAW = { geo: null, mat: null };
+function embedSaw(P, point, dir) {
+  if (!SAW.geo) { SAW.geo = new THREE.CylinderGeometry(0.075, 0.075, 0.012, 18).rotateX(Math.PI / 2); SAW.mat = std({ color: 0xb8bcc4, metalness: 0.9, roughness: 0.3 }); }
+  if (!P.saws) P.saws = 0; if (P.saws >= 4) return; P.saws++;
+  P.mesh.updateMatrixWorld(); const local = P.mesh.worldToLocal(point.clone());
+  const m = new THREE.Mesh(SAW.geo, SAW.mat); m.position.copy(local).addScaledVector(dir, -0.02); m.quaternion.setFromUnitVectors(_e.set(0, 0, 1), dir.clone().normalize().negate()); m.rotateZ(rand(0, 6.28)); m.castShadow = true; P.mesh.add(m);
+  addWoundLocal(P, local, dir.clone().negate().normalize(), 0.06);
+}
 /* ===================== main loop ===================== */
 function resize() { const w = innerWidth, h = innerHeight; renderer.setPixelRatio(settings.quality === 'high' ? Math.min(devicePixelRatio, 1.75) : Math.min(devicePixelRatio, 1)); renderer.setSize(w, h, false); camera.aspect = vmCamera.aspect = w / h; camera.updateProjectionMatrix(); vmCamera.updateProjectionMatrix(); screenBloodResize(); resizeFx(); }
 addEventListener('resize', resize);
