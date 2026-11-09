@@ -6392,6 +6392,14 @@ function storyCafe() {
   const pr = story.prod = mkNpc('producer', CAFE.bx, CAFE.bz + 0.92, Math.PI); pr.protect = true; seatNpc(pr, CAFE.bx, CAFE.bz + 0.92, Math.PI);
   // regulars at their tables and a barista
   for (const [x, z, yaw] of [[-6, 1.98, Math.PI], [-2.8, -1.98, 0], [3.8, 3.58, Math.PI], [0.5, 4.22, 0], [6.5, 4.28, Math.PI], [1.2, -1.42, Math.PI]]) { const n = mkNpc(undefined, x, z, yaw); seatNpc(n, x, z, yaw); }
+  // a far table: Melodie is in love, the resurrector eats carbonara and barely notices
+  { const TX = -4.2, TZ = -3.6, mel = mkNpc('melodie', TX, TZ + 0.78, Math.PI); mel.scripted = true; mel.protect = true; seatNpc(mel, TX, TZ + 0.78, Math.PI); mel.svExpr = 'happy';
+    const gg = mkNpc('gagarin', TX, TZ - 0.78, 0); gg.scripted = true; gg.protect = true; seatNpc(gg, TX, TZ - 0.78, 0); gg.ggMouth = 0; gg.ggDim = 0; gg.ggWing = 0.2;
+    const plate = new THREE.Group(); plate.position.set(TX, 0.8, TZ); addMesh(plate);
+    plate.add(new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.12, 0.02, 20), std({ color: 0xf4f2ea, roughness: 0.3 })));
+    plate.add(new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.035, 8, 22).rotateX(Math.PI / 2).translate(0, 0.03, 0), std({ color: 0xf2d060, roughness: 0.7 })));
+    const heart = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff4a8a })); heart.position.set(0.1, 0.05, 0.05); plate.add(heart);
+    story.cafeMel = mel; story.cafeGG = gg; }
   const ba = story.barista = mkNpc('office', -5, -6.6, 0); ba.scripted = true; ba.pos.set(-5, 0, -6.6); ba.bw = [[-7.2, -6.6], [-2.2, -6.6]];
   player.pos.set(-6.8, 0, HZ - 1.1); player.yaw = -0.95; player.pitch = 0;
   Music.stop(); Music.start('tender');
