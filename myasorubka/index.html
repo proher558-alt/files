@@ -4229,8 +4229,8 @@ function hitPart(npc, P, h, dir, dmg, w) {
   if (npc.living) { npc.hp -= dmg * mult * (madness.on ? 1.6 : 1); if (npc.alive) npc.onHit(dir, P); if (npc.hp <= 0) { npc.die('shot'); if (madness.on && Math.random() < (w.id === 'shotgun' || w.id === 'bow' ? 0.9 : 0.5)) madBurst(npc, h.point, dir); if (kind === 'head') { stats.heads++; toast('Хедшот'); } } }
   if (kind === 'limb' && !P.gone && P.attached && Math.random() < (w.id === 'shotgun' || w.id === 'bow' ? 0.35 : w.id === 'rifle' || w.id === 'pistol' ? 0.1 : 0)) breakBone(npc, P, { open: Math.random() < 0.65 });
   if (P.hp <= 0 && !P.gone) {
-    if (kind === 'head') { npc.gib('head', dir, 1); toast('Голова в клочья'); }
-    else if (kind === 'limb') { if (w.id === 'shotgun' && P.hp < -20 && Math.random() < 0.5) { npc.gib(P.name, dir, 0.7); toast('В клочья'); } else if (npc.detach(P.name, { dir })) toast('Отстрелено: ' + P.def.ru); }
+    if (kind === 'head') { if (npc.detach('head', { dir })) toast('Голова отлетела'); }
+    else if (kind === 'limb') { if (npc.detach(P.name, { dir })) toast('Отстрелено: ' + P.def.ru); }
     else P.hp = 1;
   }
   if (npc.alive && !P.gone && (P.attached || !P.def.p)) npc.reactHit(P, dir, local, ln, w.id);
@@ -7867,11 +7867,14 @@ function buildSawgun() {
   g.add(arm(1, 0, -0.06, 0.06)); g.position.set(0.12, -0.13, -0.44); g.rotation.y = 0.04; g.userData.base = { x: 0.12, y: -0.13, z: -0.44 }; g.visible = false; vmRoot.add(g); return g;
 }
 function buildAxe() {
-  const g = new THREE.Group();
-  g.add(cyl(0.016, 0.016, 0.5, vmMat.wood, 0, -0.05, -0.12, Math.PI / 2 - 0.2));
-  g.add(box(0.05, 0.1, 0.02, vmMat.steel, 0, 0.1, -0.33, 0, 0, 0));
-  g.add(box(0.012, 0.1, 0.07, vmMat.steel, 0, 0.11, -0.25));
-  g.add(arm(1, 0, 0, 0.0)); g.position.set(0.19, -0.2, -0.46); g.rotation.set(-0.7, 0.1, 0.2); g.userData.base = { x: 0.19, y: -0.2, z: -0.46 }; g.visible = false; vmRoot.add(g); return g;
+  const g = new THREE.Group(), wood = vmMat.wood, steel = vmMat.steel;
+  const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.02, 0.62, 12).rotateX(Math.PI / 2), wood); handle.position.set(0, 0, -0.2); g.add(handle);
+  const sh = new THREE.Shape(); sh.moveTo(-0.02, -0.07); sh.quadraticCurveTo(0.12, -0.11, 0.15, 0.0); sh.quadraticCurveTo(0.12, 0.09, -0.02, 0.07); sh.closePath();
+  const blade = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.012, bevelEnabled: true, bevelThickness: 0.002, bevelSize: 0.003, bevelSegments: 2 }), steel);
+  blade.position.set(0, 0.02, -0.5); blade.rotation.y = 0; g.add(blade);
+  const poll = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.07, 0.04), steel); poll.position.set(-0.03, 0.02, -0.5); g.add(poll);
+  const wrap = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.07, 12).rotateX(Math.PI / 2), vmMat.metal); wrap.position.set(0, 0, -0.44); g.add(wrap);
+  g.add(arm(1, 0, 0, 0.0)); g.position.set(0.19, -0.2, -0.36); g.rotation.set(-0.15, 0.25, 0.35); g.userData.base = { x: 0.19, y: -0.2, z: -0.36 }; g.visible = false; vmRoot.add(g); return g;
 }
 MODELS.sawgun = buildSawgun(); MODELS.axe = buildAxe();
 /* ----- sawblades that stay stuck in the body; the wounds around them stay too ----- */
@@ -7926,8 +7929,8 @@ function processImpacts() {
     if (!npc.gg && !e.P.gone && e.P.def.kind === 'limb' && v > 11 * vk && v <= 20 * vk && Math.random() < 0.6) breakBone(npc, e.P, { open: v > 15 * vk && Math.random() < 0.7 });
     if (!npc.gg && !e.P.gone && v > 12 && Math.random() < 0.5) { const q = randomSurface(e.P, new V3()); tearCloth(npc, e.P, q, q.clone().normalize(), rand(0.05, 0.09), 0.9); }
     if (npc.gg) { /* the resurrector shrugs off a fall */ }
-    else if (v > 30 * vk) burstBody(npc, p, n, v);
-    else if (v > 20 * vk) { for (const name of LIMBS) { const P = npc.parts[name]; if (!P.gone && P.attached && (P === e.P || Math.random() < 0.15) && Math.random() < 0.6) npc.detach(name, { dir: n }); } if (v > 25 * vk && !npc.parts.head.gone && Math.random() < 0.3) npc.gib('head', n, 0.7); }
+    else if (v > 30 * vk) { for (const name of LIMBS) { const P = npc.parts[name]; if (!P.gone && P.attached && Math.random() < 0.7) npc.detach(name, { dir: n }); } if (!npc.parts.head.gone && npc.parts.head.attached) npc.detach('head', { dir: n }); }
+    else if (v > 20 * vk) { for (const name of LIMBS) { const P = npc.parts[name]; if (!P.gone && P.attached && (P === e.P || Math.random() < 0.15) && Math.random() < 0.6) npc.detach(name, { dir: n }); } if (v > 25 * vk && !npc.parts.head.gone && Math.random() < 0.3) npc.detach('head', { dir: n }); }
   }
 }
 function syncRagdolls() { for (const n of npcs) for (const P of n.partList) if (P.body && !P.gone) { P.mesh.position.copy(P.body.interpolatedPosition); P.mesh.quaternion.copy(P.body.interpolatedQuaternion); } if (avatar && !npcs.includes(avatar)) for (const P of avatar.partList) if (P.body && !P.gone) { P.mesh.position.copy(P.body.interpolatedPosition); P.mesh.quaternion.copy(P.body.interpolatedQuaternion); } }
