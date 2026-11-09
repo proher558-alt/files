@@ -274,6 +274,9 @@ body.touch #wAmmo{font-size:26px}
 #choice .cbar{width:min(420px,70vw);height:6px;background:rgba(0,0,0,.6)}
 #chBar{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff3e9a,#e4281c)}
 #chArrest{background:rgba(24,60,160,.92);border-color:#6aa8ff}
+#wsName{width:100%;margin:6px 0;padding:12px;font:600 16px var(--ui);background:rgba(0,0,0,.5);color:#fff;border:2px solid #555}
+#wsColors .chip{width:34px;height:34px;padding:0;border:2px solid #222;cursor:pointer;margin:2px}
+#wsColors .chip[aria-pressed="true"]{outline:3px solid #fff}
 #ultFx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:38;display:none}
 #ultSub{position:fixed;left:0;right:0;bottom:3.4%;text-align:center;color:#fff;font:600 clamp(13px,2.4vw,24px) Arial,'Segoe UI',Roboto,sans-serif;letter-spacing:.01em;text-shadow:0 0 2px #000,0 0 2px #000,1px 1px 1px #000,-1px -1px 1px #000,1px -1px 1px #000,-1px 1px 1px #000;pointer-events:none;z-index:39;display:none}
 #quest{position:fixed;left:50%;top:12%;transform:translateX(-50%);width:min(440px,72vw);background:linear-gradient(180deg,rgba(26,10,34,.94),rgba(10,4,14,.94));border:2px solid #d8a840;box-shadow:0 0 30px rgba(200,120,255,.45);padding:10px 18px 12px;color:#f2e8d8;font-family:var(--ui);z-index:41;text-align:center;pointer-events:none}
@@ -381,6 +384,7 @@ body.touch #wAmmo{font-size:26px}
     <button class="btn" id="madOffBtn" hidden style="width:100%;margin-bottom:10px">Прийти в себя<small>Выключить безумие</small></button>
     <button class="btn" id="contStory" hidden style="width:100%;margin-bottom:10px">Продолжить главу 1<small id="contWhere"></small></button>
     <button class="btn primary" id="playStory" style="width:100%;margin-bottom:10px">Сюжет · Глава 1<small>«Преступница Свити». Награда за её устранение — 50 000 $</small></button>
+    <button class="btn" id="wsBtn" style="width:100%;margin-bottom:10px">Мастерская модов<small>Свой предмет и авторские моды</small></button>
     <button class="btn" id="exclBtn" style="width:100%;margin-bottom:10px">Эксклюзив<small>Награды за концовки сюжета: костюмы Свити</small></button>
     <button class="btn" id="admBtn" style="width:100%;margin-bottom:10px">Админ-панель<small>Служебный доступ по коду</small></button>
     <div class="modes">
@@ -406,6 +410,7 @@ body.touch #wAmmo{font-size:26px}
   </div>
 </div>
 
+<div id="workshop" class="overlay" hidden><div class="panel"><div class="eyebrow">Мастерская</div><h1 style="font-size:clamp(30px,7vw,56px)">Моды</h1><p class="mapdesc">Свой предмет можно создать один: его можно заменить или удалить. Авторские моды бесплатные, и их тоже можно удалить.</p><div class="row"><span class="lbl">Свой предмет</span></div><input id="wsName" maxlength="16" placeholder="Название, например «Кочерга»"><div class="chips" id="wsColors"></div><div class="row" style="margin-top:8px"><button class="btn primary" id="wsSave" style="flex:1">Создать или заменить<small>ближний бой</small></button><button class="btn" id="wsDelOwn" style="flex:1">Удалить свой<small>предмет</small></button></div><div class="row"><span class="lbl">Бесплатные авторские моды</span></div><div class="spawngrid" id="wsMods"></div><div class="row" style="margin-top:16px"><button class="btn primary" id="wsClose" style="flex:1">Закрыть</button></div></div></div>
 <div id="excl" class="overlay" hidden><div class="panel"><div class="eyebrow">Награды</div><h1 style="font-size:clamp(34px,8vw,64px)">Эксклюзив</h1><p class="mapdesc" id="exclInfo"></p><div class="spawngrid" id="exclGrid"></div><div class="row" style="margin-top:16px"><button class="btn primary" id="exclClose" style="flex:1">Закрыть</button></div></div></div>
 
 <div id="admin" class="overlay" hidden><div class="panel">
@@ -3702,7 +3707,7 @@ function updateAvatar(dt) {
     if (A.heldId !== curW().id) attachHeld();
   }
   A.update(dt);
-  if (A.held) A.held.visible = (state !== 'story' || story.gun) && !ward.open;
+  if (A.held) A.held.visible = (state !== 'story' || story.gun) && !ward.open && !(CAT.out && curW().id === 'mikushka');
   A.relaxed = (state === 'story' && !story.gun) || ward.open;
   if (state === 'story') { setAvatarVis(story.showAvatar, true); return; }
   const vis = state === 'play' || state === 'pause' || state === 'spawn' || state === 'over';
@@ -3930,6 +3935,7 @@ function alertHumans(radius) { for (const n of npcs) if (n.type === 'human' && n
 function tryFire(pressed) {
   const w = curW(); if (W.cd > 0 || W.switchT > 0 || player.dead || story.noFire) return;
   if (w.grab) { if (pressed) startGrab(); return; }
+  if (w.cat) { if (pressed && !CAT.out) { W.cd = w.rate; catToss(); } return; }
   if (!w.auto && !pressed) return;
   if (w.fists) { W.cd = w.rate; W.punchT = 0.26; W.punchSide = !W.punchSide; Sound.swoosh(); later(0.08, fistHit); return; }
   if (w.melee) { W.cd = w.rate; W.swingT = 0.32; if (w.id !== 'saw') Sound.swoosh(); later(0.09, meleeHit); return; }
@@ -4494,7 +4500,7 @@ document.querySelectorAll('#touch .tb').forEach((b) => {
     else if (act === 'act') storyAct(); else if (act === 'photo') storyPhoto(); else if (act === 'complain') storyComplain();
     else if (act === 'view') { settings.view = view3() ? 'fps' : 'tps'; saveSettings(); tps.cur = 0.5; ragCam.init = false; toast(view3() ? 'Вид от третьего лица' : 'Вид от первого лица'); Sound.click(1000, 0.2); }
     else if (act === 'pull') grab.pull = -1; else if (act === 'push') grab.pull = 1;
-    else if (act === 'alt') { if (grab.con) releaseGrab(true); else if (curW().grab) gravPunt(); else if (curW().id !== 'grenade') { const prev = W.cur; W.cur = 4; W.cd = 0; tryFire(true); W.cur = prev; } }
+    else if (act === 'alt') { if (grab.con) releaseGrab(true); else if (curW().grab) gravPunt(); else if (curW().cat) catMeow(); else if (curW().id !== 'grenade') { const prev = W.cur; W.cur = 4; W.cd = 0; tryFire(true); W.cur = prev; } }
   }, { passive: false });
   const up = (e) => { e.preventDefault(); b.classList.remove('on'); if (act === 'pull' || act === 'push') grab.pull = 0; if (act === 'fire') { W.fireHeld = false; if (curW().grab && grab.con) releaseGrab(false); } };
   b.addEventListener('touchend', up); b.addEventListener('touchcancel', up);
@@ -7739,6 +7745,115 @@ function updateStory(dt) {
   }
 }
 
+/* ===================== the mod workshop: one custom weapon, free author mods (Микушка the cat), everything deletable ===================== */
+const MOD_BASE = WEAPONS.length;
+GRIP.mikushka = [0, -0.04, 0.03]; GRIP.custom = GRIP.machete;
+const MODS_CATALOG = [{ id: 'mikushka', name: 'Котик Микушка', img: 'data:image/jpeg;base64,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', desc: 'Оружие. Кидаете кота мягко: 8 секунд он царапает ближайших врагов. Суперсила «МЯУ»: кот кричит и отталкивает всех рядом (перезарядка 6 с).' }];
+const WS = { color: '#ff6ab0' }, WS_COLORS = ['#ff6ab0', '#4ad8ff', '#f2c200', '#7aff6a', '#ffffff', '#2a2a2a', '#c060ff', '#ff4a3a'];
+const CAT = { out: false, root: null, st: '', t: 0, from: new V3(), to: new V3(), pos: new V3(), tgt: null, tgtT: 0, scT: 0, meowCd: 0, map: '' };
+function getMods() { try { return Object.assign({ mikushka: false, custom: null }, JSON.parse(localStorage.getItem('myasorubka-mods') || '{}')); } catch (e) { return { mikushka: false, custom: null }; } }
+function setMods(m) { try { localStorage.setItem('myasorubka-mods', JSON.stringify(m)); } catch (e) {} syncMods(); }
+function buildCat(hand) {
+  const g = new THREE.Group(), fur = std({ color: 0xa39a94, roughness: 0.9 }), dark = std({ color: 0x5a524d, roughness: 0.9 }), nose = std({ color: 0xc8787a, roughness: 0.6 });
+  const eye = new THREE.MeshBasicMaterial({ color: 0xf0a030 }), pup = new THREE.MeshBasicMaterial({ color: 0x0a0a0a });
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.2, 18, 14), fur); body.scale.set(0.9, 0.75, 1.35); body.position.set(0, 0.02, -0.02); g.add(body);
+  const head = new THREE.Group(); head.position.set(0, 0.2, 0.2); g.add(head);
+  const hm = new THREE.Mesh(new THREE.SphereGeometry(0.15, 18, 14), fur); hm.scale.set(1.15, 0.9, 1); head.add(hm);
+  for (const sd of [-1, 1]) {
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.07, 4), dark); ear.position.set(sd * 0.09, 0.15, -0.01); ear.rotation.z = sd * -0.25; head.add(ear);
+    const e = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 6), eye); e.position.set(sd * 0.055, 0.02, 0.12); e.scale.set(1, 1.2, 0.5); head.add(e);
+    const p = new THREE.Mesh(new THREE.SphereGeometry(0.012, 6, 5), pup); p.position.set(sd * 0.055, 0.02, 0.135); head.add(p);
+    const paw = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), fur); paw.scale.set(1, 0.6, 1.3); paw.position.set(sd * 0.08, -0.13, 0.12); g.add(paw);
+  }
+  const nz = new THREE.Mesh(new THREE.SphereGeometry(0.014, 6, 5), nose); nz.position.set(0, -0.005, 0.15); head.add(nz);
+  g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new V3(0, -0.02, -0.25), new V3(0.06, 0.02, -0.36), new V3(0.12, 0.12, -0.36)]), 12, 0.03, 6), fur));
+  if (hand) { g.scale.setScalar(0.7); g.add(arm(1, 0, -0.06, 0.06)); }
+  return g;
+}
+function buildCustomModel(color) {
+  if (MODELS.custom && MODELS.custom.parent) MODELS.custom.parent.remove(MODELS.custom); delete HELD.custom;
+  const g = MODELS.machete.clone(true); g.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.color.lerp(new THREE.Color(color), 0.75); } });
+  g.userData.base = { ...MODELS.machete.userData.base }; g.visible = false; vmRoot.add(g); MODELS.custom = g;
+}
+function syncMods() {
+  const M = getMods(), id = WEAPONS[W.cur] ? WEAPONS[W.cur].id : null;
+  WEAPONS.length = MOD_BASE;
+  if (M.custom) { if (!MODELS.custom || MODELS.custom.userData.color !== M.custom.color) buildCustomModel(M.custom.color); MODELS.custom.userData.color = M.custom.color; WEAPONS.push({ id: 'custom', name: M.custom.name, melee: true, rate: 0.55, dmg: 45 }); }
+  else if (MODELS.custom) { if (MODELS.custom.parent) MODELS.custom.parent.remove(MODELS.custom); delete MODELS.custom; delete HELD.custom; }
+  if (M.mikushka) WEAPONS.push({ id: 'mikushka', name: 'Микушка', melee: true, cat: true, rate: 0.7, dmg: 0 });
+  while (W.ammo.length < WEAPONS.length) W.ammo.push(0); W.ammo.length = WEAPONS.length;
+  const ni = WEAPONS.findIndex((w) => w.id === id); W.cur = ni < 0 ? 0 : ni;
+  for (const k in MODELS) MODELS[k].visible = k === WEAPONS[W.cur].id;
+  updateSlots(); if (avatar) attachHeld();
+}
+function catEnd() { if (CAT.root) { scene.remove(CAT.root); CAT.root = null; } CAT.out = false; CAT.st = ''; CAT.tgt = null; }
+function catToss() {
+  if (CAT.out || !avatar || !avatar.held || state !== 'play') return;
+  const h = avatar.held.children[0]; if (h) h.getWorldPosition(CAT.from); else CAT.from.copy(eye.position);
+  const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
+  CAT.to.set(player.pos.x + fx * 2.6, 0, player.pos.z + fz * 2.6); CAT.to.y = floorAt(CAT.to.x, CAT.to.z, CAT.from.y) + 0.2;
+  CAT.pos.copy(CAT.from); CAT.root = buildCat(false); scene.add(CAT.root); CAT.root.position.copy(CAT.pos);
+  CAT.out = true; CAT.st = 'toss'; CAT.t = 0; CAT.scT = 0; CAT.tgt = null; CAT.map = mapId; Sound.swoosh();
+}
+function catNearest() { let best = null, bd = 900; for (const n of npcs) { if (!n.alive || n.protect || n.ally || n.gg || n.scripted) continue; const d = (n.pos.x - CAT.pos.x) ** 2 + (n.pos.z - CAT.pos.z) ** 2; if (d < bd) { bd = d; best = n; } } return best; }
+function catScratch(n) {
+  const P = n.parts.torso.gone ? n.parts.pelvis : n.parts.torso; if (!P || P.gone) return;
+  const wp = P.mesh.getWorldPosition(new V3()), dir = new V3().subVectors(wp, CAT.pos).setY(0).normalize();
+  n.hp -= 10; P.hp -= 14; n.onHit(dir, P); addWoundLocal(P, randomSurface(P, _a), _b.copy(_a).normalize(), rand(0.035, 0.06)); bloody(P, 0.12); bloodSpray(wp, dir, 14, 0.6, 0.8, 3, 0.005, 0.012); Sound.splat(0.4);
+  if (n.hp <= 0) n.die('cat');
+}
+function updateCat(dt) {
+  CAT.meowCd = Math.max(0, CAT.meowCd - dt);
+  if (!CAT.out || !CAT.root) return;
+  if (CAT.map !== mapId) { catEnd(); return; }
+  CAT.t += dt;
+  if (CAT.st === 'toss') {
+    const k = Math.min(1, CAT.t / 0.6);
+    CAT.pos.lerpVectors(CAT.from, CAT.to, k); CAT.pos.y = lerp(CAT.from.y, CAT.to.y, k) + Math.sin(k * Math.PI) * 0.6;
+    CAT.root.rotation.set(-Math.sin(k * Math.PI) * 0.8, Math.atan2(CAT.to.x - CAT.from.x, CAT.to.z - CAT.from.z), 0);
+    if (k >= 1) { CAT.st = 'hunt'; CAT.t = 0; CAT.tgt = null; CAT.root.rotation.x = 0; }
+  } else {
+    if (CAT.t > 8) { spawnSprite(TEX.smoke, _a.copy(CAT.pos).setY(0.5), { color: 0xffffff, size: 0.8, grow: 2, life: 1.2, opacity: 0.5, vel: new V3(0, 0.3, 0) }); catEnd(); return; }
+    CAT.tgtT -= dt;
+    if (CAT.tgtT <= 0 || !CAT.tgt || !CAT.tgt.alive) { CAT.tgt = catNearest(); CAT.tgtT = 0.4; }
+    let tx = player.pos.x - Math.sin(player.yaw) * 1.6, tz = player.pos.z - Math.cos(player.yaw) * 1.6;
+    if (CAT.tgt) { tx = CAT.tgt.pos.x; tz = CAT.tgt.pos.z; }
+    const dx = tx - CAT.pos.x, dz = tz - CAT.pos.z, d = Math.hypot(dx, dz) || 1, near = !!CAT.tgt && d < 1.1;
+    if (!near) { const sp = Math.min(d, (CAT.tgt ? 6.5 : 3.2) * dt); CAT.pos.x += dx / d * sp; CAT.pos.z += dz / d * sp; }
+    CAT.root.rotation.set(0, Math.atan2(dx, dz), 0);
+    if (near) { CAT.scT -= dt; CAT.root.rotation.z = Math.sin(CAT.t * 30) * 0.25; if (CAT.scT <= 0) { CAT.scT = 0.5; catScratch(CAT.tgt); } } else CAT.root.rotation.z = 0;
+    CAT.pos.y = floorAt(CAT.pos.x, CAT.pos.z, CAT.pos.y + 0.5) + 0.2 + (near ? 0 : Math.abs(Math.sin(CAT.t * 16)) * 0.06);
+  }
+  CAT.root.position.copy(CAT.pos);
+}
+function catMeow() {
+  if (CAT.meowCd > 0 || state !== 'play' || player.dead) return; CAT.meowCd = 6;
+  const cx = player.pos.x, cz = player.pos.z; Sound.bigScream(); shake = Math.max(shake, 0.5); toast('МЯУ!');
+  for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2; spawnSprite(TEX.soft, _a.set(cx + Math.cos(a), 1.1, cz + Math.sin(a)), { color: 0xffd0f0, additive: true, size: 0.5, grow: 4, life: 0.5, vel: new V3(Math.cos(a) * 6, 0, Math.sin(a) * 6) }); }
+  for (const n of npcs) {
+    if (!n.alive || n.protect || n.ally || n.gg) continue;
+    const dx = n.pos.x - cx, dz = n.pos.z - cz, d = Math.hypot(dx, dz); if (d > 9) continue;
+    const k = 1 - d / 9, s = d || 1, P = n.parts.torso.gone ? n.parts.pelvis : n.parts.torso; n.panic = Math.max(n.panic, 8); n.flinch = Math.max(n.flinch || 0, 0.6);
+    if (P && P.body && !P.gone) { P.body.wakeUp(); P.body.applyImpulse(new CANNON.Vec3(dx / s * k * 150, 45 * k, dz / s * k * 150)); }
+    else n.pos.set(n.pos.x + dx / s * k * 2, n.pos.y, n.pos.z + dz / s * k * 2);
+  }
+}
+function wsRender() {
+  const M = getMods();
+  $('wsColors').innerHTML = WS_COLORS.map((c) => `<button class="chip" data-c="${c}" aria-pressed="${c === WS.color}" style="background:${c}"></button>`).join('');
+  $('wsColors').querySelectorAll('[data-c]').forEach((b) => b.onclick = () => { WS.color = b.dataset.c; wsRender(); Sound.click(1000, 0.15); });
+  $('wsDelOwn').disabled = !M.custom;
+  $('wsMods').innerHTML = MODS_CATALOG.map((m) => { const on = !!M[m.id]; return `<div class="btn" style="text-align:left"><img src="${m.img}" alt="" style="width:100%;border-radius:6px;margin-bottom:6px"><b>${m.name}</b><small>${m.desc}</small><button class="btn ${on ? '' : 'primary'}" data-mod="${m.id}" style="width:100%;margin-top:8px">${on ? 'Удалить из игры' : 'Установить'}</button></div>`; }).join('');
+  $('wsMods').querySelectorAll('[data-mod]').forEach((b) => b.onclick = () => { const X = getMods(); X[b.dataset.mod] = !X[b.dataset.mod]; setMods(X); Sound.click(1200, 0.2); toast(X[b.dataset.mod] ? 'Мод установлен' : 'Мод удалён'); wsRender(); });
+}
+function wsSaveOwn() { const name = ($('wsName').value || '').trim().slice(0, 16) || 'Свой предмет', X = getMods(); X.custom = { name, color: WS.color }; setMods(X); Sound.chime(); toast('Предмет: ' + name); wsRender(); }
+function wsDelOwn() { const X = getMods(); if (!X.custom) return; X.custom = null; setMods(X); toast('Свой предмет удалён'); wsRender(); }
+$('wsBtn').onclick = () => { Sound.init(); const M = getMods(); $('wsName').value = M.custom ? M.custom.name : ''; wsRender(); $('workshop').hidden = false; };
+$('wsClose').onclick = () => { $('workshop').hidden = true; };
+$('wsSave').onclick = wsSaveOwn; $('wsDelOwn').onclick = wsDelOwn;
+MODELS.mikushka = buildCat(true); MODELS.mikushka.visible = false; MODELS.mikushka.userData.base = { x: 0.14, y: -0.14, z: -0.42 }; vmRoot.add(MODELS.mikushka);
+syncMods();
+
 /* ===================== main loop ===================== */
 function resize() { const w = innerWidth, h = innerHeight; renderer.setPixelRatio(settings.quality === 'high' ? Math.min(devicePixelRatio, 1.75) : Math.min(devicePixelRatio, 1)); renderer.setSize(w, h, false); camera.aspect = vmCamera.aspect = w / h; camera.updateProjectionMatrix(); vmCamera.updateProjectionMatrix(); screenBloodResize(); resizeFx(); }
 addEventListener('resize', resize);
@@ -7795,7 +7910,7 @@ function frame(now) {
   const ts = (slow ? 0.25 : 1) * worldTs * fallFx.ts * (player.dead && state === 'play' && !(player.lastFall > 0) ? 0.4 : 1), dt = rdt * ts;
   const running = state === 'play' || state === 'spawn' || state === 'menu' || state === 'over' || state === 'cutscene' || state === 'sui' || state === 'story';
   if (running) {
-    if (state === 'play') { updatePlayer(rdt); W.cd -= rdt; if (W.fireHeld && curW().auto) tryFire(false); updateGrab(rdt); }
+    if (state === 'play') { updatePlayer(rdt); W.cd -= rdt; if (W.fireHeld && curW().auto) tryFire(false); updateGrab(rdt); updateCat(rdt); }
     else if (state === 'cutscene') { updatePlayer(rdt); updateCutscene(rawDt); }
     else if (state === 'sui') { updateSuicide(rawDt); }
     else if (state === 'story') updateStoryCut(rawDt);
@@ -7846,7 +7961,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
