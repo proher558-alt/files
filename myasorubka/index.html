@@ -8009,14 +8009,23 @@ const MEL_SAY = ['Ла-ла-ла! Сегодня я в голосе!', 'Хоче
 function updateMelNotes(dt) {
   for (const n of npcs) { if (!n.alive || !n.notes) continue; n.noteT = (n.noteT || 0) + dt; for (const o of n.notes) { o.g.position.y = o.y + Math.sin(n.noteT * 2.2 + o.sd) * 0.06; o.g.rotation.y = Math.sin(n.noteT * 1.4 + o.sd) * 0.4; } }
 }
+// her recorded lines (the same ones as at the café table), each with its Russian subtitle
+function melPool() {
+  const out = []; for (const k of ['mel1', 'mel2', 'mel3', 'mel4']) if (window.MEL_TITLES && window.MEL_TITLES[k]) out.push({ key: k, ru: window.MEL_TITLES[k] });
+  for (const [, who, ru, , clip] of CT_LINES) if (who === 'mel' && clip) out.push({ key: clip, ru });
+  return out;
+}
+function clipPlay(key) { return melPlay(key) || ctPlay(key); }
 function updateMelTalk(dt) {
   for (const n of npcs) {
     if (!n.alive || !n.look || !n.look.melodie) continue;
     n.melT = (n.melT ?? rand(2, 4)) - dt; if (n.melT > 0) continue;
     if (Math.hypot(n.pos.x - player.pos.x, n.pos.z - player.pos.z) > 4) { n.melT = 1; continue; }
-    n.melT = rand(25, 40); const t = pick(MEL_SAY); n.talkT = Math.max(n.talkT || 0, Math.min(6, t.length * 0.07));
+    n.melT = rand(25, 40); n.talkT = Math.max(n.talkT || 0, 3);
     const near = npcs.some((g) => g.gg && g.alive && Math.hypot(g.pos.x - n.pos.x, g.pos.z - n.pos.z) < 6);
-    if (near && melPlay(MEL_NEAR_GG)) { /* the recorded line near the resurrector */ } else { toast('Мелоди: ' + t); speakAs(t, 1.55, 1.12); }
+    if (near && melPlay(MEL_NEAR_GG)) { toast('Мелоди: ' + (window.MEL_TITLES ? window.MEL_TITLES[MEL_NEAR_GG] : '')); continue; }
+    const pool = melPool(); if (!pool.length) { const t = pick(MEL_SAY); toast('Мелоди: ' + t); speakAs(t, 1.55, 1.12); continue; }
+    const it = pick(pool); toast('Мелоди: ' + it.ru); if (!clipPlay(it.key)) speakAs(it.ru, 1.55, 1.12);
   }
 }
 /* ----- the café's far table: Melodie is in love, the resurrector eats fast, gets messy, is wiped, complains, is calmed ----- */
