@@ -1138,7 +1138,7 @@ const MAPS = {
     npcs: { human: 6, zombie: 0, soldier: 0, look: 'worker' }, props: [['crate', -9, 9], ['crate', -8.2, 9.3], ['crate', -8.6, 9.1, 1.21], ['barrel', 8, -9], ['barrel', 9, -8.4], ['crate', 10, 10]], pills: [] },
   home: { name: 'Квартира', desc: '', story: true, hx: 4, hz: 3.2, h: 2.7, spawn: [0, 0, Math.PI], fog: 0x0a0908, fogD: 0.02, bg: 0x060505, sun: 0.25, hemi: 0.6, lamp: [0xffd6a0, 6, 7], lamps: [[-2.5, 2.4, -1.5], [2.5, 2.4, -1.5], [-2.5, 2.4, 1.5], [2.5, 2.4, 1.5]], red: [[0, 1.05, 2.7], 0x6aa0ff, 2.5], build: buildHome, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   timecity: { name: 'Машина времени', desc: 'Небольшой город и машина времени рядом. Включите её и отправьтесь в 1941 год.', hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildTimeCity, npcs: { human: 8, zombie: 0, soldier: 0 }, props: [], pills: [] },
-  ww2: { name: 'Поле боя 1941', desc: '', story: true, hx: 30, hz: 36, h: 30, backdrop: 'grey', spawn: [0, 32, 0], fog: 0x8a8e88, fogD: 0.012, bg: 0x70746e, sun: 1.2, hemi: 0.8, lamp: [0xffe0b0, 10, 14], lamps: [[0, 2.6, -12], [-6, 6, 0], [6, 6, 0], [0, 6, 20]], red: [[0, 2.6, -12], 0xff9030, 2], build: buildWW2, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  ww2: { name: 'Поле боя 1941', desc: '', story: true, hx: 30, hz: 36, h: 30, spawn: [0, 32, 0], fog: 0x9a5c34, fogD: 0.018, bg: 0xb4683a, sun: 1.0, hemi: 0.9, lamp: [0xffb070, 34, 24], lamps: [[0, 2.8, -14], [-12, 3, 3], [14, 4, 10], [0, 5, 20]], red: [[0, 2.6, -12], 0xff7a30, 4], build: buildWW2, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   street: { name: 'Улица', desc: '', story: true, hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildStreet, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   police: { name: 'Участок полиции', desc: '', story: true, hx: 12, hz: 9, h: 3.4, spawn: [0, 7, 0], fog: 0x0b0d10, fogD: 0.03, bg: 0x070809, sun: 0.5, hemi: 0.55, lamp: [0xe8f2ff, 18, 14], lamps: [[-6, 3.1, -4], [6, 3.1, -4], [-6, 3.1, 4], [6, 3.1, 4]], red: [[11.8, 2.6, 0], 0x2a6aff, 4], build: buildPolice, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   flat: { name: 'Квартира Свити', desc: '', story: true, hx: 6, hz: 5, h: 2.8, spawn: [0, 3.6, 0], fog: 0x0a0807, fogD: 0.03, bg: 0x060504, sun: 0.4, hemi: 0.6, lamp: [0xffd0a0, 14, 10], lamps: [[-4, 2.5, -3], [4, 2.5, -3], [-4, 2.5, 3], [4, 2.5, 3]], red: [[0, 2.6, 4.5], 0xff3ad0, 2], build: buildFlat, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
@@ -2078,11 +2078,11 @@ const ZSKIN = [0x8c9a7c, 0x7b8872, 0x9a948a, 0x6f7a66, 0xa09a84];
 const ZCLOTH = [0x4a463c, 0x3a3e44, 0x5a4a3a, 0x3e2e2a, 0x6a6a5e];
 const helmMat = std({ color: 0x3b3f2c, roughness: 0.6, metalness: 0.2 }), rifleMat = std({ color: 0x1b1b1b, roughness: 0.5, metalness: 0.6 });
 const TYPES = {
-  human: { hp: 100, partHp: 1.8, look: () => sexLook({ skin: pick(SKIN), shirt: pick(SHIRT), pants: pick(PANTS), hair: Math.random() < 0.85 ? pick(hairMats) : null, sleeves: pick(['short', 'short', 'long', 'none']), skinTex: TEX.skin, eyes: eyeMat }) },
+  human: { hp: 100, partHp: 3.4, look: () => sexLook({ skin: pick(SKIN), shirt: pick(SHIRT), pants: pick(PANTS), hair: Math.random() < 0.85 ? pick(hairMats) : null, sleeves: pick(['short', 'short', 'long', 'none']), skinTex: TEX.skin, eyes: eyeMat }) },
   zombie: { hp: 150, partHp: 1.15, look: () => sexLook({ skin: pick(ZSKIN), shirt: pick(ZCLOTH), pants: pick(ZCLOTH), hair: Math.random() < 0.6 ? pick(hairMats) : null, sleeves: pick(['short', 'none', 'long']), skinTex: TEX.zskin, eyes: zEyeMat }) },
   dummy: { hp: 220, partHp: 1.3, look: () => ({ plastic: true }) },
   player: { hp: 100, partHp: 1.15, look: () => { const L = settings.look; const f = L.gender === 'f'; return { skin: L.skin, shirt: L.shirt, pants: 0x23262c, hair: std({ color: L.hair, roughness: 0.85, map: TEX.cloth }), sleeves: 'short', skinTex: TEX.skin, eyes: eyeMat, female: f, hairStyle: f ? L.hairStyle || 'long' : 'short', lips: f ? 0xb4605a : null, iris: L.iris || 0, prop: L.prop || null }; } },
-  soldier: { hp: 140, partHp: 1.6, look: () => sexLook({ skin: pick(SKIN), shirt: 0x4b5536, pants: 0x3d4530, hair: null, sleeves: 'long', skinTex: TEX.skin, eyes: eyeMat, helmet: true, rifle: true }) },
+  soldier: { hp: 140, partHp: 2.8, look: () => sexLook({ skin: pick(SKIN), shirt: 0x4b5536, pants: 0x3d4530, hair: null, sleeves: 'long', skinTex: TEX.skin, eyes: eyeMat, helmet: true, rifle: true }) },
 };
 const BLOOD_TINT = new THREE.Color(0x3c0303);
 const LOW_POSE = { down: 1, crawl: 1, kneel: 1, cover: 1 };
@@ -2794,7 +2794,7 @@ function applyLookKind(L, k) {
   else if (k === 'guard') { L.shirt = 0x1a1d24; L.pants = 0x15171c; L.helmet = false; L.cap = true; L.hair = null; }
   else if (k.startsWith('svity')) { L.skin = 0xf6d0b6; L.hair = null; L.female = true; L.hairStyle = null; L.svity = k.slice(6); const C = SV_COST[L.svity] || SV_COST.street; L.sleeves = C.sleeves; L.shirt = C.shirt; L.pants = C.pants; L.badge = L.svity === 'cop'; L.phone = L.svity === 'street'; }
   else if (k === 'melodie') { L.skin = 0xf4c8a4; L.hair = null; L.female = true; L.hairStyle = null; L.svity = 'melodie'; L.sleeves = 'long'; L.shirt = 0x14141a; L.pants = 0x14141a; L.melodie = true; }
-  else if (k === 'hitler') { L.female = false; L.skin = 0xe2b59a; L.skinTex = TEX.skin; L.shirt = 0x5c5a48; L.pants = 0x3a382e; L.sleeves = 'long'; L.hair = hairMats[0]; L.hairStyle = 'short'; L.helmet = false; L.cap = false; L.hitler = true; }
+  else if (k === 'hitler') { L.female = false; L.skin = 0xe2b59a; L.skinTex = TEX.skin; L.shirt = 0x5a4a30; L.pants = 0x2a2820; L.sleeves = 'long'; L.hair = null; L.hairStyle = null; L.helmet = false; L.cap = false; L.hitler = true; }
   else if (k === 'german') { L.female = false; L.shirt = 0x5c6258; L.pants = 0x4a4a42; L.sleeves = 'long'; L.helmet = true; L.german = true; }
   else if (k === 'bson') { L.female = false; L.skin = 0xf0c8a8; L.shirt = 0xffd23a; L.pants = 0x3a5a9a; L.sleeves = 'short'; L.hair = hairMats[1]; L.hairStyle = 'short'; L.prop = { build: 0.8, head: 1.7 }; L.bson = true; }
   else if (k === 'producer') { L.female = false; L.skin = 0xe9c3a2; L.skinTex = TEX.skin; L.shirt = 0xf2efe6; L.pants = 0xf2efe6; L.sleeves = 'long'; L.hair = hairMats[0]; L.hairStyle = 'short'; L.lips = null; L.producer = true; L.cap = false; L.helmet = false; L.rifle = false; }
@@ -4249,6 +4249,7 @@ function playerFoot(dt) {
   _a.set(player.pos.x + cx * sd * 0.1, player.pos.y, player.pos.z + cz * sd * 0.1); _c.set(-Math.sin(player.yaw), 0, -Math.cos(player.yaw)); addBloodDecal(_a, UP, _c, 0.07 * k, 0.15 * k);
 }
 function hitPart(npc, P, h, dir, dmg, w) {
+  if (WW.boss && npc === WW.boss && (WW.shield || !WW.provoked)) { WW.provoked = true; sparks(h.point, 8, hitNormal(h), 4); if (!WW.shT2 || performance.now() - WW.shT2 > 2500) { WW.shT2 = performance.now(); toast('Босс неуязвим: сначала перебейте охрану'); } return; }
   // Melodie dodges every bullet: she sidesteps across the shot and takes no damage
   if (npc.alive && npc.look && npc.look.melodie) { melDodge(npc, dir); return; }
   if (npc.gg && !npc.protect) { gagHit(npc, P, h, dir, w); return; }
@@ -4277,7 +4278,7 @@ function hitPart(npc, P, h, dir, dmg, w) {
     else if (kind === 'limb') {
       // at most one limb per shot burst, so a shotgun blast to the head does not strip the whole body
       const now = performance.now(); if (now - (npc.detT || 0) > 700) npc.detN = 0;
-      if ((npc.detN || 0) >= 1) P.hp = 1; else { npc.detT = now; npc.detN = (npc.detN || 0) + 1; if (npc.detach(P.name, { dir })) toast('Отстрелено: ' + P.def.ru); }
+      if (P.hp > -20) { /* bruised and bleeding, but still attached */ } else if ((npc.detN || 0) >= 1) P.hp = 1; else { npc.detT = now; npc.detN = (npc.detN || 0) + 1; if (npc.detach(P.name, { dir })) toast('Отстрелено: ' + P.def.ru); }
     }
     else P.hp = 1;
   }
@@ -4352,8 +4353,8 @@ function explode(pos, power) {
     for (const name of ORDER) {
       const P = npc.parts[name]; if (P.gone || P._d === undefined) continue; const f = 1 - P._d / R; if (f <= 0) continue;
       const away = _d.subVectors(P._w, pos).normalize().clone();
-      const mz = madness.on; if ((f > (mz ? 0.45 : 0.78) && P.def.kind !== 'torso' && P.def.kind !== 'pelvis') || (f > (mz ? 0.6 : 0.86) && P.def.kind === 'torso') || (f > (mz ? 0.7 : 0.92) && P.def.kind === 'pelvis')) { npc.gib(name, away, f * power + 0.3); gibbed++; continue; }
-      if (f > 0.4 && P.def.kind !== 'pelvis' && Math.random() < f * (P.def.kind === 'torso' ? 0.35 : 1.1)) npc.detach(name, { dir: away });
+      const mz = madness.on; if ((f > (mz ? 0.45 : 0.93) && P.def.kind !== 'torso' && P.def.kind !== 'pelvis') || (f > (mz ? 0.6 : 0.97) && P.def.kind === 'torso') || (f > (mz ? 0.7 : 0.98) && P.def.kind === 'pelvis')) { npc.gib(name, away, f * power + 0.3); gibbed++; continue; }
+      if (f > 0.55 && P.def.kind !== 'pelvis' && Math.random() < f * (P.def.kind === 'torso' ? 0.15 : 0.5)) npc.detach(name, { dir: away });
       bloody(P, f * 0.6);
     }
     for (const P of npc.partList) { if (P.gone || !P.body) continue; const pw = P.mesh.getWorldPosition(new V3()); const d = pw.distanceTo(pos); const f = Math.max(0, 1 - d / R); if (f <= 0) continue; _a.subVectors(pw, pos).normalize(); const k = f * power * P.def.mass * 13; P.body.wakeUp(); P.body.applyImpulse(new CANNON.Vec3(_a.x * k, (_a.y + 0.8) * k, _a.z * k)); }
@@ -8172,11 +8173,24 @@ function updCafeTable(dt) {
 }
 /* ===================== workshop 2: the spear, the time machine, the WWII field, Mikushka's fit and skins, B-son ===================== */
 function addHitlerExtras(n) {
-  const head = n.parts.head.mesh, arm = n.parts.uArmL.mesh, dk = std({ color: 0x15100c, roughness: 0.8 }), red = std({ color: 0xa81818, roughness: 0.7 });
-  const put = (par, geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); par.add(m); return m; };
-  put(head, new THREE.BoxGeometry(0.036, 0.012, 0.012), dk, 0, -0.038, 0.116);
-  const h = put(head, new THREE.BoxGeometry(0.15, 0.03, 0.12), dk, 0.012, 0.115, 0.04); h.rotation.z = -0.15;
-  put(arm, new THREE.CylinderGeometry(0.056, 0.056, 0.05, 12), red, 0, 0.02, 0);
+  const P = n.parts, head = P.head.mesh, torso = P.torso.mesh, pelvis = P.pelvis.mesh;
+  const put = (par, geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); par.add(m); return m; };
+  const dk = std({ color: 0x16100c, roughness: 0.8 }), red = std({ color: 0xa81818, roughness: 0.7 }), brown = std({ color: 0x4a3a26, roughness: 0.6 }), white = std({ color: 0xf0eeea, roughness: 0.6 }), blk = std({ color: 0x0e0e10, roughness: 0.5 });
+  // the face: a toothbrush moustache, heavy brows, dark hair swept to one side with a long fringe
+  put(head, new THREE.BoxGeometry(0.034, 0.014, 0.012), dk, 0, -0.037, 0.117);
+  for (const sd of [-1, 1]) put(head, new THREE.BoxGeometry(0.04, 0.009, 0.01), dk, sd * 0.04, 0.052, 0.108, 0, 0, -sd * 0.18);
+  const hair = put(head, new THREE.SphereGeometry(0.129, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), dk, 0, 0.008, -0.004); hair.scale.set(1.0, 0.96, 1.05);
+  put(head, new THREE.BoxGeometry(0.115, 0.045, 0.05), dk, -0.025, 0.088, 0.085, 0.1, 0, 0.32);
+  // the uniform: white collar and black tie, buttoned brown tunic, a cross strap and a belt with a buckle, breeches and boots
+  put(torso, new THREE.CylinderGeometry(0.056, 0.062, 0.03, 16), white, 0, 0.255, 0);
+  put(torso, new THREE.BoxGeometry(0.026, 0.2, 0.01), blk, 0, 0.13, 0.113);
+  for (let i = 0; i < 4; i++) put(torso, new THREE.SphereGeometry(0.008, 8, 6), goldMat, 0.012, 0.04 - i * 0.07, 0.118);
+  put(torso, new THREE.BoxGeometry(0.045, 0.52, 0.012), brown, 0, 0.02, 0.114, 0, 0, -0.72);
+  for (const sd of [-1, 1]) put(torso, new THREE.BoxGeometry(0.085, 0.07, 0.01), brown, sd * 0.1, -0.03, 0.114);
+  put(pelvis, new THREE.BoxGeometry(0.35, 0.045, 0.225), brown, 0, 0.075, 0); put(pelvis, new THREE.BoxGeometry(0.04, 0.04, 0.012), goldMat, 0, 0.075, 0.116);
+  put(P.uArmL.mesh, new THREE.CylinderGeometry(0.056, 0.056, 0.05, 12), red, 0, 0.02, 0);
+  for (const s of ['L', 'R']) { put(P['uLeg' + s].mesh, new THREE.CylinderGeometry(0.092, 0.07, 0.3, 12), std({ color: 0x2a2820, roughness: 0.8 }), 0, 0.03, 0); put(P['lLeg' + s].mesh, new THREE.CylinderGeometry(0.066, 0.07, 0.22, 12), blk, 0, -0.1, 0); }
+  n.hitler = true;
 }
 /* ----- the spear: weak, but 15% of hits go clean through and the spear stays in the body; a throw every 8 seconds ----- */
 GRIP.spear = GRIP.machete;
@@ -8251,34 +8265,89 @@ function startTimeTravel() {
 }
 /* ----- the map next to the modern city, and the field of 1941 with a hut and a boss ----- */
 function buildTimeCity() { buildStreet(); makeTimeMachine(0, -26); addSign([{ t: 'МАШИНА ВРЕМЕНИ', s: 90 }], 4, 0.5, 0, 3.4, -30.2, 0, 'rgba(90,240,255,0.95)'); }
-const WW = { boss: null, fight: false, won: false };
+/* ----- the field of 1941: a command hut with banners, burning wrecks, a watchtower with a searchlight, wire, trenches and a boss in several phases ----- */
+const WW = { boss: null, fight: false, won: false, shield: true, provoked: false, p2: false, p3: false, armorT: 0, shell: false, shT: 0, fires: [], sl: null, ft: 0, amb: 5, bar: null };
+function wwMapTex() {
+  const c = makeCanvas(256, 160), g = c.getContext('2d'); g.fillStyle = '#d8c89a'; g.fillRect(0, 0, 256, 160);
+  g.strokeStyle = '#7a6a48'; g.lineWidth = 2; for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(Math.random() * 256, 0); g.bezierCurveTo(Math.random() * 256, 50, Math.random() * 256, 100, Math.random() * 256, 160); g.stroke(); }
+  g.strokeStyle = '#a82020'; g.lineWidth = 4; g.beginPath(); g.moveTo(30, 130); g.lineTo(120, 80); g.lineTo(220, 40); g.stroke(); g.fillStyle = '#a82020'; for (const [x, y] of [[30, 130], [120, 80], [220, 40]]) { g.beginPath(); g.arc(x, y, 7, 0, 7); g.fill(); }
+  return toTex(c);
+}
 function buildWW2() {
   Object.assign(LV, { walls: false, ceil: false });
-  floorMesh(std({ color: 0x5a6a3a, roughness: 1, map: texRep(TEX.cloth, 40, 40) }), HX * 2, HZ * 2);
-  const BB = batcher(), wood = std({ map: TEX.wood, roughness: 0.85 }), mud = std({ color: 0x3a2a1c, roughness: 1 }), steel = std({ color: 0x4a4a48, roughness: 0.6, metalness: 0.6 });
-  const w = (x, z, sx, sz) => { BB.box(wood, x, 1.4, z, sx, 2.8, sz); solid(x, 1.4, z, sx, 2.8, sz); };
-  w(0, -16, 8, 0.3); w(-4, -12.5, 0.3, 7); w(4, -12.5, 0.3, 7); w(-2.6, -9, 2.9, 0.3); w(2.6, -9, 2.9, 0.3);
-  BB.box(wood, 0, 2.95, -12.5, 8.6, 0.25, 7.6);
-  BB.box(wood, 0, 0.45, -14.6, 1.8, 0.1, 0.9); BB.box(wood, 0, 0.22, -14.6, 0.14, 0.44, 0.14); solid(0, 0.3, -14.6, 1.8, 0.6, 0.9);
-  BB.geo(new THREE.MeshBasicMaterial({ color: 0xffd08a }), new THREE.SphereGeometry(0.1, 8, 6).translate(0.6, 0.62, -14.6));
-  for (const [x, z, r] of [[-12, 6, 3], [14, -4, 2.5], [-18, -14, 3.5], [10, 16, 2.2], [20, 8, 3]]) BB.geo(mud, new THREE.CylinderGeometry(r, r * 0.8, 0.06, 20).translate(x, 0.02, z));
-  for (let i = 0; i < 9; i++) { const x = -16 + i * 4, z = -2; BB.box(steel, x, 0.5, z, 0.06, 1.0, 0.06); BB.box(steel, x, 0.8, z, 4, 0.03, 0.03); }
-  for (let i = 0; i < 6; i++) BB.box(std({ color: 0x8a7a5a, roughness: 1 }), 6 + i * 0.9, 0.2, 6, 0.8, 0.4, 0.5);
-  for (const [x, z] of [[-14, -8], [16, -14], [-8, 14], [22, 4]]) { BB.cyl(mud, x, 2, z, 0.16, 0.22, 4, 6); BB.box(mud, x + 0.5, 3.4, z, 1.2, 0.1, 0.1, 0, 0, 0.5); }
-  BB.flush(); makeTimeMachine(8, 30);
+  floorMesh(std({ color: 0x4f5e30, roughness: 1, map: texRep(TEX.cloth, 60, 60) }), HX * 2, HZ * 2);
+  floorMesh(std({ color: 0x3a2c1e, roughness: 1, map: texRep(TEX.cloth, 4, 30) }), 5, 48, 0, 8, 0.004);
+  const BB = batcher(), wood = std({ map: TEX.wood, roughness: 0.85 }), plank = std({ map: TEX.wood, color: 0x8a6a48, roughness: 0.9 }), mud = std({ color: 0x2c2118, roughness: 1 }), steel = std({ color: 0x3e403e, roughness: 0.6, metalness: 0.6 });
+  const brick = std({ color: 0x7a4a38, roughness: 1 }), conc = std({ color: 0x8a8a84, roughness: 1 }), sand = std({ color: 0x9a8a5e, roughness: 1 }), canv = std({ color: 0x59603f, roughness: 1 }), burn = std({ color: 0x1a1612, roughness: 1 });
+  const red = std({ color: 0x9c1418, roughness: 0.8, side: THREE.DoubleSide }), gold = std({ color: 0xd8a838, roughness: 0.4, metalness: 0.6 }), glass = std({ color: 0x151a22, roughness: 0.1, metalness: 0.5 });
+  const wall = (x, z, sx, sz, h = 3.2, m = wood) => { BB.box(m, x, h / 2, z, sx, h, sz); solid(x, h / 2, z, sx, h, sz); };
+  // ===== the command hut =====
+  wall(0, -17, 10.4, 0.4); wall(-5, -13.5, 0.4, 7.4); wall(5, -13.5, 0.4, 7.4); wall(-3.1, -10, 3.8, 0.4); wall(3.1, -10, 3.8, 0.4); BB.box(wood, 0, 2.8, -10, 2.6, 0.8, 0.4);
+  BB.box(plank, -2.9, 3.85, -13.5, 6.4, 0.25, 8.6, 0, 0, 0.32); BB.box(plank, 2.9, 3.85, -13.5, 6.4, 0.25, 8.6, 0, 0, -0.32); BB.box(steel, 0, 4.45, -13.5, 0.2, 0.2, 8.8);
+  for (const [x, z, ry] of [[-3.1, -9.78, 0], [3.1, -9.78, 0], [-5.22, -13, Math.PI / 2], [5.22, -13, Math.PI / 2]]) BB.box(glass, x, 1.8, z, 1.3, 1.1, 0.1, ry);
+  floorMesh(std({ map: texRep(TEX.wood, 3, 3), color: 0x6a4a30, roughness: 0.8 }), 9.6, 6.6, 0, -13.5, 0.01);
+  BB.box(wood, 0, 0.82, -15, 3.4, 0.1, 1.5); for (const sx of [-1, 1]) BB.box(wood, sx * 1.5, 0.4, -15, 0.12, 0.8, 1.3); solid(0, 0.45, -15, 3.4, 0.9, 1.5);
+  { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.0).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: wwMapTex() })); m.position.set(0.3, 0.9, -15); addMesh(m); }
+  BB.box(wood, 0, 0.45, -16.3, 0.6, 0.1, 0.6); BB.box(wood, 0, 0.9, -16.55, 0.6, 0.9, 0.08);
+  BB.box(steel, -4.2, 1.2, -16.4, 0.9, 1.2, 0.5); BB.geo(new THREE.MeshBasicMaterial({ color: 0x40ff60 }), new THREE.BoxGeometry(0.08, 0.05, 0.02).translate(-4.2, 1.5, -16.13)); solid(-4.2, 0.6, -16.4, 0.9, 1.2, 0.5);
+  BB.geo(new THREE.MeshBasicMaterial({ color: 0xffd08a }), new THREE.SphereGeometry(0.14, 10, 8).translate(0, 2.7, -14.2)); BB.cyl(steel, 0, 3.1, -14.2, 0.01, 0.01, 0.8, 4);
+  for (const [x, z] of [[4.1, -11], [4.1, -12.1], [-4.2, -11], [3.2, -11]]) { BB.box(crateMat, x, 0.45, z, 0.9, 0.9, 0.9); solid(x, 0.45, z, 0.9, 0.9, 0.9); }
+  // ===== banners: on poles, on the hut, over the road (plain crimson with gold trim) =====
+  const flag = (x, z, h = 6, w = 1.6, hh = 2.6, ry = 0) => { BB.cyl(steel, x, h / 2, z, 0.05, 0.07, h, 8); BB.geo(gold, new THREE.SphereGeometry(0.1, 8, 6).translate(x, h + 0.05, z)); const cx = x + Math.cos(ry) * (w / 2 + 0.05), cz = z - Math.sin(ry) * (w / 2 + 0.05); BB.box(red, cx, h - hh / 2 - 0.2, cz, w, hh, 0.03, ry); BB.box(gold, cx, h - 0.25, cz, w, 0.12, 0.05, ry); BB.box(gold, cx, h - hh - 0.15, cz, w, 0.12, 0.05, ry); };
+  for (const [x, z] of [[-5.9, -9.2], [5.9, -9.2], [-3.6, 24], [3.6, 24], [-3.6, 14], [3.6, 14], [-3.6, 4], [3.6, 4]]) flag(x, z, 6.5, 1.6, 2.8, x < 0 ? Math.PI : 0);
+  flag(0, -13.5, 6.5, 3.2, 1.9, 0);
+  for (const sx of [-1, 1]) { BB.box(red, sx * 2.5, 2.0, -9.74, 1.2, 2.4, 0.05); BB.box(gold, sx * 2.5, 3.2, -9.72, 1.2, 0.1, 0.06); BB.box(gold, sx * 2.5, 0.85, -9.72, 1.2, 0.1, 0.06); }
+  // ===== sandbags and a pillbox around the entrance =====
+  for (let i = 0; i < 9; i++) for (const sx of [-1, 1]) { const x = sx * (3.2 + i * 0.95); if (Math.abs(x) < 3.4) continue; BB.box(sand, x, 0.25, -6.4, 0.9, 0.5, 0.5); BB.box(sand, x + 0.45, 0.75, -6.4, 0.9, 0.5, 0.5); solid(x, 0.5, -6.4, 0.9, 1.0, 0.5); }
+  BB.box(conc, -15, 1.1, -5, 5.2, 2.2, 3.4); BB.box(burn, -15, 1.4, -3.25, 3.2, 0.3, 0.1); solid(-15, 1.1, -5, 5.2, 2.2, 3.4); BB.box(conc, -15, 2.35, -5, 5.6, 0.3, 3.8);
+  // ===== a burning tank and a burning truck =====
+  BB.box(steel, -12, 0.75, 3, 4.4, 1.0, 2.5, 0.3); BB.box(burn, -12, 0.4, 1.7, 4.6, 0.7, 0.5, 0.3); BB.box(burn, -12, 0.4, 4.3, 4.6, 0.7, 0.5, 0.3); BB.cyl(steel, -12.1, 1.5, 3, 0.9, 1.0, 0.7, 14); BB.cyl(steel, -10.1, 1.6, 3.8, 0.12, 0.12, 3.2, 8, 0, Math.PI / 2 - 0.4); solid(-12, 0.9, 3, 4.4, 1.8, 2.6);
+  BB.box(burn, 14, 0.9, 10, 2.4, 1.2, 1.9, 0.5); BB.box(canv, 15.6, 1.1, 10.8, 3.0, 1.4, 1.9, 0.5); for (const [x, z] of [[13, 9], [16.4, 11.6], [13.4, 11.2], [15.6, 9.6]]) BB.cyl(burn, x, 0.35, z, 0.38, 0.38, 0.3, 10, Math.PI / 2); solid(14.8, 0.9, 10.4, 5, 1.8, 2.2);
+  WW.fires = [[-12, 1.8, 3], [14.8, 2.1, 10.4], [20, 1.8, -6], [-22, 1.6, -12], [10, 0.5, 20]];
+  // ===== ruined brick houses =====
+  for (const [cx, cz] of [[20, -6], [-21, -12]]) { wall(cx, cz - 3, 6, 0.5, 3.4, brick); wall(cx - 3, cz, 0.5, 6, 2.2, brick); wall(cx + 3, cz, 0.5, 4, 3.8, brick); BB.box(brick, cx + 1.4, 0.5, cz + 1.6, 1.4, 1.0, 1.0, 0.7); BB.box(burn, cx - 1.2, 0.3, cz + 0.4, 0.8, 0.5, 0.6, 0.4, 0.2); BB.box(wood, cx, 3.5, cz - 2.4, 5.4, 0.2, 1.2, 0, 0.4); }
+  // ===== a watchtower with a searchlight =====
+  for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) BB.cyl(wood, 18 + x, 3, -18 + z, 0.1, 0.12, 6, 6); BB.box(plank, 18, 6.1, -18, 3.2, 0.2, 3.2); BB.box(wood, 18, 7.1, -18, 2.8, 1.6, 2.8); BB.box(plank, 18, 8.0, -18, 3.4, 0.2, 3.4); solid(18, 3.5, -18, 3, 7, 3);
+  { const sl = new THREE.Group(); sl.position.set(18, 7.1, -16.4); const cone = new THREE.Mesh(new THREE.ConeGeometry(2.4, 22, 16, 1, true), new THREE.MeshBasicMaterial({ color: 0xfff2c0, transparent: true, opacity: 0.1, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); cone.rotation.x = -Math.PI / 2 + 0.28; cone.position.set(0, 0, 11.2); sl.add(cone); const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 8), new THREE.MeshBasicMaterial({ color: 0xfff6d0 })); sl.add(lamp); addMesh(sl); WW.sl = sl; }
+  // ===== trenches, wire, hedgehogs, tents, trees, craters =====
+  for (let i = 0; i < 10; i++) { const x = -24 + i * 2.6; BB.box(sand, x, 0.25, 14, 0.9, 0.5, 0.5); BB.box(sand, x + 0.45, 0.75, 14, 0.9, 0.5, 0.5); }
+  BB.box(mud, -11, 0.01, 14.8, 28, 0.02, 1.4);
+  for (const side of [-1, 1]) for (let i = 0; i < 8; i++) { const x = side * (7 + i * 2.8), z = -2; BB.box(steel, x, 0.6, z, 0.06, 1.2, 0.06); BB.box(steel, x, 0.45, z, 2.8, 0.03, 0.03); BB.box(steel, x, 0.95, z, 2.8, 0.03, 0.03); }
+  for (const [x, z] of [[-6, 10], [6, 10], [-8, 18], [9, 20]]) for (const r of [[0, 0, 0], [0, 1.1, 0], [0, 0, 1.1]]) BB.box(steel, x, 0.55, z, 1.4, 0.1, 0.1, r[0], r[1], r[2] + 0.5);
+  for (const [x, z] of [[-20, 8], [-23, 20]]) { BB.cyl(canv, x, 1.1, z, 0.01, 2.4, 2.2, 4); }
+  for (const [x, z] of [[-14, -14], [16, -12], [-8, -22], [22, 14], [-26, 0], [26, -2]]) { BB.cyl(burn, x, 2.2, z, 0.14, 0.24, 4.4, 6); BB.box(burn, x + 0.7, 3.4, z, 1.6, 0.12, 0.12, 0, 0, 0.5); BB.box(burn, x - 0.6, 2.9, z, 1.2, 0.1, 0.1, 0, 0, -0.6); }
+  for (const [x, z, r] of [[-8, 24, 3], [10, 28, 2.5], [-18, 28, 3.2], [24, 4, 3], [4, -26, 3.4]]) BB.geo(mud, new THREE.CylinderGeometry(r, r * 0.8, 0.06, 22).translate(x, 0.025, z));
+  for (const [x, z] of [[10, 20]]) { for (let i = 0; i < 5; i++) { const a = i / 5 * 6.28; BB.box(wood, x + Math.cos(a) * 0.5, 0.15, z + Math.sin(a) * 0.5, 0.9, 0.12, 0.12, a); } }
+  for (const [x, z] of [[-5, 26], [5, 27], [-7, 20]]) { BB.box(crateMat, x, 0.45, z, 0.9, 0.9, 0.9); solid(x, 0.45, z, 0.9, 0.9, 0.9); }
+  BB.flush(); makeTimeMachine(8, 31);
 }
+function wwBar() { if (WW.bar) return WW.bar; const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:50%;top:calc(52px + env(safe-area-inset-top,0px));transform:translateX(-50%);width:min(380px,60vw);z-index:36;pointer-events:none;display:none;font:700 12px var(--ui);letter-spacing:.14em;color:#ffd0c0;text-align:center'; d.innerHTML = '<div id="wwName">БОСС</div><div style="height:10px;background:rgba(0,0,0,.6);border:1px solid #a82020;margin-top:3px"><i id="wwFill" style="display:block;height:100%;width:100%;background:linear-gradient(90deg,#a01010,#ff4a2a)"></i></div>'; document.body.appendChild(d); return (WW.bar = d); }
 function setupWW2() {
-  WW.fight = false; WW.won = false; TM.list = TM.list.filter((g) => g.parent);
-  const b = WW.boss = spawnNPC('soldier', 0, -14.7, 0, 'hitler'); if (!b) return; b.hp = b.maxHp = 700; b.scripted = true; b.pos.set(0, 0, -14.9); b.yaw = 0; b.pose = 'sit'; b.poseDur = Infinity; b.poseRate = 1000; b.animate(0.02); b.poseRate = 8;
-  banner('Поле боя 1941', 'в домике сидит солдат');
+  Object.assign(WW, { fight: false, won: false, shield: true, provoked: false, p2: false, p3: false, armorT: 0, shell: false, shT: 0 }); TM.list = TM.list.filter((g) => g.parent);
+  const b = WW.boss = spawnNPC('soldier', 0, -16.1, 0, 'hitler'); if (!b) return; b.hp = b.maxHp = 1800; b.scripted = true; b.pos.set(0, 0, -16.1); b.yaw = 0; b.pose = 'sit'; b.poseDur = Infinity; b.poseRate = 1000; b.animate(0.02); b.poseRate = 8;
+  banner('Поле боя 1941', 'в командном домике сидит солдат');
 }
+function wwGuards() { let n = 0; for (const q of npcs) if (q.alive && q.look && q.look.german) n++; return n; }
+function wwWave(n, r) { for (let i = 0; i < n; i++) { const a = i / n * 6.28 + Math.random(); spawnNPC('soldier', Math.sin(a) * r, -3 + Math.cos(a) * (r * 0.5), a + 3.14, 'german'); } }
 function updWW2(dt) {
-  if (mapId !== 'ww2' || !WW.boss || state !== 'play') return; const b = WW.boss;
-  if (b.alive && !WW.fight && b.hp < b.maxHp - 1) {
-    WW.fight = true; b.scripted = false; b.pose = 'stand'; b.poseDur = 0; toast('БОСС: начинается бой!'); banner('БОСС', 'продержитесь и победите'); Sound.siren(0.5);
-    for (let i = 0; i < 5; i++) { const a = i / 5 * 6.28; spawnNPC('soldier', Math.sin(a) * 9, -10 + Math.cos(a) * 6, a + 3.14, 'german'); }
+  const bar = wwBar(); if (mapId !== 'ww2') { if (bar.style.display !== 'none') bar.style.display = 'none'; return; }
+  // the battlefield: flames, smoke, the searchlight and far-off shelling
+  WW.ft -= dt; if (WW.ft <= 0) { WW.ft = 0.08; for (const f of WW.fires) { spawnSprite(TEX.soft, _a.set(f[0] + rand(-0.5, 0.5), f[1], f[2] + rand(-0.5, 0.5)), { color: pick([0xff8a30, 0xffb040, 0xff5a20]), additive: true, size: rand(0.5, 1.1), grow: 1.2, life: rand(0.5, 0.9), opacity: 0.8, vel: new V3(rand(-0.2, 0.2), rand(1.2, 2.2), rand(-0.2, 0.2)) }); if (Math.random() < 0.3) spawnSprite(TEX.smoke, _a.set(f[0], f[1] + 0.8, f[2]), { color: 0x2a2622, size: rand(0.8, 1.5), grow: 2.6, life: rand(2, 3.4), opacity: 0.5, vel: new V3(rand(0.2, 0.7), rand(1.2, 2), rand(-0.2, 0.2)) }); } }
+  if (WW.sl) WW.sl.rotation.y += dt * 0.4;
+  WW.amb -= dt; if (WW.amb <= 0 && state === 'play') { WW.amb = rand(6, 13); Sound.thud(0.5); shake = Math.max(shake, 0.05); }
+  const b = WW.boss; if (!b || state !== 'play') return;
+  if (!WW.fight && WW.provoked && b.alive) {
+    WW.fight = true; b.scripted = false; b.pose = 'stand'; b.poseDur = 0; wwWave(5, 9); bar.style.display = 'block'; toast('БОСС: охрана, огонь!'); banner('БОСС', 'неуязвим, пока жива охрана'); Sound.siren(0.5);
   }
-  if (!b.alive && WW.fight && !WW.won) { WW.won = true; addUn('ww2'); syncExclSpawn(); banner('ПОБЕДА', 'открыто: машина времени, германские солдаты, Гитлер'); Sound.chime(); }
+  if (!WW.fight) return;
+  const alive = b.alive; WW.armorT = Math.max(0, WW.armorT - dt); const guards = wwGuards(), was = WW.shield; WW.shield = alive && (guards > 0 || WW.armorT > 0);
+  if (was && !WW.shield && alive) { toast('Щит упал! Бейте босса!'); Sound.chime(); }
+  if (alive && b.shootCd > 0.55 && (WW.p2 || WW.p3)) b.shootCd = 0.55;
+  if (alive && !WW.p2 && b.hp < b.maxHp * 0.5) { WW.p2 = true; wwWave(5, 11); toast('Вторая волна охраны!'); banner('ФАЗА 2', 'босс в ярости'); Sound.siren(0.5); }
+  if (alive && !WW.p3 && b.hp < b.maxHp * 0.25) { WW.p3 = true; WW.armorT = 7; WW.shell = true; toast('Артобстрел!'); banner('ФАЗА 3', 'уходите из-под снарядов'); }
+  if (WW.shell && alive) { WW.shT -= dt; if (WW.shT <= 0) { WW.shT = 2.2; const pt = new V3(player.pos.x + rand(-5, 5), 0, player.pos.z + rand(-5, 5)); spawnSprite(TEX.flash, _a.set(pt.x, 0.1, pt.z), { color: 0xff2a10, additive: true, size: 3.4, grow: 0.1, life: 1.3, opacity: 0.55 }); Sound.siren(0.15); later(1.3, () => { if (mapId === 'ww2') explode(pt, 0.9); }); } }
+  { const f = $('wwFill'); if (f) f.style.width = Math.max(0, b.hp / b.maxHp * 100) + '%'; const nm = $('wwName'); if (nm) nm.textContent = 'БОСС' + (WW.shield ? '  ·  ЩИТ' : '') + (WW.p3 ? '  ·  АРТОБСТРЕЛ' : ''); }
+  if (!alive && !WW.won) { WW.won = true; WW.shell = false; bar.style.display = 'none'; addUn('ww2'); syncExclSpawn(); banner('ПОБЕДА', 'открыто: машина времени, германские солдаты, Гитлер'); Sound.chime(); worldTs = 0.3; later(1.6, () => { worldTs = 1; }); }
 }
 /* ----- Mikushka: skins and a very rare fit ----- */
 function mikSmile(head) {
@@ -8448,7 +8517,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { BOTTLE, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
