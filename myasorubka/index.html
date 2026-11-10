@@ -2078,11 +2078,11 @@ const ZSKIN = [0x8c9a7c, 0x7b8872, 0x9a948a, 0x6f7a66, 0xa09a84];
 const ZCLOTH = [0x4a463c, 0x3a3e44, 0x5a4a3a, 0x3e2e2a, 0x6a6a5e];
 const helmMat = std({ color: 0x3b3f2c, roughness: 0.6, metalness: 0.2 }), rifleMat = std({ color: 0x1b1b1b, roughness: 0.5, metalness: 0.6 });
 const TYPES = {
-  human: { hp: 100, partHp: 1, look: () => sexLook({ skin: pick(SKIN), shirt: pick(SHIRT), pants: pick(PANTS), hair: Math.random() < 0.85 ? pick(hairMats) : null, sleeves: pick(['short', 'short', 'long', 'none']), skinTex: TEX.skin, eyes: eyeMat }) },
+  human: { hp: 100, partHp: 1.8, look: () => sexLook({ skin: pick(SKIN), shirt: pick(SHIRT), pants: pick(PANTS), hair: Math.random() < 0.85 ? pick(hairMats) : null, sleeves: pick(['short', 'short', 'long', 'none']), skinTex: TEX.skin, eyes: eyeMat }) },
   zombie: { hp: 150, partHp: 1.15, look: () => sexLook({ skin: pick(ZSKIN), shirt: pick(ZCLOTH), pants: pick(ZCLOTH), hair: Math.random() < 0.6 ? pick(hairMats) : null, sleeves: pick(['short', 'none', 'long']), skinTex: TEX.zskin, eyes: zEyeMat }) },
   dummy: { hp: 220, partHp: 1.3, look: () => ({ plastic: true }) },
   player: { hp: 100, partHp: 1.15, look: () => { const L = settings.look; const f = L.gender === 'f'; return { skin: L.skin, shirt: L.shirt, pants: 0x23262c, hair: std({ color: L.hair, roughness: 0.85, map: TEX.cloth }), sleeves: 'short', skinTex: TEX.skin, eyes: eyeMat, female: f, hairStyle: f ? L.hairStyle || 'long' : 'short', lips: f ? 0xb4605a : null, iris: L.iris || 0, prop: L.prop || null }; } },
-  soldier: { hp: 140, partHp: 1.1, look: () => sexLook({ skin: pick(SKIN), shirt: 0x4b5536, pants: 0x3d4530, hair: null, sleeves: 'long', skinTex: TEX.skin, eyes: eyeMat, helmet: true, rifle: true }) },
+  soldier: { hp: 140, partHp: 1.6, look: () => sexLook({ skin: pick(SKIN), shirt: 0x4b5536, pants: 0x3d4530, hair: null, sleeves: 'long', skinTex: TEX.skin, eyes: eyeMat, helmet: true, rifle: true }) },
 };
 const BLOOD_TINT = new THREE.Color(0x3c0303);
 const LOW_POSE = { down: 1, crawl: 1, kneel: 1, cover: 1 };
@@ -4269,12 +4269,16 @@ function hitPart(npc, P, h, dir, dmg, w) {
   Sound.splat(dv(h.point));
   if (camera.position.distanceTo(h.point) < 1.6) screenBlood(0.25);
   const mult = kind === 'head' ? 4 : kind === 'limb' ? 0.55 : 1;
-  P.hp -= dmg * (madness.on ? 3 : 1);
+  P.hp -= dmg * (madness.on ? 3 : 1) * (kind === 'limb' && w.id === 'shotgun' ? 0.55 : 1);
   if (npc.living) { npc.hp -= dmg * mult * (madness.on ? 1.6 : 1); if (npc.alive) npc.onHit(dir, P); if (npc.hp <= 0) { npc.die('shot'); if (madness.on && Math.random() < (w.id === 'shotgun' || w.id === 'bow' ? 0.9 : 0.5)) madBurst(npc, h.point, dir); if (kind === 'head') { stats.heads++; toast('Хедшот'); } } }
   if (kind === 'limb' && !P.gone && P.attached && Math.random() < (w.id === 'shotgun' || w.id === 'bow' ? 0.35 : w.id === 'rifle' || w.id === 'pistol' ? 0.1 : 0)) breakBone(npc, P, { open: Math.random() < 0.65 });
   if (P.hp <= 0 && !P.gone) {
     if (kind === 'head') { if (npc.detach('head', { dir })) toast('Голова отлетела'); }
-    else if (kind === 'limb') { if (npc.detach(P.name, { dir })) toast('Отстрелено: ' + P.def.ru); }
+    else if (kind === 'limb') {
+      // at most one limb per shot burst, so a shotgun blast to the head does not strip the whole body
+      const now = performance.now(); if (now - (npc.detT || 0) > 700) npc.detN = 0;
+      if ((npc.detN || 0) >= 1) P.hp = 1; else { npc.detT = now; npc.detN = (npc.detN || 0) + 1; if (npc.detach(P.name, { dir })) toast('Отстрелено: ' + P.def.ru); }
+    }
     else P.hp = 1;
   }
   if (npc.alive && !P.gone && (P.attached || !P.def.p)) npc.reactHit(P, dir, local, ln, w.id);
@@ -8380,8 +8384,8 @@ function processImpacts() {
     if (!npc.gg && !e.P.gone && e.P.def.kind === 'limb' && v > 11 * vk && v <= 20 * vk && Math.random() < 0.6) breakBone(npc, e.P, { open: v > 15 * vk && Math.random() < 0.7 });
     if (!npc.gg && !e.P.gone && v > 12 && Math.random() < 0.5) { const q = randomSurface(e.P, new V3()); tearCloth(npc, e.P, q, q.clone().normalize(), rand(0.05, 0.09), 0.9); }
     if (npc.gg) { /* the resurrector shrugs off a fall */ }
-    else if (v > 30 * vk) { for (const name of LIMBS) { const P = npc.parts[name]; if (!P.gone && P.attached && Math.random() < 0.7) npc.detach(name, { dir: n }); } if (!npc.parts.head.gone && npc.parts.head.attached) npc.detach('head', { dir: n }); }
-    else if (v > 20 * vk) { for (const name of LIMBS) { const P = npc.parts[name]; if (!P.gone && P.attached && (P === e.P || Math.random() < 0.15) && Math.random() < 0.6) npc.detach(name, { dir: n }); } if (v > 25 * vk && !npc.parts.head.gone && Math.random() < 0.3) npc.detach('head', { dir: n }); }
+    else if (v > 42 * vk) { for (const name of LIMBS) { const P = npc.parts[name]; if (!P.gone && P.attached && Math.random() < 0.7) npc.detach(name, { dir: n }); } if (!npc.parts.head.gone && npc.parts.head.attached) npc.detach('head', { dir: n }); }
+    else if (v > 28 * vk) { for (const name of LIMBS) { const P = npc.parts[name]; if (!P.gone && P.attached && (P === e.P || Math.random() < 0.15) && Math.random() < 0.6) npc.detach(name, { dir: n }); } if (v > 34 * vk && !npc.parts.head.gone && Math.random() < 0.2) npc.detach('head', { dir: n }); }
   }
 }
 function syncRagdolls() { for (const n of npcs) for (const P of n.partList) if (P.body && !P.gone) { P.mesh.position.copy(P.body.interpolatedPosition); P.mesh.quaternion.copy(P.body.interpolatedQuaternion); } if (avatar && !npcs.includes(avatar)) for (const P of avatar.partList) if (P.body && !P.gone) { P.mesh.position.copy(P.body.interpolatedPosition); P.mesh.quaternion.copy(P.body.interpolatedQuaternion); } }
