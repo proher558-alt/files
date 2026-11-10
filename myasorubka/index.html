@@ -3512,6 +3512,24 @@ class Humanoid {
       tg('uArmL', -0.6, 0, 0.1); tg('uArmR', -0.6, 0, -0.1); tg('lArmL', -1.2, 0, 0); tg('lArmR', -1.2, 0, 0);
     }
     if (this.alive && T.uArmL && T.uArmR && (this.shock > 0 || this.hp < this.maxHp * 0.35)) { const kk = this.shock > 0 ? 1 : 0.6, tt = this.t; T.uArmL[0] += Math.sin(tt * 37) * 0.045 * kk; T.uArmR[0] += Math.sin(tt * 41 + 1) * 0.045 * kk; if (T.lArmL) T.lArmL[0] += Math.sin(tt * 43 + 2) * 0.07 * kk; if (T.lArmR) T.lArmR[0] += Math.sin(tt * 39 + 3) * 0.07 * kk; if (T.head) T.head[1] += Math.sin(tt * 29) * 0.015 * kk; }
+    // ---- small living details: breathing, glances, shifting weight, shaky hands, rubbing the neck ----
+    if (this.alive && !this.look.plastic && !this.gg && this.type !== 'zombie' && (pose === 'stand' || pose === 'sit') && !this.clutch && !this.clutch2 && !this.controlled && T.uArmL && T.uArmR && T.lArmL && T.lArmR && T.torso && T.head) {
+      const ll = (this.live = this.live || { tr: rand(4, 14), trD: 0, trA: 0, gl: rand(2, 6), gy: 0, gx: 0, gyC: 0, gxC: 0, fid: rand(14, 30), fidD: 0 });
+      const calm = !(this.panic > 0), br = Math.sin(t * 1.7 + this.phase);
+      T.torso[0] += br * 0.012 * (calm ? 1 : 2.4); T.head[0] -= br * 0.006; T.uArmL[2] += br * 0.01; T.uArmR[2] -= br * 0.01;
+      if (s < 0.1 && calm) T.torso[2] += Math.sin(t * 0.33 + this.phase * 1.7) * 0.03;
+      // glances: a new look direction every few seconds, eased
+      ll.gl -= dt; if (ll.gl <= 0) { ll.gl = rand(2.5, 7); ll.gy = rand(-0.55, 0.55); ll.gx = rand(-0.12, 0.2); }
+      ll.gyC += (ll.gy - ll.gyC) * Math.min(1, dt * 2.2); ll.gxC += (ll.gx - ll.gxC) * Math.min(1, dt * 2.2); if (calm && !(this.talkT > 0)) { T.head[1] += ll.gyC; T.head[0] += ll.gxC; }
+      // shaky hands in episodes; more often when a gun is pointed their way
+      ll.tr -= dt; const armed = state === 'play' && Math.hypot(this.pos.x - player.pos.x, this.pos.z - player.pos.z) < 9 && !curW().melee && !curW().grab;
+      if (armed && ll.tr > 1.5 && ll.trD <= 0) ll.tr = Math.min(ll.tr, rand(0.4, 1.5));
+      if (ll.tr <= 0) { ll.trD = rand(2.5, 6); ll.trA = rand(0.012, 0.03) * (armed ? 1.5 : 1); ll.tr = rand(10, 25); }
+      if (ll.trD > 0) { ll.trD -= dt; const f = Math.min(1, ll.trD / 0.6), a = ll.trA * f; T.uArmL[0] += Math.sin(t * 41) * a; T.uArmR[0] += Math.sin(t * 37 + 1) * a; T.lArmL[0] += Math.sin(t * 47 + 2) * a * 1.8; T.lArmR[0] += Math.sin(t * 43 + 3) * a * 1.8; }
+      // now and then the right hand rubs the neck
+      ll.fid -= dt; if (ll.fid <= 0 && calm && !(this.talkT > 0) && !this.look.phone && s < 0.1) { ll.fid = rand(20, 40); ll.fidD = 2.4; }
+      if (ll.fidD > 0) { ll.fidD -= dt; const w = Math.sin(Math.min(1, (2.4 - ll.fidD) / 2.4) * Math.PI), rub = Math.sin(t * 9) * 0.06; T.uArmR[0] = lerp(T.uArmR[0], -2.35 + rub, w); T.uArmR[2] = lerp(T.uArmR[2], -0.45, w); T.lArmR[0] = lerp(T.lArmR[0], -2.0, w); T.head[2] += w * 0.08; }
+    }
     if (state === 'story' && this.fx && this.fx.eyes && !this.controlled && T.head && this.alive) { T.head[1] += clamp(this.fx.gy, -0.6, 0.6) * 0.9; T.head[0] += clamp(this.fx.gx, -0.4, 0.4) * 0.5; }
     if (pose === 'stand' && this.look.phone && !this.scripted && !(this.panic > 0)) { tg('uArmR', -1.35, 0.4, -0.2); tg('lArmR', -1.45, 0, 0); tg('head', 0.12, -0.35, 0); }
     if (this.jolt) { T.head[0] += this.jolt[0]; T.head[1] += this.jolt[1]; T.head[2] += this.jolt[2]; T.torso[0] += this.jolt[0] * 0.25; }
