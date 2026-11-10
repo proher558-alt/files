@@ -2882,6 +2882,7 @@ class Humanoid {
     world.addConstraint(con); C.constraint = con;
   }
   die(cause) {
+    if (this.look && this.look.melodie) { this.hp = this.maxHp; return; }
     if (this.gg) return; if (this.state === 'dead') return; const wasLimp = this.state === 'limp'; this.state = 'dead'; this.deadT = 0; this.killedBy = cause; this.clutch = this.clutch2 = null; if (this.sv) this.svUpdate(0);
     if (!wasLimp) {
       this.root.updateMatrixWorld(true);
@@ -2979,6 +2980,7 @@ class Humanoid {
     if (this.type === 'human') { this.panic = 10; if (this.voiceCd < 1.5) { this.voiceCd = rand(1.5, 3); Sound.voice('scream', dv(this.pos) * 0.7); } }
   }
   detach(name, o = {}) {
+    if (this.look && this.look.melodie) return false;
     if (this.gg) return false;
     const P = this.parts[name]; if (!P || P.gone || !P.attached || !P.def.p) return false;
     const parent = this.parts[P.def.p];
@@ -3011,6 +3013,7 @@ class Humanoid {
     return true;
   }
   gib(name, dir, power = 1) {
+    if (this.look && this.look.melodie) return;
     if (this.gg) return;
     const P = this.parts[name]; if (!P || P.gone) return;
     if (this.living) this.die('gib');
