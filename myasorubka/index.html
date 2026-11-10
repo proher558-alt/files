@@ -400,6 +400,7 @@ body.touch #wAmmo{font-size:26px}
         <button class="chip" data-v="tower">Небоскрёб · 200 этажей</button>
         <button class="chip" data-v="site">Стройка</button>
 <button class="chip" data-v="timecity">Машина времени</button>
+<button class="chip" data-v="factory" id="chipFactory" style="display:none">Фабрика</button>
         <button class="chip" data-v="moon" hidden>🌕 Кровавая Луна</button>
       </div>
     </div>
@@ -482,6 +483,7 @@ body.touch #wAmmo{font-size:26px}
       <button class="btn" data-spawn="x-gitler">Гитлер<small></small></button>
       <button class="btn" data-spawn="x-german">Германский солдат<small></small></button>
       <button class="btn" data-spawn="x-timemachine">Машина времени<small></small></button>
+      <button class="btn" data-spawn="huggy" id="spHuggy" style="display:none">Хаги Ваги<small>Монстр, идёт за вами</small></button>
       <button class="btn" data-spawn="melodie">Мелоди<small>Соведущая, розовые волосы и бант</small></button>
       <button class="btn" data-spawn="x-svity-street">Свити · Уличная<small id="xs1"></small></button>
       <button class="btn" data-spawn="x-svity-cop">Свити · Полицейская<small id="xs2"></small></button>
@@ -1138,6 +1140,7 @@ const MAPS = {
     npcs: { human: 6, zombie: 0, soldier: 0, look: 'worker' }, props: [['crate', -9, 9], ['crate', -8.2, 9.3], ['crate', -8.6, 9.1, 1.21], ['barrel', 8, -9], ['barrel', 9, -8.4], ['crate', 10, 10]], pills: [] },
   home: { name: 'Квартира', desc: '', story: true, hx: 4, hz: 3.2, h: 2.7, spawn: [0, 0, Math.PI], fog: 0x0a0908, fogD: 0.02, bg: 0x060505, sun: 0.25, hemi: 0.6, lamp: [0xffd6a0, 6, 7], lamps: [[-2.5, 2.4, -1.5], [2.5, 2.4, -1.5], [-2.5, 2.4, 1.5], [2.5, 2.4, 1.5]], red: [[0, 1.05, 2.7], 0x6aa0ff, 2.5], build: buildHome, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   timecity: { name: 'Машина времени', desc: 'Небольшой город и машина времени рядом. Включите её и отправьтесь в 1941 год.', hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildTimeCity, npcs: { human: 8, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  factory: { name: 'Фабрика', desc: 'Игрушечная фабрика под солнцем: полосатая труба, ворота и дорога. Здесь бродит Хаги Ваги. Открывается модом.', hx: 26, hz: 30, h: 40, spawn: [0, 26, 0], fog: 0xbfe0f5, fogD: 0.006, bg: 0x9fd0f2, sun: 2.2, hemi: 1.3, lamp: [0xfff0d0, 40, 40], lamps: [[0, 6, -10], [-14, 6, 0], [14, 6, 0], [0, 6, 14]], red: [[0, 3, 0], 0xffffff, 0], build: buildFactory, npcs: { human: 4, zombie: 0, soldier: 0 }, huggy: 2, props: [], pills: [] },
   ww2: { name: 'Поле боя 1941', desc: '', story: true, hx: 30, hz: 36, h: 30, spawn: [0, 32, 0], fog: 0x9a5c34, fogD: 0.018, bg: 0xb4683a, sun: 1.0, hemi: 0.9, lamp: [0xffb070, 34, 24], lamps: [[0, 2.8, -14], [-12, 3, 3], [14, 4, 10], [0, 5, 20]], red: [[0, 2.6, -12], 0xff7a30, 4], build: buildWW2, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   street: { name: 'Улица', desc: '', story: true, hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildStreet, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   police: { name: 'Участок полиции', desc: '', story: true, hx: 12, hz: 9, h: 3.4, spawn: [0, 7, 0], fog: 0x0b0d10, fogD: 0.03, bg: 0x070809, sun: 0.5, hemi: 0.55, lamp: [0xe8f2ff, 18, 14], lamps: [[-6, 3.1, -4], [6, 3.1, -4], [-6, 3.1, 4], [6, 3.1, 4]], red: [[11.8, 2.6, 0], 0x2a6aff, 4], build: buildPolice, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
@@ -1689,7 +1692,7 @@ function loadMap(id) {
   if (id === 'tower' && mapId !== 'tower') { TOWER.floor = 1; ELV.sel = TOWER.top; }
   if (typeof clearAll === 'function' && npcs.length + props.length) clearAll();
   removePills(); clearMap();
-  mapId = MAPS[id] && (id !== 'moon' || moonOpen()) ? id : 'polygon'; const M = MAPS[mapId];
+  mapId = MAPS[id] && (id !== 'moon' || moonOpen()) && (id !== 'factory' || getMods().huggy) ? id : 'polygon'; const M = MAPS[mapId];
   if (M.pre) M.pre();
   if (!M.npcs.soldier) M.npcs.soldier = 0;
   HX = M.hx; HZ = M.hz; WALL_H = M.h;
@@ -2796,6 +2799,7 @@ function applyLookKind(L, k) {
   else if (k === 'melodie') { L.skin = 0xf4c8a4; L.hair = null; L.female = true; L.hairStyle = null; L.svity = 'melodie'; L.sleeves = 'long'; L.shirt = 0x14141a; L.pants = 0x14141a; L.melodie = true; }
   else if (k === 'hitler') { L.female = false; L.skin = 0xe2b59a; L.skinTex = TEX.skin; L.shirt = 0x5a4a30; L.pants = 0x2a2820; L.sleeves = 'long'; L.hair = null; L.hairStyle = null; L.helmet = false; L.cap = false; L.hitler = true; }
   else if (k === 'german') { L.female = false; L.shirt = 0x5c6258; L.pants = 0x4a4a42; L.sleeves = 'long'; L.helmet = true; L.german = true; }
+  else if (k === 'huggy') { L.female = false; L.skin = 0x3558a8; L.shirt = 0x3558a8; L.pants = 0x3558a8; L.sleeves = 'long'; L.hair = null; L.hairStyle = null; L.helmet = false; L.cap = false; L.prop = { height: 1.55, build: 0.8, arms: 1.7, legs: 1.45, head: 1.45, hands: 1.3 }; L.huggy = true; }
   else if (k === 'bson') { L.female = false; L.skin = 0xf0c8a8; L.shirt = 0xffd23a; L.pants = 0x3a5a9a; L.sleeves = 'short'; L.hair = hairMats[1]; L.hairStyle = 'short'; L.prop = { build: 0.8, head: 1.7 }; L.bson = true; }
   else if (k === 'producer') { L.female = false; L.skin = 0xe9c3a2; L.skinTex = TEX.skin; L.shirt = 0xf2efe6; L.pants = 0xf2efe6; L.sleeves = 'long'; L.hair = hairMats[0]; L.hairStyle = 'short'; L.lips = null; L.producer = true; L.cap = false; L.helmet = false; L.rifle = false; }
   else if (k === 'gagarin') { L.female = false; L.skin = 0x0b0b0e; L.skinTex = null; L.shirt = 0x0c0c10; L.pants = 0xe07a1a; L.sleeves = 'long'; L.hair = null; L.gagarin = true; L.cap = false; }
@@ -2852,6 +2856,7 @@ class Humanoid {
     if (L.producer) addProducerExtras(this);
     if (L.melodie) addMelodieExtras(this);
     if (L.hitler) addHitlerExtras(this);
+    if (L.huggy) addHuggyExtras(this);
     if (L.gagarin) addGagarin(this); else if (!L.plastic && !L.svity) { this.mouthOpen = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.03, 0.01), mouthDarkMat); this.mouthOpen.position.set(0, -0.06, 0.103); this.mouthOpen.scale.y = 0.001; head.add(this.mouthOpen); }
     bodyExtras(this, L);
     remodel(this, L, type);
@@ -3981,7 +3986,7 @@ function tryFire(pressed) {
   if (!w.auto && !pressed) return;
   if (w.fists) { W.cd = w.rate; W.punchT = 0.26; W.punchSide = !W.punchSide; Sound.swoosh(); later(0.08, fistHit); return; }
   if (w.melee) { W.cd = w.rate; W.swingT = 0.32; if (w.id !== 'saw') Sound.swoosh(); later(0.09, meleeHit); return; }
-  if (w.thrown) { W.cd = w.rate; W.throwT = 0.45; later(0.15, throwGrenade); return; }
+  if (w.thrown) { W.cd = w.rate; W.throwT = 0.45; later(0.15, w.molotov ? throwMolotov : throwGrenade); return; }
   if (W.reloadT > 0) return;
   if (W.ammo[W.cur] <= 0) { Sound.click(2400, 0.2); startReload(); W.cd = 0.25; return; }
   if (w.id === 'flame') { fireFlame(w); return; }
@@ -4495,7 +4500,7 @@ function updateViewmodel(dt) {
   if (W.reloadT > 0) { W.reloadT -= dt; const t = 1 - W.reloadT / w.reload; const k = Math.sin(t * Math.PI); rx -= k * 0.7; py -= k * 0.06; rz += k * 0.5; if (m.userData.mag) m.userData.mag.position.y = -Math.sin(Math.min(1, t * 2) * Math.PI) * 0.12; if (W.reloadT <= 0) { W.ammo[W.cur] = w.mag; if (m.userData.mag) m.userData.mag.position.y = 0; } }
   if (W.swingT > 0) { W.swingT -= dt; const t = 1 - W.swingT / 0.32; const k = Math.sin(t * Math.PI); px -= k * 0.25; py += k * 0.05; rz += k * 1.4; rx -= k * 0.4; ry += k * 0.6; }
   if (w.fists && m.userData.fr) { if (W.punchT > 0) W.punchT -= dt; const t = W.punchT > 0 ? 1 - W.punchT / 0.26 : 1, k = Math.sin(t * Math.PI); for (const f of [m.userData.fr, m.userData.fl]) { const act = (f === m.userData.fr) === !!W.punchSide, b0 = f.userData.base, sg = Math.sign(b0.x); f.position.set(b0.x - (act ? sg * k * 0.11 : 0), b0.y + (act ? k * 0.06 : Math.sin(performance.now() * 0.004 + sg) * 0.005), b0.z - (act ? k * 0.27 : 0)); f.rotation.z = sg * 0.35 - (act ? sg * k * 0.5 : 0); } }
-  if (W.throwT > 0) { W.throwT -= dt; const t = 1 - W.throwT / 0.45; const k = Math.sin(t * Math.PI); pz -= k * 0.2; py += k * 0.1; rx -= k * 1.0; m.visible = t < 0.4 || t > 0.9; } else if (w.id === 'grenade') m.visible = true;
+  if (W.throwT > 0) { W.throwT -= dt; const t = 1 - W.throwT / 0.45; const k = Math.sin(t * Math.PI); pz -= k * 0.2; py += k * 0.1; rx -= k * 1.0; m.visible = t < 0.4 || t > 0.9; } else if (w.thrown) m.visible = true;
   if (m.userData.pump && W.pumpT > 0) { W.pumpT -= dt; m.userData.pump.position.z = -0.22 + Math.sin((1 - W.pumpT / 0.5) * Math.PI) * 0.08; if (m.userData.leftHand) m.userData.leftHand.position.z = Math.sin((1 - Math.max(0, W.pumpT) / 0.5) * Math.PI) * 0.08; }
   if (m.userData.slide) m.userData.slide.position.z = -0.02 + Math.min(0.04, W.recoil * 0.05);
   if (m.userData.blade) m.userData.blade.rotation.y += dt * (W.fireHeld || W.swingT > 0 ? 40 : 4);
@@ -4550,7 +4555,7 @@ document.querySelectorAll('#touch .tb').forEach((b) => {
     else if (act === 'act') storyAct(); else if (act === 'photo') storyPhoto(); else if (act === 'complain') storyComplain();
     else if (act === 'view') { settings.view = view3() ? 'fps' : 'tps'; saveSettings(); tps.cur = 0.5; ragCam.init = false; toast(view3() ? 'Вид от третьего лица' : 'Вид от первого лица'); Sound.click(1000, 0.2); }
     else if (act === 'pull') grab.pull = -1; else if (act === 'push') grab.pull = 1;
-    else if (act === 'alt') { if (grab.con) releaseGrab(true); else if (curW().grab) gravPunt(); else if (curW().cat) catMeow(); else if (curW().spear) spearThrow(); else if (curW().bottle) bottleThrow(); else if (curW().id !== 'grenade') { const prev = W.cur; W.cur = 4; W.cd = 0; tryFire(true); W.cur = prev; } }
+    else if (act === 'alt') { if (grab.con) releaseGrab(true); else if (curW().grab) gravPunt(); else if (curW().cat) catMeow(); else if (curW().spear) spearThrow(); else if (curW().bottle) bottleThrow(); else if (!curW().thrown) { const prev = W.cur; W.cur = 4; W.cd = 0; tryFire(true); W.cur = prev; } }
   }, { passive: false });
   const up = (e) => { e.preventDefault(); b.classList.remove('on'); if (act === 'pull' || act === 'push') grab.pull = 0; if (act === 'fire') { W.fireHeld = false; if (curW().grab && grab.con) releaseGrab(false); } };
   b.addEventListener('touchend', up); b.addEventListener('touchcancel', up);
@@ -4581,6 +4586,7 @@ function populateSandbox() {
   for (let i = 0; i < N.zombie; i++) spawnNPC('zombie', rand(-HX + 2, HX - 2), rand(-HZ + 1.5, -HZ * 0.5));
   for (let i = 0; i < (N.soldier || 0); i++) spawnNPC('soldier', rand(-HX + 3, HX - 3), rand(-HZ * 0.2, HZ * 0.3), undefined, N.slook);
   for (const [x, z, yaw] of N.dummies || []) spawnNPC('dummy', x, z, yaw);
+  for (let i = 0; i < (MAPS[mapId].huggy || 0); i++) spawnHuggy(rand(-8, 8), rand(-14, 0));
   if (mapId === 'moon') spawnNPC('human', 0, 4, Math.PI, 'gagarin');
   spawnMapProps();
 }
@@ -4635,6 +4641,7 @@ document.querySelectorAll('[data-spawn]').forEach((b) => b.onclick = () => {
   else if (k === 'crowd') { const p = aimPoint(); for (let i = 0; i < 6; i++) spawnNPC('human', p.x + rand(-2.5, 2.5), p.z + rand(-2.5, 2.5)); }
   else if (k === 'crate' || k === 'barrel') { const p = aimPoint(); spawnProp(k, p.x, p.z, 1.5); }
   else if (k === 'bson') { const p = aimPoint(); if (spawnNPC('human', p.x, p.z, Math.atan2(player.pos.x - p.x, player.pos.z - p.z), 'bson')) Sound.click(1100, 0.15); }
+  else if (k === 'huggy') { const p = aimPoint(); spawnHuggy(p.x, p.z); }
   else if (k === 'melodie') { const p = aimPoint(); if (spawnNPC('human', p.x, p.z, Math.atan2(player.pos.x - p.x, player.pos.z - p.z), 'melodie')) Sound.click(1100, 0.15); }
   else if (k === 'clean') cleanBlood(); else if (k === 'bodies') clearBodies(); else if (k === 'all') clearAll();
   closeSpawn();
@@ -7857,11 +7864,14 @@ function syncMods() {
   if (M.mikushka) WEAPONS.push({ id: 'mikushka', name: 'Микушка', melee: true, cat: true, rate: 0.7, dmg: 0 });
   if (M.sawgun) WEAPONS.push({ id: 'sawgun', name: 'Пиломёт', mag: 8, rate: 0.45, auto: false, spread: 0.01, pellets: 1, dmg: 70, force: 60, pen: 2, reload: 1.6 });
   if (M.axe) WEAPONS.push({ id: 'axe', name: 'Топор', melee: true, rate: 0.75, dmg: 80 });
+  if (M.molotov) WEAPONS.push({ id: 'molotov', name: 'Молотов', thrown: true, molotov: true, rate: 1.0 });
+  if (M.sledge) WEAPONS.push({ id: 'sledge', name: 'Кувалда', melee: true, rate: 1.25, dmg: 170 });
+  if (M.hammer) WEAPONS.push({ id: 'hammer', name: 'Молоток', melee: true, rate: 0.42, dmg: 38 });
   if (!MODELS.mikushka || MODELS.mikushka.userData.skin !== (M.skin || 'gray')) { if (MODELS.mikushka && MODELS.mikushka.parent) MODELS.mikushka.parent.remove(MODELS.mikushka); delete HELD.mikushka; const mk = buildCat(true, M.skin || 'gray'); mk.visible = false; mk.userData.base = { x: 0.14, y: -0.14, z: -0.42 }; mk.userData.skin = M.skin || 'gray'; vmRoot.add(mk); MODELS.mikushka = mk; }
   while (W.ammo.length < WEAPONS.length) W.ammo.push(WEAPONS[W.ammo.length].mag || 0); W.ammo.length = WEAPONS.length;
   const ni = WEAPONS.findIndex((w) => w.id === id); W.cur = ni < 0 ? 0 : ni;
   for (const k in MODELS) MODELS[k].visible = k === WEAPONS[W.cur].id;
-  updateSlots(); if (avatar) attachHeld();
+  updateSlots(); if (avatar) attachHeld(); if (typeof modsUi === 'function') modsUi();
 }
 function catEnd() { if (CAT.root) { scene.remove(CAT.root); CAT.root = null; } CAT.out = false; CAT.st = ''; CAT.tgt = null; }
 function catToss() {
@@ -7990,6 +8000,107 @@ function buildAxe() {
   g.add(arm(1, 0, 0, 0.0)); g.position.set(0.19, -0.2, -0.36); g.rotation.set(-0.15, 0.25, 0.35); g.userData.base = { x: 0.19, y: -0.2, z: -0.36 }; g.visible = false; vmRoot.add(g); return g;
 }
 MODELS.sawgun = buildSawgun(); MODELS.axe = buildAxe();
+/* ----- workshop, part 3: Molotov, sledgehammer, hammer, and the monster Huggy Wuggy (installs the «Фабрика» map) ----- */
+const svgImg = (bg, inner, label) => 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><rect width="220" height="220" fill="${bg}"/>${inner}<text x="110" y="208" font-size="20" text-anchor="middle" fill="#ffd080">${label}</text></svg>`);
+MODS_CATALOG.push(
+  { id: 'molotov', name: 'Молотов', img: svgImg('#241410', '<rect x="85" y="70" width="50" height="100" rx="14" fill="#3a8a4a"/><rect x="100" y="40" width="20" height="36" fill="#3a8a4a"/><path d="M110 8c20 20 14 30 0 40-14-10-20-20 0-40z" fill="#ff8a20"/>', 'МОЛОТОВ'), desc: 'Метательное. Бутылка разбивается и оставляет лужу огня на 7 секунд: все, кто в ней, горят.' },
+  { id: 'sledge', name: 'Кувалда', img: svgImg('#1c1c20', '<path d="M50 190 L150 60" stroke="#8a6a3a" stroke-width="12"/><rect x="108" y="30" width="80" height="46" rx="5" fill="#8a8e96" transform="rotate(40 148 53)"/>', 'КУВАЛДА'), desc: 'Очень тяжёлый удар: медленная, но почти валит с одного раза и раскидывает части.' },
+  { id: 'hammer', name: 'Молоток', img: svgImg('#1c1c20', '<path d="M60 190 L130 70" stroke="#8a6a3a" stroke-width="10"/><rect x="92" y="38" width="70" height="30" rx="4" fill="#9ca0a8" transform="rotate(30 127 53)"/>', 'МОЛОТОК'), desc: 'Быстрый и лёгкий. Бьёт часто, но слабее топора.' },
+  { id: 'huggy', name: 'Хаги Ваги', img: svgImg('#10204a', '<ellipse cx="110" cy="90" rx="60" ry="66" fill="#2a4a8a"/><circle cx="88" cy="70" r="12" fill="#fff"/><circle cx="132" cy="70" r="12" fill="#fff"/><circle cx="88" cy="72" r="6" fill="#000"/><circle cx="132" cy="72" r="6" fill="#000"/><path d="M60 100 Q110 160 160 100 Q110 128 60 100z" fill="#d81818"/><path d="M72 108 Q110 140 148 108" stroke="#fff" stroke-width="6" stroke-dasharray="4 5" fill="none"/>', 'HUGGY WUGGY'), desc: 'Монстр: появляется в меню спавна, высокий, синий, с огромной улыбкой. Идёт за вами и людьми. Вместе с ним в игре появляется карта «Фабрика».' }
+);
+GRIP.hammer = GRIP.sledge = GRIP.machete; GRIP.molotov = GRIP.grenade;
+function buildHammerModel(kind) {
+  const g = new THREE.Group(), wood = vmMat.wood, steel = vmMat.steel, L = kind === 'sledge' ? 0.7 : 0.4, hs = kind === 'sledge' ? [0.17, 0.09, 0.09] : [0.1, 0.055, 0.04];
+  const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.022, L, 12).rotateX(Math.PI / 2), wood); handle.position.set(0, 0, -L / 2 + 0.1); g.add(handle);
+  const head = new THREE.Mesh(new THREE.BoxGeometry(hs[0], hs[1], hs[2]), steel); head.position.set(0, 0, -L + 0.08); g.add(head);
+  if (kind === 'hammer') { const claw = new THREE.Mesh(new THREE.ConeGeometry(0.014, 0.07, 6).rotateX(Math.PI / 2), steel); claw.position.set(0, 0, -L + 0.13); g.add(claw); }
+  g.add(arm(1, 0, 0, 0)); g.position.set(0.19, -0.2, -0.36); g.rotation.set(-0.15, 0.2, 0.3); g.userData.base = { x: 0.19, y: -0.2, z: -0.36 }; g.visible = false; vmRoot.add(g); return g;
+}
+function buildMolotovModel() {
+  const g = new THREE.Group(), glass = new THREE.MeshStandardMaterial({ color: 0x2c7a3a, roughness: 0.2, transparent: true, opacity: 0.8 }), rag = std({ color: 0xd8d0b8, roughness: 1 });
+  g.add(cyl(0.04, 0.04, 0.17, glass, 0, 0, 0, Math.PI / 2, 0, 0, 14)); g.add(cyl(0.016, 0.016, 0.09, glass, 0, 0, -0.12, Math.PI / 2, 0, 0, 10)); g.add(cyl(0.008, 0.008, 0.07, rag, 0, 0.02, -0.19, 0.5, 0, 0, 6));
+  const fl = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.07, 8), new THREE.MeshBasicMaterial({ color: 0xff8a20 })); fl.position.set(0, 0.07, -0.22); g.add(fl); g.userData.flame = fl;
+  g.add(arm(1, 0, -0.03, 0.02)); g.position.set(0.15, -0.15, -0.4); g.userData.base = { x: 0.15, y: -0.15, z: -0.4 }; g.visible = false; vmRoot.add(g); return g;
+}
+MODELS.molotov = buildMolotovModel(); MODELS.sledge = buildHammerModel('sledge'); MODELS.hammer = buildHammerModel('hammer');
+const FIRES = [], moloGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.16, 10);
+function throwMolotov() {
+  const m = new THREE.Mesh(moloGeo, new THREE.MeshStandardMaterial({ color: 0x2c7a3a, roughness: 0.2 })); m.castShadow = true; scene.add(m);
+  const p = handWorld(new V3()), b = new CANNON.Body({ mass: 0.4, material: mProp, position: cv(p), linearDamping: 0.03, angularDamping: 0.2, collisionFilterGroup: G_GIB, collisionFilterMask: G_STATIC | G_BODY | G_PROP });
+  b.addShape(new CANNON.Sphere(0.05)); const f = aimDir(new V3()); b.velocity.set(f.x * 14 + player.vel.x, f.y * 14 + 3 + player.vel.y * 0.5, f.z * 14 + player.vel.z); b.angularVelocity.set(rand(-12, 12), rand(-12, 12), rand(-12, 12));
+  let done = false, born = performance.now();
+  const burst = () => { if (done) return; done = true; const pos = new V3(b.position.x, Math.max(0.05, b.position.y), b.position.z); scene.remove(m); world.removeBody(b); molotovBurst(pos); };
+  b.addEventListener('collide', (e) => { if (performance.now() - born > 120 && Math.abs(e.contact.getImpactVelocityAlongNormal()) > 1.2) setTimeout(burst, 0); });
+  world.addBody(b); const upd = () => { if (done) return; m.position.copy(b.interpolatedPosition); m.quaternion.copy(b.interpolatedQuaternion); if (performance.now() - born > 4000) burst(); else requestAnimationFrame(upd); }; upd(); Sound.swoosh();
+}
+function molotovBurst(pos) {
+  Sound.glass(Math.min(1, dv(pos) * 2)); Sound.flame(0.8); FIRES.push({ p: pos, t: 7, ft: 0, dt: 0, map: mapId }); shake = Math.max(shake, 0.1);
+  for (let i = 0; i < 12; i++) spawnSprite(TEX.soft, _a.copy(pos).add(randUnit(_b).multiplyScalar(0.3)), { color: pick([0xffb040, 0xff7a20, 0xffe090]), additive: true, size: rand(0.6, 1.4), grow: 1.5, life: rand(0.3, 0.6), opacity: 0.9, vel: randUnit(_c).multiplyScalar(2.5) });
+  boomLight.position.copy(pos).y += 0.6; boomLight.intensity = 260; W.boomT = 0.3; alertHumans(12);
+}
+function updFires(dt) {
+  for (let i = FIRES.length - 1; i >= 0; i--) {
+    const f = FIRES[i]; f.t -= dt; if (f.t <= 0 || f.map !== mapId) { FIRES.splice(i, 1); continue; }
+    f.ft -= dt; if (f.ft <= 0) { f.ft = 0.07; const k = Math.min(1, f.t / 1.2); for (let j = 0; j < 2; j++) spawnSprite(TEX.soft, _a.set(f.p.x + rand(-1.4, 1.4), f.p.y + 0.1, f.p.z + rand(-1.4, 1.4)), { color: pick([0xff8a30, 0xffb040, 0xff5a20]), additive: true, size: rand(0.5, 1.1) * (0.5 + k * 0.5), grow: 0.9, life: rand(0.4, 0.8), opacity: 0.85, vel: new V3(rand(-0.2, 0.2), rand(1.2, 2.4), rand(-0.2, 0.2)) }); if (Math.random() < 0.25) spawnSprite(TEX.smoke, _a.set(f.p.x, f.p.y + 0.6, f.p.z), { color: 0x2a2622, size: rand(0.7, 1.2), grow: 2.4, life: rand(1.6, 2.6), opacity: 0.45, vel: new V3(rand(0.1, 0.5), rand(1.2, 2), rand(-0.2, 0.2)) }); }
+    f.dt -= dt; if (f.dt <= 0) { f.dt = 0.3; for (const n of npcs) if (n.alive && Math.hypot(n.pos.x - f.p.x, n.pos.z - f.p.z) < 1.9 && Math.abs(n.pos.y - f.p.y) < 2.2) n.burn = Math.min(6, n.burn + 1.4); }
+  }
+}
+function addHuggyExtras(n) {
+  const P = n.parts, head = P.head.mesh; for (const c of head.children.slice()) c.visible = false;
+  const put = (par, geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); par.add(m); return m; };
+  const fur = std({ color: 0x3558a8, roughness: 1 }), red = std({ color: 0xd01818, roughness: 0.25 }), white = std({ color: 0xf0ece4, roughness: 0.4 }), blk = new THREE.MeshBasicMaterial({ color: 0x0a0a0c }), mouth = new THREE.MeshBasicMaterial({ color: 0x1a0606, side: THREE.DoubleSide }), yel = std({ color: 0xe0a82a, roughness: 0.9 });
+  head.material = fur;
+  // the huge smile: a red lip, a dark mouth, two rows of needle teeth
+  const lip = put(head, new THREE.TorusGeometry(0.095, 0.013, 8, 28, Math.PI), red, 0, 0.0, 0.1, 0, 0, Math.PI); lip.scale.set(1.15, 0.9, 1);
+  put(head, new THREE.CircleGeometry(0.095, 28, Math.PI, Math.PI), mouth, 0, 0.0, 0.098).scale.set(1.15, 0.9, 1);
+  for (let i = 0; i < 11; i++) { const a = Math.PI + 0.25 + i / 10 * (Math.PI - 0.5), x = Math.cos(a) * 0.1 * 1.15, y = Math.sin(a) * 0.095 * 0.9; put(head, new THREE.ConeGeometry(0.0085, 0.035, 5), white, x, y + 0.016, 0.102, 0, 0, 0).rotation.z = 0; put(head, new THREE.ConeGeometry(0.0075, 0.03, 5), white, x * 0.9, y * 0.9 - 0.04 + 0.028, 0.102, Math.PI, 0, 0); }
+  // big googly eyes
+  for (const s of [-1, 1]) { put(head, new THREE.SphereGeometry(0.03, 14, 10), white, s * 0.047, 0.068, 0.098); put(head, new THREE.SphereGeometry(0.019, 12, 8), blk, s * 0.047, 0.066, 0.123); }
+  // shaggy fur: two tall ears and a crown of tufts
+  for (const s of [-1, 1]) put(head, new THREE.ConeGeometry(0.05, 0.13, 6), fur, s * 0.07, 0.14, -0.01, 0, 0, -s * 0.3);
+  for (let i = 0; i < 9; i++) { const a = i / 9 * 6.28; put(head, new THREE.ConeGeometry(0.018, 0.07, 5), fur, Math.cos(a) * 0.085, 0.09 + Math.abs(Math.sin(a)) * 0.03, Math.sin(a) * 0.085 - 0.01, Math.sin(a) * 0.4, 0, -Math.cos(a) * 0.5); }
+  put(P.torso.mesh, new THREE.TorusGeometry(0.06, 0.008, 6, 14), std({ color: 0x4a78c8, roughness: 0.6 }), 0, 0.25, 0.02, Math.PI / 2, 0, 0);
+  for (const s of ['L', 'R']) { const h = P['lArm' + s].hand, f = P['lLeg' + s].foot; for (const q of [h, f]) if (q) q.material = yel; }
+  n.huggy = true;
+}
+function spawnHuggy(x, z) { const n = spawnNPC('zombie', x, z, Math.atan2(player.pos.x - x, player.pos.z - z), 'huggy'); if (n) { n.hp = n.maxHp = 700; Sound.click(900, 0.15); } return n; }
+function modsUi() {
+  const M = getMods(), on = !!M.huggy, c = document.getElementById('chipFactory'), b = document.getElementById('spHuggy'); if (c) c.style.display = on ? '' : 'none'; if (b) b.style.display = on ? '' : 'none';
+  if (!on && settings.map === 'factory') { settings.map = 'polygon'; saveSettings(); if (state === 'menu' && mapId === 'factory') { loadMap('polygon'); populateSandbox(); placePills(); } syncChips(); }
+}
+/* ----- map «Фабрика»: a toy factory in sunshine with a striped chimney and a road to the gate ----- */
+function buildFactory() {
+  Object.assign(LV, { walls: false, ceil: false });
+  floorMesh(std({ color: 0x6a9a4a, roughness: 1, map: texRep(TEX.cloth, 40, 40) }), HX * 2, HZ * 2);
+  floorMesh(std({ color: 0x45474a, roughness: 0.95 }), 6, 52, 0, 6, 0.004);
+  const BB = batcher(), C = (c) => std({ color: c, roughness: 0.85 }), yel = C(0xe8d28a), org = C(0xd8572a), blu = C(0x5a86b8), dome = std({ color: 0x8ab8d8, roughness: 0.3, metalness: 0.2 }), brick = C(0xb86a3a), roof = C(0xc8502a), dark = C(0x20262c), cur = C(0x9a9a96), line = C(0xe8d870);
+  const blk = (m, x, y, z, sx, sy, sz, rot = 0) => { BB.box(m, x, y, z, sx, sy, sz, rot); solid(x, y, z, sx, sy, sz); };
+  for (let z = -18; z < HZ - 2; z += 3) BB.box(line, 0, 0.012, z, 0.18, 0.01, 1.4); BB.box(cur, -3.2, 0.06, 6, 0.4, 0.12, 52); BB.box(cur, 3.2, 0.06, 6, 0.4, 0.12, 52);
+  // the main building: long yellow body, orange towers with domes, a blue crenel band, round windows
+  blk(yel, -12, 3.2, -25, 28, 6.4, 6); BB.box(blu, -12, 6.6, -22.2, 28.4, 0.5, 0.5);
+  for (let i = 0; i < 13; i++) BB.box(blu, -25 + i * 2.1, 6.9, -22.2, 1.1, 0.5, 0.5);
+  for (const x of [-24, -17, -9, -1]) { blk(org, x, 5.2, -23, 2.4, 10.4, 2.4); BB.geo(dome, new THREE.SphereGeometry(1.2, 14, 10, 0, 6.28, 0, 1.57).translate(x, 10.4, -23)); }
+  for (let i = 0; i < 20; i++) { const x = -25 + i * 1.4; BB.geo(dark, new THREE.CircleGeometry(0.3, 12).translate(x, 2.2 + (i % 2) * 1.6, -21.97)); }
+  for (let i = 0; i < 9; i++) BB.box(org, -24 + i * 3, 0.9, -21.95, 1.6, 1.8, 0.12);
+  // the gate: a blue arch, a dome and the sign
+  blk(C(0xf0e6b8), 9, 2.8, -25, 9, 5.6, 6); BB.box(blu, 9, 5.7, -22, 9.4, 0.5, 0.5); BB.geo(std({ color: 0xe8884a, roughness: 0.4 }), new THREE.SphereGeometry(2.2, 18, 10, 0, 6.28, 0, 1.57).translate(9, 5.6, -23)); BB.geo(dark, new THREE.CircleGeometry(1.1, 18).translate(9, 3.6, -21.97)); BB.box(dark, 9, 1.2, -21.95, 2.4, 2.4, 0.1);
+  BB.geo(org, new THREE.TorusGeometry(0.7, 0.2, 8, 18).translate(9, 9.2, -24)); BB.box(org, 8.3, 7.7, -24, 0.4, 2.2, 0.4);
+  // the brick sheds with gabled roofs and round windows
+  for (const x of [17, 22]) { blk(brick, x, 2.4, -24, 4.6, 4.8, 7); BB.box(roof, x - 1.1, 5.4, -24, 2.9, 0.25, 7.6, 0, 0, 0.55); BB.box(roof, x + 1.1, 5.4, -24, 2.9, 0.25, 7.6, 0, 0, -0.55); BB.geo(dark, new THREE.CircleGeometry(0.7, 14).translate(x, 3.6, -20.47)); for (const s of [-1, 1]) BB.box(dark, x + s * 1.5, 1.6, -20.47, 0.5, 1.1, 0.06); }
+  // chimneys: a huge striped one, and pastel ones behind
+  for (let i = 0; i < 8; i++) BB.cyl(i % 2 ? C(0xe8d08a) : C(0xd8503a), 13, 2.6 + i * 2.6, -29, 1.7, 1.75, 2.6, 18);
+  for (const [x, h, c] of [[-22, 12, 0xf0b070], [-14, 14, 0x9ac8e0], [-5, 11, 0xe8d880], [24, 12, 0xf0b070], [27, 10, 0x9ac8e0], [1, 9, 0xa8d8b0]]) BB.cyl(C(c), x, h / 2, -30, 1.3, 1.3, h, 16);
+  BB.cyl(C(0x5a6068), 18, 8, -30, 1.7, 1.7, 16, 16);
+  // toys scattered about: colourful cubes and balls
+  const cols = [0xe84a4a, 0x4a8ae8, 0xf2c200, 0x4ac86a, 0xc060e0, 0xff8a30];
+  for (const [x, z, s] of [[-8, 4, 1.4], [-9.4, 4.2, 1.1], [9, 8, 1.6], [-14, -6, 1.3], [14, -8, 1.2], [-10, 16, 1.5], [11, 18, 1.2], [-17, 8, 1.0]]) blk(C(pick(cols)), x, s / 2, z, s, s, s, rand(0, 1.5));
+  for (const [x, z] of [[-6, -10], [7, -12], [-15, 20]]) { BB.geo(C(pick(cols)), new THREE.SphereGeometry(0.9, 14, 10).translate(x, 0.9, z)); solid(x, 0.9, z, 1.6, 1.8, 1.6); }
+  // a tall fence all round keeps everyone in
+  for (const s of [-1, 1]) { blk(C(0xc8dcea), s * (HX + 0.4), 1.4, 0, 0.5, 2.8, HZ * 2); }
+  blk(C(0xc8dcea), 0, 1.4, HZ + 0.4, HX * 2, 2.8, 0.5);
+  BB.flush();
+}
+syncMods();
 /* ----- sawblades that stay stuck in the body; the wounds around them stay too ----- */
 const SAW = { geo: null, mat: null };
 function embedSaw(P, point, dir) {
@@ -8473,7 +8584,7 @@ function frame(now) {
     else if (state === 'menu' || state === 'over') { menuT += rdt * 0.08; const r = Math.min(HX, HZ) * 0.72; camera.position.set(Math.sin(menuT) * r, Math.min(5.2, WALL_H - 0.7), Math.cos(menuT) * r); camera.lookAt(0, 1, 0); }
     world.step(1 / 60 * ts, dt, 4); processGlass(); processImpacts();
     if (mapId === 'tower') updateElevator(rdt); else if (mapId === 'site') updateSite(now);
-    syncRagdolls(); updateProps(); syncDropGun(); updateGibs(dt); updateGuts(); updateGrenades(dt);
+    syncRagdolls(); updateProps(); syncDropGun(); updateGibs(dt); updateGuts(); updateGrenades(dt); updFires(dt);
     for (const n of npcs.slice()) n.update(dt);
     updateAvatar(dt);
     if (state === 'play' && mode === 'story') updateStory(rdt); else if (state === 'play') kissWatch(rdt);
@@ -8517,7 +8628,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
