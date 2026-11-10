@@ -3150,7 +3150,9 @@ class Humanoid {
     if (!c) return;
     const P = c.P, valid = this.pose !== 'crawl' && !P.gone && !P.body && (P.attached || !P.def.p) && this.handOk(c.hand);
     if (!valid) c.t = 0; else if (this.pose !== 'stand') c.t = Math.max(c.t, 0.5);
-    c.t -= dt; c.w = c.t > 0 ? Math.min(1, c.w + dt * 12) : c.w - dt * 2.5;
+    c.t -= dt; c.age = (c.age || 0) + dt;
+    // a human reaction: a short delay, then the hand rises smoothly (eased), instead of snapping to the wound
+    if (c.t > 0) { if (c.age > 0.16) { const k = Math.min(1, (c.age - 0.16) / 0.45); c.w = Math.max(c.w, Math.min(1, k * k * (3 - 2 * k))); } } else c.w -= dt * 1.8;
     if (c.w <= 0 || !valid) { if (this.clutch === c) this.clutch = null; if (this.clutch2 === c) this.clutch2 = null; return; }
     P.mesh.localToWorld(_ikT.copy(c.local)); this.ikArm(c.hand, _ikT, c.w);
   }
