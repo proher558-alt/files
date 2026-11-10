@@ -1141,6 +1141,7 @@ const MAPS = {
   home: { name: 'Квартира', desc: '', story: true, hx: 4, hz: 3.2, h: 2.7, spawn: [0, 0, Math.PI], fog: 0x0a0908, fogD: 0.02, bg: 0x060505, sun: 0.25, hemi: 0.6, lamp: [0xffd6a0, 6, 7], lamps: [[-2.5, 2.4, -1.5], [2.5, 2.4, -1.5], [-2.5, 2.4, 1.5], [2.5, 2.4, 1.5]], red: [[0, 1.05, 2.7], 0x6aa0ff, 2.5], build: buildHome, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   timecity: { name: 'Машина времени', desc: 'Небольшой город и машина времени рядом. Включите её и отправьтесь в 1941 год.', hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildTimeCity, npcs: { human: 8, zombie: 0, soldier: 0 }, props: [], pills: [] },
   factory: { name: 'Фабрика', desc: 'Игрушечная фабрика под солнцем: полосатая труба, ворота и дорога. Здесь бродит Хаги Ваги. Открывается модом.', hx: 26, hz: 30, h: 40, spawn: [0, 26, 0], fog: 0xbfe0f5, fogD: 0.006, bg: 0x9fd0f2, sun: 2.2, hemi: 1.3, lamp: [0xfff0d0, 40, 40], lamps: [[0, 6, -10], [-14, 6, 0], [14, 6, 0], [0, 6, 14]], red: [[0, 3, 0], 0xffffff, 0], build: buildFactory, npcs: { human: 4, zombie: 0, soldier: 0 }, huggy: 2, props: [], pills: [] },
+  factoryIn: { name: 'Фабрика · внутри', desc: 'Холл, атриум со статуей Хаги Ваги, комната с поездом, коридор и цех.', hx: 14, hz: 36, h: 8, spawn: [0, 33, 0], fog: 0x0a0c10, fogD: 0.03, bg: 0x050608, sun: 0.25, hemi: 0.5, lamp: [0xe8f0ff, 30, 22], lamps: [[0, 7, 29], [0, 7.5, 13], [0, 6, -4], [0, 7, -28]], red: [[-6, 3.6, -19.3], 0xff4020, 1.5], build: buildFabIn, npcs: { human: 3, zombie: 0, soldier: 0 }, props: [], pills: [] },
   ww2: { name: 'Поле боя 1941', desc: '', story: true, hx: 30, hz: 36, h: 30, spawn: [0, 32, 0], fog: 0x9a5c34, fogD: 0.018, bg: 0xb4683a, sun: 1.0, hemi: 0.9, lamp: [0xffb070, 34, 24], lamps: [[0, 2.8, -14], [-12, 3, 3], [14, 4, 10], [0, 5, 20]], red: [[0, 2.6, -12], 0xff7a30, 4], build: buildWW2, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   street: { name: 'Улица', desc: '', story: true, hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildStreet, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   police: { name: 'Участок полиции', desc: '', story: true, hx: 12, hz: 9, h: 3.4, spawn: [0, 7, 0], fog: 0x0b0d10, fogD: 0.03, bg: 0x070809, sun: 0.5, hemi: 0.55, lamp: [0xe8f2ff, 18, 14], lamps: [[-6, 3.1, -4], [6, 3.1, -4], [-6, 3.1, 4], [6, 3.1, 4]], red: [[11.8, 2.6, 0], 0x2a6aff, 4], build: buildPolice, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
@@ -1692,7 +1693,7 @@ function loadMap(id) {
   if (id === 'tower' && mapId !== 'tower') { TOWER.floor = 1; ELV.sel = TOWER.top; }
   if (typeof clearAll === 'function' && npcs.length + props.length) clearAll();
   removePills(); clearMap();
-  mapId = MAPS[id] && (id !== 'moon' || moonOpen()) && (id !== 'factory' || getMods().huggy) ? id : 'polygon'; const M = MAPS[mapId];
+  mapId = MAPS[id] && (id !== 'moon' || moonOpen()) && ((id !== 'factory' && id !== 'factoryIn') || getMods().huggy) ? id : 'polygon'; const M = MAPS[mapId];
   if (M.pre) M.pre();
   if (!M.npcs.soldier) M.npcs.soldier = 0;
   HX = M.hx; HZ = M.hz; WALL_H = M.h;
@@ -4587,6 +4588,7 @@ function populateSandbox() {
   for (let i = 0; i < (N.soldier || 0); i++) spawnNPC('soldier', rand(-HX + 3, HX - 3), rand(-HZ * 0.2, HZ * 0.3), undefined, N.slook);
   for (const [x, z, yaw] of N.dummies || []) spawnNPC('dummy', x, z, yaw);
   for (let i = 0; i < (MAPS[mapId].huggy || 0); i++) spawnHuggy(rand(-8, 8), rand(-14, 0));
+  FAB.statue = null; if (mapId === 'factoryIn') { const st = spawnHuggy(0, 11); if (st) { st.scripted = true; st.pos.set(0, 0, 11); st.yaw = 0; FAB.statue = st; } }
   if (mapId === 'moon') spawnNPC('human', 0, 4, Math.PI, 'gagarin');
   spawnMapProps();
 }
@@ -5950,6 +5952,7 @@ function actInfo(st) {
 function storyAct() {
   if (mode !== 'story' && nearMachine()) { startTimeTravel(); return; }
   if (mode !== 'story' && nearBin()) { takeBottle(); return; }
+  if (fabDoor()) { fabGo(); return; }
   const st = story.stage;
   if (st === 'search' && nearLocker()) cutSearch(); else if (st === 'flat') flatSearch();
   else if (st === 'cafe') cafeToggle();
@@ -8064,6 +8067,90 @@ function addHuggyExtras(n) {
   n.huggy = true;
 }
 function spawnHuggy(x, z) { const n = spawnNPC('zombie', x, z, Math.atan2(player.pos.x - x, player.pos.z - z), 'huggy'); if (n) { n.hp = n.maxHp = 700; Sound.click(900, 0.15); } return n; }
+/* ----- inside the factory: lobby «Welcome», the Playtime atrium with Huggy on letter blocks, the train room, the gate hallway and the production hall ----- */
+const FAB = { busy: false, statue: null, shown: '' };
+const cvTex = (w, h, fn) => { const c = makeCanvas(w, h), g = c.getContext('2d'); fn(g, w, h); return toTex(c); };
+function grime(g, w, h, n = 90, a = 0.12) { for (let i = 0; i < n; i++) { g.fillStyle = `rgba(30,24,18,${Math.random() * a})`; g.beginPath(); g.arc(Math.random() * w, Math.random() * h, 2 + Math.random() * 18, 0, 7); g.fill(); } }
+function fabTiles(dark) { return cvTex(512, 512, (g) => { const n = 8, s = 64, cols = ['#c83a3a', '#2a6ad0', '#e8c22a', '#3aa0d8']; for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { g.fillStyle = Math.random() < 0.26 ? cols[Math.random() * 4 | 0] : dark ? '#3a3e42' : '#d8d8d2'; g.fillRect(x * s + 3, y * s + 3, s - 6, s - 6); } g.strokeStyle = dark ? '#16181a' : '#5a5a56'; g.lineWidth = 6; for (let i = 0; i <= n; i++) { g.beginPath(); g.moveTo(i * s, 0); g.lineTo(i * s, 512); g.moveTo(0, i * s); g.lineTo(512, i * s); g.stroke(); } grime(g, 512, 512, 120, 0.25); }); }
+function fabWallTex(band) { return cvTex(512, 256, (g) => { g.fillStyle = '#c8c8c0'; g.fillRect(0, 0, 512, 256); g.fillStyle = band; g.beginPath(); g.moveTo(0, 256); for (let x = 0; x <= 512; x += 8) g.lineTo(x, 150 + Math.sin(x / 512 * Math.PI * 4) * 16); g.lineTo(512, 256); g.fill(); g.fillStyle = band === '#c83a3a' ? '#a02a2a' : '#1a3a8a'; g.fillRect(0, 222, 512, 34); grime(g, 512, 256, 70, 0.18); }); }
+function fabMural() { return cvTex(1024, 512, (g) => { g.fillStyle = '#d4d4cc'; g.fillRect(0, 0, 1024, 512); g.fillStyle = '#2a5ab8'; g.beginPath(); g.moveTo(0, 512); for (let x = 0; x <= 1024; x += 8) g.lineTo(x, 300 + Math.sin(x / 160) * 40); g.lineTo(1024, 512); g.fill();
+  g.fillStyle = '#3a68c8'; g.beginPath(); g.ellipse(330, 330, 170, 130, -0.2, 0, 7); g.fill(); for (let i = 0; i < 40; i++) { g.beginPath(); const a = Math.random() * 7; g.moveTo(330 + Math.cos(a) * 150, 330 + Math.sin(a) * 115); g.lineTo(330 + Math.cos(a) * 200, 330 + Math.sin(a) * 160); g.lineTo(330 + Math.cos(a + 0.1) * 150, 330 + Math.sin(a + 0.1) * 115); g.fill(); }
+  for (const x of [270, 360]) { g.fillStyle = '#fff'; g.beginPath(); g.arc(x, 280, 34, 0, 7); g.fill(); g.fillStyle = '#111'; g.beginPath(); g.arc(x + 6, 284, 16, 0, 7); g.fill(); }
+  g.fillStyle = '#d82020'; g.beginPath(); g.moveTo(220, 340); g.quadraticCurveTo(320, 470, 440, 330); g.quadraticCurveTo(330, 400, 220, 340); g.fill();
+  g.fillStyle = '#f2c62a'; g.beginPath(); g.ellipse(700, 150, 210, 110, 0, 0, 7); g.fill(); g.beginPath(); g.moveTo(560, 220); g.lineTo(500, 300); g.lineTo(620, 240); g.fill(); g.fillStyle = '#111'; g.font = '900 78px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('WELCOME!', 700, 152); grime(g, 1024, 512, 160, 0.2); }); }
+function fabClock() { return cvTex(256, 256, (g) => { g.fillStyle = '#c82a2a'; g.beginPath(); g.arc(128, 128, 126, 0, 7); g.fill(); g.fillStyle = '#e8e0c8'; g.beginPath(); g.arc(128, 128, 104, 0, 7); g.fill(); g.fillStyle = '#2a2a2a'; g.font = '700 24px serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'].forEach((r, i) => { const a = i / 12 * 6.283 - 1.5708; g.fillText(r, 128 + Math.cos(a) * 82, 128 + Math.sin(a) * 82); }); g.strokeStyle = '#111'; g.lineWidth = 7; g.beginPath(); g.moveTo(128, 128); g.lineTo(128, 62); g.moveTo(128, 128); g.lineTo(176, 140); g.stroke(); }); }
+function fabLetter(ch) { return std({ roughness: 0.9, map: cvTex(128, 128, (g) => { g.fillStyle = '#d8c49a'; g.fillRect(0, 0, 128, 128); g.strokeStyle = '#8a7048'; g.lineWidth = 8; g.strokeRect(4, 4, 120, 120); g.fillStyle = '#2a2420'; g.font = '900 92px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ch, 64, 70); grime(g, 128, 128, 20, 0.2); }) }); }
+function buildFabIn() {
+  const wallB = std({ map: texRep(fabWallTex('#2a5ab8'), 3, 1), roughness: 0.9 }), wallR = std({ map: fabWallTex('#c83a3a'), roughness: 0.9 });
+  addRoom(std({ map: texRep(fabTiles(false), 5, 13), roughness: 0.35, envMapIntensity: 0.5 }), std({ color: 0x1a1c20, roughness: 1 }), [wallB, wallB]);
+  const BB = batcher(), C = (c, r = 0.85) => std({ color: c, roughness: r }), red = C(0xc8302a), blu = C(0x2a5ab8), yel = C(0xe8c22a), grn = C(0x3aa04a), dk = C(0x1a1c20), steel = std({ color: 0x5a6068, roughness: 0.5, metalness: 0.6 }), wood = std({ map: TEX.wood, roughness: 0.8 });
+  const tube = new THREE.MeshBasicMaterial({ color: 0xf4f8ff }), H = WALL_H;
+  const blk = (m, x, y, z, sx, sy, sz, ry = 0) => { BB.box(m, x, y, z, sx, sy, sz, ry); solid(x, y, z, sx, sy, sz); };
+  const part = (z, gx, gw, m) => { const a = -HX, b = gx - gw / 2, c = gx + gw / 2, d = HX; blk(m, (a + b) / 2, H / 2, z, b - a, H, 0.4); blk(m, (c + d) / 2, H / 2, z, d - c, H, 0.4); BB.box(m, gx, (H + 3.4) / 2, z, gw, H - 3.4, 0.4); };
+  const lamp = (x, z, y = H - 0.25) => { BB.box(tube, x, y, z, 1.8, 0.06, 0.16); BB.box(steel, x, y + 0.05, z, 1.9, 0.04, 0.24); };
+  // ===== 1. lobby: the mural, the round reception desk, the gift shop, the exit =====
+  part(22, 0, 3.4, wallB);
+  { const m = new THREE.Mesh(new THREE.PlaneGeometry(10, 5), std({ map: fabMural(), roughness: 0.9 })); m.position.set(-HX + 0.03, 2.8, 29); m.rotation.y = Math.PI / 2; addMesh(m); }
+  BB.geo(wood, new THREE.CylinderGeometry(2.4, 2.4, 1.0, 28, 1, true, -1.3, 2.6).translate(1, 0.5, 27)); BB.geo(wood, new THREE.CylinderGeometry(2.6, 2.6, 0.08, 28, 1, false, -1.3, 2.6).translate(1, 1.02, 27)); solid(1, 0.5, 29.1, 4.6, 1.0, 0.8);
+  BB.box(C(0xd8d4c4), 2, 1.3, 28.6, 0.5, 0.42, 0.4); BB.box(dk, 2, 1.3, 28.83, 0.4, 0.3, 0.02); BB.box(C(0xd8d4c4), 2, 1.07, 28.4, 0.5, 0.05, 0.25);
+  blk(red, HX - 0.6, H / 2, 26, 1.0, H, 1.0); addSign([{ t: 'GIFT SHOP', s: 230 }], 4, 0.9, HX - 0.05, 4.2, 30, -Math.PI / 2, 'rgba(40,36,30,0.92)');
+  addSign([{ t: 'EAT HEALTHY', s: 120 }, { t: 'LIKE BRON!', s: 120 }], 1.4, 2.0, HX - 0.05, 2.0, 32, -Math.PI / 2, 'rgba(40,120,90,0.95)');
+  addSign([{ t: 'ВЫХОД', s: 260 }], 1.8, 0.5, 0, 2.9, HZ - 0.05, Math.PI, 'rgba(20,140,60,0.95)');
+  { const d = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.5), std({ color: 0x3a3a40, roughness: 0.5, metalness: 0.5 })); d.position.set(0, 1.25, HZ - 0.02); d.rotation.y = Math.PI; addMesh(d); }
+  BB.box(steel, -3, 5.2, 27, 6, 0.06, 0.06); addSign([{ t: 'Welcome C', s: 140 }], 3.4, 0.5, -3, 4.8, 27, 0, 'rgba(20,20,20,0.6)');
+  for (const [x, z] of [[-6, 31], [6, 31], [-6, 25], [6, 25]]) lamp(x, z);
+  // ===== 2. the Playtime atrium: the statue spot, letter blocks, red rings, coloured columns, side doors =====
+  part(4, 0, 3.4, wallB);
+  BB.box(yel, 0, 6.3, 4.22, 8.4, 2.0, 0.02); addSign([{ t: 'Playtime', s: 230 }], 8, 1.8, 0, 6.3, 4.26, 0, 'rgba(40,34,30,0.96)');
+  [['H', -2.2, 9.6], ['U', -1.0, 9.2], ['G', 1.2, 9.4], ['G', 2.3, 10.4], ['Y', -2.6, 12.6], ['G', 2.6, 12.4]].forEach(([ch, x, z], i) => blk(fabLetter(ch), x, 0.55, z, 1.1, 1.1, 1.1, rand(-0.3, 0.3)));
+  blk(fabLetter('Y'), 0.3, 1.65, 9.4, 1.0, 1.0, 1.0, 0.2);
+  addSign([{ t: 'HUGGY WUGGY', s: 120 }, { t: 'наш главный хит', s: 70 }], 1.8, 0.9, 0, 0.6, 8.6, 0, 'rgba(230,220,200,0.95)');
+  for (const y of [2.4, 4.6]) BB.geo(red, new THREE.TorusGeometry(7.6, 0.09, 6, 64).rotateX(Math.PI / 2).translate(0, y, 13));
+  for (const [x, z] of [[-12, 6.5], [12, 6.5], [-12, 19.5], [12, 19.5]]) for (let i = 0; i < 5; i++) blk([red, yel, blu, yel, red][i], x, 0.8 + i * 1.6, z, 1.6, 1.6, 1.6);
+  for (const [x, ry, name, col] of [[-HX + 0.05, Math.PI / 2, 'TESTING', 0x2a8a3a], [HX - 0.05, -Math.PI / 2, 'THEATER', 0x2a4aa8]]) { const d = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.6), std({ color: col, roughness: 0.6 })); d.position.set(x, 1.3, 13); d.rotation.y = ry; addMesh(d); addSign([{ t: name, s: 200 }], 2.8, 0.6, x, 3.1, 13, ry, 'rgba(30,30,30,0.9)'); }
+  BB.geo(new THREE.MeshBasicMaterial({ color: 0xeaf6ff }), new THREE.CircleGeometry(2.4, 24).rotateX(Math.PI / 2).translate(0, H - 0.02, 12));
+  { const cone = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 3.2, H, 24, 1, true), new THREE.MeshBasicMaterial({ color: 0xdff0ff, transparent: true, opacity: 0.07, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); cone.position.set(0, H / 2, 12); addMesh(cone); }
+  // ===== 3. the train room: the toy train on a stage, the clock, the red round platform =====
+  part(-12, 10, 3, wallB);
+  floorMesh(std({ map: cvTex(512, 512, (g) => { g.fillStyle = '#1c1e22'; g.fillRect(0, 0, 512, 512); const cs = ['#a02a2a', '#2a4a90', '#b09a2a']; for (let i = 0; i < 9; i++) { g.fillStyle = cs[i % 3]; g.beginPath(); const x = Math.random() * 512, y = Math.random() * 512; g.moveTo(x, y); g.lineTo(x + rand(-260, 260), y + rand(-260, 260)); g.lineTo(x + rand(-260, 260), y + rand(-260, 260)); g.fill(); } grime(g, 512, 512, 80, 0.3); }), roughness: 0.4 }), HX * 2, 16, 0, -4, 0.003);
+  blk(dk, -2, 0.3, -10.2, 15, 0.6, 3.2); BB.box(steel, -2, 0.62, -9.8, 15, 0.04, 0.08); BB.box(steel, -2, 0.62, -10.6, 15, 0.04, 0.08);
+  const wheel = (x, z, r = 0.32) => BB.cyl(yel, x, 0.6 + r, z, r, r, 0.12, 14, Math.PI / 2);
+  BB.box(blu, -7.6, 1.5, -10.2, 2.4, 0.9, 1.4); BB.cyl(grn, -8.2, 1.95, -10.2, 0.55, 0.55, 1.6, 16, 0, 0, Math.PI / 2); BB.box(red, -6.8, 2.3, -10.2, 1.0, 1.1, 1.4); BB.box(red, -6.8, 2.9, -10.2, 1.3, 0.12, 1.6); BB.cyl(yel, -8.8, 2.8, -10.2, 0.14, 0.22, 0.8, 10); BB.geo(C(0x9ac83a), new THREE.ConeGeometry(0.4, 0.4, 14).rotateX(Math.PI).translate(-8.8, 3.35, -10.2));
+  for (const x of [-8.6, -7.6, -6.6]) { wheel(x, -9.45); wheel(x, -10.95); }
+  [[-4.4, yel, blu], [-1.2, blu, red], [2.0, red, blu], [5.2, yel, red]].forEach(([x, a, b]) => { BB.box(b, x, 1.25, -10.2, 2.8, 0.5, 1.4); BB.box(a, x, 2.0, -10.2, 2.8, 1.0, 1.4); BB.box(b, x, 2.6, -10.2, 3.0, 0.16, 1.6); for (const dx of [-0.8, 0, 0.8]) BB.box(dk, x + dx, 2.05, -9.49, 0.5, 0.4, 0.02); for (const dx of [-0.9, 0.9]) { wheel(x + dx, -9.45, 0.26); wheel(x + dx, -10.95, 0.26); } });
+  { const m = new THREE.Mesh(new THREE.CircleGeometry(1.1, 32), std({ map: fabClock(), roughness: 0.6 })); m.position.set(-2, 5.0, -11.78); addMesh(m); }
+  BB.cyl(red, 0, 0.08, -3, 2.4, 2.4, 0.16, 32);
+  for (let x = -12; x <= 12; x += 4) BB.box(steel, x, H - 0.4, -4, 0.2, 0.5, 16); for (const z of [-10, 2]) BB.box(steel, 0, H - 0.7, z, HX * 2, 0.2, 0.2);
+  for (const x of [-8, 0, 8]) lamp(x, -6, H - 0.9);
+  // ===== 4. the gate hallway: PRODUCTION (open), GAME STATION (barred), papers on the floor =====
+  part(-20, -6, 2.4, wallR);
+  const gate = (x, label, barred) => { for (const s of [-1, 1]) { blk(blu, x + s * 1.7, 0.9, -19.6, 1.0, 1.8, 0.6); blk(red, x + s * 1.7, 2.7, -19.6, 1.0, 1.8, 0.6); } BB.box(red, x, 3.7, -19.6, 4.4, 0.6, 0.6); BB.box(yel, x, 4.2, -19.6, 4.4, 0.4, 0.62); addSign([{ t: label, s: 140 }], 3.2, 0.45, x, 4.2, -19.27, 0, 'rgba(30,40,90,0.95)'); if (barred) { for (let i = -5; i <= 5; i++) BB.cyl(steel, x + i * 0.22, 1.7, -19.75, 0.025, 0.025, 3.4, 6); solid(x, 1.7, -19.75, 2.4, 3.4, 0.2); } };
+  gate(-6, 'PRODUCTION', false); gate(3, 'GAME STATION', true);
+  const paper = [C(0xe8e4d8, 1), C(0xc8d8e8, 1), C(0xe8d890, 1), C(0xe8b0a8, 1)];
+  for (let i = 0; i < 60; i++) BB.box(pick(paper), rand(-10, 10), 0.012 + Math.random() * 0.01, rand(-19, -13), rand(0.2, 0.4), 0.005, rand(0.28, 0.5), rand(0, 3.14));
+  BB.box(tube, 0, H - 0.25, -16, 3, 0.06, 0.16);
+  // ===== 5. the production hall: conveyors, pipes, toy machines with an eye, stairs to a catwalk, trusses and skylights =====
+  floorMesh(std({ map: texRep(fabTiles(true), 4, 2.5), roughness: 0.25, envMapIntensity: 0.6 }), HX * 2, 16, 0, -28, 0.003);
+  for (const z of [-24, -29]) { blk(steel, -2, 0.7, z, 16, 0.25, 1.2); BB.box(C(0x8a8e94, 0.4), -2, 0.84, z, 15.6, 0.04, 1.0); for (let x = -9.6; x <= 5.6; x += 0.4) BB.cyl(C(0xb8bcc4, 0.3), x, 0.88, z, 0.05, 0.05, 1.0, 6, Math.PI / 2); for (let x = -9; x <= 5; x += 3.5) for (const s of [-1, 1]) BB.box(steel, x, 0.3, z + s * 0.5, 0.12, 0.6, 0.12); }
+  for (const z of [-26.5, -31.5]) BB.cyl(C(0x2a5ab8, 0.4), -2, 0.3, z, 0.22, 0.22, 20, 12, 0, 0, Math.PI / 2);
+  const machine = (x, z, col) => { blk(C(col), x, 1.6, z, 2.4, 3.2, 2.0); BB.box(yel, x, 3.4, z, 1.6, 0.6, 1.6); BB.geo(std({ color: 0xffffff, roughness: 0.3 }), new THREE.SphereGeometry(0.55, 16, 12).translate(x, 1.9, z + 1.02)); BB.geo(new THREE.MeshBasicMaterial({ color: 0x111111 }), new THREE.SphereGeometry(0.28, 12, 10).translate(x, 1.9, z + 1.4)); BB.geo(grn, new THREE.ConeGeometry(0.8, 1.0, 16, 1, true).rotateX(Math.PI).translate(x, 4.4, z)); BB.geo(C(0xb03a2a), new THREE.TorusGeometry(1.4, 0.16, 8, 20, Math.PI).rotateY(Math.PI / 2).translate(x, 3.8, z - 1.4)); };
+  machine(-8, -34, 0xa8c83a); machine(0, -34, 0xd8c83a);
+  for (let i = 0; i < 10; i++) blk(steel, HX - 1, 0.2 + i * 0.36, -22.5 - i * 0.45, 1.6, 0.12, 0.45);
+  blk(steel, HX - 1, 3.6, -31, 1.8, 0.15, 8); for (let z = -35; z <= -27; z += 1) BB.box(yel, HX - 1.9, 4.1, z, 0.06, 1.0, 0.06); BB.box(yel, HX - 1.9, 4.6, -31, 0.06, 0.06, 8);
+  for (let z = -34; z <= -22; z += 3) { BB.box(steel, 0, H - 0.3, z, HX * 2, 0.12, 0.12); for (let x = -12; x <= 12; x += 2) BB.box(steel, x, H - 0.55, z, 0.06, 0.5, 0.06, 0, 0, 0.6); }
+  for (const [x, z] of [[-8, -27], [0, -31], [8, -24], [-4, -23]]) BB.box(new THREE.MeshBasicMaterial({ color: 0xcfe6ff }), x, H - 0.02, z, 1.2, 0.02, 2.2);
+  lamp(-6, -27, H - 1); lamp(6, -31, H - 1);
+  BB.flush();
+}
+function fabDoor() { if (mode === 'story' || state !== 'play' || player.dead) return null; if (mapId === 'factory' && Math.hypot(player.pos.x - 9, player.pos.z + 21.4) < 2.6) return 'in'; if (mapId === 'factoryIn' && player.pos.z > HZ - 3 && Math.abs(player.pos.x) < 2.6) return 'out'; return null; }
+function fabGo() {
+  if (FAB.busy) return; const d = fabDoor(); if (!d) return; FAB.busy = true; const dest = d === 'in' ? 'factoryIn' : 'factory'; $('black').classList.add('on'); $('actBtn').hidden = true; Sound.thud(0.4);
+  setTimeout(() => { loadMap(dest); populateSandbox(); respawnPlayer(); if (dest === 'factory') { player.pos.set(9, 0, -18.5); player.yaw = Math.PI; } FAB.busy = false; banner(MAPS[mapId].name, dest === 'factoryIn' ? 'добро пожаловать на фабрику Playtime' : ''); }, 1100);
+}
+function updFab(dt) {
+  const S = FAB.statue; if (!S || mapId !== 'factoryIn' || state !== 'play') return;
+  if (S.alive && S.scripted && (Math.hypot(player.pos.x - S.pos.x, player.pos.z - S.pos.z) < 4 || S.hp < S.maxHp)) { S.scripted = false; toast('Хаги Ваги ожил!'); Sound.siren(0.3); shake = Math.max(shake, 0.2); }
+}
 function modsUi() {
   const M = getMods(), on = !!M.huggy, c = document.getElementById('chipFactory'), b = document.getElementById('spHuggy'); if (c) c.style.display = on ? '' : 'none'; if (b) b.style.display = on ? '' : 'none';
   if (!on && settings.map === 'factory') { settings.map = 'polygon'; saveSettings(); if (state === 'menu' && mapId === 'factory') { loadMap('polygon'); populateSandbox(); placePills(); } syncChips(); }
@@ -8351,7 +8438,7 @@ function nearMachine() { TM.list = TM.list.filter((g) => g.parent); for (const g
 function updTimeMachine(dt) {
   for (const g of TM.list) if (g.parent) { const t = g.userData.tm, k = performance.now() / 1000; t.ring.rotation.z += dt * 1.2; t.ring2.rotation.x += dt * 2; t.core.scale.setScalar(1 + Math.sin(k * 5) * 0.12); }
   if (mode === 'story' || state !== 'play') return;
-  const lab = nearMachine() ? 'Включить машину' : nearBin() ? 'Взять бутылку' : ''; if (lab !== TM.shown) { TM.shown = lab; $('actBtn').hidden = !lab; if (lab) $('actBtn').textContent = lab; }
+  const fd = fabDoor(), lab = nearMachine() ? 'Включить машину' : nearBin() ? 'Взять бутылку' : fd === 'in' ? 'Войти на фабрику' : fd === 'out' ? 'Выйти на улицу' : ''; if (lab !== TM.shown) { TM.shown = lab; $('actBtn').hidden = !lab; if (lab) $('actBtn').textContent = lab; }
 }
 function ttDom() { if (TM.cv) return; const c = TM.cv = document.createElement('canvas'); c.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:38;pointer-events:none;display:none'; document.body.appendChild(c); TM.g = c.getContext('2d'); }
 function startTimeTravel() {
@@ -8584,7 +8671,7 @@ function frame(now) {
     else if (state === 'menu' || state === 'over') { menuT += rdt * 0.08; const r = Math.min(HX, HZ) * 0.72; camera.position.set(Math.sin(menuT) * r, Math.min(5.2, WALL_H - 0.7), Math.cos(menuT) * r); camera.lookAt(0, 1, 0); }
     world.step(1 / 60 * ts, dt, 4); processGlass(); processImpacts();
     if (mapId === 'tower') updateElevator(rdt); else if (mapId === 'site') updateSite(now);
-    syncRagdolls(); updateProps(); syncDropGun(); updateGibs(dt); updateGuts(); updateGrenades(dt); updFires(dt);
+    syncRagdolls(); updateProps(); syncDropGun(); updateGibs(dt); updateGuts(); updateGrenades(dt); updFires(dt); updFab(dt);
     for (const n of npcs.slice()) n.update(dt);
     updateAvatar(dt);
     if (state === 'play' && mode === 'story') updateStory(rdt); else if (state === 'play') kissWatch(rdt);
@@ -8628,7 +8715,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
