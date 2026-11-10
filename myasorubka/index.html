@@ -5530,7 +5530,7 @@ function kissWatch(dt) {
   let gg = null, sv = null, bd = 1e9;
   for (const n of npcs) if (n.alive && n.gg && !n.regenBusy && !n.controlled && !n.scripted && performance.now() > (n.regenUntil || 0)) { gg = n; break; }
   if (!gg) { KT.both = 0; return; }
-  for (const n of npcs) if (n.alive && n.sv && !n.scripted && !n.controlled) { const d = Math.hypot(n.pos.x - gg.pos.x, n.pos.z - gg.pos.z); if (d < bd) { bd = d; sv = n; } }
+  for (const n of npcs) if (n.alive && n.sv && !n.scripted && !n.controlled && !(n.look && n.look.melodie)) { const d = Math.hypot(n.pos.x - gg.pos.x, n.pos.z - gg.pos.z); if (d < bd) { bd = d; sv = n; } }
   if (!sv) { KT.both = 0; return; }
   KT.both += dt; if (KT.both < 3.5) return;
   KT.both = 0; cutKissTrap(gg, sv);
@@ -5545,6 +5545,7 @@ function svKillHead(sv, dir) {
   for (let i = 0; i < 8; i++) later(1 + i * 0.8, () => { if (!sv.parts) return; const b = sv.parts.torso.gone ? sv.parts.pelvis.mesh.position : sv.parts.torso.mesh.position; addPool(b.x, b.z, 0.15, 0.8); });
 }
 function cutKissTrap(gg, sv) {
+  if (!sv || (sv.look && sv.look.melodie)) { KT.cd = 20; return; } // the kiss trap is only Svity's
   const lane = kissLane(gg); if (!lane) { KT.cd = 20; return; }
   KT.busy = true; lfxInit(); gagStart(gg); story.svity = sv; story.gg = gg;
   const a = lane.a, L = lane.L, P = new V3(gg.pos.x, 0, gg.pos.z), dv = new V3(Math.sin(a), 0, Math.cos(a)), sd = new V3(Math.cos(a), 0, -Math.sin(a));
