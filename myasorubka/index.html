@@ -4213,6 +4213,8 @@ function playerFoot(dt) {
   _a.set(player.pos.x + cx * sd * 0.1, player.pos.y, player.pos.z + cz * sd * 0.1); _c.set(-Math.sin(player.yaw), 0, -Math.cos(player.yaw)); addBloodDecal(_a, UP, _c, 0.07 * k, 0.15 * k);
 }
 function hitPart(npc, P, h, dir, dmg, w) {
+  // Melodie dodges every bullet: she sidesteps across the shot and takes no damage
+  if (npc.alive && npc.look && npc.look.melodie) { melDodge(npc, dir); return; }
   if (npc.gg && !npc.protect) { gagHit(npc, P, h, dir, w); return; }
   if (npc.protect) { if (performance.now() - (story.warnT || 0) > 2500) { story.warnT = performance.now(); toast('Рано! Нужны доказательства'); } sparks(h.point, 4, hitNormal(h), 2); return; }
   const kind = P.def.kind, wasAlive = npc.alive;
@@ -8006,7 +8008,16 @@ function melPlay(key) {
 }
 // Melodie's own lines: she hums and chats when you stand close
 const MEL_SAY = ['Ла-ла-ла! Сегодня я в голосе!', 'Хочешь, спою тебе? Только не убегай!', 'Эй, не наступи на мой хвост!', 'Бум-бум-бум, музыка внутри меня!', 'Мяу! Ой… то есть ля-ля-ля!', 'Дайте микрофон — и я разнесу весь зал!', 'Ты фанат? Автограф в обмен на улыбку!', 'Тише… я беру самую высокую ноту!', 'Какой красивый бант, правда?', 'Подпевай мне, не стесняйся!'];
+function melDodge(n, dir) {
+  // move perpendicular to the shot, to the side the bullet did not come from
+  let vx = -dir.z, vz = dir.x; const L = Math.hypot(vx, vz) || 1; vx /= L; vz /= L;
+  const side = (vx * (player.pos.x - n.pos.x) + vz * (player.pos.z - n.pos.z)) > 0 ? -1 : 1;
+  n.dodgeVx = vx * side; n.dodgeVz = vz * side; n.dodgeT = 0.35;
+  Sound.whoosh();
+  if (!n.dodgeToastT || performance.now() - n.dodgeToastT > 1500) { n.dodgeToastT = performance.now(); toast('Мелоди увернулась!'); }
+}
 function updateMelNotes(dt) {
+  for (const n of npcs) { if (n.alive && n.dodgeT > 0) { n.dodgeT -= dt; n.pos.x += n.dodgeVx * dt * 5; n.pos.z += n.dodgeVz * dt * 5; } }
   for (const n of npcs) { if (!n.alive || !n.notes) continue; n.noteT = (n.noteT || 0) + dt; for (const o of n.notes) { o.g.position.y = o.y + Math.sin(n.noteT * 2.2 + o.sd) * 0.06; o.g.rotation.y = Math.sin(n.noteT * 1.4 + o.sd) * 0.4; } }
 }
 // her recorded lines (the same ones as at the café table), each with its Russian subtitle
