@@ -7841,7 +7841,7 @@ function catToss() {
   const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
   CAT.to.set(player.pos.x + fx * 2.6, 0, player.pos.z + fz * 2.6); CAT.to.y = floorAt(CAT.to.x, CAT.to.z, CAT.from.y) + 0.2;
   CAT.skin = getMods().skin || 'gray'; CAT.fit = lucky(0.08); CAT.eggs = false;
-  CAT.pos.copy(CAT.from); CAT.root = buildCat(false, CAT.skin); if (CAT.fit) { CAT.root.scale.setScalar(2.2); Sound.bigScream(); toast('Микушка: приступ яичка!'); shake = Math.max(shake, 0.6); } scene.add(CAT.root); CAT.root.position.copy(CAT.pos);
+  CAT.pos.copy(CAT.from); CAT.root = buildCat(false, CAT.skin); CAT.cutDone = false; scene.add(CAT.root); CAT.root.position.copy(CAT.pos);
   CAT.out = true; CAT.st = 'toss'; CAT.t = 0; CAT.scT = 0; CAT.tgt = null; CAT.map = mapId; Sound.swoosh();
 }
 function catNearest() { let best = null, bd = 900; for (const n of npcs) { if (!n.alive || n.protect || n.ally || n.gg || n.scripted) continue; const d = (n.pos.x - CAT.pos.x) ** 2 + (n.pos.z - CAT.pos.z) ** 2; if (d < bd) { bd = d; best = n; } } return best; }
@@ -7863,7 +7863,7 @@ function updateCat(dt) {
     const k = Math.min(1, CAT.t / 0.6);
     CAT.pos.lerpVectors(CAT.from, CAT.to, k); CAT.pos.y = lerp(CAT.from.y, CAT.to.y, k) + Math.sin(k * Math.PI) * 0.6;
     CAT.root.rotation.set(-Math.sin(k * Math.PI) * 0.8, Math.atan2(CAT.to.x - CAT.from.x, CAT.to.z - CAT.from.z), 0);
-    if (k >= 1) { CAT.st = 'hunt'; CAT.t = 0; CAT.tgt = null; CAT.root.rotation.x = 0; }
+    if (k >= 1) { CAT.st = 'hunt'; CAT.t = 0; CAT.tgt = null; CAT.root.rotation.x = 0; if (CAT.fit && !CAT.cutDone) { CAT.cutDone = true; cutMikFit(); return; } }
   } else {
     const life = CAT.fit ? 24 : 8;
     if (CAT.t > life) { spawnSprite(TEX.smoke, _a.copy(CAT.pos).setY(0.5), { color: 0xffffff, size: 0.8, grow: 2, life: 1.2, opacity: 0.5, vel: new V3(0, 0.3, 0) }); catEnd(); return; }
@@ -7873,13 +7873,43 @@ function updateCat(dt) {
     if (CAT.tgt) { tx = CAT.tgt.pos.x; tz = CAT.tgt.pos.z; }
     const runAtPlayer = CAT.fit && CAT.t > 16; if (runAtPlayer) { tx = player.pos.x; tz = player.pos.z; }
     const dx = tx - CAT.pos.x, dz = tz - CAT.pos.z, d = Math.hypot(dx, dz) || 1, near = !runAtPlayer && !!CAT.tgt && d < 1.1;
-    if (runAtPlayer && d < 1.6 && !CAT.eggs) { CAT.eggs = true; dropEggs(); CAT.t = Math.max(CAT.t, life - 2); }
+    if (runAtPlayer && d < 7 && !CAT.eggs) { CAT.eggs = true; cutMikEggs(); return; }
     if (!near && !(runAtPlayer && CAT.eggs)) { const sp = Math.min(d, (CAT.tgt || runAtPlayer ? (CAT.fit ? 8 : 6.5) : 3.2) * dt); CAT.pos.x += dx / d * sp; CAT.pos.z += dz / d * sp; }
     CAT.root.rotation.set(0, Math.atan2(dx, dz), 0);
     if (near) { CAT.scT -= dt; CAT.root.rotation.z = Math.sin(CAT.t * 30) * 0.25; if (CAT.scT <= 0) { CAT.scT = 0.5; catScratch(CAT.tgt); } } else CAT.root.rotation.z = 0;
     CAT.pos.y = floorAt(CAT.pos.x, CAT.pos.z, CAT.pos.y + 0.5) + 0.2 + (near ? 0 : Math.abs(Math.sin(CAT.t * 16)) * 0.06);
   }
   CAT.root.position.copy(CAT.pos);
+}
+
+/* ----- two cutscenes: the fit begins; Mikushka runs up, the eggs fall off and he laughs ----- */
+function cutMikFit() {
+  const root = CAT.root; CAT.st = 'cut'; const c0 = CAT.pos.clone();
+  runCut([
+    [0.1, () => sub('', 'Микушку вдруг скрутило…')],
+    [1.4, () => { sub('', 'Он начинает расти!'); Sound.rise(2); }],
+    [3.0, () => { sub('', 'ПРИСТУП ЯИЧКА!'); Sound.bigScream(); flashScreen('#ff3030', 500); shake = Math.max(shake, 0.8); }],
+  ], (t) => {
+    const k = clamp((t - 1.4) / 2.2, 0, 1); root.scale.setScalar(lerp(1, 2.2, k)); root.position.set(c0.x + Math.sin(t * 50) * 0.02 * (1 + k), c0.y + 0.2 * k, c0.z); root.rotation.z = Math.sin(t * 45) * 0.12;
+    if (t < 3) camSet(c0.x + 0.9, c0.y + 0.55, c0.z + 1.4, c0.x, c0.y + 0.35 + 0.2 * k, c0.z);
+    else camSet(c0.x - 2.2, c0.y + 1.4, c0.z + 4, c0.x, c0.y + 0.9, c0.z);
+  }, 5.6, () => { root.rotation.z = 0; root.scale.setScalar(2.2); CAT.pos.copy(c0); CAT.st = 'hunt'; CAT.t = 0; resume(); });
+}
+function cutMikEggs() {
+  const root = CAT.root; CAT.st = 'cut'; const a = CAT.pos.clone(), b = new V3(player.pos.x - Math.sin(player.yaw) * 1.3, a.y, player.pos.z - Math.cos(player.yaw) * 1.3); let dropped = false;
+  runCut([
+    [0.1, () => sub('', 'Микушка бежит прямо на вас!')],
+    [2.6, () => { sub('', 'У него отваливаются яйца!'); }],
+    [4.4, () => { sub('', 'Микушка смеётся…'); Sound.laugh({ pitch: 1.3, n: 6, gap: 0.16, dist: 0, vol: 0.8, pause: 0.4 }); }],
+  ], (t, dt) => {
+    updEggs(dt);
+    if (t < 2.6) { const k = t / 2.6; CAT.pos.lerpVectors(a, b, k); CAT.pos.y = a.y + Math.abs(Math.sin(t * 14)) * 0.2; root.rotation.y = Math.atan2(b.x - a.x, b.z - a.z); root.position.copy(CAT.pos); camSet(player.pos.x, player.pos.y + 0.7, player.pos.z, CAT.pos.x, CAT.pos.y + 0.5, CAT.pos.z); }
+    else {
+      if (!dropped) { dropped = true; dropEggs(); shake = Math.max(shake, 0.4); }
+      const laugh = t > 4.4; root.position.copy(CAT.pos); root.rotation.z = laugh ? Math.sin(t * 28) * 0.18 : 0; root.scale.setScalar(2.2 * (1 + (laugh ? Math.abs(Math.sin(t * 20)) * 0.06 : 0)));
+      camSet(CAT.pos.x + 1.8, CAT.pos.y + 1.0, CAT.pos.z + 2.4, CAT.pos.x, CAT.pos.y + 0.6, CAT.pos.z);
+    }
+  }, 8.2, () => { spawnSprite(TEX.smoke, _a.copy(CAT.pos).setY(0.6), { color: 0xffffff, size: 1.2, grow: 2, life: 1.2, opacity: 0.5, vel: new V3(0, 0.3, 0) }); catEnd(); resume(); });
 }
 function catMeow() {
   if (CAT.meowCd > 0 || state !== 'play' || player.dead) return; CAT.meowCd = 6;
