@@ -8236,7 +8236,15 @@ function buildC2Base() {
   part(15, 6, 1.2); part(6, 3, 1.6);
   // ===== the storage room (south): shelves, an old freezer, the calendar =====
   for (const x of [-7, -3.5]) { blk(steel, x, 1.0, 21.4, 2.6, 2.0, 0.6); for (const y of [0.5, 1.1, 1.7]) for (let i = 0; i < 3; i++) BB.box(crateMat, x - 0.8 + i * 0.8, y + 0.15, 21.3, 0.5, 0.3, 0.4, rand(-0.2, 0.2)); }
-  blk(C(0xd8d8d0, 0.5), 7.6, 0.8, 20.6, 1.4, 1.6, 1.0); BB.box(dk, 7.6, 1.2, 20.08, 1.2, 0.04, 0.02);
+  blk(wall, 2.5, H / 2, 16.5, 0.3, H, 2.7); blk(wall, 2.5, H / 2, 20.6, 0.3, H, 2.8); BB.box(wall, 2.5, (H + 2.3) / 2, 18.4, 0.3, H - 2.3, 1.2);
+  blk(C(0x2a2c30, 0.4), 8.5, 1.0, 16.6, 0.8, 2.0, 1.0); for (let i = 0; i < 6; i++) BB.box(new THREE.MeshBasicMaterial({ color: i % 2 ? 0x30ff60 : 0xff3030 }), 8.08, 0.4 + i * 0.28, 16.4, 0.02, 0.03, 0.03);
+  blk(wood, 5.5, 0.38, 21.3, 3.4, 0.76, 0.9); BB.box(dk, 4.2, 0.82, 21.2, 0.5, 0.1, 0.35); BB.box(C(0x6a6a6a), 6.6, 0.8, 21.1, 0.14, 0.06, 0.14);
+  { const big = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.94), new THREE.MeshBasicMaterial({ map: tapeTex() })); big.position.set(5.5, 1.42, 21.84); big.rotation.y = Math.PI; addMesh(big);
+    const nz = cvTex(128, 80, (g) => { g.fillStyle = '#101810'; g.fillRect(0, 0, 128, 80); for (let i = 0; i < 900; i++) { const v = Math.random() * 120 | 0; g.fillStyle = `rgb(${v},${v + 10},${v})`; g.fillRect(Math.random() * 128, Math.random() * 80, 2, 1); } g.fillStyle = '#d8e8d8'; g.font = '700 10px monospace'; g.fillText('НЕТ СИГНАЛА', 30, 44); });
+    for (const [x, y] of [[4.2, 1.42], [6.8, 1.42], [4.2, 2.2], [5.5, 2.2], [6.8, 2.2]]) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.62), new THREE.MeshBasicMaterial({ map: nz })); m.position.set(x, y, 21.86); m.rotation.y = Math.PI; addMesh(m); }
+    BB.box(dk, 5.5, 1.8, 21.93, 4.0, 1.9, 0.08); }
+  addSign([{ t: 'ОХРАНА', s: 200 }], 1.2, 0.34, 2.68, 2.6, 18.4, Math.PI / 2, 'rgba(230,230,230,0.9)');
+  BB.box(dk, HX - 0.4, 1.56, -6, 0.36, 0.12, 0.26); BB.box(new THREE.MeshBasicMaterial({ color: 0xff2020 }), HX - 0.6, 1.63, -6.06, 0.03, 0.02, 0.03);
   for (const [x, z] of [[-1, 17.2], [0.2, 17.6], [-6, 16.6]]) blk(crateMat, x, 0.45, z, 0.9, 0.9, 0.9, rand(0, 1));
   { const m = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.88), std({ map: c2CalTex(), roughness: 0.9 })); m.position.set(-HX + 0.03, 1.5, 18.5); m.rotation.y = Math.PI / 2; addMesh(m); }
   // ===== the rehearsal room: drums, amps, a sofa, the shrine =====
@@ -8364,7 +8372,7 @@ function c2FinalAnswer(k) {
       [6.8, () => { C2.shot = 'markClose'; markSay(k === 0 ? 'Слышала?! Он тебя НЕ любит! А я — люблю! Только я!' : 'Ха! Торговаться вздумал? Она пока посидит в кладовой. Подумает.'); }],
       [11.6, () => { C2.shot = 'mel'; melSay('Марк… ты чудовище.'); }],
       [14.4, () => { fadeOut(); subOff(); Sound.thud(0.4); }],
-      [15.8, () => { if (mel) { seatNpc(mel, 2, 19.6, Math.PI); mel.root.position.copy(mel.pos); } C2.melState = 'tied'; fadeIn(); C2.shot = 'gg'; ggSay('Он увёз её в кладовую. Сначала — она. Потом — он.', 3); }],
+      [15.8, () => { if (mel) { seatNpc(mel, -1.4, 19.6, Math.PI); mel.root.position.copy(mel.pos); } C2.melState = 'tied'; fadeIn(); C2.shot = 'gg'; ggSay('Он увёз её в кладовую. Сначала — она. Потом — он.', 3); }],
     ], (t, dt) => { c2CamUpd(t, dt); if (M && t > 15) { walkPath(M, M.out, 2.2, dt); M.root.position.copy(M.pos); M.root.rotation.y = M.yaw; } }, 19.8, () => { if (M) { M.dispose(); story.mark = null; } c2Gameplay(false); });
   }
   if (M) M.out = [[-3, 9.5], [3, 7], [3, 4]];
@@ -8404,8 +8412,9 @@ function c2Intro() {
 /* ----- gameplay ----- */
 function c2Gameplay(fromCp) {
   story.showAvatar = false; story.alarm = false; story.noise = 0; story.guards = []; C2.volt = C2.rage >= 4; C2.tauntT = 25;
-  const pts = [[[-6, -1], [6, -1], [6, 3.5], [-2, 3.5]], [[-6, -7], [7, -7], [7, -12.5], [-6, -12.5]], [[-5, -5.6], [-1, -5.6]], [[-6, 17.5], [5, 17.5], [5, 19]]]; if (C2.rage >= 5) pts.push([[0, -13], [0, -6]]);
+  const pts = [[[-6, -1], [6, -1], [6, 3.5], [-2, 3.5]], [[-6, -7], [7, -7], [7, -12.5], [-6, -12.5]], [[-5, -5.6], [-1, -5.6]], [[-6, 17.5], [0.8, 17.5], [0.8, 20.4]]]; if (C2.rage >= 5) pts.push([[0, -13], [0, -6]]);
   story.guards = pts.map((p) => guardSetup(mkNpc('guard', p[0][0], p[0][1], 0, 'soldier'), p));
+  { const h = C2.hyp = mkNpc('guard', -4.6, 19.8, Math.PI / 2); h.scripted = true; h.protect = true; h.pos.set(-4.6, 0, 19.8); }
   if (fromCp) { c2OpenDoor(true); C2.pipe = true; story.c2pipe = true; syncMods(); C2.floodK = 1; if (C2.pipeM) C2.pipeM.visible = false; setStage('c2-base', ''); player.pos.set(-5.6, 0, 11.8); player.yaw = Math.PI / 2; selectWeapon(WEAPONS.findIndex((w) => w.id === 'pipe')); }
   else setStage('c2-cage', '');
   banner('Подвал Марка', 'вы — воскреситель · вы регенерируете');
@@ -8424,6 +8433,11 @@ function c2Act(info) {
   if (st === 'c2-base' || st === 'c2-exit') {
     if (C2.melState === 'tied' && c2MelNear()) return info ? 'Развязать Мелоди' : cutC2Free();
     if (C2.melState === 'dead' && c2MelNear()) return info ? (C2.souls >= 3 ? 'Воскресить Мелоди' : `Нужно 3 души (${C2.souls}/3)`) : C2.souls >= 3 ? cutC2Revive() : c2Say('Мне нужны души. Три. Роуди Марка вполне сойдут.');
+    if (!c2Has('pick') && c2Near([-4.4, 9.9], 1.3)) return info ? 'Взять медиатор' : c2Pick();
+    if (C2.shrine && !c2Has('receipt') && c2Near(C2_SHRINE, 1.5)) return info ? 'Тайник в алтаре' : cutC2Stash();
+    if (!c2Has('tape') && c2Near([5.5, 20.3], 1.4)) return info ? 'Записи с камер' : cutC2Tape();
+    if (!c2Has('voice') && c2Near([HX - 1.1, -6], 1.3)) return info ? 'Автоответчик (3 сообщения)' : cutC2Voice();
+    if (!c2Has('roadie') && C2.hyp && C2.hyp.alive && c2Near([C2.hyp.pos.x, C2.hyp.pos.z], 1.6)) return info ? 'Допросить роуди' : c2Hypno();
     if (!C2.shrine && c2Near(C2_SHRINE, 1.5)) return info ? 'Осмотреть алтарь' : cutC2Shrine();
     if (!C2.cal && c2Near(C2_CAL, 1.4)) return info ? 'Осмотреть календарь' : cutC2Cal();
     if (!C2.diary && c2Near(C2_DESK, 1.4)) return info ? 'Читать дневник' : cutC2Diary();
@@ -8461,14 +8475,14 @@ function cutC2Shrine() {
     [5.6, () => ggSay('Сорок пять фотографий её… и одна — меня. Перечёркнутая.', 3.2)],
     [9.6, () => sub('', 'Под одним снимком красным маркером: «14 — её день. Наш день».')],
     [13.6, () => ggSay('Четырнадцать. Запомню.', 1.8)],
-  ], (t) => { camSet(-5.4, 1.7, 0.6 + Math.sin(t * 0.3) * 0.8, -HX, 1.5, 0.6); }, 16.0, () => { setStage(st, ''); toast('Подсказка к сейфу: 14'); });
+  ], (t) => { camSet(-5.4, 1.7, 0.6 + Math.sin(t * 0.3) * 0.8, -HX, 1.5, 0.6); }, 16.0, () => { setStage(st, ''); c2Ev('shrine'); toast('Подсказка к сейфу: 14 · в алтаре что-то не так со свечами…'); });
 }
 function cutC2Cal() {
   C2.cal = true; const st = story.stage; story.stage = 'c2-cut';
   runCut([
     [0.2, () => sub('', 'Календарь. Июль. Четырнадцатое обведено сердечками: «ДР Мелоди ♥♥♥».')],
     [4.4, () => ggSay('Июль. Седьмой месяц. Ну конечно.', 2.4)],
-  ], () => camSet(-7.6, 1.55, 18.5, -HX, 1.5, 18.5), 7.4, () => { setStage(st, ''); toast('Подсказка к сейфу: июль (07)'); });
+  ], () => camSet(-7.6, 1.55, 18.5, -HX, 1.5, 18.5), 7.4, () => { setStage(st, ''); c2Ev('cal'); toast('Подсказка к сейфу: июль (07)'); });
 }
 function cutC2Diary() {
   C2.diary = true; const st = story.stage; story.stage = 'c2-cut';
@@ -8476,7 +8490,7 @@ function cutC2Diary() {
     [0.2, () => sub('Дневник Мелоди', '«Он такой загадочный… Я пою о нём каждую ночь. Но он даже не знает моего имени.»')],
     [5.4, () => sub('Дневник Мелоди', '«Марк опять стоял под моим окном до утра. Мне страшно. Я никому не скажу.»')],
     [10.4, () => ggSay('Вот и вся правда, Марк. Это она любит меня. А я — никого.', 3.4)],
-  ], (t) => { if (t < 10.4) camSet(2.75, 1.45, -10.1, 2.7, 0.85, -10.5); else camSet(4.6, 1.6, -8.6, 3, 1.0, -10.6); }, 14.4, () => setStage(st, ''));
+  ], (t) => { if (t < 10.4) camSet(2.75, 1.45, -10.1, 2.7, 0.85, -10.5); else camSet(4.6, 1.6, -8.6, 3, 1.0, -10.6); }, 14.4, () => { setStage(st, ''); c2Ev('diary'); });
 }
 function c2Keypad() {
   const d = c2Ui(); let code = ''; const st = story.stage; runCut([], () => camSet(HX - 2.0, 1.2, -12, HX - 0.8, 0.7, -12), 99999, () => {});
@@ -8487,7 +8501,7 @@ function c2Keypad() {
   render(); d.style.display = 'block';
 }
 function c2SafeOpen(st) {
-  C2.safe = true; story.stage = 'c2-cut';
+  C2.safe = true; story.stage = 'c2-cut'; later(1, () => c2Ev('letters'));
   runCut([
     [0.2, () => { Sound.click(600, 0.4); Sound.thud(0.3); sub('', 'Щелчок. Внутри: ключ от студии, пистолет и пачка любовных писем, которые Марк так и не отправил.'); }],
     [5.4, () => ggSay('Сто писем. Ни одного отправленного. Жалкое зрелище.', 3)],
@@ -8579,22 +8593,7 @@ function cutC2End() {
     [19.2, () => { cam = 'mark'; markSay('Она моя! Сегодня на концерте она скажет это всем! ВСЕМ!!!'); }],
     [23.2, () => { run = true; open = 1; cam = 'wide'; subOff(); Sound.thud(0.5); }],
   ];
-  if (mel) S.push(
-    [26.4, () => { cam = 'mel'; melSay('Он побежал на концерт… Он хочет испортить мой концерт. Или сделать что-то страшное.'); }],
-    [32.0, () => { cam = 'gg'; ggSay('Пусть бежит. Расплата его догонит.', 2.6); }],
-    [35.6, () => { cam = 'mel'; melSay(C2.revived ? 'Ты вернул меня с того света… и даже не скажешь почему?' : 'Ты пришёл за мной. Не говори, что за ключом.'); }],
-    [40.6, () => { cam = 'gg'; ggSay('Я пришёл не за тобой.', 2); }],
-    [43.4, () => ggSay('…Но не отставай.', 1.8)],
-    [46.0, () => { ggSay('Это — расплата.', 2.4); fxStory.grade = 0.4; Sound.droneLoop(0.3); }],
-    [49.0, () => { subOff(); showCard('ГЛАВА 2 · ЛОКАЦИЯ 1 ПРОЙДЕНА', 'Дальше: концерт «Громкая ночь»', 5200); }]);
-  else S.push(
-    [26.0, () => { sub('', 'На полу вибрирует телефон Марка. На экране: «Мелоди ♥».'); for (let i = 0; i < 4; i++) later(i * 0.6, () => Sound.click(1400, 0.25)); cam = 'phone'; }],
-    [29.6, () => melSay('Марк? Марк, где ты?.. Алло?')],
-    [32.6, () => { cam = 'gg'; ggSay('Твой басист посадил меня в клетку, девочка.', 2.6); }],
-    [36.2, () => { cam = 'phone'; melSay('В-воскреситель?.. Это правда ты? Он сошёл с ума, он думает, что мы… Прошу, не делай ему больно!'); }],
-    [42.6, () => { cam = 'gg'; ggSay('Это уже не мне решать.', 2); }],
-    [45.4, () => { ggSay('Это — расплата.', 2.4); fxStory.grade = 0.4; Sound.droneLoop(0.3); }],
-    [48.4, () => { subOff(); showCard('ГЛАВА 2 · ЛОКАЦИЯ 1 ПРОЙДЕНА', 'Дальше: концерт «Громкая ночь»', 5200); }]);
+  S.push([25.4, () => { subOff(); cam = 'wide'; sub('', 'Марк исчезает на лестнице. Воскреситель не спешит: он знает, что Марк вернётся. Такие всегда возвращаются.'); }]);
   runCut(S, (t, dt) => {
     c2Amb(dt); if (C2.exitDoor) C2.exitDoor.rotation.y = 1.6 * sm(0, 0.8, t - 23.2) * open;
     if (run) { walkPath(M, M.esc || (M.esc = [[1.0, -21.4], [1.0, -23.5]]), 3.4, dt); if (M.pos.z < -22.2) M.root.visible = false; }
@@ -8604,16 +8603,239 @@ function cutC2End() {
     else if (cam === 'mark') camSet(_c2a.x - 0.4, _c2a.y + 0.1, _c2a.z + 0.6, _c2b.x, _c2b.y, _c2b.z); else if (cam === 'gg') camSet(_c2a.x + 0.3, _c2a.y, _c2a.z - 0.9, _c2a.x, _c2a.y - 0.03, _c2a.z);
     else if (cam === 'mel' && mel) { headPos(mel, _c2b); camSet(_c2b.x - 0.6, _c2b.y + 0.05, _c2b.z - 0.9, _c2b.x, _c2b.y - 0.03, _c2b.z); }
     else camSet(-1.0, 0.9, -19.2, -0.9, 0.02, -19.9);
-  }, 54.5, () => { fxStory.grade = 0; Sound.droneLoop(0); c2Finish(); });
+  }, 30.6, () => { subOff(); c2Police(); });
   later(0.1, () => { const ph = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.012, 0.16), new THREE.MeshBasicMaterial({ color: 0xff6ab8 })); ph.position.set(-0.9, 0.01, -19.9); addMesh(ph); });
+}
+/* ===================== chapter 2 · the investigation and the trial =====================
+   Evidence is scattered all over the basement (security room tapes, an answering machine, a stash behind the shrine,
+   a hypnotised roadie…). After the fight Mark runs up the stairs and comes back with the police, accusing the resurrector.
+   The resurrector, a mentalist at heart, takes Mark's lies apart one by one with the evidence — and Mark is arrested. */
+const EVD = {
+  pick: ['Медиатор Мелоди', 'Розовый медиатор. Стёрт с левой стороны — им играл левша.'],
+  shrine: ['Алтарь Марка', '45 фото Мелоди и одно — воскресителя, перечёркнутое красным.'],
+  receipt: ['Чек за клетку', '«Клетка 2×3 м + трансформатор 380 В». Покупатель: Марк Вельский.'],
+  cal: ['Календарь', 'Июль, 14 обведено: «ДР Мелоди ♥♥♥».'],
+  diary: ['Дневник Мелоди', '«Марк опять стоял под моим окном до утра. Мне страшно.»'],
+  letters: ['Письма из сейфа', 'Сто любовных писем Марка Мелоди. Ни одно не отправлено.'],
+  tape: ['Запись камеры №3', 'Закулисье, 23:41. Марк бьёт воскресителя грифом по затылку и тащит к лифту.'],
+  voice: ['Автоответчик', 'Мелоди: «Марк, не звони мне больше». Магазин: «Ваша клетка готова к выдаче».'],
+  roadie: ['Показания роуди', 'Под гипнозом: «Марк платил нам, чтобы мы молчали и сторожили клетку».'],
+};
+function c2Has(id) { return C2.ev && C2.ev.has(id); }
+function c2Ev(id) { if (!C2.ev) C2.ev = new Set(); if (C2.ev.has(id)) return; C2.ev.add(id); Sound.chime(); toast('Улика: ' + EVD[id][0] + ` (${C2.ev.size}/9)`); }
+function c2Pick() { c2Ev('pick'); c2Say('Медиатор. Стёрт с левой стороны… Интересно. Мелоди ведь правша.'); }
+function cutC2Stash() {
+  const st = story.stage; story.stage = 'c2-cut';
+  runCut([
+    [0.2, () => { Sound.click(500, 0.4); Sound.thud(0.3); sub('', 'Одна свеча не горит и не плавится — она пластиковая. Воскреситель поворачивает её. Щелчок: за фото открывается тайник.'); }],
+    [5.4, () => sub('', 'Внутри: её старые банты, украденная перчатка… и чек. «Клетка 2×3 м, трансформатор 380 В. Покупатель: Марк Вельский».')],
+    [10.6, () => ggSay('Люди всегда прячут самое важное за самым дорогим. Предсказуемо, Марк.', 3.4)],
+  ], (t) => camSet(-6.6, 1.3, 1.6, -8.6, 1.0, 0.6), 14.4, () => { setStage(st, ''); c2Ev('receipt'); });
+}
+/* ----- the security room: a real tape on a real screen ----- */
+const TAPE = { cv: null, g: null, tex: null };
+function tapeTex() { if (TAPE.tex) return TAPE.tex; TAPE.cv = makeCanvas(320, 200); TAPE.g = TAPE.cv.getContext('2d'); TAPE.tex = toTex(TAPE.cv); tapeDraw(-1); return TAPE.tex; }
+function tapeDraw(t) {
+  const g = TAPE.g, W2 = 320, H = 200; g.fillStyle = '#0c1410'; g.fillRect(0, 0, W2, H);
+  if (t >= 0) {
+    g.fillStyle = 'rgba(255,90,180,0.25)'; g.beginPath(); g.moveTo(40, 0); g.lineTo(0, 150); g.lineTo(120, 150); g.fill();
+    g.fillStyle = '#26302a'; g.fillRect(0, 150, W2, 50); g.fillStyle = '#3a443c'; for (let i = 0; i < 6; i++) g.fillRect(200 + i * 18, 90, 12, 60);
+    const fig = (x, y, c, h, lean = 0, fall = 0) => { g.save(); g.translate(x, y); g.rotate(fall); g.fillStyle = c; g.fillRect(-7, -h, 14, h * 0.55); g.beginPath(); g.arc(lean, -h - 8, 8, 0, 7); g.fill(); g.fillRect(-7, -h * 0.45, 5, h * 0.45); g.fillRect(2, -h * 0.45, 5, h * 0.45); g.restore(); };
+    const ggX = 150, phase = t;
+    if (phase < 3.2) fig(ggX, 150, '#0a0a0e', 62);
+    else if (phase < 4.4) fig(ggX, 150, '#0a0a0e', 62, 0, (phase - 3.2) * 1.2);
+    else { const dx = Math.max(0, (phase - 5.2) * 22); fig(ggX + 30 - dx, 156, '#0a0a0e', 62, 0, Math.PI / 2); }
+    const mx = phase < 2.2 ? 300 - phase * 60 : phase < 4.4 ? 168 : 196 - Math.max(0, (phase - 5.2) * 22);
+    fig(mx, 150, '#a01020', 54); if (phase > 2.2 && phase < 3.4) { g.strokeStyle = '#c81830'; g.lineWidth = 5; g.beginPath(); g.moveTo(mx - 4, 98); g.lineTo(mx - 24 + (phase - 2.2) * -10, 70 + (phase - 2.2) * 30); g.stroke(); }
+    if (phase > 3.2 && phase < 3.5) { g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(0, 0, W2, H); }
+    g.fillStyle = '#2a4ad0'; g.fillRect(mx - 6, 88, 12, 6);
+  }
+  for (let i = 0; i < 400; i++) { const v = Math.random() * 60 | 0; g.fillStyle = `rgba(${v},${v},${v},0.25)`; g.fillRect(Math.random() * W2, Math.random() * H, 2, 1); }
+  for (let y = 0; y < H; y += 3) { g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(0, y, W2, 1); }
+  g.fillStyle = '#e8f0e8'; g.font = '700 13px monospace'; g.fillText('КАМ 3 · ЗАКУЛИСЬЕ', 8, 16); g.fillText('23:41:' + String(Math.max(0, Math.floor(t * 2) + 10)).padStart(2, '0'), 240, 16);
+  if (t < 0 || Math.floor(performance.now() / 500) % 2) { g.fillStyle = '#ff2a2a'; g.beginPath(); g.arc(14, 188, 5, 0, 7); g.fill(); g.fillStyle = '#ff6a6a'; g.fillText('REC', 24, 192); }
+  if (TAPE.tex) TAPE.tex.needsUpdate = true;
+}
+function cutC2Tape() {
+  const st = story.stage; story.stage = 'c2-cut'; let play = -1;
+  runCut([
+    [0.2, () => sub('', 'Комната охраны. Шесть мониторов, видеомагнитофон, пепельница, полная окурков. Марк не врал: камеры у него есть.')],
+    [4.6, () => { ggSay('Камера три. Закулисье. Ночь концерта. Посмотрим, кто кого «похитил».', 3.2); }],
+    [8.4, () => { play = 0; Sound.click(400, 0.4); subOff(); }],
+    [16.8, () => { play = -1; ggSay('Удар по затылку. Сзади. Грифом бас-гитары. Как благородно, Марк.', 3.4); }],
+    [21.2, () => ggSay('Кассету — с собой. Она ещё сыграет. Громче любого соло.', 3)],
+  ], (t, dt) => { if (play >= 0) { play = t - 8.4; tapeDraw(play); } else if (Math.random() < 0.3) tapeDraw(-1); camSet(5.5, 1.45, 20.3, 5.5, 1.42, 21.95); }, 24.6, () => { setStage(st, ''); c2Ev('tape'); });
+}
+function cutC2Voice() {
+  const st = story.stage; story.stage = 'c2-cut';
+  runCut([
+    [0.2, () => { Sound.click(1200, 0.3); sub('Автоответчик', '«У вас три новых сообщения». Пиииип.'); }],
+    [3.8, () => sub('Сообщение 1', '«Марк, это Стас, менеджер. Ты опять не пришёл на саундчек. Мелоди просила передать — она тебя боится. Разберись с собой.»')],
+    [10.4, () => { Sound.click(1200, 0.2); sub('Сообщение 2 · голос Мелоди', '«Марк… это Мелоди. Пожалуйста, не звони мне больше. И не стой у моего окна. Я серьёзно.»'); }],
+    [17.2, () => { Sound.click(1200, 0.2); sub('Сообщение 3', '«Господин Вельский, ваш заказ готов: клетка два на три метра и трансформатор на триста восемьдесят вольт. Доставка в подвал, как просили.»'); }],
+    [24.4, () => ggSay('Она просит не звонить. А он покупает клетку. Классика жанра.', 3)],
+  ], () => camSet(7.0, 1.7, -6.4, 8.6, 1.5, -6), 28.0, () => { setStage(st, ''); c2Ev('voice'); });
+}
+/* ----- hypnosis: a frightened roadie, a pocket watch, four perfect swings ----- */
+function c2Hypno() {
+  const R = C2.hyp, st = story.stage; story.stage = 'c2-cut';
+  runCut([
+    [0.2, () => { c2Talk0('Роуди', 'Н-не убивай! Я просто таскаю колонки! Я ничего не знаю!'); }],
+    [3.8, () => ggSay('Конечно, не знаешь. Посмотри на часы. Просто… посмотри.', 3)],
+  ], () => { headPos(R, _c2b); camSet(_c2b.x + 0.9, _c2b.y + 0.05, _c2b.z - 0.4, _c2b.x, _c2b.y, _c2b.z); }, 7.2, () => hypGame(st));
+}
+function c2Talk0(who, t) { line(who, t, who === 'Инспектор' ? 1.1 : who === 'Роуди' ? 0.95 : 1, 1.05); }
+function hypGame(st) {
+  const R = C2.hyp; runCut([], () => { headPos(R, _c2b); camSet(_c2b.x + 0.9, _c2b.y + 0.05, _c2b.z - 0.4, _c2b.x, _c2b.y, _c2b.z); }, 99999, () => {});
+  let d = document.getElementById('hyp'); if (!d) { d = document.createElement('div'); d.id = 'hyp'; d.style.cssText = 'position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(40,20,60,.35),rgba(0,0,0,.8));color:#f2e8e0;font-family:var(--ui);text-align:center'; ['pointerdown', 'touchstart', 'click'].forEach((e) => d.addEventListener(e, (ev) => ev.stopPropagation())); document.body.appendChild(d); }
+  d.innerHTML = '<small style="letter-spacing:.2em;color:#c8a0ff">ГИПНОЗ</small><b style="margin:4px 0 2px">Жмите, когда часы в центре</b><small id="hypN" style="color:#ffd080">0 / 4</small><div style="position:relative;width:220px;height:200px"><div style="position:absolute;left:109px;top:0;width:2px;height:200px;background:rgba(255,255,255,.12)"></div><div id="hypP" style="position:absolute;left:110px;top:6px;width:2px;height:150px;transform-origin:0 0;background:#d8c070"><i style="position:absolute;left:-17px;bottom:-30px;width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff6c0,#c8a030 60%,#6a5010);box-shadow:0 0 20px #ffd060"></i></div></div><button class="btn primary" id="hypGo" style="min-width:180px">СЕЙЧАС</button>';
+  d.style.display = 'flex'; let n = 0, t0 = performance.now(), on = true, ang = 0;
+  const loop = () => { if (!on) return; const t = (performance.now() - t0) / 1000; ang = Math.sin(t * (2.2 + n * 0.35)) * 0.9; const p = document.getElementById('hypP'); if (p) p.style.transform = `rotate(${-ang}rad)`; requestAnimationFrame(loop); }; loop();
+  document.getElementById('hypGo').onclick = () => {
+    if (Math.abs(ang) < 0.2) { n++; Sound.chime(); flashScreen('#c8a0ff', 300); } else { n = Math.max(0, n - 1); Sound.zap(0.3); }
+    document.getElementById('hypN').textContent = n + ' / 4';
+    if (n >= 4) { on = false; d.style.display = 'none'; hypDone(st); }
+  };
+}
+function hypDone(st) {
+  const R = C2.hyp;
+  runCut([
+    [0.2, () => { ggSay('Твои веки тяжелеют… Ты в безопасности… Расскажи мне про Марка.', 3.4); }],
+    [4.2, () => c2Talk0('Роуди', '(монотонно) Марк… платил нам. По сто долларов в день. Чтобы мы молчали… и сторожили клетку.')],
+    [10.0, () => c2Talk0('Роуди', '(монотонно) В ночь концерта он ударил тебя грифом. Сзади. Мы несли тебя втроём. Ты был очень… тяжёлый.')],
+    [16.4, () => ggSay('Спасибо. Когда я щёлкну пальцами, ты проснёшься и забудешь, что я был здесь.', 3.4)],
+    [20.4, () => { Sound.click(2000, 0.5); c2Talk0('Роуди', '…А? Что? Почему я сижу на полу?'); }],
+    [23.6, () => ggSay('Работа нервная. Отдохни.', 1.8)],
+  ], () => { headPos(R, _c2b); camSet(_c2b.x + 0.9, _c2b.y + 0.05, _c2b.z - 0.4, _c2b.x, _c2b.y, _c2b.z); }, 26.0, () => { setStage(st, ''); c2Ev('roadie'); });
+}
+/* ----- the police, the accusation and the trial ----- */
+const TRIAL = [
+  { claim: 'Он ворвался к нам на концерт и похитил меня! Притащил сюда силой!', ok: ['tape'],
+    win: [['Воскреситель', 'Камера номер три, закулисье, двадцать три сорок одна. Марк бьёт меня грифом по затылку. Сзади. И тащит к лифту.'], ['Инспектор', '…Это действительно он на записи.']],
+    bluff: [['Воскреситель', 'У вас свежие мозоли на ладонях и натёртое ремнём плечо. Вы что-то долго тащили, Марк. Что-то тяжёлое. Меня.']] },
+  { claim: 'Её медиатор был у него в кармане! Он украл его, он одержим ею!', ok: ['pick'],
+    win: [['Воскреситель', 'Медиатор стёрт с левой стороны. Им играл левша. Мелоди правша. В группе один левша — бас-гитарист.'], ['Воскреситель', 'Вы подбросили его мне, Марк. Неловко вышло.']],
+    bluff: [['Воскреситель', 'Вы трогаете свой карман каждый раз, когда говорите «медиатор». Там лежит второй, верно?']] },
+  { claim: 'Клетка — его! Это он притащил её сюда, чтобы мучить людей!', ok: ['receipt', 'voice'],
+    win: [['Воскреситель', '«Клетка два на три, трансформатор триста восемьдесят вольт». Покупатель — Марк Вельский. Доставка в этот подвал. По вашей просьбе.'], ['Инспектор', 'Тут ваша подпись, Вельский.']],
+    bluff: [['Воскреситель', 'Посмотрите на его руки, инспектор. Ожоги от тока на пальцах. Только хозяин клетки знает, где у неё рубильник.']] },
+  { claim: 'Он одержим Мелоди! Он маньяк! Он преследует её!', ok: ['shrine', 'letters', 'cal'],
+    win: [['Воскреситель', 'Стена с сорока пятью её фото. Свечи. Сто неотправленных писем. И день её рождения в сердечках. Это не мой подвал, инспектор.'], ['Мелоди', 'Марк… Это правда ты?']],
+    bluff: [['Воскреситель', 'Он произносит её имя чаще, чем дышит. Вы считали? Я считал. Сорок два раза за пять минут.']] },
+  { claim: 'Мелоди сама говорила мне, что боится его!', ok: ['diary', 'voice'],
+    win: [['Воскреситель', 'Она боится. Но не меня. «Марк опять стоял под моим окном до утра. Мне страшно». Её почерк. Её дневник.'], ['Мелоди', '…Да. Это я писала. Про тебя, Марк.']],
+    bluff: [['Воскреситель', 'Мелоди, когда он подходит, вы делаете полшага назад. Каждый раз. Тело не умеет врать.'], ['Мелоди', '…Это правда.']] },
+  { claim: 'Мои ребята всё видели! Они подтвердят, что он напал первым!', ok: ['roadie'],
+    win: [['Воскреситель', 'Ваши ребята уже всё рассказали. Сто долларов в день за молчание и охрану клетки. Дёшево вы цените свободу человека.'], ['Инспектор', 'Мы опросим каждого. Под протокол.']],
+    bluff: [['Воскреситель', 'Ваши роуди сбежали при первом выстреле. Свидетели не бегут, Марк. Бегут соучастники.']] },
+];
+function c2PoliceCam(shot) {
+  const T = (n) => (n && n.parts ? headPos(n, _c2b) : _c2b.set(0, 1.6, -20));
+  if (shot === 'gg') { headPos(avatar, _c2a); camSet(_c2a.x + 0.35, _c2a.y + 0.02, _c2a.z - 0.95, _c2a.x, _c2a.y - 0.03, _c2a.z); }
+  else if (shot === 'mark') { headPos(avatar, _c2a); T(story.mark); camSet(_c2a.x - 0.35, _c2a.y + 0.08, _c2a.z + 0.5, _c2b.x, _c2b.y, _c2b.z); }
+  else if (shot === 'markClose') { T(story.mark); camSet(_c2b.x - 0.25, _c2b.y + 0.02, _c2b.z + 0.85, _c2b.x, _c2b.y, _c2b.z); }
+  else if (shot === 'insp') { T(C2.insp); camSet(_c2b.x + 0.5, _c2b.y + 0.02, _c2b.z + 0.8, _c2b.x, _c2b.y, _c2b.z); }
+  else if (shot === 'mel') { T(C2.mel); camSet(_c2b.x + 0.3, _c2b.y + 0.04, _c2b.z - 0.9, _c2b.x, _c2b.y, _c2b.z); }
+  else camSet(3.4, 2.4, -15.8, -0.6, 1.2, -19.8);
+}
+function c2PSay(who, t) { C2.pshot = who === 'Марк' ? (Math.random() < 0.5 ? 'mark' : 'markClose') : who === 'Инспектор' ? 'insp' : who === 'Мелоди' ? 'mel' : who === '' ? 'wide' : 'gg'; if (who === 'Марк') markSay(t); else if (who === 'Мелоди') melSay(t); else if (who === 'Инспектор') c2Talk0('Инспектор', t); else if (who === '') sub('', t); else ggSay(t, Math.min(4.2, 0.6 + t.length * 0.05)); }
+function c2PTalk(lines, after) { let t = 0.2; const steps = []; for (const [w, x] of lines) { steps.push([t, () => c2PSay(w, x)]); t += 1.3 + x.length * 0.058; } runCut(steps, c2PUpd, t, after); }
+function c2PUpd(t, dt) {
+  c2Amb(dt); const all = [story.mark, C2.insp, C2.mel, ...(C2.cops || [])]; for (const n of all) if (n && n.root) { if (n.path && n.path.length) walkPath(n, n.path, n.pathSp || 1.6, dt); else if (!n.noFace) n.yaw += angDiff(n.yaw, Math.atan2(player.pos.x - n.pos.x, player.pos.z - n.pos.z)) * Math.min(1, dt * 4); n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; }
+  c2PoliceCam(C2.pshot || 'wide');
+}
+function c2Police() {
+  const M = story.mark; story.stage = 'c2-trial'; story.showAvatar = true; C2.trust = 3; C2.round = 0; C2.bluffs = 0; C2.wrong = 0;
+  player.pos.set(-1.2, 0, -17.6); player.yaw = 0; avatar.pos.copy(player.pos); standAvatar();
+  for (const g of story.guards) if (g.alive) g.dispose();
+  M.root.visible = true; M.pos.set(1.0, 0, -23.4); M.path = [[1.0, -21.0], [1.4, -20.4]]; M.pathSp = 2.2;
+  const I = C2.insp = mkNpc('cop', 0.6, -23.8, 0); I.scripted = true; I.protect = true; I.path = [[0.6, -21.2], [-0.4, -20.6]];
+  C2.cops = [[1.6, -24.2, [[1.6, -21.4], [2.6, -20.0]]], [0.2, -24.6, [[0.2, -21.6], [-2.4, -19.6]]]].map(([x, z, p]) => { const c = mkNpc('cop', x, z, 0); c.scripted = true; c.protect = true; c.path = p; return c; });
+  if (!(C2.melAlly && C2.mel && C2.mel.alive)) { const mel = C2.mel = mkNpc('melodie', 1.2, -25, 0); mel.scripted = true; mel.protect = true; mel.path = [[1.2, -21.8], [-2.8, -17.4]]; mel.lateArrive = true; } else { C2.mel.path = [[-2.8, -17.4]]; }
+  Sound.siren(0.5); later(1.4, () => Sound.siren(0.5)); later(2.8, () => Sound.siren(0.5));
+  const late = C2.mel.lateArrive;
+  c2PTalk([
+    ['', 'Сирены. Топот по лестнице. В дверь врываются полицейские — и Марк, прячась за их спинами.'],
+    ['Марк', 'ВОТ ОН! Это он! Он похитил меня, держал в подвале, избил моих ребят! Он маньяк!'],
+    ['Инспектор', 'Полиция! Руки за голову! Медленно!'],
+    ...(late ? [['Мелоди', 'Я позвонила в полицию! Марк не пришёл на саундчек, телефон молчит… Что здесь происходит?!']] : []),
+    ['Воскреситель', '…'],
+    ['Воскреситель', 'Инспектор Лисова, если не ошибаюсь. Вы не спали всю ночь, пили кофе из автомата — без сахара, — и у вас ноет левое колено. Старая травма. Баскетбол?'],
+    ['Инспектор', '…Откуда вы… Кто вам сказал?'],
+    ['Воскреситель', 'Никто. Я просто смотрю. Экстрасенсов не бывает, инспектор. Бывают внимательные люди.'],
+    ['Воскреситель', 'Дайте мне пять минут. Если я не докажу, что всё это сделал он — наденете наручники на меня. Сам протяну руки.'],
+    ['Инспектор', '…Пять минут. И ни секундой больше. Говорите.'],
+  ], () => c2Round(0));
+}
+function c2Round(i) {
+  if (i >= TRIAL.length) return c2Trick();
+  const R = TRIAL[i], d = c2Ui(); C2.pshot = 'markClose'; runCut([[0.1, () => markSay(R.claim)]], c2PUpd, 99999, () => {});
+  const trust = '★'.repeat(Math.max(0, C2.trust)) + '☆'.repeat(Math.max(0, 3 - C2.trust));
+  d.style.borderColor = '#d8a840';
+  d.innerHTML = `<small style="letter-spacing:.18em;color:#ffd060">РАЗОБЛАЧЕНИЕ · ${i + 1}/${TRIAL.length} · доверие инспектора ${trust}</small><b style="display:block;margin:6px 0 4px;font-size:14px">Марк: «${R.claim}»</b><small style="display:block;margin-bottom:6px;color:#bbb">Чем опровергнуть? Выберите улику</small><div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:46vh;overflow:auto">` + Object.keys(EVD).map((k) => `<button class="btn" data-e="${k}" ${c2Has(k) ? '' : 'disabled style="opacity:.35"'} style="text-align:left;padding:6px 8px;font-size:12px">${c2Has(k) ? EVD[k][0] : '??? (не найдено)'}</button>`).join('') + '</div><button class="btn" data-e="bluff" style="width:100%;margin-top:6px;border-color:#c8a0ff">🎩 Метод менталиста (блеф, без улики)</button>';
+  d.style.display = 'block';
+  d.querySelectorAll('[data-e]').forEach((b) => b.onclick = () => {
+    if (b.disabled) return; const e = b.dataset.e; d.style.display = 'none'; Sound.click(900, 0.2); try { speechSynthesis.cancel(); } catch (x) {}
+    if (e === 'bluff') { C2.bluffs++; C2.trust--; c2PTalk([...R.bluff, ['Инспектор', 'Звучит убедительно… но это не доказательство. Ещё один такой фокус — и я перестану слушать.']], () => c2Next(i)); }
+    else if (R.ok.includes(e)) { c2PTalk([['Воскреситель', pick(['Позвольте показать.', 'Смотрите внимательно.', 'А вот и нет.'])], ...R.win, ['Марк', pick(['Это… это подделка!', 'Нет! Это ничего не значит!', 'Вы ему верите?!'])]], () => c2Next(i)); }
+    else { C2.wrong++; C2.trust--; c2PTalk([['Воскреситель', 'Взгляните: ' + EVD[e][0].toLowerCase() + '.'], ['Инспектор', 'И что? Это никак не связано с его словами.'], ['Марк', 'Видите?! Он просто болтает!']], () => (C2.trust <= 0 ? c2Mercy(i) : c2Round(i))); }
+  });
+}
+function c2Next(i) { if (C2.trust <= 0) c2Mercy(i + 1); else c2Round(i + 1); }
+function c2Mercy(i) { C2.trust = 1; c2PTalk([['Инспектор', 'Всё, хватит фокусов. Наручники!'], ['Воскреситель', 'Одну минуту, инспектор. Одну. Вы ведь сами хотите знать правду — у вас дёргается уголок рта, когда он говорит.'], ['Инспектор', '…Одна минута.']], () => c2Round(i)); }
+function c2Trick() {
+  c2PTalk([
+    ['Воскреситель', 'Последний вопрос, Марк. Ключ от клетки. Не говорите мне, где он. Просто… подумайте о нём.'],
+    ['Марк', 'Я… я не знаю ни о каком ключе!'],
+    ['', 'На долю секунды взгляд Марка падает вниз и влево — к внутренней стороне куртки. Пальцы дёргаются к лацкану.'],
+  ], () => c2TrickAsk());
+}
+function c2TrickAsk() {
+  const d = c2Ui(); C2.pshot = 'markClose'; runCut([], c2PUpd, 99999, () => {});
+  const opts = [['Левый внутренний карман куртки', true], ['Правый карман джинсов', false], ['В ботинке', false], ['В чехле от бас-гитары', false]];
+  d.innerHTML = '<small style="letter-spacing:.18em;color:#c8a0ff">ПОСЛЕДНИЙ ФОКУС</small><b style="display:block;margin:6px 0 8px">Куда посмотрел Марк? Где ключ?</b>' + opts.map((o, k) => `<button class="btn" data-k="${k}" style="width:100%;margin:4px 0;text-align:left">${o[0]}</button>`).join('');
+  d.style.display = 'block';
+  d.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { d.style.display = 'none'; Sound.click(900, 0.2); if (opts[+b.dataset.k][1]) c2Arrest(); else { C2.wrong++; c2PTalk([['Инспектор', '…Пусто.'], ['Марк', 'Ха! ХА! Я же говорил!'], ['Воскреситель', 'Простите. Я смотрел на руки, а надо — на глаза. Ещё раз.']], () => c2TrickAsk()); } });
+}
+function c2Arrest() {
+  const M = story.mark, I = C2.insp, mel = C2.mel;
+  const cops = C2.cops || [];
+  c2PTalk([
+    ['Воскреситель', 'Левый внутренний карман. Инспектор, будьте добры.'],
+    ['', 'Инспектор Лисова запускает руку в куртку Марка. Звякает металл. На ладони — тяжёлый ключ с биркой «КЛЕТКА».'],
+    ['Инспектор', '…Ключ от клетки. В вашем кармане, Вельский.'],
+    ['Марк', 'Я… Я ОХРАНЯЛ ЕЁ!!! От него! От всех! Три года я был рядом, три года! А она пела про НЕГО!'],
+    ['Мелоди', 'Марк… Я никогда не была твоей. Ни одного дня.'],
+    ['Инспектор', 'Марк Вельский, вы задержаны по подозрению в похищении, незаконном лишении свободы и нападении. Вы имеете право хранить молчание.'],
+  ], () => {
+    Sound.click(2400, 0.6); later(0.25, () => Sound.click(2200, 0.6)); toast('Марк арестован');
+    if (cops[0]) cops[0].path = [[M.pos.x + 0.6, M.pos.z + 0.2]]; if (cops[1]) cops[1].path = [[M.pos.x - 0.6, M.pos.z + 0.2]];
+    c2PTalk([
+      ['', 'Щелчок наручников. Двое полицейских берут Марка под руки.'],
+      ['Марк', 'Вы ещё услышите! Все услышите! СЕГОДНЯ НА СЦЕНЕ ОНА ВСЁ СКАЖЕТ! ВСЁ!!!'],
+    ], () => {
+      M.noFace = true; M.path = [[1.0, -21.4], [1.0, -24]]; M.pathSp = 1.4; for (const c of cops) { c.noFace = true; c.path = [[1.0 + (c === cops[0] ? 0.6 : -0.6), -21.4], [1.0, -24.2]]; c.pathSp = 1.4; }
+      c2PTalk([
+        ['', 'Крики Марка затихают на лестнице. В подвале становится очень тихо.'],
+        ['Мелоди', '«Она всё скажет на сцене»… Что он имел в виду? Я ничего не собиралась говорить.'],
+        ['Воскреситель', 'Ревнивцы всегда оставляют последнее слово себе. Видимо, он что-то приготовил на концерт.'],
+        ['Инспектор', 'Кто вы вообще такой? Ни документов, ни отпечатков… Вы даже на камерах выглядите как… тень.'],
+        ['Воскреситель', 'Просто наблюдательный. И, если можно, — чашку чая. Без сахара.'],
+        ['Инспектор', '…Не покидайте город.'],
+        ['Мелоди', 'Концерт через три часа. Ты придёшь?'],
+        ['Воскреситель', 'Марк сказал: на сцене ты всё скажешь. Мне стало интересно, что именно.'],
+        ['Воскреситель', 'Это — расплата. И она ещё не закончилась.'],
+      ], () => { fxStory.grade = 0.35; Sound.droneLoop(0.3); showCard('ГЛАВА 2 · ЛОКАЦИЯ 1 ПРОЙДЕНА', 'Дальше: концерт «Громкая ночь» — «на сцене она всё скажет»', 6000); runCut([[0.1, () => subOff()]], c2PUpd, 6.5, () => { fxStory.grade = 0; Sound.droneLoop(0); c2Finish(); }); });
+    });
+  });
 }
 function c2Finish() {
   const kills = story.guards.filter((g) => !g.alive).length, sec = Math.round((performance.now() - C2.t0) / 1000);
-  const melTxt = C2.revived ? 'убита Марком — воскрешена' : C2.freed ? 'спасена из кладовой' : 'звонила по телефону';
-  const rows = [['Время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Ярость Марка', Math.min(10, C2.rage) + ' / 10'], ['Мелоди', melTxt], ['Роуди повержено', kills + ' / ' + story.guards.length], ['Подсказки', (C2.shrine ? 1 : 0) + (C2.cal ? 1 : 0) + (C2.diary ? 1 : 0) + ' / 3'], ['Смертей', '0 — воскреситель не умирает']];
+  const melTxt = C2.revived ? 'убита Марком — воскрешена' : C2.freed ? 'спасена из кладовой' : 'привела полицию';
+  const rows = [['Время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Ярость Марка', Math.min(10, C2.rage) + ' / 10'], ['Мелоди', melTxt], ['Роуди повержено', kills + ' / ' + story.guards.length], ['Улики', (C2.ev ? C2.ev.size : 0) + ' / 9'], ['Доверие инспектора', Math.max(0, C2.trust) + ' / 3'], ['Блеф менталиста', C2.bluffs + ' раз'], ['Смертей', '0 — воскреситель не умирает']];
   addUn('c2a'); if (C2.revived) addUn('c2mel'); saveCp(null); fadeIn(); $('cut').hidden = true; $('cut').classList.remove('on', 'ghost'); $('credits').hidden = true; if (C2.bar) C2.bar.style.display = 'none'; storyReset(); mode = 'story'; lastCh = 2; Music.stop();
   document.body.classList.remove('playing'); state = 'over';
-  document.querySelector('#over .eyebrow').textContent = 'Глава 2 · Расплата'; $('overTitle').textContent = 'Подвал Марка пройден';
+  document.querySelector('#over .eyebrow').textContent = 'Глава 2 · Расплата'; $('overTitle').textContent = 'Марк арестован';
   $('overStats').innerHTML = rows.map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join(''); $('againBtn').innerHTML = 'Ещё раз<small>Глава 2 сначала</small>';
   $('over').hidden = false; $('hud').hidden = true; $('touch').hidden = true;
 }
@@ -8637,17 +8859,17 @@ function updC2(dt, tick) {
   if (st === 'c2-cage') { tgt = C2.pipe ? C2_LOCK : C2_PIPE; obj = C2.pipe ? `Сломайте замок клетки трубой (${C2.lockN}/3)` : `Выберитесь из клетки: вырвите ржавую трубу у стены (${C2.pipeN}/4)` + (C2.volt ? ' · клетка под током' : ''); }
   else {
     const melTask = C2.melState === 'tied' ? 'Освободите Мелоди в кладовой (юг)' : C2.melState === 'dead' ? (C2.souls >= 3 ? 'Воскресите Мелоди (у клетки)' : `Соберите души роуди ${C2.souls}/3, чтобы воскресить Мелоди`) : '';
-    if (melTask && (C2.melState === 'tied' || C2.souls >= 3)) tgt = C2.melState === 'tied' ? [2, 19.6] : [C2.corpsePos.x, C2.corpsePos.z];
+    if (melTask && (C2.melState === 'tied' || C2.souls >= 3)) tgt = C2.melState === 'tied' ? [-1.4, 19.6] : [C2.corpsePos.x, C2.corpsePos.z];
     else if (!C2.safe) tgt = C2.knowLock || C2.melAlly ? C2_SAFE : C2_SDOOR; else tgt = C2_SDOOR;
     const clues = `подсказки: ${C2.shrine ? '14' : '?'} · ${C2.cal ? '07' : '?'}`;
-    obj = (melTask ? melTask + ' · ' : '') + (!C2.safe ? (C2.knowLock || C2.melAlly ? `Откройте сейф Марка в кабинете (${C2.melAlly ? 'код 1407' : clues})` : 'Найдите выход из подвала (север)') : 'Ключ у вас! Откройте студию (север)') + ` · роуди: ${alive}` + (story.alarm ? ' · ТРЕВОГА' : '');
+    obj = (melTask ? melTask + ' · ' : '') + (!C2.safe ? (C2.knowLock || C2.melAlly ? `Откройте сейф Марка в кабинете (${C2.melAlly ? 'код 1407' : clues})` : 'Найдите выход из подвала (север)') : 'Ключ у вас! Откройте студию (север)') + ` · роуди: ${alive} · улики: ${C2.ev ? C2.ev.size : 0}/9` + (story.alarm ? ' · ТРЕВОГА' : '');
   }
   targetArrow(tgt ? _b.set(tgt[0], 0, tgt[1]) : null); $('sObj').textContent = obj;
 }
 function startCh2(cp) {
   Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'story'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true;
   story.on = true; story.asGG = true; story.ch = 2; lastCh = 2; vmSkinGG(true); W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0;
-  Object.assign(C2, { rage: 0, open: false, pipe: false, pipeN: 0, lockN: 0, floodK: 0, spray: 0, shrine: false, cal: false, diary: false, safe: false, knowLock: false, volt: false, mel: null, melState: 'none', melAlly: false, souls: 0, corpse: null, corpsePos: null, boss: false, revived: false, freed: false, t0: performance.now() });
+  Object.assign(C2, { rage: 0, open: false, pipe: false, pipeN: 0, lockN: 0, floodK: 0, spray: 0, shrine: false, cal: false, diary: false, safe: false, knowLock: false, volt: false, mel: null, melState: 'none', melAlly: false, souls: 0, corpse: null, corpsePos: null, boss: false, revived: false, freed: false, ev: new Set(), hyp: null, insp: null, cops: null, trust: 3, bluffs: 0, wrong: 0, t0: performance.now() });
   $('resumeBtn').hidden = true; startGame.fromWaves = true;
   if (cp === 'c2b') { storyMap('c2base'); story.gg = avatar; C2.rage = 3; c2Gameplay(true); return; }
   saveCp(null); c2Intro();
@@ -9216,7 +9438,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { C2, startCh2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
