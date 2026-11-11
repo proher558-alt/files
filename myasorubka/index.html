@@ -9723,7 +9723,7 @@ function flHud() {
 function flHudSync() { const d = flHud(); d.querySelectorAll('[data-f]').forEach((b) => { if (b.dataset.f !== 'x') b.style.borderColor = +b.dataset.f === FLU.cur ? '#fff' : '#fff3'; }); $('flName').textContent = LQT[FLU.cur].name.toUpperCase(); }
 function flValve() { if (mapId !== 'fluidlab' || !FLU.on || mode === 'story') return null; for (const t of FLU.taps) if (Math.hypot(player.pos.x - t.x, player.pos.z + 3.2) < 1.2) return t; return null; }
 function flToggle() { const t = flValve(); if (!t) return; t.on = t.on > 0 ? 0 : 14; Sound.click(500, 0.4); Sound.thud(0.3); toast((t.on ? 'Кран открыт: ' : 'Кран закрыт: ') + LQT[t.t].name); }
-function flHose() { if (mapId !== 'fluidlab') return; aimDir(_a); const o = eye.position, t = FLU.cur; for (let k = 0; k < 2; k++) { const s = 7.5 + rand(-0.6, 0.6); flAddR(o.x + _a.x * 0.7 + rand(-0.04, 0.04), o.y + _a.y * 0.7 - 0.25, o.z + _a.z * 0.7 + rand(-0.04, 0.04), _a.x * s + rand(-0.4, 0.4) + player.vel.x, _a.y * s + rand(-0.3, 0.4), _a.z * s + rand(-0.4, 0.4) + player.vel.z, t); } FLU.hoseT = 0.15; }
+function flHose() { if (mapId !== 'fluidlab') return; aimDir(_a); const o = eye.position, t = FLU.cur; for (let k = 0; k < 2; k++) { const s = 7.5 + rand(-0.6, 0.6); flAddR(o.x + _a.x * 0.7 + rand(-0.04, 0.04), o.y + _a.y * 0.7 - 0.25, o.z + _a.z * 0.7 + rand(-0.04, 0.04), _a.x * s + rand(-0.4, 0.4) + player.vel.x, _a.y * s + rand(-0.3, 0.4), _a.z * s + rand(-0.4, 0.4) + player.vel.z, t); } FLU.hoseT = 0.15; if (t === 0) flHosePush(); }
 function updFluid(dt) {
   if (FLU.weapMap !== mapId) { FLU.weapMap = mapId; if (typeof syncMods === 'function') syncMods(); }
   const here = mapId === 'fluidlab' && FLU.on; const hud = FLU.hud || (here ? flHud() : null);
@@ -9751,7 +9751,7 @@ function updFluid(dt) {
   if (Math.random() < dt * 6) for (let k = 0; k < 3; k++) { const i = (Math.random() * LQ.N) | 0; if (LQ.ty[i] === 2) spawnSprite(TEX.soft, _a.set(px[i], py[i] + 0.1, pz[i]), { color: pick([0xff7a20, 0xffa040]), additive: true, size: rand(0.15, 0.35), grow: 1, life: 0.6, opacity: 0.5, vel: new V3(0, 0.6, 0) }); }
   for (let i = 0; i < LQ.N; i++) if (LQ.burn[i] > 0) { LQ.burn[i] -= dt; if (Math.random() < 0.25) spawnSprite(TEX.soft, _a.set(px[i], py[i] + 0.15, pz[i]), { color: pick([0xff8a30, 0xffb040, 0xff5a20]), additive: true, size: rand(0.25, 0.5), grow: 1, life: 0.5, opacity: 0.8, vel: new V3(rand(-0.2, 0.2), 1.6, rand(-0.2, 0.2)) }); if (LQ.burn[i] <= 0) LQ.age[i] = 999; }
   for (let i = LQ.N - 1; i >= 0; i--) if (LQ.age[i] >= 999) flKill(i);
-  FLU.sizzle -= dt;
+  FLU.sizzle -= dt; LQ.pushT = (LQ.pushT || 0) - dt;
 }
 function flReact() {
   flGrid(); const px = LQ.px, py = LQ.py, pz = LQ.pz, ty = LQ.ty, kill = new Set();
@@ -9760,35 +9760,122 @@ function flReact() {
     if (t === 2) { // lava: water → steam + stone; oil → fire; slowly cools
       flNear(i, 0.22, (j) => { const u = ty[j]; if (u === 0 || u === 1 || u === 4) { kill.add(j); ty[i] = 6; if (Math.random() < 0.5) spawnSprite(TEX.smoke, _a.set(px[i], py[i] + 0.2, pz[i]), { color: 0xf0f0f0, size: 0.4, grow: 2.4, life: 1.6, opacity: 0.55, vel: new V3(rand(-0.3, 0.3), 1.6, rand(-0.3, 0.3)) }); if (FLU.sizzle <= 0) { FLU.sizzle = 0.25; Sound.flame(0.4); } } else if (u === 5 && LQ.burn[j] <= 0) LQ.burn[j] = rand(2, 4); });
       if (LQ.age[i] > 40 && Math.abs(LQ.vx[i]) + Math.abs(LQ.vz[i]) < 0.05 && Math.random() < 0.02) ty[i] = 6;
+    } else if (t === 1) { flNear(i, 0.2, (j) => { if (ty[j] === 3 && Math.random() < 0.25) { kill.add(j); kill.add(i); spawnSprite(TEX.smoke, _a.set(px[i], py[i] + 0.1, pz[i]), { color: 0xeaffd8, size: 0.3, grow: 2, life: 1, opacity: 0.5, vel: new V3(0, 0.8, 0) }); } else if (ty[j] === 5 && LQ.burn[j] > 0) LQ.burn[j] = 0.05; });
     } else if (t === 3) { // acid eats stone
       flNear(i, 0.2, (j) => { if (ty[j] === 6 && Math.random() < 0.05) { kill.add(j); spawnSprite(TEX.smoke, _a.set(px[j], py[j] + 0.1, pz[j]), { color: 0x9aff6a, size: 0.25, grow: 2, life: 1, opacity: 0.4, vel: new V3(0, 0.8, 0) }); } });
     } else if (t === 5 && LQ.burn[i] > 0) flNear(i, 0.25, (j) => { if (ty[j] === 5 && LQ.burn[j] <= 0 && Math.random() < 0.3) LQ.burn[j] = rand(2, 4); if (ty[j] === 0) LQ.burn[i] = Math.min(LQ.burn[i], 0.05); });
   }
   [...kill].sort((a, b) => b - a).forEach((i) => flKill(i));
 }
+/* ===== realistic contact with liquids: per-body-part exposure, stains, burns, melting, wet drips, footprints, honey strands, slips, bees ===== */
+const FLC = { MILK: new THREE.Color(0xf6f4ec), OIL: new THREE.Color(0x0e0c0a), RAW: new THREE.Color(0xa82a22), BONE: new THREE.Color(0xe6dcc4), CHAR: new THREE.Color(0x15100c), HONEY: new THREE.Color(0xd89a20), LAVA: new THREE.Color(0xff4a00) };
+const FLX = { prints: [], pi: 0, strands: [], strandMat: null, bees: 0, stuck: [], pStuck: 0, pAnchor: new V3(), lavaT: 0 };
+const _fq = new V3(), _fq2 = new V3(), _fqq = new THREE.Quaternion(), _fup = new V3(0, 1, 0);
+function flQuery(x, y, z, R, cnt) { const H = LQ.H, R2 = R * R, ix = Math.floor(x / H), iy = Math.floor(y / H), iz = Math.floor(z / H); for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (let c = -1; c <= 1; c++) { let j = LQ.head[flHash(ix + a, iy + b, iz + c)]; while (j !== -1) { const dx = LQ.px[j] - x, dy = LQ.py[j] - y, dz = LQ.pz[j] - z; if (dx * dx + dy * dy + dz * dz < R2) { cnt[LQ.ty[j]]++; if (LQ.burn[j] > 0) cnt[7]++; } j = LQ.next[j]; } } }
+function flPartFx(P) { if (!P.fl) { P.fl = { w: 0, m: 0, o: 0, a: 0, l: 0, h: 0, wounds: 0, torn: 0, base0: P.baseColor.clone(), r0: P.baseRough }; } return P.fl; }
+function flRepaint(P) {
+  const F = P.fl, c = _flc.copy(F.base0);
+  if (F.m > 0) c.lerp(FLC.MILK, Math.min(0.7, F.m * 0.7)); if (F.h > 0) c.lerp(FLC.HONEY, Math.min(0.5, F.h * 0.5)); if (F.o > 0) c.lerp(FLC.OIL, Math.min(0.88, F.o * 0.9));
+  if (F.a > 0) { if (P.skin) { c.lerp(FLC.RAW, Math.min(0.85, F.a * 0.9)); if (F.a > 1.4) c.lerp(FLC.BONE, Math.min(1, (F.a - 1.4) * 1.2)); } else c.lerp(_fqc.setHex(0x4a5a2a), Math.min(0.6, F.a * 0.5)); }
+  if (F.l > 0) c.lerp(FLC.CHAR, Math.min(0.95, F.l * 1.3));
+  P.baseColor.copy(c); P.baseRough = F.o > 0.2 || F.h > 0.2 ? 0.12 : F.w > 0.3 ? 0.18 : F.a > 0.6 && P.skin ? 0.3 : F.r0; bloody(P, 0);
+  if (P.mat.emissive) { P.mat.emissive.copy(FLC.LAVA); P.mat.emissiveIntensity = Math.max(0, (F.heat || 0)); }
+}
+const _fqc = new THREE.Color();
+function flPrint(x, z, kind) {
+  let m = FLX.prints[FLX.pi]; const col = { w: 0x0a1018, o: 0x050403, m: 0xf4f2ea, h: 0xc88a18, a: 0x4a8a20 }[kind] || 0x0a1018;
+  if (!m) { m = new THREE.Mesh(new THREE.CircleGeometry(0.075, 10).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: col, roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.55, depthWrite: false })); m.scale.set(0.75, 1, 1.5); addMesh(m); FLX.prints[FLX.pi] = m; }
+  m.material.color.setHex(col); m.position.set(x, 0.006 + FLX.pi * 0.00002, z); m.visible = true; m.userData.t = kind === 'w' ? 14 : 40; m.material.opacity = kind === 'w' ? 0.45 : 0.75; FLX.pi = (FLX.pi + 1) % 90;
+}
+function flStrand(i, a, b, w) {
+  if (!FLX.strandMat) FLX.strandMat = new THREE.MeshStandardMaterial({ color: 0xe0a020, roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.85, emissive: 0x3a2000 });
+  let m = FLX.strands[i]; if (!m) { m = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 6), FLX.strandMat); addMesh(m); FLX.strands[i] = m; }
+  const len = a.distanceTo(b); m.visible = true; m.position.copy(a).add(b).multiplyScalar(0.5); _fq.subVectors(b, a).normalize(); m.quaternion.setFromUnitVectors(_fup, _fq); m.scale.set(w, len, w);
+}
+function flStick(n, leg) { if (n.flStuck) return; const P = n.parts['lLeg' + leg]; if (!P || P.gone) return; (P.foot || P.mesh).getWorldPosition(_fq); n.flStuck = { t: 5, leg, ax: _fq.x, az: _fq.z, px: n.pos.x, pz: n.pos.z, ph: 0 }; FLX.stuck.push(n); if (Math.random() < 0.6) c2Say(pick(['Ай! Нога прилипла!', 'Да что это такое?!', 'Мёд?! Отпусти!', 'Помогите, я застрял!']), 'Прохожий'); }
 function flEffects() {
-  const px = LQ.px, py = LQ.py, pz = LQ.pz, ty = LQ.ty;
-  const bodies = [...npcs.filter((n) => n.alive && n.state !== 'dead'), { isP: true }];
+  const isDeadOk = (n) => n.root && n.parts;
+  const bodies = npcs.filter((n) => isDeadOk(n) && Math.hypot(n.pos.x, n.pos.z) < 40);
+  const cnt = [0, 0, 0, 0, 0, 0, 0, 0];
   for (const n of bodies) {
-    const x = n.isP ? player.pos.x : n.pos.x, z = n.isP ? player.pos.z : n.pos.z, y0 = n.isP ? player.pos.y : n.pos.y || 0, c = [0, 0, 0, 0, 0, 0, 0], fire = { n: 0 };
-    for (let i = 0; i < LQ.N; i++) { const dy = py[i] - y0; if (dy < -0.1 || dy > 1.4) continue; const dx = px[i] - x, dz = pz[i] - z; if (dx * dx + dz * dz < 0.36) { c[ty[i]]++; if (LQ.burn[i] > 0) fire.n++; } }
-    const any = c.some((v) => v); if (!any) continue;
-    if (n.isP) {
-      if (c[2] > 1) { damagePlayer(Math.min(12, 2 + c[2])); Sound.flame(0.3); }
-      if (c[3] > 1) { damagePlayer(Math.min(8, 1 + c[3] * 0.5)); }
-      if (fire.n) damagePlayer(4);
-      if (c[4] > 3) { player.vel.x *= 0.3; player.vel.z *= 0.3; }
-      continue;
+    const alive = n.alive && n.state !== 'dead'; let hpLoss = 0, touched = false, sum = { w: 0, o: 0, m: 0, h: 0, a: 0, fire: 0 }, lava = 0, acid = 0, feet = { w: 0, o: 0, m: 0, h: 0, a: 0 };
+    for (const name in n.parts) { const P = n.parts[name]; if (!P || P.gone || !P.mesh) continue; P.mesh.getWorldPosition(_fq2); if (_fq2.y > 1.6) continue;
+      cnt.fill(0); flQuery(_fq2.x, _fq2.y, _fq2.z, 0.3, cnt); const any = cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4] + cnt[5]; const F = P.fl; if (!any && !F) continue;
+      const fx = flPartFx(P); let dirty = false; touched = touched || any > 0;
+      if (cnt[0]) { fx.w = 1; fx.m *= 0.92; fx.h *= 0.9; dirty = true; }
+      if (cnt[1]) { fx.m = Math.min(1, fx.m + cnt[1] * 0.06); fx.w = Math.max(fx.w, 0.6); dirty = true; }
+      if (cnt[5]) { fx.o = Math.min(1, fx.o + cnt[5] * 0.08); dirty = true; }
+      if (cnt[4]) { fx.h = Math.min(1, fx.h + cnt[4] * 0.06); dirty = true; if (alive && (name === 'lLegL' || name === 'lLegR')) flStick(n, name.slice(-1)); }
+      if (cnt[3]) { const was = fx.a; fx.a = Math.min(3, fx.a + cnt[3] * (P.skin ? 0.03 : 0.02)); acid += cnt[3]; dirty = true;
+        if (Math.floor(fx.a * 2.5) > Math.floor(was * 2.5) && fx.wounds < 5) { fx.wounds++; const q = randomSurface(P, new V3()); if (P.skin) { addWoundLocal(P, q, q.clone().normalize(), rand(0.04, 0.07)); bloody(P, 0.08); } else if (typeof tearCloth === 'function') tearCloth(n, P, q, q.clone().normalize(), rand(0.05, 0.09), 0.6); }
+        if (Math.random() < 0.5) spawnSprite(TEX.soft, _fq2.clone().add(randUnit(_fq).multiplyScalar(0.12)), { color: pick([0xb8ff6a, 0x7cff3a, 0xeaffd0]), additive: true, size: rand(0.03, 0.07), grow: 0.6, life: 0.4, opacity: 0.9, vel: new V3(0, 0.4, 0) });
+        if (Math.random() < 0.25) spawnSprite(TEX.smoke, _fq2.clone(), { color: 0x9aff6a, size: 0.25, grow: 2, life: 1.2, opacity: 0.35, vel: new V3(0, 0.7, 0) });
+        if (fx.a > 2.6 && name !== 'torso' && name !== 'pelvis' && name !== 'head' && Math.random() < 0.15) { n.detach(name, { dir: new V3(rand(-1, 1), 0.3, rand(-1, 1)) }); Sound.splat && Sound.splat(0.5); } }
+      if (cnt[2] || cnt[7]) { fx.l = Math.min(3, fx.l + cnt[2] * 0.035 + cnt[7] * 0.01); fx.heat = Math.min(1.5, (fx.heat || 0) + cnt[2] * 0.08); lava += cnt[2]; dirty = true;
+        if (fx.o > 0.15) { n.burn = Math.max(n.burn || 0, 12); }
+        if (fx.l > 0.35) { const k = Math.max(0.35, 1 - (fx.l - 0.35) * 0.45); if (!fx.s0) fx.s0 = P.mesh.scale.clone(); P.mesh.scale.set(fx.s0.x * (2 - k) * 0.9 + fx.s0.x * 0.1, fx.s0.y * k, fx.s0.z * (2 - k) * 0.9 + fx.s0.z * 0.1); }
+        if (Math.random() < 0.4) spawnSprite(TEX.smoke, _fq2.clone(), { color: 0x2a2420, size: 0.35, grow: 2.4, life: 1.4, opacity: 0.45, vel: new V3(rand(-0.2, 0.2), 1.0, rand(-0.2, 0.2)) });
+        if (fx.l > 2.0 && name !== 'torso' && name !== 'pelvis' && Math.random() < 0.12) { n.detach(name, { dir: new V3(0, 0.2, 0) }); for (let k = 0; k < 6; k++) spawnSprite(TEX.smoke, _fq2.clone(), { color: 0x3a3634, size: 0.2, grow: 2, life: 1.6, opacity: 0.6, vel: randUnit(new V3()).multiplyScalar(0.8) }); } }
+      else if (fx.heat > 0) { fx.heat = Math.max(0, fx.heat - 0.05); dirty = true; }
+      if (fx.w > 0 && !cnt[0]) { fx.w = Math.max(0, fx.w - 0.006); if (fx.w > 0.25 && Math.random() < fx.w * 0.6) spawnSprite(TEX.soft, _fq2.clone().add(_fq.set(rand(-0.06, 0.06), -0.05, rand(-0.06, 0.06))), { color: 0x9ad0ff, additive: true, size: 0.025, grow: 0.1, life: 0.55, opacity: 0.85, vel: new V3(0, -2.2, 0) }); if (fx.w < 0.02 || Math.random() < 0.05) dirty = true; }
+      if (dirty) flRepaint(P);
+      if (name === 'lLegL' || name === 'lLegR') { if (fx.w > 0.3) feet.w++; if (fx.o > 0.2) feet.o++; if (fx.m > 0.3) feet.m++; if (fx.h > 0.3) feet.h++; if (fx.a > 0.6) feet.a++; }
+      sum.w += cnt[0]; sum.o += cnt[5]; sum.fire += cnt[7];
     }
-    if (c[0] > 2 && n.burn > 0) { n.burn = 0; spawnSprite(TEX.smoke, _a.set(x, 1, z), { color: 0xf0f0f0, size: 0.6, grow: 2, life: 1.4, opacity: 0.5, vel: new V3(0, 1.2, 0) }); }
-    if (c[2] > 0 || fire.n) { n.burn = Math.max(n.burn || 0, 6); n.hp -= Math.min(14, c[2] * 1.2 + fire.n * 2); for (const k of ['lLegL', 'lLegR', 'uLegL', 'uLegR', 'pelvis']) { const P = n.parts[k]; if (P && P.mat && !P.gone) P.mat.color.multiplyScalar(0.97); } if (n.hp <= 0) n.die('shot'); }
-    if (c[3] > 0) { n.hp -= Math.min(6, c[3] * 0.35); for (const k of LIMBS) { const P = n.parts[k]; if (P && P.mat && !P.gone) P.mat.color.lerp(_flc.setHex(0x6aa83a), 0.04); }
-      if (Math.random() < 0.3) spawnSprite(TEX.smoke, _a.set(x + rand(-0.2, 0.2), 0.4, z + rand(-0.2, 0.2)), { color: 0x9aff6a, size: 0.3, grow: 2, life: 1.2, opacity: 0.45, vel: new V3(0, 0.9, 0) });
-      if (c[3] > 2 && Math.random() < 0.12) { const k = ['lLegL', 'lLegR', 'lArmL', 'lArmR', 'uLegL', 'uLegR', 'uArmL', 'uArmR'].find((q) => n.parts[q] && !n.parts[q].gone); if (k) { n.detach(k, { dir: new V3(rand(-1, 1), 0.5, rand(-1, 1)) }); Sound.splat && Sound.splat(0.6); } }
-      if (n.hp <= 0) n.die('shot'); }
-    if (c[1] > 2) for (const k of ['lLegL', 'lLegR']) { const P = n.parts[k]; if (P && P.mat && !P.gone) P.mat.color.lerp(_flc.setHex(0xffffff), 0.05); }
-    if (c[4] > 2) { if (n._hx !== undefined) { n.pos.x = lerp(n.pos.x, n._hx, 0.75); n.pos.z = lerp(n.pos.z, n._hz, 0.75); } n._hx = n.pos.x; n._hz = n.pos.z; } else n._hx = undefined;
+    if (!touched && !n.flFeet) continue;
+    // fire and water, damage
+    if (alive) {
+      if ((sum.w > 1) && n.burn > 0) { n.burn = 0; spawnSprite(TEX.smoke, _fq.set(n.pos.x, 1, n.pos.z), { color: 0xf0f0f0, size: 0.6, grow: 2, life: 1.4, opacity: 0.5, vel: new V3(0, 1.2, 0) }); }
+      if (lava || sum.fire) { n.burn = Math.max(n.burn || 0, 7); hpLoss += Math.min(12, lava * 0.6 + sum.fire * 1.5); }
+      if (acid) hpLoss += Math.min(1.5, acid * 0.08);
+      if (hpLoss) { n.hp -= hpLoss; if (n.hp <= 0) n.die('shot'); }
+      // oily feet slip
+      if (feet.o && n.speed > 0.4 && !n.flStuck && Math.random() < 0.05 && n.goLimp) { n.vel && n.vel.set(rand(-1, 1), 1.5, rand(-1, 1)); n.goLimp(); Sound.thud(0.5); }
+      // footprints
+      const kind = feet.o ? 'o' : feet.h ? 'h' : feet.m ? 'm' : feet.a ? 'a' : feet.w ? 'w' : ''; n.flFeet = !!kind;
+      if (kind) { const d = Math.hypot(n.pos.x - (n.flLX ?? 999), n.pos.z - (n.flLZ ?? 999)); if (d > 0.45) { n.flLX = n.pos.x; n.flLZ = n.pos.z; n.flSide = !n.flSide; const s = n.flSide ? 0.12 : -0.12, c = Math.cos(n.yaw), si = Math.sin(n.yaw); flPrint(n.pos.x + c * s, n.pos.z - si * s, kind); const pr = FLX.prints[(FLX.pi + 89) % 90]; if (pr) pr.rotation.y = n.yaw; } }
+    } else if (lava > 6) { // a dead body in lava slowly burns to ash
+      n.flAsh = (n.flAsh || 0) + lava * 0.004; if (n.flAsh > 1 && !n.flGone) { n.flGone = true; for (let k = 0; k < 24; k++) spawnSprite(TEX.smoke, _fq.set(n.pos.x + rand(-0.5, 0.5), rand(0.1, 1), n.pos.z + rand(-0.5, 0.5)), { color: pick([0x2a2624, 0x4a4442, 0xff7a20]), size: rand(0.3, 0.7), grow: 2, life: rand(1.5, 3), opacity: 0.6, vel: new V3(0, rand(0.5, 1.6), 0) }); later(0.2, () => n.dispose && n.dispose()); toast('Тело сгорело дотла'); }
+    }
   }
+  // the player
+  cnt.fill(0); flQuery(player.pos.x, player.pos.y + 0.3, player.pos.z, 0.55, cnt);
+  if (cnt[2] > 1) { damagePlayer(Math.min(12, 2 + cnt[2])); Sound.flame(0.3); }
+  if (cnt[3] > 1) { damagePlayer(Math.min(8, 1 + cnt[3] * 0.4)); flashScreen('#4aff4a', 140); }
+  if (cnt[7]) damagePlayer(4);
+  if (cnt[4] > 2 && FLX.pStuck <= 0 && state === 'play') { FLX.pStuck = 5; FLX.pAnchor.set(player.pos.x, player.pos.y, player.pos.z); toast('Нога прилипла к мёду! Тянете… 5 секунд'); }
+  if (cnt[5] > 2 && player.vel && Math.hypot(player.vel.x, player.vel.z) > 3 && Math.random() < 0.08 && typeof triggerFall === 'function') { toast('Поскользнулись на нефти!'); triggerFall(); }
+}
+// after people animate: honey pulls legs back, strands stretch like cheese, prints fade, bees buzz, the lava lights the room
+function updFluidPost(dt) {
+  if (mapId !== 'fluidlab' || !LQ.N && !FLX.stuck.length) { for (const m of FLX.strands) if (m) m.visible = false; return; }
+  let si = 0; const t = performance.now() / 1000;
+  for (let k = FLX.stuck.length - 1; k >= 0; k--) {
+    const n = FLX.stuck[k], S = n.flStuck; if (!S || !n.parts || !n.alive) { FLX.stuck.splice(k, 1); if (n) n.flStuck = null; continue; }
+    S.t -= dt; S.ph += dt; n.pos.x = S.px; n.pos.z = S.pz; if (n.root) n.root.position.x = S.px, n.root.position.z = S.pz;
+    const pull = Math.max(0, Math.sin(S.ph * 2.6)) * Math.min(1, 0.3 + S.ph * 0.18), U = n.parts['uLeg' + S.leg], L = n.parts['lLeg' + S.leg];
+    if (U && L && !U.gone && !L.gone) { U.pivot.rotation.x = -1.0 * pull; L.pivot.rotation.x = 1.5 * pull; n.root.updateMatrixWorld(true); (L.foot || L.mesh).getWorldPosition(_fq); for (let j = 0; j < 3; j++) { _fq2.set(S.ax + (j - 1) * 0.06, 0.01, S.az + Math.sin(j * 2.1) * 0.05); const len = _fq.distanceTo(_fq2); flStrand(si++, _fq, _fq2, Math.max(0.008, 0.07 / (1 + len * 4)) * (1 - j * 0.2)); } }
+    if (Math.random() < dt * 2) c2Say(pick(['Ммм! Не отлипает!', 'Тянется, как сыр!', 'Да чтоб его!']), 'Прохожий');
+    if (S.t <= 0) { n.flStuck = null; FLX.stuck.splice(k, 1); (L.foot || L.mesh).getWorldPosition(_fq); for (let j = 0; j < 6; j++) flAdd(_fq.x + rand(-0.05, 0.05), 0.2, _fq.z + rand(-0.05, 0.05), rand(-0.5, 0.5), 0.5, rand(-0.5, 0.5), 4); Sound.splat && Sound.splat(0.3); }
+  }
+  if (FLX.pStuck > 0) { FLX.pStuck -= dt; player.pos.x = FLX.pAnchor.x; player.pos.z = FLX.pAnchor.z; if (player.vel) { player.vel.x = 0; player.vel.z = 0; } const pull = Math.max(0, Math.sin((5 - FLX.pStuck) * 2.6));
+    const fx = player.pos.x - Math.sin(player.yaw) * 0.35, fz = player.pos.z - Math.cos(player.yaw) * 0.35; _fq.set(fx, player.pos.y + 0.12 + pull * 0.45, fz);
+    for (let j = 0; j < 3; j++) { _fq2.set(fx + (j - 1) * 0.07, player.pos.y + 0.01, fz + Math.sin(j * 2) * 0.05); flStrand(si++, _fq, _fq2, Math.max(0.008, 0.07 / (1 + _fq.distanceTo(_fq2) * 4))); }
+    if (FLX.pStuck <= 0) { toast('Нога свободна!'); for (let j = 0; j < 5; j++) flAdd(fx, 0.25, fz, rand(-0.5, 0.5), 0.5, rand(-0.5, 0.5), 4); } }
+  for (let j = si; j < FLX.strands.length; j++) if (FLX.strands[j]) FLX.strands[j].visible = false;
+  for (const m of FLX.prints) if (m && m.visible) { m.userData.t -= dt; if (m.userData.t < 3) m.material.opacity *= 0.985; if (m.userData.t <= 0) m.visible = false; }
+  // bees over honey
+  let hn = 0, hi = -1; for (let i = 0; i < LQ.N; i += 3) if (LQ.ty[i] === 4) { hn++; if (Math.random() < 0.2) hi = i; }
+  if (hn > 6 && hi >= 0 && Math.random() < dt * 14) spawnSprite(TEX.soft, _fq.set(LQ.px[hi] + rand(-0.4, 0.4), LQ.py[hi] + rand(0.2, 0.8), LQ.pz[hi] + rand(-0.4, 0.4)), { color: pick([0xffd020, 0x1a1408]), size: 0.04, grow: 0, life: 0.5, opacity: 1, vel: new V3(rand(-1.5, 1.5), rand(-0.5, 0.5), rand(-1.5, 1.5)) });
+  for (const n of FLX.stuck) if (Math.random() < dt * 8) spawnSprite(TEX.soft, _fq.set(n.pos.x + rand(-0.4, 0.4), rand(0.3, 1.6), n.pos.z + rand(-0.4, 0.4)), { color: pick([0xffd020, 0x1a1408]), size: 0.04, grow: 0, life: 0.5, opacity: 1, vel: new V3(rand(-1.5, 1.5), rand(-0.5, 0.5), rand(-1.5, 1.5)) });
+  // lava lights the room
+  FLX.lavaT -= dt; if (FLX.lavaT <= 0) { FLX.lavaT = 0.4; let n = 0, x = 0, y = 0, z = 0; for (let i = 0; i < LQ.N; i++) if (LQ.ty[i] === 2) { n++; x += LQ.px[i]; y += LQ.py[i]; z += LQ.pz[i]; } if (n) { redLight.position.set(x / n, y / n + 0.8, z / n); MAPS.fluidlab.red[2] = Math.min(9, 1 + n * 0.04); } else MAPS.fluidlab.red[2] = 0; }
+}
+// a water hose has pressure: it shoves people and can knock them down
+function flHosePush() {
+  if (LQ.pushT > 0) return; LQ.pushT = 0.08; aimDir(_fq);
+  for (const n of npcs) { if (!n.alive || n.state !== 'alive') continue; _fq2.set(n.pos.x - eye.position.x, 1.0 - eye.position.y, n.pos.z - eye.position.z); const d = _fq2.length(); if (d > 8) continue; _fq2.multiplyScalar(1 / d); if (_fq2.dot(_fq) < 0.965) continue;
+    n.pos.x += _fq.x * 0.06; n.pos.z += _fq.z * 0.06; n.hoseHit = (n.hoseHit || 0) + 1; if (n.hoseHit > 22 && n.goLimp) { n.hoseHit = 0; n.vel && n.vel.set(_fq.x * 3, 1.5, _fq.z * 3); n.goLimp(); Sound.thud(0.5); toast('Струя сбила с ног!'); } }
 }
 function c2L1Rows() {
   const g = story.guards || [], kills = g.filter((x) => !x.alive).length, sec = Math.round((performance.now() - C2.t0) / 1000);
@@ -10376,6 +10463,7 @@ function frame(now) {
     if (mapId === 'tower') updateElevator(rdt); else if (mapId === 'site') updateSite(now);
     syncRagdolls(); updateProps(); syncDropGun(); updateGibs(dt); updateGuts(); updateGrenades(dt); updFires(dt); updFab(dt); updFluid(dt);
     for (const n of npcs.slice()) n.update(dt);
+    updFluidPost(dt);
     updateAvatar(dt);
     if (state === 'play' && mode === 'story') updateStory(rdt); else if (state === 'play') kissWatch(rdt);
     if (state === 'play' || state === 'cutscene' || state === 'spawn') placeCamera(rdt);
@@ -10418,7 +10506,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
