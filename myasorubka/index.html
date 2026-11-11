@@ -7680,8 +7680,90 @@ function admUlt() { admClose(); Sound.init(); startStory(); setTimeout(() => { s
 function admRainbow() { admClose(); Sound.init(); startStory(); setTimeout(() => cutRainbow(), 300); }
 function admPick(name) { const f = $('admFile'); f.onchange = async () => { const file = f.files[0]; f.value = ''; if (!file) return; Sound.init(); try { const buf = await Sound.ctx.decodeAudioData(await file.arrayBuffer()); Sound.clipSet(name, buf); toast('Звук загружен: ' + file.name.slice(0, 24)); Sound.myLaugh(name); } catch (e) { toast('Не удалось прочитать звук'); } }; f.click(); }
 const admUn = () => { renderExcl(); syncExclSpawn(); admRender(); Sound.click(1200, 0.2); };
+/* ===== admin · chapter 2: jump to any moment, hand out evidence, trigger events ===== */
+function c2In() { const ok = mode === 'story' && story.asGG && mapId === 'c2base' && state !== 'over'; if (!ok) toast('Сначала запустите главу 2 (или любую точку из «Телепорта»)'); return ok; }
+function c2AdmDo(fn) { admClose(); if (!c2In()) return; if (state === 'pause') resume(); fn(); }
+function admSkipTo(cond, ms = 60000) { const t0 = performance.now(); const iv = setInterval(() => { if (cond() || performance.now() - t0 > ms || mode !== 'story') { clearInterval(iv); return; } if (story.cut) { story.lastSkip = 0; storySkip(); } }, 140); }
+function c2AdmBase(fn) { admClose(); try { localStorage.setItem('myasorubka-ch2', '1'); } catch (e) {} startCh2('c2b'); setTimeout(fn, 600); }
+function c2AdmAsk(i, rage = 0) { admClose(); startCh2(); setTimeout(() => { story.cut = null; fadeIn(); Music.start('dread'); const M = story.mark; M.inp.length = 0; M.pos.set(-4.9, 0, 11.8); M.yaw = -Math.PI / 2; M.root.position.copy(M.pos); M.root.rotation.y = M.yaw; C2.rage = rage; if (i === 'mel') c2MelScene(); else if (i === 'final') { c2MelScene(); admSkipTo(() => { const d = document.getElementById('c2q'); return d && d.style.display === 'block'; }); } else c2Ask(i); }, 500); }
+function c2AdmCage(volt) { admClose(); startCh2(); setTimeout(() => { story.cut = null; fadeIn(); Music.start('dread'); if (story.mark) { story.mark.dispose(); story.mark = null; } C2.rage = volt ? 5 : 1; c2Gameplay(false); }, 500); }
+function c2AdmMel(kind) {
+  if (C2.mel && C2.mel.root) C2.mel.dispose(); C2.mel = null; C2.melAlly = false; C2.corpse = null;
+  if (kind === 'dead') { const m = C2.mel = mkNpc('melodie', -4.6, 13.0, -Math.PI / 2); m.c2kill = true; m.die('shot'); C2.corpse = m; C2.corpsePos = m.pos.clone(); C2.melState = 'dead'; C2.souls = 0; }
+  else if (kind === 'tied') { const m = C2.mel = mkNpc('melodie', -1.4, 19.6, Math.PI); seatNpc(m, -1.4, 19.6, Math.PI); addRopes(m); m.protect = true; C2.melState = 'tied'; }
+  else { const m = C2.mel = mkNpc('melodie', player.pos.x + 1.2, player.pos.z + 0.6, 0); m.scripted = true; m.protect = true; C2.melState = 'ally'; C2.melAlly = true; }
+}
+function c2AdmMark() { const M = story.mark = mkNpc('mark', 1.0, -23.4, 0); M.scripted = true; M.protect = true; if (M.bass) M.bass.visible = false; return M; }
+function c2PoliceSnap() { for (const n of [story.mark, C2.insp, C2.mel, ...(C2.cops || [])]) if (n && n.path && n.path.length) { const p = n.path[n.path.length - 1]; n.pos.set(p[0], 0, p[1]); n.path = []; } }
+function c2AdmTrial(then) { c2AdmBase(() => { for (const k in EVD) c2Ev(k); C2.safe = true; c2AdmMark(); c2Police(); if (then) { c2PoliceSnap(); story.cut = null; subOff(); try { speechSynthesis.cancel(); } catch (e) {} then(); } }); }
+function c2AdmTp(x, z, yaw = 0) { c2AdmDo(() => { player.pos.set(x, 0, z); player.yaw = yaw; player.vel.set(0, 0, 0); toast('Телепорт'); }); }
+function admCh2() {
+  const open = (() => { try { return localStorage.getItem('myasorubka-ch2') === '1'; } catch (e) { return false; } })(), ev = (k) => ({ l: (c2Has(k) ? '✔ ' : '') + EVD[k][0], s: EVD[k][1], f: () => c2AdmDo(() => c2Ev(k)) });
+  return [
+    { sec: 'Доступ' },
+    { l: 'Глава 2: ' + (open ? 'ОТКРЫТА' : 'закрыта'), s: open ? 'Нажмите, чтобы снова закрыть кодом' : 'Открыть без кода 3398', on: open, f: () => { try { if (open) localStorage.removeItem('myasorubka-ch2'); else localStorage.setItem('myasorubka-ch2', '1'); } catch (e) {} ch2Label(); admRender(); } },
+    { sec: 'Телепорт · сюжет' },
+    { l: 'Пробуждение в клетке', s: 'Глава 2 с самого начала', f: () => { admClose(); try { localStorage.setItem('myasorubka-ch2', '1'); } catch (e) {} startCh2(); } },
+    ...[0, 1, 2, 3, 4].map((i) => ({ l: `Допрос · вопрос ${i + 1}`, s: C2_Q[i].q, f: () => c2AdmAsk(i) })),
+    { l: 'Марк привозит Мелоди', s: 'Ярость на максимуме', f: () => c2AdmAsk('mel', 10) },
+    { l: 'Финальный вопрос', s: 'На кону жизнь Мелоди', f: () => c2AdmAsk('final', 10) },
+    { l: 'Побег из клетки', s: 'Труба и замок, клетка без тока', f: () => c2AdmCage(false) },
+    { l: 'Побег из клетки (под током)', s: 'С коротким замыканием', f: () => c2AdmCage(true) },
+    { l: 'Подвал (после клетки)', s: 'Чекпоинт, дверь открыта', f: () => c2AdmBase(() => {}) },
+    { l: 'Сейф открыт · тревога', s: 'Подкрепление роуди', f: () => c2AdmBase(() => c2SafeOpen('c2-base')) },
+    { l: 'Студия · бой с Марком', s: 'Босс с бас-гитарой', f: () => c2AdmBase(() => { C2.safe = true; cutC2Studio(); }) },
+    { l: 'Марк на последнем издыхании', s: 'Сразу финал боя', f: () => c2AdmBase(() => { C2.safe = true; cutC2Studio(); admSkipTo(() => { if (story.stage === 'c2-boss' && story.mark) { story.mark.hp = story.mark.maxHp * 0.15; return true; } return false; }); }) },
+    { l: 'Полиция приехала', s: 'Марк обвиняет воскресителя', f: () => c2AdmTrial() },
+    ...TRIAL.map((r, i) => ({ l: `Разоблачение · раунд ${i + 1}`, s: '«' + r.claim + '»', f: () => c2AdmTrial(() => c2Round(i)) })),
+    { l: 'Последний фокус', s: 'Где ключ от клетки?', f: () => c2AdmTrial(() => c2Trick()) },
+    { l: 'Арест Марка', s: '«На сцене она всё скажет!»', f: () => c2AdmTrial(() => c2Arrest()) },
+    { l: 'Экран итогов', s: '«Марк арестован»', f: () => c2AdmBase(() => { for (const k in EVD) c2Ev(k); c2Finish(); }) },
+    { sec: 'Телепорт · по подвалу (во время главы)' },
+    { l: 'Клетка', s: 'Внутри', f: () => c2AdmTp(-7.6, 11.8, -Math.PI / 2) },
+    { l: 'Стол допроса', s: 'Медиатор', f: () => c2AdmTp(-4.4, 9.6, Math.PI) },
+    { l: 'Кладовая', s: 'Календарь, роуди, Мелоди', f: () => c2AdmTp(-3, 17.4, Math.PI) },
+    { l: 'Комната охраны', s: 'Записи с камер', f: () => c2AdmTp(5.5, 19.6, Math.PI) },
+    { l: 'Репетиционная', s: 'Алтарь и тайник', f: () => c2AdmTp(-6.6, 0.6, Math.PI / 2) },
+    { l: 'Кабинет Марка', s: 'Дневник, сейф, автоответчик', f: () => c2AdmTp(3, -8.6, 0) },
+    { l: 'Студия', s: 'Пульт и выход', f: () => c2AdmTp(4, -16.4, 0) },
+    { sec: 'Мелоди' },
+    { l: 'Мелоди убита', s: 'Нужно 3 души, чтобы воскресить', f: () => c2AdmDo(() => c2AdmMel('dead')) },
+    { l: 'Мелоди связана', s: 'В кладовой', f: () => c2AdmDo(() => c2AdmMel('tied')) },
+    { l: 'Мелоди — союзница', s: 'Идёт за вами', f: () => c2AdmDo(() => c2AdmMel('ally')) },
+    { l: '+1 душа', s: 'Для воскрешения', f: () => c2AdmDo(() => { C2.souls = Math.min(3, C2.souls + 1); toast(`Души: ${C2.souls}/3`); }) },
+    { l: 'Сцена воскрешения', s: 'Сразу', f: () => c2AdmDo(() => { if (C2.melState !== 'dead') c2AdmMel('dead'); C2.souls = 3; later(0.4, () => cutC2Revive()); }) },
+    { l: 'Освободить Мелоди', s: 'Сцена в кладовой', f: () => c2AdmDo(() => { if (C2.melState !== 'tied') c2AdmMel('tied'); later(0.3, () => cutC2Free()); }) },
+    { sec: 'Улики (во время главы)' },
+    { l: 'Все 9 улик', s: 'Сразу', f: () => c2AdmDo(() => { for (const k in EVD) c2Ev(k); }) },
+    { l: 'Сбросить улики', s: 'Начать поиск заново', f: () => c2AdmDo(() => { C2.ev = new Set(); toast('Улики сброшены'); }) },
+    ...Object.keys(EVD).map(ev),
+    { sec: 'Моменты (во время главы)' },
+    { l: 'Запись камеры №3', s: 'Сцена в комнате охраны', f: () => c2AdmDo(() => cutC2Tape()) },
+    { l: 'Автоответчик', s: '3 сообщения', f: () => c2AdmDo(() => cutC2Voice()) },
+    { l: 'Тайник в алтаре', s: 'Пластиковая свеча', f: () => c2AdmDo(() => cutC2Stash()) },
+    { l: 'Гипноз роуди', s: 'Мини-игра с маятником', f: () => c2AdmDo(() => { if (!C2.hyp || !C2.hyp.alive) { const h = C2.hyp = mkNpc('guard', player.pos.x + 1.2, player.pos.z, -Math.PI / 2); h.scripted = true; h.protect = true; } c2Hypno(); }) },
+    { l: 'Дневник Мелоди', s: 'Сцена чтения', f: () => c2AdmDo(() => cutC2Diary()) },
+    { l: 'Алтарь', s: 'Сцена', f: () => c2AdmDo(() => cutC2Shrine()) },
+    { l: 'Календарь', s: 'Сцена', f: () => c2AdmDo(() => cutC2Cal()) },
+    { l: 'Панель сейфа', s: 'Ввести код (1407)', f: () => c2AdmDo(() => c2Keypad()) },
+    { l: 'Открыть сейф сразу', s: 'Ключ, пистолет, тревога', f: () => c2AdmDo(() => c2SafeOpen(story.stage)) },
+    { l: 'Удар током', s: 'Вспышка и искры', f: () => c2AdmDo(() => c2Shock()) },
+    { l: 'Затопление клетки', s: 'Вода из трубы', f: () => c2AdmDo(() => { C2.spray = 9; C2.floodK = Math.max(C2.floodK, 0.02); }) },
+    { l: 'Открыть клетку', s: 'Без замка', f: () => c2AdmDo(() => { c2OpenDoor(true); if (story.stage === 'c2-cage') setStage('c2-base', ''); }) },
+    { l: 'Открыть студию', s: 'Дверь на север', f: () => c2AdmDo(() => { C2.safe = true; c2Remove(C2.sR); if (C2.sDoor) C2.sDoor.rotation.y = 1.6; }) },
+    { l: 'Тревога', s: 'Все роуди атакуют', f: () => c2AdmDo(() => alertGuards('Тревога (админ)')) },
+    { l: 'Убрать всех роуди', s: 'Тихий подвал', f: () => c2AdmDo(() => { for (const g of story.guards || []) if (g.alive) g.die('shot'); }) },
+    { l: '+2 роуди', s: 'Атакуют сразу', f: () => c2AdmDo(() => { for (let i = 0; i < 2; i++) { const g = guardSetup(mkNpc('guard', player.pos.x + rand(-4, 4), player.pos.z + rand(-4, 4), 0, 'soldier'), [[player.pos.x, player.pos.z]]); g.calm = false; story.guards.push(g); } }) },
+    { l: 'Марк по громкой связи', s: 'Случайная угроза', f: () => c2AdmDo(() => c2Say(pick(MARK_TAUNT), 'Марк (громкая связь)')) },
+    { l: 'Ярость Марка = 10', s: 'Сейчас: ' + C2.rage, f: () => { C2.rage = 10; toast('Ярость: 10'); admRender(); } },
+    { l: 'Ярость Марка = 0', s: 'Сейчас: ' + C2.rage, f: () => { C2.rage = 0; toast('Ярость: 0'); admRender(); } },
+    { l: 'Доверие инспектора = 3', s: 'Для разоблачения', f: () => { C2.trust = 3; toast('Доверие: ★★★'); } },
+    { l: 'Труба в руки', s: 'Оружие главы', f: () => c2AdmDo(() => { C2.pipe = true; story.c2pipe = true; syncMods(); selectWeapon(WEAPONS.findIndex((w) => w.id === 'pipe')); }) },
+  ];
+}
 function admItems(tab) {
   const u = getUn(), on = (v) => (v ? 'ВКЛ' : 'выкл');
+  if (tab === 'ch2') return admCh2();
   if (tab === 'end') return [
     { sec: `Награды · хорошая ${u.good ? '✅' : '⬜'} · плохая ${u.bad ? '✅' : '⬜'} · правосудие ${u.justice ? '✅' : '⬜'} · пешка ${u.pawn ? '✅' : '⬜'}` },
     { l: 'Активировать хорошую', s: 'Отметить концовку пройденной', f: () => { addUn('good'); admUn(); } },
@@ -7751,7 +7833,7 @@ function admRender() {
   $('admLock').hidden = adm.ok; $('admBody').hidden = !adm.ok;
   $('admDisp').textContent = [0, 1, 2, 3].map((i) => (i < adm.in.length ? '●' : '–')).join(' ');
   if (!adm.ok) return;
-  const T = [['end', 'Концовки'], ['cut', 'Кат-сцены'], ['gg', 'Воскреситель'], ['cheat', 'Читы']];
+  const T = [['end', 'Концовки'], ['cut', 'Кат-сцены'], ['ch2', 'Глава 2'], ['gg', 'Воскреситель'], ['cheat', 'Читы']];
   $('admTabs').innerHTML = T.map(([k, l]) => `<button class="chip${adm.tab === k ? ' on' : ''}" data-t="${k}">${l}</button>`).join('');
   $('admTabs').querySelectorAll('[data-t]').forEach((b) => b.onclick = () => { adm.tab = b.dataset.t; Sound.click(900, 0.15); admRender(); });
   const it = admItems(adm.tab); window.__admFns = it;
@@ -9438,7 +9520,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
