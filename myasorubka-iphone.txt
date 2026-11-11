@@ -530,6 +530,7 @@ body.touch #wAmmo{font-size:26px}
 <div id="shout"></div>
 <div id="black"></div>
 <div id="loading">ЗАГРУЗКА ПОЛИГОНА…</div>
+<noscript><div style="position:fixed;inset:0;z-index:99;background:#000;color:#fff;font:16px sans-serif;padding:24px;line-height:1.5">Здесь выключен JavaScript, поэтому игра не запускается.<br><br>Просмотр в приложении «Файлы» не запускает игры. Откройте игру по ссылке в Safari или через браузер, который умеет открывать файлы (например, «Documents»).</div></noscript>
 
 <script>
   setTimeout(function(){ if(!window.__gameReady){ var l=document.getElementById('loading'); if(l) l.textContent='Не удалось загрузить 3D-движок. Проверьте интернет и обновите страницу.'; } }, 20000);
