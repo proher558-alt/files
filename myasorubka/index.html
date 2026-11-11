@@ -1144,6 +1144,7 @@ const MAPS = {
   factory: { name: 'Фабрика', desc: 'Игрушечная фабрика под солнцем: полосатая труба, ворота и дорога. Здесь бродит Хаги Ваги. Открывается модом.', hx: 26, hz: 30, h: 40, spawn: [0, 26, 0], fog: 0xbfe0f5, fogD: 0.006, bg: 0x9fd0f2, sun: 2.2, hemi: 1.3, lamp: [0xfff0d0, 40, 40], lamps: [[0, 6, -10], [-14, 6, 0], [14, 6, 0], [0, 6, 14]], red: [[0, 3, 0], 0xffffff, 0], build: buildFactory, npcs: { human: 4, zombie: 0, soldier: 0 }, huggy: 2, props: [], pills: [] },
   factoryIn: { name: 'Фабрика · внутри', desc: 'Холл, атриум со статуей Хаги Ваги, комната с поездом, коридор и цех.', hx: 14, hz: 36, h: 8, spawn: [0, 33, 0], fog: 0x0a0c10, fogD: 0.03, bg: 0x050608, sun: 0.25, hemi: 0.5, lamp: [0xe8f0ff, 30, 22], lamps: [[0, 7, 29], [0, 7.5, 13], [0, 6, -4], [0, 7, -28]], red: [[-6, 3.6, -19.3], 0xff4020, 1.5], build: buildFabIn, npcs: { human: 3, zombie: 0, soldier: 0 }, props: [], pills: [] },
   c2base: { name: 'Подвал Марка', desc: '', story: true, hx: 9, hz: 22, h: 3.4, spawn: [-7.6, 11.8, -Math.PI / 2], fog: 0x0a0908, fogD: 0.045, bg: 0x050404, sun: 0.12, hemi: 0.32, lamp: [0xffd8a0, 22, 12], lamps: [[-7.4, 2.4, 11.8], [0, 3.0, 1], [2.2, 3.0, -9], [3, 3.0, -19]], red: [[2, 2.6, 19.5], 0xff2a20, 1.6], build: buildC2Base, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  club: { name: 'Клуб «Громкая ночь»', desc: '', story: true, hx: 22, hz: 34, h: 9, spawn: [0, 28, 0], fog: 0x0a0812, fogD: 0.018, bg: 0x07060c, sun: 0.25, hemi: 0.55, lamp: [0xffd0e8, 40, 26], lamps: [[0, 7, 24], [0, 8, -22], [-18, 6, -14], [18, 6, -8]], red: [[0, 6, 0], 0xff3aa0, 6], build: buildClub, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   ww2: { name: 'Поле боя 1941', desc: '', story: true, hx: 30, hz: 36, h: 30, spawn: [0, 32, 0], fog: 0x9a5c34, fogD: 0.018, bg: 0xb4683a, sun: 1.0, hemi: 0.9, lamp: [0xffb070, 34, 24], lamps: [[0, 2.8, -14], [-12, 3, 3], [14, 4, 10], [0, 5, 20]], red: [[0, 2.6, -12], 0xff7a30, 4], build: buildWW2, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   street: { name: 'Улица', desc: '', story: true, hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildStreet, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   police: { name: 'Участок полиции', desc: '', story: true, hx: 12, hz: 9, h: 3.4, spawn: [0, 7, 0], fog: 0x0b0d10, fogD: 0.03, bg: 0x070809, sun: 0.5, hemi: 0.55, lamp: [0xe8f2ff, 18, 14], lamps: [[-6, 3.1, -4], [6, 3.1, -4], [-6, 3.1, 4], [6, 3.1, 4]], red: [[11.8, 2.6, 0], 0x2a6aff, 4], build: buildPolice, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
@@ -2803,6 +2804,8 @@ function applyLookKind(L, k) {
   else if (k === 'hitler') { L.female = false; L.skin = 0xe2b59a; L.skinTex = TEX.skin; L.shirt = 0x5a4a30; L.pants = 0x2a2820; L.sleeves = 'long'; L.hair = null; L.hairStyle = null; L.helmet = false; L.cap = false; L.hitler = true; }
   else if (k === 'german') { L.female = false; L.shirt = 0x5c6258; L.pants = 0x4a4a42; L.sleeves = 'long'; L.helmet = true; L.german = true; }
   else if (k === 'huggy') { L.female = false; L.skin = 0x3558a8; L.shirt = 0x3558a8; L.pants = 0x3558a8; L.sleeves = 'long'; L.hair = null; L.hairStyle = null; L.helmet = false; L.cap = false; L.prop = { height: 1.55, build: 0.8, arms: 1.7, legs: 1.45, head: 1.45, hands: 1.3 }; L.huggy = true; }
+  else if (k === 'stas') { L.female = false; L.skin = 0xe6c0a2; L.skinTex = TEX.skin; L.shirt = 0x3a3d44; L.pants = 0x3a3d44; L.sleeves = 'long'; L.tie = 0x8a1020; L.hair = hairMats[0]; L.hairStyle = 'short'; L.cap = false; L.helmet = false; }
+  else if (k === 'tech') { L.female = false; L.shirt = 0x16161a; L.pants = 0x3a3a30; L.sleeves = 'short'; L.cap = true; L.helmet = false; }
   else if (k === 'mark') { L.female = false; L.skin = 0xeac0a0; L.skinTex = TEX.skin; L.shirt = 0x7a1418; L.pants = 0x16161c; L.sleeves = 'long'; L.hair = std({ color: 0x2a3ad0, roughness: 0.7, map: TEX.cloth }); L.hairStyle = 'short'; L.cap = false; L.helmet = false; L.mark = true; }
   else if (k === 'bson') { L.female = false; L.skin = 0xf0c8a8; L.shirt = 0xffd23a; L.pants = 0x3a5a9a; L.sleeves = 'short'; L.hair = hairMats[1]; L.hairStyle = 'short'; L.prop = { build: 0.8, head: 1.7 }; L.bson = true; }
   else if (k === 'producer') { L.female = false; L.skin = 0xe9c3a2; L.skinTex = TEX.skin; L.shirt = 0xf2efe6; L.pants = 0xf2efe6; L.sleeves = 'long'; L.hair = hairMats[0]; L.hairStyle = 'short'; L.lips = null; L.producer = true; L.cap = false; L.helmet = false; L.rifle = false; }
@@ -5672,7 +5675,7 @@ function showCard(small, big, ms = 2600, mini = false) { const c = $('chapter');
 function sub(who, text) { const c = $('cut'); c.classList.remove('ghost'); $('cutWho').textContent = who; story.typ = { text, n: 0, k: -1 }; $('cutText').textContent = ''; c._want = true; if (c.hidden) { c.hidden = false; requestAnimationFrame(() => { if (c._want) c.classList.add('on'); }); } else c.classList.add('on'); }
 function subOff() { story.typ = null; const c = $('cut'); c._want = false; c.classList.remove('on'); setTimeout(() => { if (!c.classList.contains('on')) c.hidden = true; }, 650); }
 function speakAs(text, pitch = 1, rate = 1) { try { if (!window.speechSynthesis) return; const u = new SpeechSynthesisUtterance(text); u.lang = 'ru-RU'; u.pitch = pitch; u.rate = rate; const v = speechSynthesis.getVoices().find((x) => /^ru/i.test(x.lang)); if (v) u.voice = v; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} }
-function speakerOf(who) { return who === 'Продюсер' ? story.prod : who === 'Полиция' ? story.copSpk : who === 'Свити' ? story.svity : who === 'Дежурный' ? story.desk : who === 'Вы' ? avatar : who === 'Воскреситель' ? story.gg : who === 'Марк' ? story.mark : null; }
+function speakerOf(who) { return who === 'Продюсер' ? story.prod : who === 'Полиция' ? story.copSpk : who === 'Свити' ? story.svity : who === 'Дежурный' ? story.desk : who === 'Вы' ? avatar : who === 'Воскреситель' ? story.gg : who === 'Марк' ? story.mark : who === 'Стас' ? C3.stas : who === 'Мелоди' ? (C3.mel || C2.mel) : null; }
 function line(who, text, pitch, rate) { sub(who, text); { const sp = speakerOf(who); story.spk = sp || null; if (sp) sp.talkT = Math.max(sp.talkT || 0, Math.min(9, text.length * 0.075)); } speakAs(text.replace(/50 000 \$/g, 'пятьдесят тысяч долларов'), pitch, rate); }
 function fadeOut() { $('black').classList.add('on'); }
 function fadeIn() { $('black').classList.remove('on'); }
@@ -5720,15 +5723,15 @@ function storyReset() {
 function startStory(cp = null) {
   Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'story'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true;
   story.on = true; story.asGG = false; story.ch = 1; lastCh = 1; W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0; selectWeapon(cp ? 1 : 0);
-  if (cp === 'c2b') { startCh2('c2b'); return; }
+  if (['c2b', 'c3', 'c3b', 'c3c'].includes(cp)) { startCh2(cp); return; }
   $('resumeBtn').hidden = true; startGame.fromWaves = true;
   if (CP_FN[cp]) { cpRestore(cp); CP_FN[cp](); renderNotes(); return; }
   saveCp(null); cutIntro();
 }
-const CP_NAME = { c2b: 'главу 2 из подвала', cafe: 'с кафе «Полночь»', police: 'с участка полиции', port: 'с порта', studio: 'со студии', gala: 'с ужина принцессы' };
+const CP_NAME = { c2b: 'главу 2 из подвала', c3: 'главу 2 · клуб «Громкая ночь»', c3b: 'главу 2 · за кулисами', c3c: 'главу 2 · поиск зарядов', cafe: 'с кафе «Полночь»', police: 'с участка полиции', port: 'с порта', studio: 'со студии', gala: 'с ужина принцессы' };
 function saveCp(cp) { cpStore(cp); try { if (cp) localStorage.setItem('myasorubka-story', cp); else localStorage.removeItem('myasorubka-story'); } catch (e) {} syncCont(); }
 function loadCp() { try { return localStorage.getItem('myasorubka-story'); } catch (e) { return null; } }
-function syncCont() { const cp = loadCp(); $('contStory').hidden = !CP_NAME[cp]; if ($('contStory').firstChild) $('contStory').firstChild.textContent = cp === 'c2b' ? 'Продолжить главу 2' : 'Продолжить главу 1'; if (CP_NAME[cp]) $('contWhere').textContent = 'Продолжить ' + CP_NAME[cp]; }
+function syncCont() { const cp = loadCp(); $('contStory').hidden = !CP_NAME[cp]; if ($('contStory').firstChild) $('contStory').firstChild.textContent = (cp === 'c2b' || (cp || '').startsWith('c3')) ? 'Продолжить главу 2' : 'Продолжить главу 1'; if (CP_NAME[cp]) $('contWhere').textContent = 'Продолжить ' + CP_NAME[cp]; }
 $('contStory').onclick = () => startStory(loadCp());
 // things she says when you are close, like a blogger on a live stream
 const SV_SAY = {
@@ -5960,6 +5963,7 @@ function storyPhoto() {
 function nearLocker() { return Math.hypot(player.pos.x - LOCKER_X, player.pos.z - (HZ - 1.3)) < 1.8; }
 function actInfo(st) {
   if (st.startsWith('c2')) return c2Act(true);
+  if (st.startsWith('c3')) return c3Act(true);
   if (st === 'search') return nearLocker() ? 'Обыскать' : null;
   if (st === 'flat') return nearClue() ? 'Осмотреть' : null;
   if (st === 'cafe') return CAFE.paper ? 'Убрать газету' : 'Газета';
@@ -5979,6 +5983,7 @@ function storyAct() {
   else if (st === 'port') { const h = nearHostage(); if (h) portFree(h); else if (nearLedger()) portLedger(); }
   else if (st === 'studio') cutCable();
   else if (st.startsWith('c2')) c2Act(false);
+  else if (st.startsWith('c3')) c3Act(false);
   else if (st === 'studio-usb' && nearConsole()) cutStudioLive();
 }
 function cutSearch() {
@@ -7718,6 +7723,25 @@ function admCh2() {
     { l: 'Последний фокус', s: 'Где ключ от клетки?', f: () => c2AdmTrial(() => c2Trick()) },
     { l: 'Арест Марка', s: '«На сцене она всё скажет!»', f: () => c2AdmTrial(() => c2Arrest()) },
     { l: 'Экран итогов', s: '«Марк арестован»', f: () => c2AdmBase(() => { for (const k in EVD) c2Ev(k); c2Finish(); }) },
+    { sec: 'Локация 1 · новое' },
+    { l: 'Пролог: ночь концерта', s: 'Флешбэк в клубе, удар сзади', f: () => { admClose(); try { localStorage.setItem('myasorubka-ch2', '1'); } catch (e) {} startCh2(); } },
+    { l: 'Блэкаут', s: 'Свет вырублен, фонарики роуди', f: () => c2AdmBase(() => { C2.safe = true; story.stage = 'c2-exit'; c2Blackout(); }) },
+    { l: 'Щиток (головоломка)', s: 'Во время блэкаута', f: () => c2AdmDo(() => { if (C2.power !== false) { story.stage = 'c2-exit'; c2Blackout(); } later(0.3, () => c2Fuse()); }) },
+    { l: 'Разговор с Мелоди', s: 'По телефону, 3 выбора', f: () => c2AdmDo(() => { C2.talked = false; c2Chat(!C2.melAlly); }) },
+    { sec: 'Локация 2 · клуб «Громкая ночь»' },
+    { l: 'Начало: у клуба', s: 'Очередь, Стас, звонок инспектора', f: () => { admClose(); try { localStorage.setItem('myasorubka-ch2', '1'); } catch (e) {} startCh2('c3'); } },
+    { l: 'Снаружи: проникновение', s: 'Худи, пропуск, подозрение', f: () => { admClose(); startCh2('c3'); setTimeout(() => admSkipTo(() => story.stage === 'c3-out'), 400); } },
+    { l: 'За кулисами', s: 'Телефон Стаса, гримёрка', f: () => { admClose(); startCh2('c3b'); } },
+    { l: 'Бас-гитара (ритм-игра)', s: 'Песня «Громкая ночь»', f: () => { admClose(); startCh2('c3b'); setTimeout(() => { C3.phone = true; c3Show(); }, 600); } },
+    { l: 'Поиск зарядов', s: '4:00, тестер, охрана с шокерами', f: () => { admClose(); startCh2('c3c'); } },
+    { l: 'Финал на сцене', s: '«Я должна сказать всё»', f: () => { admClose(); startCh2('c3c'); setTimeout(() => { C3.charges.forEach((c) => { c.done = true; }); C3.defused = 4; c3Finale(); }, 600); } },
+    { l: 'Финал: заряды не найдены', s: 'Взрывы, воскреситель закрывает Мелоди', f: () => { admClose(); startCh2('c3c'); setTimeout(() => c3Finale(), 600); } },
+    { l: 'Выбор: судьба Стаса', s: 'Полиция или расплата', f: () => { admClose(); startCh2('c3c'); setTimeout(() => { C3.charges.forEach((c) => { c.done = true; }); C3.defused = 4; c3Finale(); admSkipTo(() => { const d = document.getElementById('c2q'); return d && d.style.display === 'block'; }); }, 600); } },
+    { l: 'Эпилог', s: 'Улица, инспектор, Марк в машине', f: () => { admClose(); startCh2('c3c'); setTimeout(() => { story.stage = 'c3-final'; C3.fate = 'law'; c3Epilogue(); }, 600); } },
+    { l: 'Схема зарядов', s: 'Выдать (во время поиска)', f: () => { admClose(); C3.schem = true; toast('Схема: 1 синий · 2 жёлтый · 3 красный · 4 белый'); } },
+    { l: 'Обезвредить все заряды', s: 'Во время поиска', f: () => { admClose(); if (story.stage === 'c3-pyro') { C3.charges.forEach((c) => { c.done = true; c.led.material.color.setHex(0x20ff40); }); C3.defused = 4; c3Finale(); } else toast('Сначала «Поиск зарядов»'); } },
+    { l: 'Таймер +60 с', s: 'Во время поиска', f: () => { admClose(); C3.timer += 60; toast('+60 секунд'); } },
+    { l: 'Симпатия Мелоди ♥♥', s: 'Влияет на её слова на сцене', f: () => { C2.sym = 3; toast('Симпатия: ♥♥'); } },
     { sec: 'Телепорт · по подвалу (во время главы)' },
     { l: 'Клетка', s: 'Внутри', f: () => c2AdmTp(-7.6, 11.8, -Math.PI / 2) },
     { l: 'Стол допроса', s: 'Медиатор', f: () => c2AdmTp(-4.4, 9.6, Math.PI) },
@@ -7916,6 +7940,7 @@ function updateStory(dt) {
   else if (st === 'cafe') updCafe(dt, tick);
   else if (st === 'port') updPort(dt, tick);
   else if (st.startsWith('c2')) updC2(dt, tick);
+  else if (st.startsWith('c3')) updC3(dt, tick);
   else if (st === 'studio' || st === 'studio-usb') updStudio(dt, tick);
   else if (st === 'choice') { story.choiceT -= dt; $('chBar').style.width = Math.max(0, story.choiceT / 7 * 100) + '%'; if (story.choiceT <= 0) chooseMarry(); }
   else if (st === 'hunted') {
@@ -8326,6 +8351,7 @@ function buildC2Base() {
     for (const [x, y] of [[4.2, 1.42], [6.8, 1.42], [4.2, 2.2], [5.5, 2.2], [6.8, 2.2]]) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.62), new THREE.MeshBasicMaterial({ map: nz })); m.position.set(x, y, 21.86); m.rotation.y = Math.PI; addMesh(m); }
     BB.box(dk, 5.5, 1.8, 21.93, 4.0, 1.9, 0.08); }
   addSign([{ t: 'ОХРАНА', s: 200 }], 1.2, 0.34, 2.68, 2.6, 18.4, Math.PI / 2, 'rgba(230,230,230,0.9)');
+  BB.box(C(0x8a8a50, 0.5), 2.72, 1.4, 21.0, 0.14, 0.8, 0.6); addSign([{ t: '⚡ ЩИТОК', s: 120 }], 0.6, 0.2, 2.8, 1.9, 21.0, Math.PI / 2, 'rgba(20,20,20,0.95)');
   BB.box(dk, HX - 0.4, 1.56, -6, 0.36, 0.12, 0.26); BB.box(new THREE.MeshBasicMaterial({ color: 0xff2020 }), HX - 0.6, 1.63, -6.06, 0.03, 0.02, 0.03);
   for (const [x, z] of [[-1, 17.2], [0.2, 17.6], [-6, 16.6]]) blk(crateMat, x, 0.45, z, 0.9, 0.9, 0.9, rand(0, 1));
   { const m = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.88), std({ map: c2CalTex(), roughness: 0.9 })); m.position.set(-HX + 0.03, 1.5, 18.5); m.rotation.y = Math.PI / 2; addMesh(m); }
@@ -8515,6 +8541,9 @@ function c2Act(info) {
   if (st === 'c2-base' || st === 'c2-exit') {
     if (C2.melState === 'tied' && c2MelNear()) return info ? 'Развязать Мелоди' : cutC2Free();
     if (C2.melState === 'dead' && c2MelNear()) return info ? (C2.souls >= 3 ? 'Воскресить Мелоди' : `Нужно 3 души (${C2.souls}/3)`) : C2.souls >= 3 ? cutC2Revive() : c2Say('Мне нужны души. Три. Роуди Марка вполне сойдут.');
+    if (C2.power === false && c2Near([3.4, 21.0], 1.4)) return info ? 'Щиток' : c2Fuse();
+    if (!C2.talked && C2.melAlly && C2.mel && C2.mel.alive && c2Near([C2.mel.pos.x, C2.mel.pos.z], 1.8)) return info ? 'Поговорить с Мелоди' : c2Chat(false);
+    if (!C2.talked && C2.melState === 'none' && c2Has('voice') && c2Near([HX - 1.1, -6], 1.3)) return info ? 'Перезвонить Мелоди' : c2Chat(true);
     if (!c2Has('pick') && c2Near([-4.4, 9.9], 1.3)) return info ? 'Взять медиатор' : c2Pick();
     if (C2.shrine && !c2Has('receipt') && c2Near(C2_SHRINE, 1.5)) return info ? 'Тайник в алтаре' : cutC2Stash();
     if (!c2Has('tape') && c2Near([5.5, 20.3], 1.4)) return info ? 'Записи с камер' : cutC2Tape();
@@ -8524,7 +8553,7 @@ function c2Act(info) {
     if (!C2.cal && c2Near(C2_CAL, 1.4)) return info ? 'Осмотреть календарь' : cutC2Cal();
     if (!C2.diary && c2Near(C2_DESK, 1.4)) return info ? 'Читать дневник' : cutC2Diary();
     if (!C2.safe && c2Near(C2_SAFE, 1.3)) return info ? 'Сейф (код)' : c2Keypad();
-    if (c2Near(C2_SDOOR, 1.5)) { if (!info) { if (!C2.safe) { C2.knowLock = true; c2Say('Заперто. Ключ, наверное, в сейфе Марка.'); } else if (C2.melState === 'tied' || C2.melState === 'dead') c2Say('Сначала Мелоди. Без неё я не уйду… Хм. Странно это звучит.'); else cutC2Studio(); return; } return C2.safe ? 'Войти в студию' : 'Дверь (заперто)'; }
+    if (c2Near(C2_SDOOR, 1.5)) { if (!info) { if (!C2.safe) { C2.knowLock = true; c2Say('Заперто. Ключ, наверное, в сейфе Марка.'); } else if (C2.melState === 'tied' || C2.melState === 'dead') c2Say('Сначала Мелоди. Без неё я не уйду… Хм. Странно это звучит.'); else if (C2.power === false) c2Say('Электронный замок без питания. Щиток — в комнате охраны.'); else cutC2Studio(); return; } return C2.safe ? 'Войти в студию' : 'Дверь (заперто)'; }
   }
   return null;
 }
@@ -8589,7 +8618,7 @@ function c2SafeOpen(st) {
     [5.4, () => ggSay('Сто писем. Ни одного отправленного. Жалкое зрелище.', 3)],
     [9.0, () => { Sound.siren(0.5); line('Марк', '(по громкой связи) Ты открыл мой сейф?! Парни — взять его!!!', 0.85, 1.15); shake = 0.3; }],
   ], () => camSet(HX - 2.0, 1.2, -12, HX - 0.8, 0.7, -12), 12.8, () => {
-    setStage('c2-exit', ''); selectWeapon(0); W.ammo[0] = WEAPONS[0].mag; alertGuards('Тревога! Роуди Марка бегут к вам');
+    setStage('c2-exit', ''); later(9, c2Blackout); selectWeapon(0); W.ammo[0] = WEAPONS[0].mag; alertGuards('Тревога! Роуди Марка бегут к вам');
     for (const [x, z] of [[-5, -3.2], [-4.4, -2.6]]) { const g = guardSetup(mkNpc('guard', x, z, Math.PI, 'soldier'), [[x, z]]); g.calm = false; story.guards.push(g); }
   });
 }
@@ -8907,11 +8936,500 @@ function c2Arrest() {
         ['Мелоди', 'Концерт через три часа. Ты придёшь?'],
         ['Воскреситель', 'Марк сказал: на сцене ты всё скажешь. Мне стало интересно, что именно.'],
         ['Воскреситель', 'Это — расплата. И она ещё не закончилась.'],
-      ], () => { fxStory.grade = 0.35; Sound.droneLoop(0.3); showCard('ГЛАВА 2 · ЛОКАЦИЯ 1 ПРОЙДЕНА', 'Дальше: концерт «Громкая ночь» — «на сцене она всё скажет»', 6000); runCut([[0.1, () => subOff()]], c2PUpd, 6.5, () => { fxStory.grade = 0; Sound.droneLoop(0); c2Finish(); }); });
+      ], () => { fxStory.grade = 0.35; Sound.droneLoop(0.3); showCard('ГЛАВА 2 · ЛОКАЦИЯ 1 ПРОЙДЕНА', 'Дальше: клуб «Громкая ночь» — «на сцене она всё скажет»', 4500); runCut([[0.1, () => subOff()]], c2PUpd, 6.5, () => { fxStory.grade = 0; Sound.droneLoop(0); c3Begin(); }); });
     });
   });
 }
+/* ===================== CHAPTER 2 · LOCATION 2 «ГРОМКАЯ НОЧЬ» =====================
+   The club. Mark is arrested, but the cage was paid for by the band's manager Stas Gromov. "On stage she'll say everything":
+   Stas has rigged the stage with pyro to kill Melodie during the last song and blame Mark.
+   Get in through the service entrance (a van hoodie, a pickpocketed pass, suspicion at the gate), unlock Stas's phone,
+   play bass on stage in a rhythm game, hunt four charges with a detector against a clock, defuse them, and decide Stas's fate. */
+const C3 = { hood: false, badge: false, sus: 0, dockOpen: false, phone: false, schem: false, talked: false, hype: 0, timer: 0, charges: [], defused: 0, brawl: [], wave: 0, fate: '', crowd: [], fans: [], tech: null, techPts: null, mel: null, stas: null, dockR: null, beepT: 0, led: null, ledG: null, ledCv: null, ledMode: 'logo', lights: [], done: false, shots: 0, l1: null };
+const _c3a = new V3(), _c3b = new V3();
+function ledDraw(t) {
+  const g = C3.ledG; if (!g) return; const W2 = 512, H = 160; g.fillStyle = '#05030a'; g.fillRect(0, 0, W2, H);
+  if (C3.ledMode === 'logo') { for (let i = 0; i < 18; i++) { g.fillStyle = `hsla(${(t * 40 + i * 20) % 360},90%,60%,0.25)`; g.fillRect((i * 31 + t * 60) % W2, 0, 14, H); } g.fillStyle = '#ff5ab4'; g.font = '900 54px Arial'; g.textAlign = 'center'; g.fillText('ГРОМКАЯ НОЧЬ', W2 / 2, 92); g.fillStyle = '#9af0ff'; g.font = '700 22px Arial'; g.fillText('MELODIE · LIVE', W2 / 2, 130); }
+  else if (C3.ledMode === 'show') { for (let i = 0; i < 40; i++) { const a = t * 2 + i; g.fillStyle = `hsla(${(i * 9 + t * 120) % 360},100%,60%,0.5)`; g.beginPath(); g.arc(W2 / 2 + Math.cos(a) * (40 + i * 5), H / 2 + Math.sin(a * 1.3) * 50, 6, 0, 7); g.fill(); } g.fillStyle = '#fff'; g.font = '900 40px Arial'; g.textAlign = 'center'; g.fillText('♥ MELODIE ♥', W2 / 2, 94); }
+  else { g.fillStyle = '#e8e8f0'; g.font = '700 15px monospace'; g.textAlign = 'left'; ['Стас → Пиротехник:', '«Финальная песня. Четыре заряда. По моему сигналу.»', '«Всё спишут на психа Марка. Клетка, письма — всё на нём.»', '«Страховка на Мелоди — 2 000 000. Права на песни — мои.»'].forEach((s, i) => { g.fillStyle = i ? '#ffd0e0' : '#ff5a5a'; g.fillText(s, 14, 34 + i * 34); }); }
+  C3.led.needsUpdate = true;
+}
+function buildClub() {
+  Object.assign(LV, { walls: false, ceil: false });
+  const H = WALL_H, BB = batcher(), C = (c, r = 0.85) => std({ color: c, roughness: r }), dk = C(0x15151a), steel = std({ color: 0x3a3c42, roughness: 0.45, metalness: 0.7 }), wood = std({ map: TEX.wood, roughness: 0.8 });
+  const wallM = std({ map: texRep(TEX.wall, 6, 2), color: 0x4a4650, roughness: 0.95 }), facade = std({ map: texRep(TEX.wall, 8, 2), color: 0x2a2630, roughness: 0.95 });
+  const blk = (m, x, y, z, sx, sy, sz, ry = 0) => { BB.box(m, x, y, z, sx, sy, sz, ry); solid(x, y, z, sx, sy, sz); };
+  const wz = (x0, x1, z, gaps = [], m = wallM, h = H) => { let a = x0; for (const [g0, g1] of [...gaps, [x1, x1]]) { if (g0 > a) blk(m, (a + g0) / 2, h / 2, z, g0 - a, h, 0.3); if (g1 > g0 && g1 < x1) BB.box(m, (g0 + g1) / 2, (h + 2.4) / 2, z, g1 - g0, h - 2.4, 0.3); a = g1; } };
+  const wx = (z0, z1, x, gaps = [], m = wallM, h = H) => { let a = z0; for (const [g0, g1] of [...gaps, [z1, z1]]) { if (g0 > a) blk(m, x, h / 2, (a + g0) / 2, 0.3, h, g0 - a); if (g1 > g0 && g1 < z1) BB.box(m, x, (h + 2.4) / 2, (g0 + g1) / 2, 0.3, h - 2.4, g1 - g0); a = g1; } };
+  // ground: the street and the club floor
+  floorMesh(std({ map: texRep(TEX.asphalt, 10, 5), roughness: 0.9 }), 44, 22, 0, 23);
+  floorMesh(std({ map: texRep(TEX.wall, 10, 10), color: 0x2a2830, roughness: 0.6, envMapIntensity: 0.4 }), 44, 46, 0, -11, 0.002);
+  BB.box(C(0x6a6a66), 0, 0.06, 13.2, 44, 0.12, 2.0);
+  for (let x = -20; x <= 20; x += 4) BB.box(C(0xe8d870), x, 0.012, 24, 2, 0.01, 0.15);
+  // across the street: houses with lit windows; side fences
+  for (let i = 0; i < 6; i++) { const x = -20 + i * 8; blk(C([0x2a2a34, 0x332a2a, 0x2a3330][i % 3]), x, 6, 35.5, 7.4, 12, 3); for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) if (Math.random() < 0.6) BB.box(new THREE.MeshBasicMaterial({ color: pick([0xffd890, 0xfff0c0, 0x9ad0ff]) }), x - 2.2 + c * 2.2, 2 + r * 2.6, 33.98, 1.0, 1.3, 0.05); }
+  for (const s of [-1, 1]) blk(C(0x3a3a40), s * 22.3, 1.4, 23, 0.4, 2.8, 22);
+  // the facade with the main doors (closed) and the service door (dock)
+  wz(-22, 22, 12, [[-2, 2], [16, 19]], facade); blk(C(0x101014, 0.3), 0, 1.2, 12, 4, 2.4, 0.2);
+  addSign([{ t: 'ГРОМКАЯ НОЧЬ', s: 260 }], 14, 2.2, 0, 6.2, 12.2, 0, 'rgba(255,90,180,0.98)');
+  addSign([{ t: 'MELODIE · LIVE · СЕГОДНЯ', s: 120 }], 8, 1.0, 0, 4.4, 12.2, 0, 'rgba(154,240,255,0.95)');
+  addSign([{ t: 'СЛУЖЕБНЫЙ ВХОД', s: 110 }], 3, 0.5, 17.5, 3.0, 12.2, 0, 'rgba(255,220,120,0.95)');
+  { const d = new THREE.Mesh(new THREE.BoxGeometry(3, 2.4, 0.12), std({ color: 0x3a3a40, roughness: 0.5, metalness: 0.5 })); d.position.set(17.5, 1.2, 12); addMesh(d); C3.dockDoor = d; C3.dockR = c2Removable(17.5, 1.2, 12, 3, 2.4, 0.3); }
+  BB.box(new THREE.MeshBasicMaterial({ color: 0x30ff60 }), 19.3, 1.3, 12.2, 0.12, 0.18, 0.04);
+  // queue barriers, a fence to the alley, a van, a police car, street lamps
+  for (let z = 15; z <= 27; z += 3) for (const x of [-12.5, -3.5]) BB.box(steel, x, 0.55, z, 0.06, 1.1, 2.9);
+  blk(C(0x2a2a2e), 13.2, 1.3, 18, 0.15, 2.6, 12); for (let z = 12.4; z < 24; z += 0.4) BB.cyl(steel, 13.2, 1.3, z, 0.015, 0.015, 2.6, 4);
+  blk(C(0xd8d8d0, 0.5), 18.5, 1.2, 21.5, 2.4, 2.2, 5.2); BB.box(C(0x1a1a20), 18.5, 1.3, 18.85, 2.2, 0.8, 0.05); addSign([{ t: 'ЗВУК · СВЕТ · ПИРО', s: 90 }], 4, 0.5, 19.72, 1.6, 21.5, Math.PI / 2, 'rgba(30,30,30,0.9)');
+  for (const [x, z] of [[17.3, 19.5], [19.7, 19.5], [17.3, 23.6], [19.7, 23.6]]) BB.cyl(dk, x, 0.35, z, 0.35, 0.35, 0.25, 12, 0, 0, Math.PI / 2);
+  blk(C(0xe8e8f0, 0.4), -16, 0.7, 26, 2.0, 1.1, 4.4); BB.box(C(0x1a3a8a, 0.4), -16, 0.9, 26, 2.04, 0.3, 4.44); BB.box(C(0x101018, 0.2), -16, 1.5, 26, 1.8, 0.6, 2.4);
+  C3.siren = []; for (const [c, dx] of [[0xff2020, -0.3], [0x2050ff, 0.3]]) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.14, 0.2), new THREE.MeshBasicMaterial({ color: c })); m.position.set(-16 + dx, 1.9, 26); addMesh(m); C3.siren.push(m); }
+  for (const x of [-18, -6, 6]) { BB.cyl(steel, x, 3, 30, 0.08, 0.1, 6, 8); BB.geo(new THREE.MeshBasicMaterial({ color: 0xffd8a0 }), new THREE.SphereGeometry(0.22, 10, 8).translate(x, 6, 30)); }
+  // the building shell and the roof
+  wx(-34, 12, -22); wx(-34, 12, 22); wz(-22, 22, -34);
+  BB.box(C(0x0c0c10, 1), 0, H + 0.1, -11, 44.4, 0.2, 46.4);
+  // the arena walls with doors to the side rooms; the back wall of the stage with an LED screen
+  wx(-30, 12, -14, [[-3, -1]]); wx(-30, 12, 14, [[-7, -5]]); wz(-14, 14, -30);
+  { C3.ledCv = makeCanvas(512, 160); C3.ledG = C3.ledCv.getContext('2d'); C3.led = toTex(C3.ledCv); ledDraw(0); const m = new THREE.Mesh(new THREE.PlaneGeometry(24, 7.5), new THREE.MeshBasicMaterial({ map: C3.led })); m.position.set(0, 5.0, -29.82); addMesh(m); }
+  // the stage: solid, a deck on top, stairs at both sides, a crowd barrier, speaker towers, a truss with lights
+  blk(C(0x18161c, 0.6), 0, 0.6, -25, 28, 1.2, 10); addDeck(-14, 14, -30, -20, 1.2);
+  for (const s of [-1, 1]) { const x0 = s > 0 ? 11 : -13.6, x1 = s > 0 ? 13.6 : -11; addDeck(x0, x1, -20.0, -19.2, 0.8); addDeck(x0, x1, -19.2, -18.4, 0.4); BB.box(C(0x2a2830), s * 12.3, 0.4, -19.6, 2.6, 0.8, 0.8); BB.box(C(0x2a2830), s * 12.3, 0.2, -18.8, 2.6, 0.4, 0.8); }
+  blk(steel, 0, 0.55, -17.6, 20, 1.1, 0.25); 
+  for (const s of [-1, 1]) { blk(dk, s * 12.6, 2.6, -16.4, 1.8, 5.2, 1.6); for (let i = 0; i < 4; i++) BB.cyl(C(0x2a2a2a, 1), s * 12.6, 0.8 + i * 1.2, -15.58, 0.45, 0.45, 0.04, 16, Math.PI / 2); }
+  BB.box(steel, 0, 7.6, -22, 26, 0.3, 0.3); BB.box(steel, 0, 7.6, -27, 26, 0.3, 0.3); for (let x = -12; x <= 12; x += 4) BB.box(steel, x, 7.6, -24.5, 0.3, 0.3, 5);
+  C3.lights = []; for (let i = 0; i < 7; i++) { const x = -12 + i * 4, col = [0xff5ab4, 0x9af0ff, 0xffd060, 0xc080ff][i % 4]; const cone = new THREE.Mesh(new THREE.ConeGeometry(1.6, 7, 16, 1, true), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); cone.position.set(x, 4.1, -22); cone.userData.x = x; addMesh(cone); C3.lights.push(cone); BB.box(dk, x, 7.35, -22, 0.4, 0.4, 0.4); }
+  // the band gear: drums, amps, mic stand
+  for (const [x, z, r, h] of [[-3.6, -26.6, 0.34, 0.5], [-3.0, -27.4, 0.24, 0.32], [-4.3, -27.4, 0.24, 0.32], [-3.6, -28, 0.42, 0.55]]) BB.cyl(C(0xc81830, 0.4), x, 1.2 + h / 2 + 0.2, z, r, r, h, 16);
+  for (const x of [-8, 6.5, 8]) blk(dk, x, 1.9, -28.6, 1.2, 1.4, 0.8);
+  BB.cyl(steel, 0, 2.0, -23.6, 0.015, 0.015, 1.6, 6);
+  // the FOH booth in the middle of the hall
+  blk(C(0x1a1a20, 0.5), 0, 0.55, 6, 4, 1.1, 1.8); for (let i = 0; i < 20; i++) BB.box(C(i % 4 ? 0xd8d8d8 : 0xff4a4a), -1.7 + i * 0.18, 1.12, 6, 0.04, 0.03, 0.1); BB.box(new THREE.MeshBasicMaterial({ color: 0x40a0ff }), 0, 1.5, 6.6, 1.4, 0.7, 0.04);
+  // west side: the dressing room, Stas's office, the pyro storage
+  wz(-22, -14, -30, [[-18.8, -17.2]]); wz(-22, -14, -20, [[-18.8, -17.2]]); wz(-22, -14, -8, [[-18.8, -17.2]]);
+  blk(wood, -21.4, 1.0, -25, 0.6, 2.0, 3.0); for (let i = 0; i < 6; i++) BB.geo(new THREE.MeshBasicMaterial({ color: 0xfff0c0 }), new THREE.SphereGeometry(0.06, 8, 6).translate(-21.05, 2.1, -26.3 + i * 0.52)); BB.box(C(0xc8d8e8, 0.05), -21.08, 1.5, -25, 0.02, 1.0, 2.6);
+  blk(C(0xff6ab8, 0.6), -16, 0.4, -28.6, 2.4, 0.8, 0.9); for (let i = 0; i < 5; i++) BB.box(C(pick([0xff5ab4, 0x1a1a20, 0xffffff])), -19.2 + i * 0.3, 1.2, -21.0, 0.25, 1.1, 0.05);
+  blk(wood, -18, 0.78, -14, 2.2, 0.08, 1.1); for (const [dx, dz] of [[-1, -0.45], [1, -0.45], [-1, 0.45], [1, 0.45]]) BB.box(wood, -18 + dx, 0.38, -14 + dz, 0.07, 0.76, 0.07); BB.box(C(0x101014), -17.6, 0.83, -13.8, 0.1, 0.012, 0.18); BB.cyl(C(0xa86a20, 0.2), -18.6, 0.92, -14.1, 0.05, 0.06, 0.25, 10);
+  addSign([{ t: 'ГРОМОВ ПРОДАКШН', s: 120 }, { t: 'Стас Громов · менеджер', s: 70 }], 3, 1.2, -18, 2.4, -19.83, Math.PI, 'rgba(230,200,120,0.95)');
+  for (let i = 0; i < 6; i++) { blk(crateMat, -21.2, 0.45 + (i % 2) * 0.9, -6.6 + Math.floor(i / 2) * 1.2, 0.9, 0.9, 0.9); }
+  addSign([{ t: '⚠ ПИРО', s: 200 }], 1.6, 0.6, -21.84, 2.2, -2, Math.PI / 2, 'rgba(255,60,40,0.95)'); BB.box(C(0xe8e0c8, 0.9), -21.84, 1.5, 0.4, 0.02, 0.9, 1.2);
+  // east side: the dock, the equipment storage, the green room
+  wz(14, 22, 0, [[17.2, 18.8]]); wz(14, 22, -14, [[17.2, 18.8]]); wz(14, 22, -30, [[17.2, 18.8]]);
+  for (const [x, z] of [[15.2, 9], [15.2, 7.8], [20.8, 3], [20.8, 4.2], [15.6, 2]]) blk(C(0x22222a, 0.5), x, 0.55, z, 1.2, 1.1, 1.0); for (const [x, z] of [[20.6, -4], [20.6, -9], [15.4, -11]]) BB.cyl(C(0x3a2a20), x, 0.6, z, 0.6, 0.6, 0.5, 14, Math.PI / 2);
+  blk(C(0x2a3a4a, 0.8), 20.8, 0.4, -22, 1.4, 0.8, 3.0); blk(wood, 16, 0.45, -26, 2.4, 0.9, 1.0); BB.box(new THREE.MeshBasicMaterial({ color: 0x3a6aff }), 21.85, 1.8, -22, 0.04, 0.9, 1.6);
+  // the back corridor
+  addSign([{ t: 'СЦЕНА →', s: 140 }], 2, 0.4, 16, 2.5, -33.84, 0, 'rgba(255,220,120,0.95)');
+  BB.flush();
+}
+/* ----- people of the club ----- */
+function stasSay(t) { line('Стас', t, 0.95, 1.05); }
+function inspSay(t) { line('Инспектор', t, 1.1, 1.0); }
+function c3Npc(kind, x, z, yaw, type = 'human') { const n = mkNpc(kind, x, z, yaw, type); n.scripted = true; n.protect = true; n.pos.set(x, 0, z); n.yaw = yaw; n.root.position.copy(n.pos); n.root.rotation.y = yaw; return n; }
+function c3Face(n, x, z) { n.yaw = Math.atan2(x - n.pos.x, z - n.pos.z); n.root.rotation.y = n.yaw; }
+function c3Sync(list, dt) { for (const n of list) if (n && n.root && n.alive !== false) { if (n.path && n.path.length) { walkPath(n, n.path, n.pathSp || 1.6, dt); } n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; } }
+function c3Crowd(on) {
+  for (const n of C3.crowd) if (n.root) n.dispose(); C3.crowd = [];
+  if (!on) return; for (let i = 0; i < 14; i++) { const x = -9 + (i % 7) * 3 + rand(-0.6, 0.6), z = -15.6 + Math.floor(i / 7) * 2.6 + rand(-0.4, 0.4); C3.crowd.push(c3Npc(undefined, x, z, Math.PI + rand(-0.3, 0.3))); }
+}
+function c3Queue(on) { for (const n of C3.fans) if (n.root) n.dispose(); C3.fans = []; if (!on) return; for (let i = 0; i < 8; i++) C3.fans.push(c3Npc(undefined, -8 + (i % 2) * 1.4 + rand(-0.3, 0.3), 15.6 + Math.floor(i / 2) * 2.8, Math.PI + rand(-0.4, 0.4))); }
+function c3Band() { if (!C3.drum) { C3.drum = c3Npc(undefined, -3.6, -27.2, Math.PI); C3.drum.pos.y = 1.2; } if (!C3.gtr) { C3.gtr = c3Npc(undefined, 5, -25.4, Math.PI); C3.gtr.pos.y = 1.2; } }
+function c3Cam(shot, t = 0) {
+  const H = (n) => headPos(n, _c3b);
+  if (shot === 'street') camSet(-2 + Math.sin(t * 0.1) * 3, 4.5, 32, 0, 3.5, 12);
+  else if (shot === 'neon') camSet(4, 1.8, 18, 0, 5.4, 12);
+  else if (shot === 'police') camSet(-12.4, 1.8, 28.6, -16, 1.4, 26);
+  else if (shot === 'gg') { headPos(avatar, _c3a); camSet(_c3a.x + 0.4, _c3a.y + 0.02, _c3a.z - 0.95, _c3a.x, _c3a.y - 0.03, _c3a.z); }
+  else if (shot === 'stas' && C3.stas) { H(C3.stas); camSet(_c3b.x - 0.3, _c3b.y + 0.04, _c3b.z + 0.95, _c3b.x, _c3b.y, _c3b.z); }
+  else if (shot === 'mel' && C3.mel) { H(C3.mel); camSet(_c3b.x + 0.35, _c3b.y + 0.04, _c3b.z + 0.95, _c3b.x, _c3b.y, _c3b.z); }
+  else if (shot === 'gate') camSet(6, 2.2, 19, 0, 1.4, 13);
+  else if (shot === 'stage') camSet(Math.sin(t * 0.25) * 9, 3.2, -10 + Math.cos(t * 0.25) * 2, 0, 2.6, -25);
+  else if (shot === 'crowd') camSet(0, 2.6, -22, 0, 1.4, -12);
+  else if (shot === 'melStage' && C3.mel) { H(C3.mel); camSet(_c3b.x + 0.2, _c3b.y + 0.1, _c3b.z + 1.6, _c3b.x, _c3b.y, _c3b.z); }
+  else if (shot === 'phone') camSet(-17.6, 1.25, -13.4, -17.6, 0.83, -13.8);
+  else if (shot === 'dress' && C3.mel) { H(C3.mel); camSet(_c3b.x + 1.2, _c3b.y + 0.15, _c3b.z + 1.0, _c3b.x, _c3b.y, _c3b.z); }
+  else camSet(0, 3, 2, 0, 1.6, -20);
+}
+function c3Talk(lines, upd, after) { let t = 0.2; const steps = []; for (const [who, txt, shot] of lines) { const at = t; steps.push([at, () => { if (shot) C3.shot = shot; if (who === 'Стас') stasSay(txt); else if (who === 'Мелоди') melSay(txt); else if (who === 'Инспектор') inspSay(txt); else if (who === 'Воскреситель') ggSay(txt, Math.min(4.2, 0.6 + txt.length * 0.05)); else if (who === '') sub('', txt); else line(who, txt, 1, 1.05); }]); t += 1.3 + txt.length * 0.058; } runCut(steps, upd, t, after); }
+function c3Upd(t, dt) { c3Amb(dt); c3Sync([C3.stas, C3.mel, C3.tech, C3.insp, C3.markCar, ...C3.crowd, ...C3.fans], dt); c3Cam(C3.shot || 'street', t); }
+function c3Amb(dt) {
+  const t = performance.now() / 1000; C3.ledT = (C3.ledT || 0) - dt; if (C3.ledT <= 0) { C3.ledT = 0.08; ledDraw(t); }
+  if (C3.siren) C3.siren.forEach((m, i) => (m.visible = Math.floor(t * 4 + i) % 2 === 0));
+  for (const c of C3.lights) { c.rotation.z = Math.sin(t * 0.8 + c.userData.x) * 0.35; c.material.opacity = C3.ledMode === 'show' ? 0.12 + Math.sin(t * 6 + c.userData.x) * 0.05 : 0.05; }
+}
+/* ----- start ----- */
+function c3Start(cp) {
+  storyMap('club'); story.gg = avatar; story.showAvatar = true; story.gun = true; story.guards = []; story.alarm = false;
+  Object.assign(C3, { hood: false, badge: false, sus: 0, dockOpen: false, phone: false, schem: false, talked: false, hype: 0, timer: 0, defused: 0, brawl: [], wave: 0, fate: '', crowd: [], fans: [], drum: null, gtr: null, ledMode: 'logo', shots: 0, done: false, t0: performance.now() });
+  C3.stas = null; C3.mel = null; C3.tech = null; C3.insp = null; C3.markCar = null;
+  if (cp === 'c3b') { c3Back(true); return; } if (cp === 'c3c') { c3PyroStart(true); return; }
+  saveCp('c3'); cpStore('c3'); c3Intro();
+}
+function c3Intro() {
+  player.pos.set(1.2, 0, 26); player.yaw = 0; avatar.pos.copy(player.pos); standAvatar();
+  c3Queue(true);
+  const S = C3.stas = c3Npc('stas', 0, 12.6, 0); S.root.visible = false;
+  const M = C3.mel = c3Npc('melodie', 2.2, 26.4, 0);
+  const mk = C3.markCar = c3Npc('mark', -16.4, 26.6, Math.PI / 2); seatNpc(mk, -16.4, 26.6, Math.PI / 2); mk.pos.y = 0.3; if (mk.bass) mk.bass.visible = false;
+  Music.stop(); Music.start('dread'); fadeIn();
+  c3Talk([
+    ['', 'Клуб «Громкая ночь». До концерта — час. Очередь фанатов тянется до угла.', 'street'],
+    ['', 'У обочины — полицейская машина. На заднем сиденье, в наручниках, — Марк. Он смотрит на неоновую вывеску и шевелит губами.', 'police'],
+    ['Воскреситель', '«На сцене она всё скажет». Он повторяет это, как молитву.', 'gg'],
+    ['', 'Звонит телефон. Инспектор Лисова.', 'gg'],
+    ['Инспектор', 'Это Лисова. Вельский молчит. Но клетку оплатили не с его карты. С карты продюсерского центра «Громов продакшн». Стас Громов — менеджер Мелоди.', 'gg'],
+    ['Воскреситель', 'Менеджер, который платит за клетку басиста. Как трогательно.', 'gg'],
+    ['Инспектор', 'Я ничего вам не говорила. И не лезьте в это.', 'gg'],
+    ['Мелоди', 'Стас — мой менеджер с самого начала. Он… он не мог.', 'mel'],
+    ['', 'Двери клуба открываются. Выходит человек в сером костюме, с идеальной улыбкой.', 'gate'],
+    ['Стас', 'Мелоди! Звёздочка, наконец-то! Где ты была?! Через час выход!', 'stas'],
+    ['Стас', 'А это ещё кто? Охрана — этого не пускать. Без пропуска — ни шагу.', 'stas'],
+    ['Мелоди', 'Стас, он со мной!', 'mel'],
+    ['Стас', 'Сегодня все со мной, милая. Идём, гримёр ждёт.', 'stas'],
+    ['', 'Стас уводит Мелоди внутрь. Двери захлопываются.', 'gate'],
+    ['Воскреситель', 'Ему сказали, что Марка арестовали. А он даже не моргнул. Люди моргают, когда удивлены. Он — не удивился.', 'gg'],
+    ['Воскреситель', 'Парадный вход — не для меня. Значит, служебный.', 'gg'],
+  ], (t, dt) => {
+    c3Upd(t, dt);
+    if (t > 24 && !S.root.visible) { S.root.visible = true; M.path = [[1.2, 14.4]]; M.pathSp = 1.4; }
+    if (t > 46 && !S.gone) { S.gone = true; S.path = [[0, 11]]; M.path = [[0.4, 11]]; }
+    if (S.gone && S.pos.z < 11.4) { S.root.visible = false; M.root.visible = false; }
+  }, () => { if (C3.stas) { C3.stas.dispose(); C3.stas = null; } if (C3.mel) { C3.mel.dispose(); C3.mel = null; } c3Out(); });
+}
+/* ----- outside: the hoodie, the pass, suspicion ----- */
+function c3Out() {
+  const gL = C3.g1 = c3Npc('guard', -2.6, 13.6, 0), gR = C3.g2 = c3Npc('guard', 2.6, 13.6, 0), dg = C3.dockG = c3Npc('guard', 16.4, 13.6, 0);
+  const T = C3.tech = c3Npc('tech', 16, 16, 0); C3.techPts = [[16, 16], [20.4, 16], [20.4, 17.6], [16, 17.6]]; T.path = C3.techPts.map((p) => p.slice()); T.pathSp = 0.7; T.idle = 0;
+  story.showAvatar = false; setStage('c3-out', ''); banner('Громкая ночь', 'проберитесь внутрь через служебный вход');
+}
+function c3Act(info) {
+  const st = story.stage, near = (x, z, r = 1.4) => Math.hypot(player.pos.x - x, player.pos.z - z) < r;
+  if (st === 'c3-out') {
+    if (!C3.hood && near(18.5, 18.6, 1.5)) return info ? 'Взять худи техника' : (C3.hood = true, Sound.click(700, 0.3), toast('Худи техника надето'), c2Say('Чёрное худи с надписью «CREW». Мне идёт чёрное.'));
+    const T = C3.tech; if (!C3.badge && T && near(T.pos.x, T.pos.z, 1.4)) { if (info) return 'Стащить пропуск'; const dx = player.pos.x - T.pos.x, dz = player.pos.z - T.pos.z, d = Math.hypot(dx, dz) || 1, fw = (Math.sin(T.yaw) * dx + Math.cos(T.yaw) * dz) / d; if (fw < 0.1) { C3.badge = true; Sound.click(1500, 0.2); toast('Пропуск «STAFF» у вас'); c2Say('Ловкость рук. Он даже не почувствовал.'); } else { C3.sus = Math.min(100, C3.sus + 40); c2Say('Эй! Ты чего по карманам шаришь?!', 'Техник'); T.yaw += Math.PI; } return; }
+    if (near(16.4, 14.6, 1.6)) { if (info) return 'Служебный вход'; if (C3.hood && C3.badge) return c3Dock(); c2Say(C3.badge ? 'Пропуск-то есть. А форма где? Ты не техник.' : C3.hood ? 'Форма есть, а пропуск? Без бейджа — не пущу.' : 'Служебный вход. Ты кто такой? Иди отсюда.', 'Охранник'); C3.sus = Math.min(100, C3.sus + 25); return; }
+    return null;
+  }
+  if (st === 'c3-back') {
+    if (!C3.phone && near(-17.6, -12.9, 1.4)) return info ? 'Телефон Стаса' : c3Pattern();
+    if (!C3.schem && near(-21, 0.4, 1.6)) return info ? 'Схема зарядов' : c3Schem();
+    if (C3.mel && near(C3.mel.pos.x, C3.mel.pos.z, 1.8)) { if (info) return 'Поговорить с Мелоди'; if (!C3.phone) { c2Say('Стас какой-то странный сегодня… Он заперся у себя в кабинете с телефоном.', 'Мелоди'); return; } return cutC3Dress(); }
+    return null;
+  }
+  if (st === 'c3-pyro') {
+    if (!C3.schem && near(-21, 0.4, 1.6)) return info ? 'Схема зарядов' : c3Schem();
+    const c = C3.charges.find((q) => !q.done && near(q.x, q.z, 1.4)); if (c) return info ? `Обезвредить заряд №${c.n}` : c3Defuse(c);
+    return null;
+  }
+  return null;
+}
+function c3Dock() {
+  story.stage = 'c3-cut';
+  runCut([
+    [0.2, () => line('Охранник', 'Техник? Опаздываешь. Пропуск… ладно, проходи. Свет на сцене до сих пор не настроен.', 0.9, 1.05)],
+    [4.6, () => { Sound.thud(0.4); C3.dockOpen = true; c2Remove(C3.dockR); }],
+    [5.4, () => ggSay('Я всегда опаздываю. Это моя фирменная черта.', 2.6)],
+  ], (t) => { if (C3.dockDoor) C3.dockDoor.position.x = 17.5 + Math.min(1, Math.max(0, t - 4.6)) * 2.8; camSet(14.6, 1.8, 16, 17.5, 1.4, 12); }, 8.4, () => c3Back(false));
+}
+/* ----- backstage ----- */
+function c3Back(fromCp) {
+  c3Queue(false); for (const k of ['g1', 'g2', 'dockG', 'tech']) if (C3[k]) { C3[k].dispose(); C3[k] = null; }
+  if (fromCp) { C3.hood = C3.badge = C3.dockOpen = true; c2Remove(C3.dockR); if (C3.dockDoor) C3.dockDoor.position.x = 20.3; player.pos.set(17.5, 0, 9); player.yaw = 0; }
+  C3.mel = c3Npc('melodie', -17, -26, -Math.PI / 2);
+  C3.staff = [c3Npc('tech', 18, -6, 0), c3Npc('tech', 16, -20, Math.PI / 2)]; C3.staff[0].path = [[18, -10], [18, -2]]; C3.staff[0].pathSp = 0.9;
+  saveCp('c3b'); cpStore('c3b'); setStage('c3-back', ''); if (!fromCp) toast('Чекпоинт: за кулисами');
+}
+const PAT_OK = [0, 1, 2, 4, 6, 7, 8];
+function c3Pattern() {
+  const st = story.stage; story.stage = 'c3-cut'; const d = c2Ui(); runCut([], () => c3Cam('phone'), 99999, () => {}); let seq = [];
+  const render = (msg = '') => {
+    const pos = (i) => [40 + (i % 3) * 70, 40 + Math.floor(i / 3) * 70], sm = PAT_OK.map(pos).map((p) => p.join(',')).join(' '), cur = seq.map(pos).map((p) => p.join(',')).join(' ');
+    d.innerHTML = `<small style="letter-spacing:.18em;color:#9af0ff">ТЕЛЕФОН СТАСА · ГРАФИЧЕСКИЙ КЛЮЧ</small><small style="display:block;margin:4px 0;color:#bbb">На стекле видны жирные следы пальца. Повторите узор (нажимайте точки по порядку).</small><svg viewBox="0 0 220 220" style="width:min(150px,32vh);height:min(150px,32vh);display:block;margin:0 auto;background:#0a0a10;border-radius:12px"><polyline points="${sm}" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${cur}" fill="none" stroke="#9af0ff" stroke-width="5"/>${[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => { const [x, y] = pos(i); return `<circle cx="${x}" cy="${y}" r="16" fill="${seq.includes(i) ? '#9af0ff' : '#333'}" data-p="${i}"/>`; }).join('')}</svg><small style="display:block;color:#ff8a8a;min-height:16px">${msg}</small><button class="btn" data-x="1" style="width:100%;margin-top:4px">Сбросить</button><button class="btn" data-x="2" style="width:100%;margin-top:4px">Закрыть</button>`;
+    d.querySelectorAll('[data-p]').forEach((c) => c.onclick = () => { const i = +c.dataset.p; if (seq.includes(i)) return; seq.push(i); Sound.click(1500, 0.12); if (seq.length === PAT_OK.length) { const ok = seq.every((v, k) => v === PAT_OK[k]) || seq.every((v, k) => v === PAT_OK[PAT_OK.length - 1 - k]); if (ok) { d.style.display = 'none'; cutC3Msgs(st); return; } Sound.zap(0.3); seq = []; render('Неверный узор'); return; } render(); });
+    d.querySelector('[data-x="1"]').onclick = () => { seq = []; render(); }; d.querySelector('[data-x="2"]').onclick = () => { d.style.display = 'none'; story.cut = null; setStage(st, ''); };
+  };
+  render(); d.style.display = 'block';
+}
+function cutC3Msgs(st) {
+  C3.phone = true;
+  c3Talk([
+    ['', 'Экран оживает. Переписка: «Пиротехник».', 'phone'],
+    ['Стас', '(сообщение) «Финальная песня. Четыре заряда под сценой и на башнях. По моему сигналу.»', 'phone'],
+    ['', '«Пиротехник»: «Там же будут люди. Она будет стоять прямо над ними.»', 'phone'],
+    ['Стас', '(сообщение) «Там будет ОНА. А виноват будет сумасшедший басист. Клетка, письма, алтарь — всё указывает на него. Я об этом позаботился.»', 'phone'],
+    ['Стас', '(сообщение) «Страховка на Мелоди — два миллиона. Права на песни — мои. Она всё равно собиралась уйти из лейбла.»', 'phone'],
+    ['Воскреситель', '«На сцене она всё скажет». Марк думал, что это про любовь. А Стас готовил ей последнюю песню.', 'phone'],
+    ['Воскреситель', 'Он купил клетку. Он кормил ревность Марка. Он сделал из басиста идеального виноватого. Красиво. Почти.', 'phone'],
+  ], () => c3Cam('phone'), () => { setStage(st, ''); toast('Телефон Стаса у вас · найдите Мелоди в гримёрке'); });
+}
+function c3Schem() { C3.schem = true; const st = story.stage; story.stage = 'c3-cut'; c3Talk([['', 'На стене — схема подключения пиротехники. Четыре заряда, и у каждого подписано, какой провод — «спуск».', 'phone'], ['Воскреситель', 'Заряд один — синий, два — жёлтый, три — красный, четыре — белый. Запомню. Или нет: просто сфотографирую глазами.']], () => camSet(-19.6, 1.6, 0.4, -21.84, 1.5, 0.4), () => { setStage(st, ''); toast('Схема зарядов: 1 синий · 2 жёлтый · 3 красный · 4 белый'); }); }
+function cutC3Dress() {
+  story.stage = 'c3-cut'; story.showAvatar = true; const M = C3.mel; player.pos.set(-18.6, 0, -25); player.yaw = -Math.PI / 2; avatar.pos.copy(player.pos); standAvatar(); c3Face(M, player.pos.x, player.pos.z);
+  c3Talk([
+    ['Мелоди', 'Ты пробрался сюда?! Стас тебя убьёт… То есть — выгонит.', 'dress'],
+    ['Воскреситель', 'Он собирается убить тебя. На финальной песне. Пиротехникой.', 'gg'],
+    ['', 'Воскреситель протягивает ей телефон Стаса. Мелоди читает. Её руки начинают дрожать.', 'dress'],
+    ['Мелоди', 'Два миллиона… Он… Он меня с шестнадцати лет вёл. Он мне как отец был.', 'dress'],
+    ['Мелоди', 'Нужно отменить концерт! Сказать всем!', 'dress'],
+    ['Воскреситель', 'Если отменишь — он поймёт и нажмёт кнопку раньше. Там тысяча человек. Нет. Концерт идёт. А я найду заряды.', 'gg'],
+    ['Мелоди', 'Но… у нас нет басиста. Марк в полиции. Без баса мы не выйдем.', 'dress'],
+    ['Воскреситель', 'Дай мне бас.', 'gg'],
+    ['Мелоди', 'Ты умеешь играть?!', 'dress'],
+    ['Воскреситель', 'Я играл на похоронах. Много раз. Зрители ни разу не жаловались.', 'gg'],
+    ['Мелоди', '…Ты невозможный. Выход через пять минут. Капюшон не снимай.', 'dress'],
+  ], (t, dt) => { c3Amb(dt); c3Cam(C3.shot || 'dress', t); }, () => c3Show());
+}
+/* ----- the show: the resurrector on bass (a rhythm game) ----- */
+const SONG = { bpm: 124, len: 46, lyrics: [[2, 'Громкая ночь… громче, чем страх…'], [8, 'Я пою о тени в чужих глазах…'], [14, 'Он такой загадочный, он — как дым…'], [20, 'Я сгораю — а он невредим…'], [27, 'Громкая ночь! Громкая ночь!'], [33, 'Никто не уйдёт, никто не прочь…'], [39, 'Громкая ночь — громче, чем ложь!'], [44, '…и ты меня не найдёшь.']] };
+function songNotes() { const b = 60 / SONG.bpm, out = []; let k = 0; for (let t = 2.4; t < SONG.len - 1; t += b) { k++; const dens = t > 26 ? 0.85 : 0.6; if (Math.random() < dens) out.push({ t, lane: (k * 7 + (t > 26 ? k % 2 : 0)) % 3, hit: false, miss: false }); if (t > 26 && k % 4 === 0) out.push({ t: t + b / 2, lane: (k + 1) % 3, hit: false, miss: false }); } return out; }
+function c3Show() {
+  C3.mel.pos.set(0, 1.2, -23.6); C3.mel.yaw = 0; c3Band(); c3Crowd(true); C3.ledMode = 'show'; C3.mel.root.visible = true;
+  player.pos.set(-5, 1.2, -24.4); player.yaw = Math.PI * 0.95; avatar.pos.copy(player.pos); standAvatar(); story.showAvatar = true; Music.stop();
+  c3Talk([
+    ['', 'Свет гаснет. Тысяча телефонов поднимается вверх, как звёзды.', 'crowd'],
+    ['Мелоди', 'Привет, «Громкая ночь»! Сегодня у нас новый басист… он немного… мрачный!', 'melStage'],
+    ['', 'Толпа ревёт. Воскреситель в капюшоне берёт бас-гитару.', 'stage'],
+  ], (t, dt) => { c3Upd(t, dt); if (Math.random() < 0.4) spawnSprite(TEX.soft, _a.set(rand(-9, 9), rand(2.2, 3.2), rand(-16, -8)), { color: 0xffffff, additive: true, size: 0.06, grow: 0.2, life: 0.8, opacity: 0.7 }); Sound.crowd && Math.random() < dt * 0.6 && Sound.crowd(0.3); }, () => rhythm());
+}
+function rhythm() {
+  const notes = songNotes(); let d = document.getElementById('rhy'); if (!d) { d = document.createElement('div'); d.id = 'rhy'; d.style.cssText = 'position:fixed;inset:0;z-index:58;pointer-events:none'; ['pointerdown', 'touchstart', 'click'].forEach((e) => d.addEventListener(e, (ev) => ev.stopPropagation())); document.body.appendChild(d); }
+  d.innerHTML = '<canvas id="rhyC" style="position:absolute;left:50%;transform:translateX(-50%);top:4%;width:min(360px,60vw);height:62%"></canvas><div id="rhyS" style="position:absolute;left:12px;top:10px;color:#ffd0e0;font:700 13px var(--ui);text-shadow:0 0 4px #000">ХАЙП 0%</div><div style="position:absolute;left:0;right:0;bottom:4%;display:flex;justify-content:center;gap:12px;pointer-events:auto">' + [0, 1, 2].map((i) => `<button class="btn" data-l="${i}" style="width:min(120px,26vw);height:64px;font-size:20px;border-color:${['#ff5ab4', '#9af0ff', '#ffd060'][i]}">${['◀', '●', '▶'][i]}</button>`).join('') + '</div>';
+  d.style.display = 'block'; const cv = document.getElementById('rhyC'), g = cv.getContext('2d'); cv.width = 360; cv.height = 420;
+  const t0 = performance.now(), cols = ['#ff5ab4', '#9af0ff', '#ffd060']; let hits = 0, lyr = 0, beatN = 0, flash = [0, 0, 0], combo = 0; const T = () => (performance.now() - t0) / 1000;
+  const press = (l) => { const t = T(); let best = null; for (const n of notes) if (!n.hit && !n.miss && n.lane === l && Math.abs(n.t - t) < 0.16) { if (!best || Math.abs(n.t - t) < Math.abs(best.t - t)) best = n; } if (best) { best.hit = true; hits++; combo++; flash[l] = 1; Sound.click(70 + l * 25, 0.6); if (combo % 8 === 0) toast(`Комбо ×${combo}!`); } else { combo = 0; Sound.click(40, 0.25); } };
+  d.querySelectorAll('[data-l]').forEach((b) => { b.onpointerdown = (e) => { e.preventDefault(); press(+b.dataset.l); }; });
+  runCut([], (t, dt) => { c3Upd(t, dt); C3.shot = t % 12 < 6 ? 'stage' : 'melStage'; if (Math.random() < 0.5) spawnSprite(TEX.soft, _a.set(rand(-9, 9), rand(2.2, 3.4), rand(-16, -8)), { color: pick([0xffffff, 0xff9ad8, 0x9af0ff]), additive: true, size: 0.06, grow: 0.2, life: 0.8, opacity: 0.7 }); }, 99999, () => {});
+  const loop = () => {
+    const t = T(); if (d.style.display === 'none') return;
+    const b = 60 / SONG.bpm; while (beatN * b < t) { if (beatN % 2 === 0) Sound.beat(0.25); else Sound.click(5000, 0.06); beatN++; }
+    if (lyr < SONG.lyrics.length && t >= SONG.lyrics[lyr][0]) { sub('Мелоди', SONG.lyrics[lyr][1]); lyr++; }
+    g.clearRect(0, 0, 360, 420); for (let l = 0; l < 3; l++) { g.fillStyle = `rgba(255,255,255,${0.04 + flash[l] * 0.2})`; g.fillRect(l * 120 + 6, 0, 108, 420); flash[l] *= 0.88; }
+    g.fillStyle = 'rgba(255,255,255,0.8)'; g.fillRect(0, 372, 360, 4);
+    for (const n of notes) { if (n.hit) continue; const y = 372 - (n.t - t) * 260; if (n.t - t < -0.18 && !n.miss) { n.miss = true; combo = 0; } if (y < -20 || y > 440 || n.miss) continue; g.fillStyle = cols[n.lane]; g.shadowColor = cols[n.lane]; g.shadowBlur = 12; g.beginPath(); g.roundRect ? g.roundRect(n.lane * 120 + 16, y - 12, 88, 24, 10) : g.rect(n.lane * 120 + 16, y - 12, 88, 24); g.fill(); g.shadowBlur = 0; }
+    const hype = Math.round(hits / notes.length * 100); document.getElementById('rhyS').textContent = `ХАЙП ${hype}% · комбо ${combo}`;
+    if (t > SONG.len) { d.style.display = 'none'; subOff(); C3.hype = hits / notes.length; c3AfterSong(); return; }
+    requestAnimationFrame(loop);
+  }; loop();
+}
+function c3AfterSong() {
+  const h = Math.round(C3.hype * 100), good = C3.hype > 0.55;
+  c3Talk([
+    ['', good ? `Толпа взрывается. Хайп ${h}%. Кто-то кричит: «БАСИСТ, ТЫ КТО?!»` : `Пара фальшивых нот, но толпа прощает. Хайп ${h}%.`, 'crowd'],
+    ['Мелоди', good ? 'Вы слышали этот бас?! Аплодисменты нашему загадочному басисту!' : 'Наш басист сегодня… немного волнуется!', 'melStage'],
+    ['Мелоди', 'Перерыв пять минут — и последняя песня! Не расходитесь!', 'melStage'],
+    ['', 'Из-за кулис на воскресителя смотрит Стас. Он больше не улыбается. Он что-то шепчет охране.', 'stage'],
+    ['Воскреситель', 'Четыре минуты до финальной песни. Четыре заряда. Тестер пиротехника, забытый у сцены, пищит рядом с проводкой.', 'gg'],
+    ['Воскреситель', 'Ищи по писку. Чем чаще — тем ближе.', 'gg'],
+  ], c3Upd, () => c3PyroStart(false));
+}
+/* ----- the pyro hunt: a detector, a clock, Stas's shock-baton security ----- */
+const CHG = [[3.4, -19.0, 'под сценой'], [-12.6, -14.9, 'у левой башни'], [12.6, -14.9, 'у правой башни'], [1.6, 7.4, 'в будке звукорежиссёра']];
+const CHG_WIRE = ['синий', 'жёлтый', 'красный', 'белый'];
+function c3PyroStart(fromCp) {
+  if (fromCp) { C3.mel = c3Npc('melodie', 0, -23.6, 0); C3.mel.pos.y = 1.2; c3Band(); c3Crowd(true); C3.ledMode = 'show'; C3.phone = true; C3.hood = C3.badge = C3.dockOpen = true; c2Remove(C3.dockR); }
+  story.showAvatar = false; player.pos.set(-12.3, 0, -17.6); player.yaw = 0; C3.timer = 240; C3.defused = 0; C3.wave = 0; C3.brawl = [];
+  C3.charges = CHG.map(([x, z, where], i) => { const m = new THREE.Group(); m.add(new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.2), std({ color: 0x8a2a1a, roughness: 0.6 }))); const led = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 6), new THREE.MeshBasicMaterial({ color: 0xff2020 })); led.position.set(0.1, 0.12, 0.1); m.add(led); m.position.set(x, 0.12, z); addMesh(m); return { n: i + 1, x, z, where, done: false, m, led, wires: [0, 1, 2, 3], wrong: 0 }; });
+  saveCp('c3c'); cpStore('c3c'); setStage('c3-pyro', ''); banner('4:00 до финальной песни', 'найдите и обезвредьте 4 заряда'); Music.start('dread');
+}
+function c3Brawlers(n) { for (let i = 0; i < n; i++) { const a = rand(0, 6.28), x = clamp(player.pos.x + Math.cos(a) * 9, -12, 12), z = clamp(player.pos.z + Math.sin(a) * 9, -16, 9); const b = mkNpc('guard', x, z, 0); b.scripted = true; b.brawl = true; b.atk = rand(0.5, 1.2); b.wind = 0; C3.brawl.push(b); } c2Say(pick(['Стас сказал — убрать басиста!', 'Вот он! Шокеры к бою!', 'Держи его!']), 'Охрана Стаса'); }
+function c3BrawlUpd(dt) {
+  for (const b of C3.brawl) { if (!b.alive || b.state === 'dead') continue; const dx = player.pos.x - b.pos.x, dz = player.pos.z - b.pos.z, d = Math.hypot(dx, dz) || 1;
+    b.yaw += angDiff(b.yaw, Math.atan2(dx, dz)) * Math.min(1, dt * 8); if (d > 1.4 && !b.wind) { walkNpc(b, player.pos.x, player.pos.z, 3.1, dt); pushOutAABBs(b.pos, 0.35, 0); } else b.speed = 0;
+    b.root.position.copy(b.pos); b.root.rotation.y = b.yaw; b.atk -= dt;
+    if (!b.wind && d < 1.7 && b.atk <= 0) { b.wind = 0.5; b.atk = 1.4; }
+    if (b.wind) { b.wind -= dt; if (b.wind <= 0) { b.wind = 0; if (d < 2.1) { damagePlayer(12); Sound.zap(0.7); headPos(b, _a); sparks(_a, 12, UP, 4); flashScreen('#9ad8ff', 160); } } } }
+}
+function c3Defuse(c) {
+  const st = story.stage; story.stage = 'c3-cut'; const d = c2Ui(); runCut([], () => camSet(c.x + 0.9, 0.9, c.z + 0.9, c.x, 0.1, c.z), 99999, () => {});
+  const cols = { 0: ['синий', '#3a6aff'], 1: ['жёлтый', '#ffd040'], 2: ['красный', '#ff3030'], 3: ['белый', '#f0f0f0'] };
+  const render = (msg = '') => { d.innerHTML = `<small style="letter-spacing:.18em;color:#ff6a40">ЗАРЯД №${c.n} · ${c.where}</small><b style="display:block;margin:6px 0">Какой провод резать?</b><small style="display:block;color:#bbb;margin-bottom:6px">${C3.schem ? 'По схеме: заряд №' + c.n + ' — ' + CHG_WIRE[c.n - 1] + ' провод.' : 'Схемы нет — придётся наугад (схема висит в складе пиротехники, запад).'}</small>` + c.wires.map((w) => `<button class="btn" data-w="${w}" style="width:100%;margin:4px 0;border-left:10px solid ${cols[w][1]}">✂ ${cols[w][0]}</button>`).join('') + `<small style="display:block;color:#ff8a8a;min-height:16px">${msg}</small><button class="btn" data-w="x" style="width:100%">Отойти</button>`;
+    d.querySelectorAll('[data-w]').forEach((b) => b.onclick = () => { const w = b.dataset.w; if (w === 'x') { d.style.display = 'none'; story.cut = null; setStage(st, ''); return; }
+      if (+w === c.n - 1) { d.style.display = 'none'; c.done = true; C3.defused++; c.led.material.color.setHex(0x20ff40); Sound.chime(); toast(`Заряд №${c.n} обезврежен (${C3.defused}/4)`); story.cut = null; setStage(st, ''); if (C3.defused >= 4) later(1.2, () => c3Finale()); }
+      else { c.wrong++; c.wires = c.wires.filter((x) => x !== +w); C3.timer = Math.max(5, C3.timer - 15); Sound.zap(0.9); flashScreen('#ff6020', 300); damagePlayer(14); render('Искры! Не тот провод: −15 секунд'); } }); };
+  render(); d.style.display = 'block';
+}
+/* ----- the finale on stage ----- */
+function c3Finale() {
+  if (story.stage === 'c3-final') return; story.stage = 'c3-final'; story.showAvatar = true; C3.brawl.forEach((b) => b.alive && b.dispose()); C3.brawl = [];
+  const left = C3.charges.filter((c) => !c.done), sym = C2.sym || 0, M = C3.mel;
+  const S = C3.stas = c3Npc('stas', 11, -27, -Math.PI / 2); S.pos.y = 1.2; player.pos.set(-4.5, 1.2, -24.6); player.yaw = Math.PI; avatar.pos.copy(player.pos); standAvatar(); M.pos.set(0, 1.2, -23.6); M.yaw = 0;
+  const L = [
+    ['', left.length ? `Время вышло. Заряды, которые не нашли: ${left.length}. Свет гаснет. Финальная песня.` : 'Последний провод перерезан. Свет гаснет. Финальная песня.', 'crowd'],
+    ['Мелоди', 'Подождите. Перед последней песней я должна сказать… всё.', 'melStage'],
+    ['Мелоди', 'Мой басист Марк сейчас в полиции. Он держал человека в клетке. Из-за меня. Из-за песни.', 'melStage'],
+    ['Мелоди', 'Но клетку купил не он. Клетку купил мой менеджер. Стас Громов. И сегодня он собирался взорвать эту сцену. Вместе со мной.', 'melStage'],
+    ['', 'На огромном экране за её спиной вспыхивает переписка Стаса. Зал замирает. Потом — гул.', 'crowd'],
+    ['Стас', 'Это ложь! Это подделка! Охрана!', 'stas'],
+  ];
+  if (left.length) L.push(['Стас', 'Ну что ж. Значит, громкий финал.', 'stas'], ['', 'Стас жмёт на пульт. Под сценой вспыхивает пламя.', 'stage'], ['Воскреситель', '…', 'gg'], ['', 'Воскреситель закрывает Мелоди собой. Огонь проходит сквозь него — и гаснет. Он встаёт. Невредимый.', 'stage']);
+  else L.push(['', 'Стас жмёт на пульт. Щёлк. Щёлк. Щёлк. Тишина.', 'stas'], ['Воскреситель', 'Ищете это? Четыре провода. Синий, жёлтый, красный и белый. Я перерезал их за вас.', 'gg']);
+  L.push(['Стас', 'Если она не моя звезда — то ничья!', 'stas'], ['', 'Стас выхватывает пистолет. Выстрел. Воскреситель делает шаг — и пуля входит ему в грудь.', 'stage'], ['Воскреситель', 'Не больно. Правда. Меня убивали и получше.', 'gg']);
+  let fire = false;
+  c3Talk(L, (t, dt) => {
+    c3Upd(t, dt); if (t > 16 && C3.ledMode !== 'msgs') { C3.ledMode = 'msgs'; ledDraw(0); }
+    if (left.length && !fire && t > 24) { fire = true; for (const c of left) { explode(new V3(c.x, 0.3, c.z), 0.5); } shake = 0.8; }
+    if (!C3.shot1 && t > 30) { C3.shot1 = true; Sound.shot('pistol', 1); flashScreen('#fff', 200); }
+  }, () => c3Fate(left.length));
+}
+function c3Fate(left) {
+  const d = c2Ui(); C3.shot = 'stas'; runCut([], c3Upd, 99999, () => {});
+  d.style.borderColor = '#ff2a2a';
+  d.innerHTML = '<small style="letter-spacing:.18em;color:#ff6a6a">СУДЬБА СТАСА ГРОМОВА</small><b style="display:block;margin:6px 0 8px">Стас без патронов. Он пятится к краю сцены. Что сделает воскреситель?</b><button class="btn" data-k="0" style="width:100%;margin:4px 0;text-align:left">🚔 Сдать полиции. Пусть ответит по закону.</button><button class="btn" data-k="1" style="width:100%;margin:4px 0;text-align:left">💀 Расплата. Забрать его душу.</button>';
+  d.style.display = 'block';
+  d.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { d.style.display = 'none'; Sound.click(900, 0.2); C3.fate = b.dataset.k === '1' ? 'soul' : 'law'; c3FateCut(left); });
+}
+function c3FateCut(left) {
+  const S = C3.stas, soul = C3.fate === 'soul', sym = C2.sym || 0; let pull = 0;
+  const L = soul ? [
+    ['Воскреситель', 'Ты продал её за два миллиона. Посмотрим, сколько стоит твоя душа.', 'gg'],
+    ['', 'Воскреситель поднимает руку. Из груди Стаса тянется бледный светящийся дым.', 'stas'],
+    ['Стас', 'Н-нет… что ты… что это… холодно… так холодно…', 'stas'],
+    ['', 'Свет уходит. Стас оседает на колени. Глаза открыты — но в них никого нет.', 'stas'],
+    ['Мелоди', 'Он… он жив?', 'melStage'],
+    ['Воскреситель', 'Тело — да. Остальное — моё. Это и есть расплата.', 'gg'],
+  ] : [
+    ['Воскреситель', 'Нет, Стас. Ты не заслужил ни смерти, ни меня. Ты заслужил протокол.', 'gg'],
+    ['', 'Двери зала распахиваются. Инспектор Лисова с полицейскими бегут к сцене.', 'crowd'],
+    ['Инспектор', 'Стас Громов, вы задержаны за покушение на убийство! На колени!', 'stas'],
+    ['Стас', 'Вы не понимаете! Это всё он! Он не человек! Пуля прошла насквозь!', 'stas'],
+    ['Инспектор', 'Да-да. Расскажете это в участке. Рядом с Вельским. Вам будет о чём поговорить.', 'stas'],
+  ];
+  L.push(
+    ['Мелоди', sym >= 2 ? 'И последнее. Песня «He’s so mysterious»… она о нём. О человеке в капюшоне. Теперь вы все знаете.' : 'И последнее. Спасибо человеку, который сегодня просто… пришёл. Даже если не говорит почему.', 'melStage'],
+    ['', C3.hype > 0.55 ? 'Зал взрывается аплодисментами. Кто-то скандирует: «БА-СИСТ! БА-СИСТ!»' : 'Зал аплодирует. Громко. Как и положено «Громкой ночи».', 'crowd'],
+  );
+  c3Talk(L, (t, dt) => { c3Upd(t, dt); if (soul && t > 4 && t < 14) { pull = 1; headPos(S, _a); for (let i = 0; i < 2; i++) spawnSprite(TEX.soft, _a.clone().add(new V3(rand(-0.2, 0.2), rand(-0.3, 0.2), rand(-0.2, 0.2))), { color: 0xc8f0ff, additive: true, size: rand(0.06, 0.16), grow: 0.6, life: 1.0, opacity: 0.8, vel: new V3(rand(-1, -3), rand(0.2, 0.8), rand(-0.3, 0.3)) }); } if (soul && t > 11 && S.pose !== 'sit') { S.pose = 'sit'; S.poseDur = Infinity; } }, () => c3Epilogue());
+}
+function c3Epilogue() {
+  C3.ledMode = 'logo'; c3Crowd(false); for (const k of ['drum', 'gtr']) if (C3[k]) { C3[k].dispose(); C3[k] = null; } if (C3.stas) { C3.stas.dispose(); C3.stas = null; }
+  player.pos.set(3.4, 0, 18); player.yaw = Math.PI; avatar.pos.copy(player.pos); standAvatar(); C3.mel.pos.set(2.2, 0, 17.4); C3.mel.yaw = Math.PI * 0.6;
+  const I = C3.insp = c3Npc('cop', 5.4, 19.6, -Math.PI / 2);
+  if (!C3.markCar) { const mk = C3.markCar = c3Npc('mark', -16.4, 26.6, Math.PI / 2); seatNpc(mk, -16.4, 26.6, Math.PI / 2); mk.pos.y = 0.3; if (mk.bass) mk.bass.visible = false; }
+  Music.stop(); Music.start('tender');
+  c3Talk([
+    ['', 'Три часа ночи. Улица перед клубом мигает синим и красным.', 'street'],
+    ['Инспектор', 'Опять вы. Второй раз за ночь. Я начинаю думать, что вы приносите неприятности.', 'gg'],
+    ['Воскреситель', 'Я прихожу туда, где они уже есть. Это разные вещи, инспектор.', 'gg'],
+    ['Инспектор', C3.fate === 'soul' ? 'Громов не говорит. Смотрит в одну точку. Врачи разводят руками. Вы ничего не хотите мне сказать?' : 'Громов поёт, как соловей. Валит всё на пиротехника, пиротехник — на него. Красота.', 'gg'],
+    ['Воскреситель', C3.fate === 'soul' ? 'Хочу. Чашку чая. Без сахара.' : 'Когда соловьи поют дуэтом, протокол пишется сам.', 'gg'],
+    ['', 'В полицейской машине Марк поднимает голову. На экране у входа крутят запись: Мелоди на сцене, «я должна сказать всё».', 'police'],
+    ['Марк', '…Она сказала. Всё сказала. Только не про меня.', 'police'],
+    ['Мелоди', 'Ты опять исчезнешь, да?', 'mel'],
+    ['Воскреситель', (C2.sym || 0) >= 2 ? 'Исчезну. Но ты пой. Я буду слушать. Иногда.' : 'Я всегда исчезаю. Это моя работа.', 'gg'],
+    ['Мелоди', (C2.sym || 0) >= 2 ? '…Тогда я буду петь громче.' : 'Тогда… спасибо. За всё.', 'mel'],
+    ['', 'Воскреситель уходит в туман между фонарями. Его тень на мокром асфальте длиннее, чем должна быть.', 'street'],
+    ['Воскреситель', 'Расплата закончена. Почти.', 'gg'],
+  ], (t, dt) => { c3Upd(t, dt); }, () => { showCard('ГЛАВА 2 · ЛОКАЦИЯ 2 ПРОЙДЕНА', 'Продолжение следует…', 6000); runCut([[0.1, () => subOff()]], c3Upd, 6.5, () => { C3.done = true; c2Finish(); }); });
+}
+/* ----- per-frame ----- */
+function updC3(dt, tick) {
+  c3Amb(dt); if (state === 'play' && !player.dead && player.hp < 100) player.hp = Math.min(100, player.hp + 6 * dt);
+  const st = story.stage; c3Sync([C3.tech, ...(C3.staff || []), C3.mel, ...C3.crowd, ...C3.fans, C3.g1, C3.g2, C3.dockG, C3.drum, C3.gtr], dt);
+  if (st === 'c3-out') {
+    const T = C3.tech; if (T && (!T.path || !T.path.length)) { T.idle = (T.idle || 0) + dt; if (T.idle > 3) { T.idle = 0; T.path = C3.techPts.map((p) => p.slice()); } else if (Math.random() < dt * 0.3) spawnSprite(TEX.smoke, headPos(T, _a).add(new V3(0.1, 0.05, 0.2)), { color: 0xcccccc, size: 0.1, grow: 1.4, life: 1.2, opacity: 0.4, vel: new V3(0, 0.3, 0) }); }
+    for (const g of [C3.g1, C3.g2]) if (g) c3Face(g, player.pos.x, player.pos.z);
+    const dg = Math.min(...[C3.g1, C3.g2].filter(Boolean).map((g) => Math.hypot(player.pos.x - g.pos.x, player.pos.z - g.pos.z)));
+    if (dg < 5) C3.sus = Math.min(100, C3.sus + dt * 30); else C3.sus = Math.max(0, C3.sus - dt * 8);
+    if (C3.sus >= 100) { C3.sus = 0; c2Say('Проход только по билетам! Назад, за ограждение!', 'Охранник'); player.pos.set(0, 0, 27); player.vel.set(0, 0, 0); shake = 0.3; Sound.thud(0.5); }
+    if (tick) { const tg = !C3.hood ? [18.5, 18.6] : !C3.badge && C3.tech ? [C3.tech.pos.x, C3.tech.pos.z] : [16.4, 14.6]; targetArrow(_b.set(tg[0], 0, tg[1])); $('sObj').textContent = `Проберитесь внутрь через служебный вход · худи: ${C3.hood ? '✔' : 'в фургоне'} · пропуск: ${C3.badge ? '✔' : 'у техника (подкрадитесь сзади)'} · подозрение: ${Math.round(C3.sus)}%`; }
+  } else if (st === 'c3-back') {
+    if (tick) { const tg = !C3.phone ? [-17.6, -12.9] : C3.mel ? [C3.mel.pos.x, C3.mel.pos.z] : null; targetArrow(tg ? _b.set(tg[0], 0, tg[1]) : null); $('sObj').textContent = !C3.phone ? 'Найдите кабинет Стаса (запад) и разблокируйте его телефон' : 'Найдите Мелоди в гримёрке (запад, в глубине)'; }
+  } else if (st === 'c3-pyro') {
+    C3.timer -= dt; c3BrawlUpd(dt);
+    if (C3.wave === 0 && C3.timer < 175) { C3.wave = 1; c3Brawlers(3); } else if (C3.wave === 1 && C3.timer < 95) { C3.wave = 2; c3Brawlers(2); }
+    const left = C3.charges.filter((c) => !c.done); let nd = 99; for (const c of left) nd = Math.min(nd, Math.hypot(player.pos.x - c.x, player.pos.z - c.z));
+    C3.beepT -= dt; if (left.length && C3.beepT <= 0) { C3.beepT = clamp(nd / 7, 0.12, 1.6); Sound.click(nd < 3 ? 2400 : 1800, nd < 3 ? 0.25 : 0.14); for (const c of left) c.led.visible = !c.led.visible; }
+    if (C3.timer <= 0) { C3.timer = 0; c3Finale(); return; }
+    if (tick) { targetArrow(null); const m = Math.floor(C3.timer / 60), s = Math.floor(C3.timer % 60); $('sObj').textContent = `⏱ ${m}:${String(s).padStart(2, '0')} до финала · заряды: ${C3.defused}/4 · тестер: ${nd < 99 ? '~' + Math.round(nd) + ' м' : '—'} · схема: ${C3.schem ? '✔' : 'склад пиро (запад)'}`; }
+  }
+}
+/* ===================== chapter 2 · location 1: new pieces =====================
+   A playable prologue on the concert night, a blackout with flashlights and a fuse-box puzzle, and a heart-to-heart with Melodie. */
+const FLASH_PTS = [[18, 1.2], [18, -6], [13, -6], [12.3, -16.4], [12.3, -18.6], [12.0, -23.6]];
+function c2Flash() {
+  storyMap('club'); story.gg = avatar; story.showAvatar = false; story.gun = true; C2.fi = 0;
+  player.pos.set(17.6, 0, 9); player.yaw = 0; player.pitch = 0; selectWeapon(WEAPONS.findIndex((w) => w.id === 'fists')); W.switchT = 0;
+  C3.mel = c3Npc('melodie', 0, -23.6, 0); C3.mel.pos.y = 1.2; c3Band(); c3Crowd(true); C3.ledMode = 'show'; C2.flT = 1; C2.lyr = 0;
+  fadeIn(); showCard('ГЛАВА 2 · ПРОЛОГ', 'Ночь концерта. Сутки назад', 3600); Music.stop();
+  setStage('c2-flash', ''); banner('Сутки назад', 'клуб «Громкая ночь»');
+}
+const FLASH_LYR = ['Громкая ночь… громче, чем страх…', 'Он такой загадочный, он — как дым…', 'Я пою о тени в чужих глазах…'];
+function c2FlashUpd(dt, tick) {
+  c3Amb(dt); c3Sync([C3.mel, C3.drum, C3.gtr, ...C3.crowd], dt);
+  C2.flT -= dt; if (C2.flT <= 0) { C2.flT = 0.5; Sound.beat(0.12); if (Math.random() < 0.08) c2Say(FLASH_LYR[C2.lyr++ % FLASH_LYR.length], 'Мелоди (со сцены)'); }
+  const p = FLASH_PTS[Math.min(C2.fi, FLASH_PTS.length - 1)]; if (Math.hypot(player.pos.x - p[0], player.pos.z - p[1]) < 1.6 && C2.fi < FLASH_PTS.length - 1) C2.fi++;
+  if (tick) { targetArrow(_b.set(p[0], 0, p[1])); $('sObj').textContent = C2.fi < 3 ? 'Ночь концерта. Вы пришли послушать певицу, которая поёт о вас. Пройдите в зал' : 'Поднимитесь на сцену, за кулисы — посмотреть на неё поближе'; }
+  if (player.pos.y > 1.0 && player.pos.z < -22.4 && player.pos.x > 9) cutC2Hit();
+}
+function cutC2Hit() {
+  story.stage = 'c2-cut'; story.showAvatar = true; player.pos.set(11.8, 1.2, -24); player.yaw = Math.PI / 2; avatar.pos.copy(player.pos); standAvatar();
+  const M = c3Npc('mark', 13.4, -27.6, -Math.PI / 2); M.pos.y = 1.2; let swing = 0;
+  runCut([
+    [0.2, () => sub('', 'Отсюда она видна целиком: розовые волосы, бант, гитара. Она поёт — и смотрит в темноту зала. Как будто ищет кого-то.')],
+    [4.8, () => ggSay('«Он такой загадочный»… Смешно. Если бы она знала, кто стоит за кулисами.', 3.2)],
+    [8.8, () => { sub('', 'Сзади — шаги. Тяжёлые. Кто-то снимает с плеча бас-гитару.'); M.path = [[12.4, -24.6]]; M.pathSp = 1.4; }],
+    [12.4, () => { line('???', 'Это она поёт про тебя?..', 0.85, 1.0); }],
+    [14.6, () => { swing = 1; Sound.whoosh(); }],
+    [15.2, () => { Sound.thud(1.2); flashScreen('#fff', 120); shake = 1; fadeOut(); subOff(); }],
+    [16.6, () => sub('', 'Темнота.')],
+  ], (t, dt) => { c3Amb(dt); c3Sync([M, C3.mel, C3.drum, C3.gtr, ...C3.crowd], dt); if (M.bass) M.bass.rotation.x = swing ? Math.min(1.6, (t - 14.6) * 6) : 0; headPos(avatar, _c2a); if (t < 8.8) camSet(9.6, 2.0, -22.2, 0, 2.2, -23.6); else camSet(_c2a.x - 1.6, _c2a.y + 0.2, _c2a.z - 0.4, _c2a.x + 1, _c2a.y - 0.1, _c2a.z - 2); }, 19.2,
+  () => { c3Crowd(false); for (const k of ['drum', 'gtr', 'mel']) if (C3[k]) { C3[k].dispose(); C3[k] = null; } M.dispose(); c2Intro(); });
+}
+/* ----- the blackout and the fuse box ----- */
+function c2Blackout() {
+  if (mapId !== 'c2base' || C2.power === false || !story.stage.startsWith('c2') || story.stage === 'c2-boss' || story.stage === 'c2-end') return;
+  C2.power = false; c2Say('Свет тебе больше не понадобится, воскреситель!', 'Марк (громкая связь)'); Sound.zap(1); Sound.thud(0.6); shake = 0.3;
+  C2.lampK = lamps.map((l) => l.intensity); lamps.forEach((l) => (l.intensity = 0.8)); C2.hemi0 = hemi.intensity; hemi.intensity = 0.05; MAPS.c2base.hemi = 0.05; MAPS.c2base.lamp[1] = 0.8;
+  const sp = C2.fl = new THREE.SpotLight(0xfff2d8, 60, 16, 0.42, 0.55, 1.4), tg = C2.flT2 = new THREE.Object3D(); sp.target = tg; addMesh(sp); addMesh(tg);
+  C2.cones = []; for (const g of story.guards || []) if (g.alive) { const c = new THREE.Mesh(new THREE.ConeGeometry(0.9, 5, 14, 1, true), new THREE.MeshBasicMaterial({ color: 0xfff0c0, transparent: true, opacity: 0.09, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); c.rotation.x = -Math.PI / 2; c.position.set(0, 1.5, 2.6); g.root.add(c); C2.cones.push(c); }
+  toast('Блэкаут! Фонарик включён · роуди видят только в луче своих фонарей');
+}
+function c2PowerOn() {
+  C2.power = true; if (C2.lampK) lamps.forEach((l, i) => (l.intensity = C2.lampK[i])); hemi.intensity = C2.hemi0 || 0.32; MAPS.c2base.hemi = C2.hemi0 || 0.32; MAPS.c2base.lamp[1] = 22;
+  if (C2.fl) { C2.fl.parent && C2.fl.parent.remove(C2.fl); C2.flT2.parent && C2.flT2.parent.remove(C2.flT2); C2.fl = null; } for (const c of C2.cones || []) c.parent && c.parent.remove(c); C2.cones = [];
+  Sound.chime(); toast('Питание восстановлено · замок студии работает');
+}
+function c2Fuse() {
+  const st = story.stage; story.stage = 'c2-cut'; const d = c2Ui(); runCut([], () => camSet(4.4, 1.5, 21.0, 2.7, 1.4, 21.0), 99999, () => {});
+  let s = [1, 1, 1, 1, 1]; const flip = (i) => { for (const k of [i - 1, i, i + 1]) if (k >= 0 && k < 5) s[k] ^= 1; }; for (const i of [1, 3, 4]) flip(i);
+  const render = () => { d.innerHTML = '<small style="letter-spacing:.18em;color:#ffd060">ЩИТОК · 5 АВТОМАТОВ</small><small style="display:block;margin:4px 0;color:#bbb">Каждый рычаг переключает себя и соседей. Зажгите все лампы.</small><div style="display:flex;gap:8px;justify-content:center;margin:8px 0">' + s.map((v, i) => `<button class="btn" data-i="${i}" style="width:54px;height:84px;font-size:24px;${v ? 'background:#3a8a3a;border-color:#8aff8a' : ''}">${v ? '●' : '○'}<small>${i + 1}</small></button>`).join('') + '</div><button class="btn" data-x="1" style="width:100%">Отойти</button>';
+    d.querySelectorAll('[data-i]').forEach((b) => b.onclick = () => { flip(+b.dataset.i); Sound.click(600, 0.3); if (s.every((v) => v)) { d.style.display = 'none'; story.cut = null; setStage(st, ''); c2PowerOn(); return; } render(); });
+    d.querySelector('[data-x]').onclick = () => { d.style.display = 'none'; story.cut = null; setStage(st, ''); }; };
+  render(); d.style.display = 'block';
+}
+/* ----- a heart-to-heart with Melodie (in person or by phone) ----- */
+const C2_CHAT = [
+  { m: 'Можно спросить? Почему ты всё-таки пришёл за мной?', p: 'Алло?.. Марк?.. Нет… Это ты?! Как ты взял его телефон?', a: [['Потому что мог.', 0, 'Ха… Честно хотя бы.'], ['Потому что ты не заслужила клетку.', 1, '…Спасибо. Мне такого никто не говорил.'], ['Ты мне нужна для кода.', -1, 'Ну конечно. Как я могла подумать иначе.']] },
+  { m: 'Я пою про тебя каждую ночь. Ты знал?', a: [['Теперь знаю.', 1, 'И… что ты об этом думаешь?'], ['Пой про кого-нибудь живого.', -1, 'Живые меня в клетки сажают.'], ['(Промолчать)', 0, '…Ладно. Молчание — тоже ответ.']] },
+  { m: 'После концерта… ты исчезнешь, да?', a: [['Я всегда исчезаю.', 0, 'Тогда хотя бы попрощайся. В этот раз.'], ['Посмотрим, как ты споёшь.', 1, 'Тогда я спою так, что ты останешься.'], ['Да. И не ищи меня.', -1, '…Хорошо. Не буду.']] },
+];
+function c2Chat(phone) {
+  C2.talked = true; C2.sym = 0; const st = story.stage; story.stage = 'c2-cut'; const mel = C2.mel;
+  const cam = () => { if (phone || !mel || !mel.parts) camSet(7.0, 1.7, -6.4, HX, 1.5, -6); else { headPos(mel, _c2b); camSet(_c2b.x + 0.7, _c2b.y + 0.1, _c2b.z - 0.9, _c2b.x, _c2b.y, _c2b.z); } };
+  const step = (i) => {
+    if (i >= C2_CHAT.length) { runCut([[0.2, () => melSay(C2.sym >= 2 ? 'Знаешь… на сцене я, наверное, скажу больше, чем собиралась.' : C2.sym <= -1 ? 'Ладно. Делай что хочешь. Как всегда.' : 'Ладно. Увидимся на концерте. Наверное.')]], cam, 4.6, () => { setStage(st, ''); toast(`Симпатия Мелоди: ${C2.sym >= 2 ? '♥♥' : C2.sym >= 1 ? '♥' : C2.sym <= -1 ? '💔' : '—'}`); }); return; }
+    const Q = C2_CHAT[i], d = c2Ui(); runCut([[0.1, () => melSay(phone && Q.p ? Q.p + ' ' + Q.m : Q.m)]], cam, 99999, () => {});
+    d.style.borderColor = '#ff5ab4'; d.innerHTML = `<small style="letter-spacing:.18em;color:#ff9ad8">${phone ? 'ТЕЛЕФОН · МЕЛОДИ' : 'РАЗГОВОР С МЕЛОДИ'} · ${i + 1}/3</small><b style="display:block;margin:6px 0 8px">${Q.m}</b>` + Q.a.map((a, k) => `<button class="btn" data-k="${k}" style="width:100%;margin:4px 0;text-align:left">${a[0]}</button>`).join('');
+    d.style.display = 'block';
+    d.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { const A = Q.a[+b.dataset.k]; d.style.display = 'none'; Sound.click(900, 0.2); C2.sym += A[1]; try { speechSynthesis.cancel(); } catch (e) {} runCut([[0.2, () => { if (!A[0].startsWith('(')) ggSay(A[0], 2.2); }], [2.8, () => melSay(A[2])]], cam, 6.2, () => step(i + 1)); });
+  };
+  step(0);
+}
+/* ----- glue: location 1 → location 2, the final screen ----- */
+function c2L1Rows() {
+  const g = story.guards || [], kills = g.filter((x) => !x.alive).length, sec = Math.round((performance.now() - C2.t0) / 1000);
+  const melTxt = C2.revived ? 'убита Марком — воскрешена' : C2.freed ? 'спасена из кладовой' : 'привела полицию';
+  return [['Подвал · время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Ярость Марка', Math.min(10, C2.rage) + ' / 10'], ['Мелоди', melTxt], ['Улики', (C2.ev ? C2.ev.size : 0) + ' / 9'], ['Доверие инспектора', Math.max(0, C2.trust) + ' / 3'], ['Роуди повержено', kills + ' / ' + g.length]];
+}
+function c3Begin() { C3.l1rows = c2L1Rows(); fadeOut(); subOff(); later(1.4, () => { c3Start(); }); }
+function c3FinishScreen() {
+  const sec = Math.round((performance.now() - (C3.t0 || performance.now())) / 1000), sym = C2.sym || 0;
+  const rows = [...(C3.l1rows || []), ['Клуб · время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Хайп на сцене', Math.round(C3.hype * 100) + '%'], ['Заряды обезврежены', C3.defused + ' / 4'], ['Стас Громов', C3.fate === 'soul' ? 'без души' : 'арестован'], ['Симпатия Мелоди', sym >= 2 ? '♥♥' : sym >= 1 ? '♥' : sym <= -1 ? '💔' : '—'], ['Смертей', '0 — воскреситель не умирает']];
+  addUn('c2a'); addUn('c2b'); if (C3.fate === 'soul') addUn('c2soul'); saveCp(null); fadeIn(); $('cut').hidden = true; $('cut').classList.remove('on', 'ghost'); $('credits').hidden = true; storyReset(); mode = 'story'; lastCh = 2; Music.stop();
+  document.body.classList.remove('playing'); state = 'over';
+  document.querySelector('#over .eyebrow').textContent = 'Глава 2 · Расплата'; $('overTitle').textContent = C3.fate === 'soul' ? 'Расплата свершилась' : 'Громкая ночь закончилась';
+  $('overStats').innerHTML = rows.map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join(''); $('againBtn').innerHTML = 'Ещё раз<small>Глава 2 сначала</small>';
+  $('over').hidden = false; $('hud').hidden = true; $('touch').hidden = true;
+}
 function c2Finish() {
+  if (C3.done) return c3FinishScreen();
   const kills = story.guards.filter((g) => !g.alive).length, sec = Math.round((performance.now() - C2.t0) / 1000);
   const melTxt = C2.revived ? 'убита Марком — воскрешена' : C2.freed ? 'спасена из кладовой' : 'привела полицию';
   const rows = [['Время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Ярость Марка', Math.min(10, C2.rage) + ' / 10'], ['Мелоди', melTxt], ['Роуди повержено', kills + ' / ' + story.guards.length], ['Улики', (C2.ev ? C2.ev.size : 0) + ' / 9'], ['Доверие инспектора', Math.max(0, C2.trust) + ' / 3'], ['Блеф менталиста', C2.bluffs + ' раз'], ['Смертей', '0 — воскреситель не умирает']];
@@ -8925,14 +9443,15 @@ const MARK_TAUNT = ['Я слышу, как ты крадёшься, воскре
 function updC2(dt, tick) {
   c2Amb(dt); if (state === 'play' && !player.dead && player.hp < 100) player.hp = Math.min(100, player.hp + 6 * dt);
   if (C2.floodK > 0 && C2.floodK < 1 && C2.spray > 0) C2.floodK = Math.min(1, C2.floodK + dt * 0.12); else if (C2.pipe && C2.floodK === 0) C2.floodK = 0.02;
-  const st = story.stage; if (st === 'c2-cut' || st === 'c2-end') return;
+  const st = story.stage; if (st === 'c2-flash') { c2FlashUpd(dt, tick); return; } if (st === 'c2-cut' || st === 'c2-end') return;
+  if (C2.fl) { C2.fl.position.copy(eye.position); eye.getWorldDirection(_c2a); C2.flT2.position.copy(eye.position).addScaledVector(_c2a, 6); }
   const mel = C2.mel;
   if (C2.melAlly && mel && mel.alive && state === 'play') { const d = Math.hypot(player.pos.x - mel.pos.x, player.pos.z - mel.pos.z); if (d > 2.4) { walkNpc(mel, player.pos.x, player.pos.z, d > 6 ? 4.2 : 2.8, dt); pushOutAABBs(mel.pos, 0.3, 0); } else mel.speed = 0; mel.root.position.copy(mel.pos); mel.root.rotation.y = mel.yaw; }
   if (C2.melState === 'dead') { const dead = (story.guards || []).filter((g) => !g.alive && !g.soul); for (const g of dead) { g.soul = true; if (C2.souls >= 3) continue; C2.souls++; const from = g.pos.clone(); from.y = 1; for (let i = 0; i < 14; i++) later(i * 0.05, () => { const k = i / 14; spawnSprite(TEX.soft, _a.copy(from).lerp(eye.position, k), { color: 0x9af0ff, additive: true, size: 0.18, grow: 0.2, life: 0.5, opacity: 0.9 }); }); Sound.chime(); toast(`Душа поглощена: ${C2.souls}/3`); } }
   if (st === 'c2-boss') { updC2Boss(dt); if (tick) { targetArrow(null); $('sObj').textContent = 'Победите Марка · уворачивайтесь от его «соло»'; } return; }
   if (st === 'c2-base' || st === 'c2-exit') {
     if (story.noise) { story.noise = 0; alertGuards('Шум! Роуди Марка вас услышали'); }
-    if (tick && !story.alarm) for (const g of story.guards) if (g.alive && g.calm) { const dx = player.pos.x - g.pos.x, dz = player.pos.z - g.pos.z, d = Math.hypot(dx, dz) || 1, fw = (Math.sin(g.yaw) * dx + Math.cos(g.yaw) * dz) / d; if (d < 2.0 || (d < 9 && fw > 0.35 && losFrom(headPos(g, _cfH), eye.position))) { alertGuards('Роуди заметили вас!'); break; } }
+    if (tick && !story.alarm) for (const g of story.guards) if (g.alive && g.calm) { const dx = player.pos.x - g.pos.x, dz = player.pos.z - g.pos.z, d = Math.hypot(dx, dz) || 1, fw = (Math.sin(g.yaw) * dx + Math.cos(g.yaw) * dz) / d; const dark = C2.power === false; if (d < (dark ? 1.4 : 2.0) || (d < (dark ? 7 : 9) && fw > (dark ? 0.8 : 0.35) && losFrom(headPos(g, _cfH), eye.position))) { alertGuards(dark ? 'Луч фонаря упал на вас!' : 'Роуди заметили вас!'); break; } }
     C2.tauntT -= dt; if (C2.tauntT <= 0 && state === 'play') { C2.tauntT = rand(28, 42); c2Say(pick(MARK_TAUNT), 'Марк (громкая связь)'); Sound.zap(0.15); }
   }
   if (!tick) return;
@@ -8944,17 +9463,19 @@ function updC2(dt, tick) {
     if (melTask && (C2.melState === 'tied' || C2.souls >= 3)) tgt = C2.melState === 'tied' ? [-1.4, 19.6] : [C2.corpsePos.x, C2.corpsePos.z];
     else if (!C2.safe) tgt = C2.knowLock || C2.melAlly ? C2_SAFE : C2_SDOOR; else tgt = C2_SDOOR;
     const clues = `подсказки: ${C2.shrine ? '14' : '?'} · ${C2.cal ? '07' : '?'}`;
-    obj = (melTask ? melTask + ' · ' : '') + (!C2.safe ? (C2.knowLock || C2.melAlly ? `Откройте сейф Марка в кабинете (${C2.melAlly ? 'код 1407' : clues})` : 'Найдите выход из подвала (север)') : 'Ключ у вас! Откройте студию (север)') + ` · роуди: ${alive} · улики: ${C2.ev ? C2.ev.size : 0}/9` + (story.alarm ? ' · ТРЕВОГА' : '');
+    if (C2.power === false) { tgt = [3.4, 21.0]; }
+    obj = (C2.power === false ? 'БЛЭКАУТ! Почините щиток в комнате охраны (юг) · ' : '') + (melTask ? melTask + ' · ' : '') + (!C2.safe ? (C2.knowLock || C2.melAlly ? `Откройте сейф Марка в кабинете (${C2.melAlly ? 'код 1407' : clues})` : 'Найдите выход из подвала (север)') : 'Ключ у вас! Откройте студию (север)') + ` · роуди: ${alive} · улики: ${C2.ev ? C2.ev.size : 0}/9` + (story.alarm ? ' · ТРЕВОГА' : '');
   }
   targetArrow(tgt ? _b.set(tgt[0], 0, tgt[1]) : null); $('sObj').textContent = obj;
 }
 function startCh2(cp) {
   Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'story'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true;
   story.on = true; story.asGG = true; story.ch = 2; lastCh = 2; vmSkinGG(true); W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0;
-  Object.assign(C2, { rage: 0, open: false, pipe: false, pipeN: 0, lockN: 0, floodK: 0, spray: 0, shrine: false, cal: false, diary: false, safe: false, knowLock: false, volt: false, mel: null, melState: 'none', melAlly: false, souls: 0, corpse: null, corpsePos: null, boss: false, revived: false, freed: false, ev: new Set(), hyp: null, insp: null, cops: null, trust: 3, bluffs: 0, wrong: 0, t0: performance.now() });
+  Object.assign(C2, { rage: 0, open: false, pipe: false, pipeN: 0, lockN: 0, floodK: 0, spray: 0, shrine: false, cal: false, diary: false, safe: false, knowLock: false, volt: false, mel: null, melState: 'none', melAlly: false, souls: 0, corpse: null, corpsePos: null, boss: false, revived: false, freed: false, ev: new Set(), hyp: null, insp: null, cops: null, trust: 3, bluffs: 0, wrong: 0, power: true, fl: null, cones: [], talked: false, sym: 0, t0: performance.now() });
   $('resumeBtn').hidden = true; startGame.fromWaves = true;
   if (cp === 'c2b') { storyMap('c2base'); story.gg = avatar; C2.rage = 3; c2Gameplay(true); return; }
-  saveCp(null); c2Intro();
+  if (cp && cp.startsWith('c3')) { C2.rage = 3; c3Start(cp); return; }
+  saveCp(null); c2Flash();
 }
 function modsUi() {
   const M = getMods(), on = !!M.huggy, c = document.getElementById('chipFactory'), b = document.getElementById('spHuggy'); if (c) c.style.display = on ? '' : 'none'; if (b) b.style.display = on ? '' : 'none';
@@ -9520,7 +10041,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
