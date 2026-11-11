@@ -554,6 +554,7 @@ import * as CANNON from 'cannon-es';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
 
 /* ===================== utils ===================== */
 const $ = (id) => document.getElementById(id);
@@ -9681,7 +9682,7 @@ function flMats() {
 function buildFluidLab() {
   const H = WALL_H, wall = std({ map: texRep(TEX.wall, 6, 2), color: 0xd8dce0, roughness: 0.8 });
   addRoom(std({ map: texRep(TEX.tiles, 14, 14), roughness: 0.25, envMapIntensity: 0.6 }), std({ color: 0x9aa0a6, roughness: 1 }), [wall, wall]);
-  const BB = batcher(), C = (c, r = 0.7) => std({ color: c, roughness: r }), steel = std({ color: 0x8a9098, roughness: 0.3, metalness: 0.8 }), glass = std({ color: 0xc8e8ff, roughness: 0.02, metalness: 0.1, transparent: true, opacity: 0.18 }), conc = C(0x8a8e92, 0.9);
+  const BB = batcher(), C = (c, r = 0.7) => std({ color: c, roughness: r }), steel = std({ color: 0x8a9098, roughness: 0.3, metalness: 0.8 }), glass = std({ color: 0xc8e8ff, roughness: 0.02, metalness: 0.1, transparent: true, opacity: 0.18, depthWrite: false }), conc = C(0x8a8e92, 0.9);
   flInit(900); LQ.bx = [-HX, HX]; LQ.bz = [-HZ, HZ];
   const box = (m, x0, x1, y0, y1, z0, z1, player = true, vis = true) => { if (vis) BB.box(m, (x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2, x1 - x0, y1 - y0, z1 - z0); LQ.boxes.push({ x0, x1, y0, y1, z0, z1 }); if (player) solid((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2, x1 - x0, y1 - y0, z1 - z0); };
   // the platform with six taps, and a ramp down to the floor
@@ -9705,11 +9706,67 @@ function buildFluidLab() {
   addSign([{ t: 'КРАНЫ', s: 140 }], 2, 0.5, 0, 2.0, -3.4, Math.PI, 'rgba(40,40,40,0.9)');
   BB.flush();
   // rendering: one instanced mesh per liquid
-  const geo = new THREE.IcosahedronGeometry(1, 1), mats = flMats(); FLU.meshes = LQT.map((t, i) => { const m = new THREE.InstancedMesh(geo, mats[i], LQ.max); m.count = 0; m.frustumCulled = false; m.castShadow = false; m.receiveShadow = true; addMesh(m); return m; });
+  LQV.vols = []; const geo = new THREE.IcosahedronGeometry(1, 2), mats = flMats(); FLU.meshes = LQT.map((t, i) => { const m = new THREE.InstancedMesh(geo, mats[i], LQ.max); m.count = 0; m.frustumCulled = false; m.castShadow = false; m.receiveShadow = true; addMesh(m); return m; });
   // pre-fill: water in the tank, acid and lava in their basins
   const fill = (t, x0, x1, z0, z1, n, sp = 0.17) => { let c = 0; for (let y = 0.15; c < n; y += sp) for (let x = x0; x < x1 && c < n; x += sp) for (let z = z0; z < z1 && c < n; z += sp, c++) flAdd(x + rand(-0.02, 0.02), y, z + rand(-0.02, 0.02), 0, 0, 0, t); };
   fill(0, -1.25, 1.25, 1.15, 3.65, 300, 0.18); fill(3, -12.25, -9.75, 5.15, 8.05, 180, 0.18); fill(2, 9.75, 12.25, 5.15, 8.05, 160, 0.18);
   FLU.on = true; FLU.cur = 0;
+}
+/* ===== realistic liquid surfaces: marching-cubes isosurfaces over the particles, tiled to fit each puddle; splashes as droplets ===== */
+const LQV = { vols: [], mats: null, lavaCols: null, res: 28 };
+function lqMats() {
+  if (LQV.mats) return LQV.mats;
+  const P = (o) => new THREE.MeshPhysicalMaterial(o);
+  LQV.mats = [
+    P({ color: 0x1f6aa8, roughness: 0.04, metalness: 0.05, transparent: true, opacity: 0.78, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 0.7, ior: 1.33, specularIntensity: 0.8, emissive: 0x052040, emissiveIntensity: 0.4 }),
+    P({ color: 0xeeebe2, roughness: 0.3, metalness: 0, clearcoat: 0.5, clearcoatRoughness: 0.25, sheen: 0.4, sheenColor: new THREE.Color(0xffffff), envMapIntensity: 0.5 }),
+    P({ vertexColors: true, roughness: 0.8, metalness: 0, emissive: 0xff2a00, emissiveIntensity: 0.3, envMapIntensity: 0.15 }),
+    P({ color: 0x4ad018, roughness: 0.05, metalness: 0, transparent: true, opacity: 0.84, clearcoat: 1, clearcoatRoughness: 0.04, emissive: 0x1a6a08, emissiveIntensity: 0.6, envMapIntensity: 0.6 }),
+    P({ color: 0xc87a08, roughness: 0.05, metalness: 0, transparent: true, opacity: 0.9, clearcoat: 1, clearcoatRoughness: 0.03, emissive: 0x3a1a00, emissiveIntensity: 0.5, envMapIntensity: 0.7 }),
+    P({ color: 0x0b0907, roughness: 0.05, metalness: 0.35, clearcoat: 1, clearcoatRoughness: 0.02, iridescence: 1, iridescenceIOR: 1.6, iridescenceThicknessRange: [180, 620], envMapIntensity: 1.6 }),
+  ];
+  LQV.lavaCols = []; for (let k = 0; k < 10; k++) { const t = k / 9; LQV.lavaCols.push(new THREE.Color().setRGB(lerp(1.0, 0.12, t), lerp(0.38, 0.03, t), lerp(0.03, 0.02, t))); }
+  return LQV.mats;
+}
+function lqVol(i, t) {
+  let v = LQV.vols[i];
+  if (!v || v.userData.t !== t) { if (v && v.parent) v.parent.remove(v); v = new MarchingCubes(LQV.res, lqMats()[t], false, t === 2, 16000); v.isolation = 80; v.userData.t = t; v.frustumCulled = false; v.castShadow = false; v.receiveShadow = true; v.renderOrder = t === 0 || t === 3 ? 2 : 1; addMesh(v); LQV.vols[i] = v; }
+  v.visible = true; return v;
+}
+const _lqIdx = [[], [], [], [], [], []];
+function lqRender() {
+  const N = LQ.N, px = LQ.px, py = LQ.py, pz = LQ.pz, ty = LQ.ty, rho = _rho.r, ms = FLU.meshes;
+  for (const a of _lqIdx) a.length = 0;
+  const cnt = new Array(LQT.length).fill(0);
+  // isolated flying drops and solid stone are instanced; everything else becomes surface
+  for (let i = 0; i < N; i++) {
+    const t = ty[i], solid = LQT[t].solid, v2 = LQ.vx[i] * LQ.vx[i] + LQ.vy[i] * LQ.vy[i] + LQ.vz[i] * LQ.vz[i], iso = !solid && rho && rho[i] < 0.9 && v2 > 0.5;
+    if (!solid && !iso) { _lqIdx[t].push(i); continue; }
+    const m = ms[t]; if (!m) continue; const a = m.instanceMatrix.array, o = cnt[t]++ * 16;
+    if (solid) { const s = 0.13 + ((i * 7919) % 13) * 0.006; a.set([s, 0, 0, 0, 0, s * 0.75, 0, 0, 0, 0, s * 1.1, 0, px[i], py[i], pz[i], 1], o); }
+    else { const sp = Math.sqrt(v2), s = 0.032, st = Math.min(3.5, 1 + sp * 0.25), nx = LQ.vx[i] / sp, ny = LQ.vy[i] / sp, nz = LQ.vz[i] / sp;
+      // a stretched droplet along its velocity: columns x, y(=velocity), z
+      let ux = 0, uy = 1, uz = 0; if (Math.abs(ny) > 0.9) { ux = 1; uy = 0; } let bx = uy * nz - uz * ny, by = uz * nx - ux * nz, bz = ux * ny - uy * nx; const bl = Math.hypot(bx, by, bz) || 1; bx /= bl; by /= bl; bz /= bl; const cx = ny * bz - nz * by, cy = nz * bx - nx * bz, cz = nx * by - ny * bx;
+      a.set([bx * s, by * s, bz * s, 0, nx * s * st, ny * s * st, nz * s * st, 0, cx * s, cy * s, cz * s, 0, px[i], py[i], pz[i], 1], o); }
+  }
+  ms.forEach((m, t) => { m.count = cnt[t]; m.instanceMatrix.needsUpdate = true; });
+  // surfaces: one or more cubes per liquid, fitted to its particles
+  LQV.f = (LQV.f || 0) + 1; if (LQV.f % 2) return; let vi = 0; const RI = 0.3, RV = 0.125, SUB = 80 * RV * RV / (RI * RI - RV * RV), MAXV = 10;
+  for (let t = 0; t < 6 && vi < MAXV; t++) {
+    const idx = _lqIdx[t]; if (idx.length < 2) continue;
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, z0 = 1e9, z1 = -1e9; for (const i of idx) { if (px[i] < x0) x0 = px[i]; if (px[i] > x1) x1 = px[i]; if (py[i] < y0) y0 = py[i]; if (py[i] > y1) y1 = py[i]; if (pz[i] < z0) z0 = pz[i]; if (pz[i] > z1) z1 = pz[i]; }
+    const tile = 3.0, nxT = Math.max(1, Math.ceil((x1 - x0) / tile)), nzT = Math.max(1, Math.ceil((z1 - z0) / tile)), tw = (x1 - x0) / nxT, td = (z1 - z0) / nzT;
+    for (let a = 0; a < nxT && vi < MAXV; a++) for (let b = 0; b < nzT && vi < MAXV; b++) {
+      const tx0 = x0 + a * tw, tz0 = z0 + b * td, M = RI + 0.15, cxm = tx0 + tw / 2, czm = tz0 + td / 2, S = Math.max(tw, td, y1 - y0) + 2 * M, ox = cxm - S / 2, oz = czm - S / 2, oy = Math.min(y0 - M, (y0 + y1) / 2 - S / 2);
+      let any = false; const v = lqVol(vi, t), st = SUB * (RI / S) * (RI / S);
+      v.reset(); v.position.set(ox + S / 2, oy + S / 2, oz + S / 2); v.scale.setScalar(S / 2);
+      for (const i of idx) { const x = px[i], z = pz[i]; if (x < tx0 - M || x > tx0 + tw + M || z < tz0 - M || z > tz0 + td + M) continue; any = true;
+        if (t === 2) v.addBall((x - ox) / S, (py[i] - oy) / S, (z - oz) / S, st, SUB, LQV.lavaCols[Math.max(0, Math.min(9, ((LQ.age[i] / 2.5) | 0) - (Math.abs(LQ.vx[i]) + Math.abs(LQ.vz[i]) > 0.3 ? 3 : 0)))]);
+        else v.addBall((x - ox) / S, (py[i] - oy) / S, (z - oz) / S, st, SUB); }
+      if (any) { v.update(); vi++; } else v.visible = false;
+    }
+  }
+  for (let k = vi; k < LQV.vols.length; k++) if (LQV.vols[k]) LQV.vols[k].visible = false;
 }
 function flAddR(x, y, z, vx, vy, vz, t) { if (LQ.N >= LQ.max) { let b = -1, ba = -1; for (let k = 0; k < 40; k++) { const i = (Math.random() * LQ.N) | 0; if (!LQT[LQ.ty[i]].solid && LQ.age[i] > ba) { ba = LQ.age[i]; b = i; } } if (b >= 0) flKill(b); } return flAdd(x, y, z, vx, vy, vz, t); }
 function flNear(i, R, fn) { const H = LQ.H, px = LQ.px, py = LQ.py, pz = LQ.pz, ix = Math.floor(px[i] / H), iy = Math.floor(py[i] / H), iz = Math.floor(pz[i] / H), R2 = R * R; for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (let c = -1; c <= 1; c++) { let j = LQ.head[flHash(ix + a, iy + b, iz + c)]; while (j !== -1) { if (j !== i) { const dx = px[j] - px[i], dy = py[j] - py[i], dz = pz[j] - pz[i]; if (dx * dx + dy * dy + dz * dz < R2) fn(j); } j = LQ.next[j]; } } }
@@ -9742,11 +9799,8 @@ function updFluid(dt) {
   for (let i = LQ.N - 1; i >= 0; i--) { const x = px[i], z = pz[i]; if (py[i] < 0.35) for (const D of LQ.drains) if (x > D.x0 && x < D.x1 && z > D.z0 && z < D.z1) { flKill(i); break; } }
   // reactions and effects, ten times a second
   FLU.tick -= dt; if (FLU.tick <= 0) { FLU.tick = 0.1; flReact(); flEffects(); }
-  // render
-  const cnt = new Array(LQT.length).fill(0), ms = FLU.meshes;
-  for (let i = 0; i < LQ.N; i++) { const t = LQ.ty[i], m = ms[t]; if (!m) continue; const T = LQT[t], v2 = LQ.vx[i] * LQ.vx[i] + LQ.vy[i] * LQ.vy[i] + LQ.vz[i] * LQ.vz[i], s = T.r * (1.55 + Math.min(0.35, v2 * 0.004)) * (LQ.burn[i] > 0 ? 0.8 : 1), a = m.instanceMatrix.array, o = cnt[t]++ * 16;
-    a[o] = s; a[o + 1] = 0; a[o + 2] = 0; a[o + 3] = 0; a[o + 4] = 0; a[o + 5] = s * (py[i] < 0.2 ? 0.7 : 1); a[o + 6] = 0; a[o + 7] = 0; a[o + 8] = 0; a[o + 9] = 0; a[o + 10] = s; a[o + 11] = 0; a[o + 12] = px[i]; a[o + 13] = py[i]; a[o + 14] = pz[i]; a[o + 15] = 1; }
-  ms.forEach((m, t) => { m.count = cnt[t]; m.instanceMatrix.needsUpdate = true; });
+  // render: surfaces + droplets
+  lqRender();
   // lava glows and smokes, burning oil flames
   if (Math.random() < dt * 6) for (let k = 0; k < 3; k++) { const i = (Math.random() * LQ.N) | 0; if (LQ.ty[i] === 2) spawnSprite(TEX.soft, _a.set(px[i], py[i] + 0.1, pz[i]), { color: pick([0xff7a20, 0xffa040]), additive: true, size: rand(0.15, 0.35), grow: 1, life: 0.6, opacity: 0.5, vel: new V3(0, 0.6, 0) }); }
   for (let i = 0; i < LQ.N; i++) if (LQ.burn[i] > 0) { LQ.burn[i] -= dt; if (Math.random() < 0.25) spawnSprite(TEX.soft, _a.set(px[i], py[i] + 0.15, pz[i]), { color: pick([0xff8a30, 0xffb040, 0xff5a20]), additive: true, size: rand(0.25, 0.5), grow: 1, life: 0.5, opacity: 0.8, vel: new V3(rand(-0.2, 0.2), 1.6, rand(-0.2, 0.2)) }); if (LQ.burn[i] <= 0) LQ.age[i] = 999; }
@@ -10506,7 +10560,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { scene, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
