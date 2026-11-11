@@ -1143,7 +1143,7 @@ const MAPS = {
   timecity: { name: 'Машина времени', desc: 'Небольшой город и машина времени рядом. Включите её и отправьтесь в 1941 год.', hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildTimeCity, npcs: { human: 8, zombie: 0, soldier: 0 }, props: [], pills: [] },
   factory: { name: 'Фабрика', desc: 'Игрушечная фабрика под солнцем: полосатая труба, ворота и дорога. Здесь бродит Хаги Ваги. Открывается модом.', hx: 26, hz: 30, h: 40, spawn: [0, 26, 0], fog: 0xbfe0f5, fogD: 0.006, bg: 0x9fd0f2, sun: 2.2, hemi: 1.3, lamp: [0xfff0d0, 40, 40], lamps: [[0, 6, -10], [-14, 6, 0], [14, 6, 0], [0, 6, 14]], red: [[0, 3, 0], 0xffffff, 0], build: buildFactory, npcs: { human: 4, zombie: 0, soldier: 0 }, huggy: 2, props: [], pills: [] },
   factoryIn: { name: 'Фабрика · внутри', desc: 'Холл, атриум со статуей Хаги Ваги, комната с поездом, коридор и цех.', hx: 14, hz: 36, h: 8, spawn: [0, 33, 0], fog: 0x0a0c10, fogD: 0.03, bg: 0x050608, sun: 0.25, hemi: 0.5, lamp: [0xe8f0ff, 30, 22], lamps: [[0, 7, 29], [0, 7.5, 13], [0, 6, -4], [0, 7, -28]], red: [[-6, 3.6, -19.3], 0xff4020, 1.5], build: buildFabIn, npcs: { human: 3, zombie: 0, soldier: 0 }, props: [], pills: [] },
-  c2base: { name: 'Подвал Марка', desc: '', story: true, hx: 9, hz: 22, h: 3.4, spawn: [-7.6, 11.8, -Math.PI / 2], fog: 0x0a0908, fogD: 0.045, bg: 0x050404, sun: 0.12, hemi: 0.32, lamp: [0xffd8a0, 22, 12], lamps: [[-7.4, 2.4, 11.8], [0, 3.0, 1], [2.2, 3.0, -9], [3, 3.0, -19]], red: [[2, 2.6, 19.5], 0xff2a20, 1.6], build: buildC2Base, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  c2base: { name: 'Подвал Марка', desc: '', story: true, hx: 9, hz: 22, h: 3.4, spawn: [-7.6, 11.8, -Math.PI / 2], fog: 0x0d0b0a, fogD: 0.03, bg: 0x050404, sun: 0.12, hemi: 0.5, lamp: [0xffd8a0, 28, 13], lamps: [[-7.4, 2.4, 11.8], [0, 3.0, 1], [2.2, 3.0, -9], [3, 3.0, -19]], red: [[2, 2.6, 19.5], 0xff2a20, 1.6], build: buildC2Base, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   club: { name: 'Клуб «Громкая ночь»', desc: '', story: true, hx: 22, hz: 34, h: 9, spawn: [0, 28, 0], fog: 0x0a0812, fogD: 0.018, bg: 0x07060c, sun: 0.25, hemi: 0.55, lamp: [0xffd0e8, 40, 26], lamps: [[0, 7, 24], [0, 8, -22], [-18, 6, -14], [18, 6, -8]], red: [[0, 6, 0], 0xff3aa0, 6], build: buildClub, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   ww2: { name: 'Поле боя 1941', desc: '', story: true, hx: 30, hz: 36, h: 30, spawn: [0, 32, 0], fog: 0x9a5c34, fogD: 0.018, bg: 0xb4683a, sun: 1.0, hemi: 0.9, lamp: [0xffb070, 34, 24], lamps: [[0, 2.8, -14], [-12, 3, 3], [14, 4, 10], [0, 5, 20]], red: [[0, 2.6, -12], 0xff7a30, 4], build: buildWW2, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   street: { name: 'Улица', desc: '', story: true, hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildStreet, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
@@ -8322,7 +8322,7 @@ function c2Removable(x, y, z, sx, sy, sz) { const ob = { min: new V3(x - sx / 2,
 function c2Remove(r) { if (!r) return; const i = obstacles.indexOf(r.ob); if (i >= 0) obstacles.splice(i, 1); if (r.bd) world.removeBody(r.bd); }
 function buildC2Base() {
   const H = WALL_H, wall = std({ map: texRep(TEX.wall, 5, 1), color: 0x8a847a, roughness: 0.95 });
-  addRoom(std({ map: texRep(TEX.wall, 6, 14), color: 0x5a5852, roughness: 0.9 }), std({ color: 0x141312, roughness: 1 }), [wall, wall]);
+  c2Shell(std({ map: texRep(TEX.wall, 6, 14), color: 0x5a5852, roughness: 0.55, envMapIntensity: 0.5 }), std({ color: 0x141312, roughness: 1 }), wall);
   const BB = batcher(), C = (c, r = 0.85) => std({ color: c, roughness: r }), steel = std({ color: 0x4a4c50, roughness: 0.45, metalness: 0.7 }), rust = std({ color: 0x6a3a22, roughness: 0.8, metalness: 0.4 }), wood = std({ map: TEX.wood, roughness: 0.8 }), dk = C(0x18181a), glass = std({ color: 0x9ab8c8, roughness: 0.05, metalness: 0.3, transparent: true, opacity: 0.22 });
   const blk = (m, x, y, z, sx, sy, sz, ry = 0) => { BB.box(m, x, y, z, sx, sy, sz, ry); solid(x, y, z, sx, sy, sz); };
   const part = (z, gx, gw) => { const a = -HX, b = gx - gw / 2, c = gx + gw / 2, d = HX; blk(wall, (a + b) / 2, H / 2, z, b - a, H, 0.3); blk(wall, (c + d) / 2, H / 2, z, d - c, H, 0.3); BB.box(wall, gx, (H + 2.3) / 2, z, gw, H - 2.3, 0.3); };
@@ -8381,13 +8381,14 @@ function buildC2Base() {
   addSign([{ t: 'MELODIE ♥', s: 220 }], 3, 0.7, 4.5, 2.7, -21.83, 0, 'rgba(255,90,200,0.95)');
   addSign([{ t: 'ВЫХОД', s: 220 }], 1.2, 0.36, 1, 2.55, -21.83, 0, 'rgba(30,200,80,0.95)');
   { const d = new THREE.Group(); d.position.set(0.4, 0, -21.92); const pl = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.25, 0.06), std({ color: 0x3a3a40, roughness: 0.5, metalness: 0.5 })); pl.position.set(0.6, 1.12, 0); d.add(pl); addMesh(d); C2.exitDoor = d; }
-  BB.flush();
+  BB.flush(); c2Deco();
 }
 /* ----- speaking, camera, ambience ----- */
 function markSay(t) { line('Марк', t, 0.85, 1.05); }
 function melSay(t) { line('Мелоди', t, 1.45, 1.05); }
 function c2Say(t, who = 'Воскреситель') { $('sSay').textContent = who + ': ' + t; speakAs(t, who === 'Воскреситель' ? 0.3 : who === 'Мелоди' ? 1.45 : 0.85, who === 'Воскреситель' ? 0.75 : 1.05); clearTimeout(story.sayTimer); story.sayTimer = setTimeout(() => { $('sSay').textContent = ''; }, 4200); }
 function c2Amb(dt) {
+  c2DecoAmb(dt);
   if (C2.bulb) C2.bulb.rotation.z = Math.sin(performance.now() / 900) * 0.18;
   if (C2.spray > 0) { C2.spray -= dt; if (Math.random() < 0.7) spawnSprite(TEX.soft, _a.set(-HX + 0.2, 0.9, 12.8), { color: 0x9ab8d0, size: rand(0.04, 0.09), grow: 0.5, life: 0.6, opacity: 0.7, vel: new V3(rand(0.4, 1.4), rand(0.2, 1.4), rand(-0.5, 0.5)) }); }
   if (C2.flood && C2.floodK > 0) { const k = C2.floodK; C2.flood.scale.set(Math.max(0.01, k * 9), 1, Math.max(0.01, k * 7)); C2.flood.position.set(-9 + k * 4.5, 0.02, 12); }
@@ -8543,6 +8544,7 @@ function c2Act(info) {
     if (C2.melState === 'tied' && c2MelNear()) return info ? 'Развязать Мелоди' : cutC2Free();
     if (C2.melState === 'dead' && c2MelNear()) return info ? (C2.souls >= 3 ? 'Воскресить Мелоди' : `Нужно 3 души (${C2.souls}/3)`) : C2.souls >= 3 ? cutC2Revive() : c2Say('Мне нужны души. Три. Роуди Марка вполне сойдут.');
     if (C2.power === false && c2Near([3.4, 21.0], 1.4)) return info ? 'Щиток' : c2Fuse();
+    if (!C2.demo && c2Near([-15.2, 3.9], 1.4)) return info ? 'Демо-кассета Марка' : cutC2Tape2();
     if (!C2.talked && C2.melAlly && C2.mel && C2.mel.alive && c2Near([C2.mel.pos.x, C2.mel.pos.z], 1.8)) return info ? 'Поговорить с Мелоди' : c2Chat(false);
     if (!C2.talked && C2.melState === 'none' && c2Has('voice') && c2Near([HX - 1.1, -6], 1.3)) return info ? 'Перезвонить Мелоди' : c2Chat(true);
     if (!c2Has('pick') && c2Near([-4.4, 9.9], 1.3)) return info ? 'Взять медиатор' : c2Pick();
@@ -9018,7 +9020,7 @@ function buildClub() {
   blk(C(0x2a3a4a, 0.8), 20.8, 0.4, -22, 1.4, 0.8, 3.0); blk(wood, 16, 0.45, -26, 2.4, 0.9, 1.0); BB.box(new THREE.MeshBasicMaterial({ color: 0x3a6aff }), 21.85, 1.8, -22, 0.04, 0.9, 1.6);
   // the back corridor
   addSign([{ t: 'СЦЕНА →', s: 140 }], 2, 0.4, 16, 2.5, -33.84, 0, 'rgba(255,220,120,0.95)');
-  BB.flush();
+  BB.flush(); c3Deco();
 }
 /* ----- people of the club ----- */
 function stasSay(t) { line('Стас', t, 0.95, 1.05); }
@@ -9051,6 +9053,7 @@ function c3Cam(shot, t = 0) {
 function c3Talk(lines, upd, after) { let t = 0.2; const steps = []; for (const [who, txt, shot] of lines) { const at = t; steps.push([at, () => { if (shot) C3.shot = shot; if (who === 'Стас') stasSay(txt); else if (who === 'Мелоди') melSay(txt); else if (who === 'Инспектор') inspSay(txt); else if (who === 'Воскреситель') ggSay(txt, Math.min(4.2, 0.6 + txt.length * 0.05)); else if (who === '') sub('', txt); else line(who, txt, 1, 1.05); }]); t += 1.3 + txt.length * 0.058; } runCut(steps, upd, t, after); }
 function c3Upd(t, dt) { c3Amb(dt); c3Sync([C3.stas, C3.mel, C3.tech, C3.insp, C3.markCar, ...C3.crowd, ...C3.fans], dt); c3Cam(C3.shot || 'street', t); }
 function c3Amb(dt) {
+  c3DecoAmb(dt);
   const t = performance.now() / 1000; C3.ledT = (C3.ledT || 0) - dt; if (C3.ledT <= 0) { C3.ledT = 0.08; ledDraw(t); }
   if (C3.siren) C3.siren.forEach((m, i) => (m.visible = Math.floor(t * 4 + i) % 2 === 0));
   for (const c of C3.lights) { c.rotation.z = Math.sin(t * 0.8 + c.userData.x) * 0.35; c.material.opacity = C3.ledMode === 'show' ? 0.12 + Math.sin(t * 6 + c.userData.x) * 0.05 : 0.05; }
@@ -9454,7 +9457,7 @@ function c2Blackout() {
   toast('Блэкаут! Фонарик включён · роуди видят только в луче своих фонарей');
 }
 function c2PowerOn() {
-  C2.power = true; if (C2.lampK) lamps.forEach((l, i) => (l.intensity = C2.lampK[i])); hemi.intensity = C2.hemi0 || 0.32; MAPS.c2base.hemi = C2.hemi0 || 0.32; MAPS.c2base.lamp[1] = 22;
+  C2.power = true; if (C2.lampK) lamps.forEach((l, i) => (l.intensity = C2.lampK[i])); hemi.intensity = C2.hemi0 || 0.5; MAPS.c2base.hemi = C2.hemi0 || 0.5; MAPS.c2base.lamp[1] = 28;
   if (C2.fl) { C2.fl.parent && C2.fl.parent.remove(C2.fl); C2.flT2.parent && C2.flT2.parent.remove(C2.flT2); C2.fl = null; } for (const c of C2.cones || []) c.parent && c.parent.remove(c); C2.cones = [];
   Sound.chime(); toast('Питание восстановлено · замок студии работает');
 }
@@ -9485,6 +9488,120 @@ function c2Chat(phone) {
   step(0);
 }
 /* ----- glue: location 1 → location 2, the final screen ----- */
+/* ===================== chapter 2 · prettier and bigger locations ===================== */
+function posterTex(lines, bg, fg, w = 256, h = 360) { return cvTex(w, h, (g) => { g.fillStyle = bg; g.fillRect(0, 0, w, h); for (let i = 0; i < 10; i++) { g.fillStyle = `rgba(255,255,255,${Math.random() * 0.08})`; g.beginPath(); g.arc(Math.random() * w, Math.random() * h, 20 + Math.random() * 60, 0, 7); g.fill(); } g.textAlign = 'center'; lines.forEach(([t, sz, c], i) => { g.fillStyle = c || fg; g.font = `900 ${sz}px Arial`; g.fillText(t, w / 2, 70 + i * (sz + 18)); }); grime(g, w, h, 40, 0.25); g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(0, h - 6, w, 6); }); }
+function decoPlane(tex, w, h, x, y, z, ry, basic) { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), basic ? new THREE.MeshBasicMaterial({ map: tex, transparent: true }) : std({ map: tex, roughness: 0.9, transparent: true, polygonOffset: true, polygonOffsetFactor: -2 })); m.position.set(x, y, z); m.rotation.y = ry; addMesh(m); return m; }
+function puddle(x, z, r) { const m = new THREE.Mesh(new THREE.CircleGeometry(r, 20).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x0c0d10, roughness: 0.04, metalness: 0.6, transparent: true, opacity: 0.85 })); m.position.set(x, 0.007, z); m.scale.set(1, 1, rand(0.5, 0.9)); m.rotation.y = rand(0, 3); addMesh(m); }
+/* ----- the basement: pipes, flickering tubes, puddles, posters, graffiti, foam, and a new boiler room to the west ----- */
+function c2Shell(floorMat, ceilMat, wall) {
+  const H = WALL_H;
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(HX * 2, HZ * 2), floorMat); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; floor.userData.kind = 'env'; addMesh(floor); envMeshes.push(floor);
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(HX * 2, HZ * 2), ceilMat); ceil.rotation.x = Math.PI / 2; ceil.position.y = H; ceil.userData.kind = 'env'; addMesh(ceil); envMeshes.push(ceil);
+  addStaticBox(0, H / 2, -HZ - 0.5, HX * 2 + 2, H, 1, wall, false); addStaticBox(0, H / 2, HZ + 0.5, HX * 2 + 2, H, 1, wall, false); addStaticBox(HX + 0.5, H / 2, 0, 1, H, HZ * 2 + 2, wall, false);
+  const g0 = -3.5, g1 = -2.1; addStaticBox(-HX - 0.5, H / 2, (-HZ - 1 + g0) / 2, 1, H, g0 + HZ + 1, wall, false); addStaticBox(-HX - 0.5, H / 2, (g1 + HZ + 1) / 2, 1, H, HZ + 1 - g1, wall, false); addStaticBox(-HX - 0.5, (H + 2.3) / 2, (g0 + g1) / 2, 1, H - 2.3, g1 - g0, wall, false);
+  // the boiler room: x -16..-9, z -4..6
+  const f2 = new THREE.Mesh(new THREE.PlaneGeometry(7, 10), floorMat); f2.rotation.x = -Math.PI / 2; f2.position.set(-12.5, 0, 1); f2.receiveShadow = true; f2.userData.kind = 'env'; addMesh(f2); envMeshes.push(f2);
+  const c2 = new THREE.Mesh(new THREE.PlaneGeometry(7, 10), ceilMat); c2.rotation.x = Math.PI / 2; c2.position.set(-12.5, H, 1); addMesh(c2);
+  addStaticBox(-16.5, H / 2, 1, 1, H, 12, wall, false); addStaticBox(-12.5, H / 2, -4.5, 8, H, 1, wall, false); addStaticBox(-12.5, H / 2, 6.5, 8, H, 1, wall, false);
+  LV.bounds.push({ x0: -16, x1: -9, z0: -4, z1: 6 }, { x0: -10, x1: -8, z0: g0 + 0.05, z1: g1 - 0.05 });
+}
+function c2Deco() {
+  const BB = batcher(), H = WALL_H, C = (c, r = 0.8) => std({ color: c, roughness: r }), rust = std({ color: 0x5a3422, roughness: 0.7, metalness: 0.5 }), steel = std({ color: 0x4a4c50, roughness: 0.4, metalness: 0.75 }), dk = C(0x161618);
+  // ceiling pipes and cable trays running the whole basement
+  for (const [x, r, m] of [[-6.2, 0.11, rust], [-5.8, 0.06, steel], [5.4, 0.13, steel], [5.0, 0.05, rust]]) BB.cyl(m, x, H - 0.25, 0, r, r, HZ * 2, 10, Math.PI / 2);
+  for (let z = -20; z <= 20; z += 4) { BB.box(steel, -6, H - 0.12, z, 0.7, 0.04, 0.04); BB.box(steel, 5.2, H - 0.12, z, 0.7, 0.04, 0.04); }
+  BB.box(dk, 0.5, H - 0.15, 0, 0.35, 0.06, HZ * 2); for (let z = -21; z <= 21; z += 3) BB.cyl(C(0x202024), 0.5 + rand(-0.1, 0.1), H - 0.4, z, 0.012, 0.012, 0.5, 4);
+  // flickering fluorescent tubes with a glow
+  C2.tubes = [];
+  for (const [x, z] of [[-3, 12], [0, 1], [-4, -1], [3, -10], [-4, -7], [2, -18], [-5, -19], [-4, 18.5], [6, 18.5], [-12.5, -1], [-12.5, 3.5]]) { const m = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.05, 0.12), new THREE.MeshBasicMaterial({ color: 0xe8f4ff })); m.position.set(x, H - 0.08, z); addMesh(m); const glow = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.6), new THREE.MeshBasicMaterial({ map: TEX.soft, color: 0x9ab8d8, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false })); glow.rotation.x = Math.PI / 2; glow.position.set(x, H - 0.12, z); addMesh(glow); C2.tubes.push({ m, glow, t: rand(0, 5), bad: Math.random() < 0.4 }); }
+  // wet floor, cobwebs, scratches
+  for (const [x, z, r] of [[-5.6, 12.6, 0.8], [-1, 8, 0.6], [6, 2, 0.9], [-2, -6.4, 0.7], [4, -13, 0.6], [-6, 17, 1.0], [5, 20, 0.6], [-11, 2, 1.2], [-14, -2, 0.7], [1, -20, 0.5]]) puddle(x, z, r);
+  const web = cvTex(128, 128, (g) => { g.strokeStyle = 'rgba(220,220,220,0.5)'; g.lineWidth = 1; for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(0, 0); const a = i / 8 * Math.PI / 2; g.lineTo(Math.cos(a) * 128, Math.sin(a) * 128); g.stroke(); } for (let r = 12; r < 128; r += 14) { g.beginPath(); g.arc(0, 0, r, 0, Math.PI / 2); g.stroke(); } });
+  for (const [x, z, ry] of [[-HX + 0.05, 14.8, Math.PI / 2], [HX - 0.05, 14.8, -Math.PI / 2], [-HX + 0.05, -14.8, Math.PI / 2], [-15.9, 5.8, Math.PI / 2]]) { const m = decoPlane(web, 1.0, 1.0, x, H - 0.5, z, ry, true); m.rotation.z = Math.PI; }
+  // inside the cage: tally marks and a scratched plea
+  addSign([{ t: 'IIII IIII IIII II', s: 90 }, { t: 'ПОМОГИТЕ', s: 120 }], 1.6, 0.8, -HX + 0.04, 1.4, 11.2, Math.PI / 2, 'rgba(200,190,170,0.75)');
+  // posters and graffiti
+  decoPlane(posterTex([['MELODIE', 60, '#ff5ab4'], ['ГРОМКАЯ', 40, '#fff'], ['НОЧЬ', 40, '#fff'], ['тур 2026', 26, '#9af0ff']], '#2a1030', '#fff'), 0.9, 1.25, -3.2, 1.6, 6.17, Math.PI);
+  decoPlane(posterTex([['ТЕНЬ', 70, '#c8c8c8'], ['Марк Вельский', 24, '#e04040'], ['сольный', 26, '#888'], ['альбом', 26, '#888']], '#101014', '#fff'), 0.9, 1.25, 6.4, 1.6, -3.83, 0);
+  decoPlane(posterTex([['ВХОД', 50, '#ffd060'], ['ТОЛЬКО', 30, '#fff'], ['ДЛЯ', 30, '#fff'], ['ГРУППЫ', 30, '#fff']], '#3a2010', '#fff'), 0.7, 1.0, -7.2, 1.6, -14.83, 0);
+  addSign([{ t: 'М + М ♥', s: 160 }], 1.6, 0.6, HX - 0.04, 1.5, 3, -Math.PI / 2, 'rgba(255,60,120,0.7)');
+  addSign([{ t: 'ОНА МОЯ', s: 140 }], 1.8, 0.5, -HX + 0.04, 2.6, -2.8 - 2, Math.PI / 2, 'rgba(220,30,30,0.6)');
+  // rehearsal room: a rug and string lights
+  BB.box(C(0x5a1a2a, 1), 3.5, 0.01, 1.5, 4.6, 0.01, 3.4); C2.bulbs = [];
+  for (let i = 0; i < 16; i++) { const x = -8 + i * 1.05, y = H - 0.3 - Math.sin(i / 15 * Math.PI) * 0.4; const b = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), new THREE.MeshBasicMaterial({ color: [0xff5ab4, 0xffd060, 0x9af0ff, 0x8aff8a][i % 4] })); b.position.set(x, y, 5.6); addMesh(b); C2.bulbs.push(b); }
+  // the studio: acoustic foam and a REC light
+  for (let z = -21.4; z <= -15.6; z += 0.5) for (let y = 0.6; y <= 2.8; y += 0.5) BB.box(C(0x1a1a22, 1), HX - 0.08, y, z, 0.12, 0.44, 0.44, 0, ((z * 2 + y * 2) | 0) % 2 ? 0 : Math.PI / 2);
+  { const rec = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.22, 0.04), new THREE.MeshBasicMaterial({ color: 0xff2020 })); rec.position.set(-5.5, 2.9, -18.05); addMesh(rec); C2.rec = rec; addSign([{ t: 'REC', s: 200 }], 0.55, 0.2, -5.5, 2.9, -18.02, 0, 'rgba(255,255,255,0.95)'); }
+  for (const z of [-16.5, -19, -21]) BB.box(new THREE.MeshBasicMaterial({ color: 0xff3aa0 }), 0, 0.03, z, 14, 0.02, 0.04);
+  // ===== the boiler room =====
+  for (const [x, z] of [[-14.6, -2.2], [-14.6, 1.0]]) { BB.cyl(C(0x6a5a48, 0.6), x, 1.3, z, 0.8, 0.8, 2.6, 18); BB.cyl(rust, x, 2.8, z, 0.12, 0.12, 0.8, 8); BB.box(C(0x2a2a2a), x + 0.8, 0.7, z, 0.06, 0.5, 0.5); solid(x, 1.3, z, 1.6, 2.6, 1.6); }
+  BB.cyl(rust, -14.6, 3.2, -0.6, 0.12, 0.12, 3.2, 8, Math.PI / 2); for (let i = 0; i < 3; i++) BB.cyl(C(0xa82020, 0.5), -13.6, 1.7, -2.2 + i * 1.6, 0.16, 0.16, 0.05, 12, 0, 0, Math.PI / 2);
+  blk2(BB, C(0x2a2422, 0.9), -12.6, 0.8, 5.4, 2.2, 1.6, 1.0); { const f = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.6), new THREE.MeshBasicMaterial({ color: 0xff7a20 })); f.position.set(-12.6, 0.7, 4.88); f.rotation.y = Math.PI; addMesh(f); C2.furnace = f; }
+  for (let i = 0; i < 6; i++) BB.cyl(steel, -9.6, 0.5, -3.4 + i * 0.25, 0.01, 0.01, 1.0, 4); 
+  blk2(BB, std({ map: TEX.wood, roughness: 0.8 }), -15.2, 0.4, 4.6, 1.0, 0.8, 0.7); BB.box(C(0x1a1a1a), -15.2, 0.83, 4.5, 0.2, 0.06, 0.12);
+  decoPlane(posterTex([['ТЕНЬ', 70, '#d0d0d0'], ['дебют', 26, '#aaa'], ['отменён', 30, '#e04040']], '#0c0c10', '#fff'), 0.8, 1.1, -15.95, 1.7, 2.6, Math.PI / 2);
+  addSign([{ t: 'КОТЕЛЬНАЯ', s: 140 }], 1.6, 0.35, -9.06, 2.65, -2.8, -Math.PI / 2, 'rgba(255,200,80,0.9)');
+  BB.flush();
+}
+function blk2(BB, m, x, y, z, sx, sy, sz) { BB.box(m, x, y, z, sx, sy, sz); solid(x, y, z, sx, sy, sz); }
+function c2DecoAmb(dt) {
+  if (mapId !== 'c2base') return; const t = performance.now() / 1000;
+  for (const T of C2.tubes || []) { T.t -= dt; if (T.t <= 0) { T.t = T.bad ? rand(0.04, 0.6) : rand(2, 9); const on = T.bad ? Math.random() < 0.6 : true; if (C2.power === false) { T.m.visible = false; T.glow.visible = false; } else { T.m.visible = on; T.glow.visible = on; } } }
+  if (C2.bulbs) C2.bulbs.forEach((b, i) => (b.visible = C2.power !== false && Math.sin(t * 2 + i) > -0.6));
+  if (C2.rec) C2.rec.visible = Math.floor(t * 1.5) % 2 === 0;
+  if (C2.furnace) { C2.furnace.material.color.setHSL(0.06 + Math.sin(t * 9) * 0.01, 1, 0.45 + Math.sin(t * 13) * 0.08); if (Math.random() < dt * 8) spawnSprite(TEX.soft, _a.set(-12.6 + rand(-0.3, 0.3), 0.9, 4.8), { color: pick([0xff8a30, 0xffb040]), additive: true, size: rand(0.2, 0.4), grow: 0.5, life: 0.5, opacity: 0.7, vel: new V3(0, 0.5, -0.2) }); }
+  if (Math.random() < dt * 2) spawnSprite(TEX.smoke, _a.set(-14.6 + rand(-0.2, 0.2), 3.2, -0.6 + rand(-1, 1)), { color: 0xd8d8d8, size: 0.4, grow: 2, life: 2, opacity: 0.25, vel: new V3(rand(0.2, 0.5), -0.05, 0) });
+  if (Math.random() < dt * 5) spawnSprite(TEX.soft, _a.set(player.pos.x + rand(-3, 3), rand(0.5, 2.6), player.pos.z + rand(-3, 3)), { color: 0xfff0d8, additive: true, size: rand(0.01, 0.025), grow: 1, life: rand(3, 5), opacity: 0.5, vel: new V3(rand(-0.03, 0.03), rand(-0.02, 0.02), rand(-0.03, 0.03)) });
+}
+function cutC2Tape2() {
+  C2.demo = true; const st = story.stage; story.stage = 'c2-cut';
+  runCut([
+    [0.2, () => { Sound.click(500, 0.4); sub('', 'Старый кассетник. На кассете маркером: «ТЕНЬ — демо. Для М.».'); }],
+    [4.2, () => { Sound.click(300, 0.3); line('Марк (запись)', 'Раз-раз… Это песня для тебя, Мелоди. Я написал её за одну ночь.', 0.85, 1.0); }],
+    [9.4, () => line('Марк (запись, поёт)', 'Ты светишь, как прожектор… а я — твоя тень… я рядом каждый вечер… и каждый новый день…', 0.85, 0.9)],
+    [16.4, () => line('Марк (запись)', '…Она сказала: «Мило». Просто «мило». Я сжёг весь тираж.', 0.85, 0.95)],
+    [21.2, () => ggSay('Из обиженных музыкантов получаются худшие тюремщики. И лучшие песни. Жаль, у него — первое.', 4)],
+  ], () => camSet(-14.2, 1.5, 3.4, -15.2, 0.8, 4.5), 26.0, () => { setStage(st, ''); toast('Секрет: демо-кассета Марка'); });
+}
+/* ----- the club: a balcony, a bar, merch, a mirror ball, lasers, LED strips, a livelier street ----- */
+function c3Deco() {
+  const BB = batcher(), C = (c, r = 0.8) => std({ color: c, roughness: r }), dk = C(0x141418), steel = std({ color: 0x3a3c42, roughness: 0.45, metalness: 0.7 }), neon = (c) => new THREE.MeshBasicMaterial({ color: c });
+  // the balcony over the back of the hall with stairs on the left
+  BB.box(C(0x221e26, 0.7), 0, 3.0, 9, 28, 0.4, 6); addDeck(-14, 14, 6, 12, 3.2); for (let i = 0; i < 8; i++) { addDeck(11.6, 13.8, -2 + i, -1 + i, 0.4 * (i + 1)); BB.box(C(0x2a2630), 12.7, 0.2 * (i + 1), -1.5 + i, 2.2, 0.4 * (i + 1), 1.0); }
+  for (let x = -14; x <= 11; x += 0.5) BB.cyl(steel, x, 3.7, 6.05, 0.02, 0.02, 1.0, 4); BB.box(steel, -1.5, 4.2, 6.05, 25, 0.06, 0.06); solid(-1.5, 3.7, 6.05, 25, 1.0, 0.12);
+  BB.box(neon(0xff3aa0), 0, 2.78, 6.05, 28, 0.06, 0.06); addSign([{ t: 'VIP', s: 300 }], 2, 0.8, 6, 6.6, 11.8, Math.PI, 'rgba(255,215,90,0.98)');
+  for (const x of [-6, 0, 6]) { BB.box(C(0x5a1030, 0.9), x, 3.5, 10.6, 2.4, 0.6, 0.9); BB.box(C(0x5a1030, 0.9), x, 3.9, 11.1, 2.4, 0.6, 0.2); }
+  // the bar (west) and the merch stand (east)
+  blk2(BB, C(0x3a2418, 0.5), -12.4, 0.55, -10, 1.2, 1.1, 6); BB.box(neon(0xff5ab4), -11.78, 1.05, -10, 0.04, 0.05, 6);
+  for (let i = 0; i < 18; i++) BB.cyl(new THREE.MeshStandardMaterial({ color: pick([0x2a8a3a, 0x8a5a20, 0xd8d8e8, 0x8a1a2a]), roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.85 }), -13.7, 1.6 + (i % 3) * 0.5, -12.6 + Math.floor(i / 3) * 1.0, 0.05, 0.05, 0.3, 8);
+  addSign([{ t: 'BAR', s: 260 }], 1.8, 0.7, -13.84, 3.2, -10, Math.PI / 2, 'rgba(90,220,255,0.98)');
+  blk2(BB, C(0x1a1a22, 0.6), -12.4, 0.45, 3, 1.2, 0.9, 4); for (let i = 0; i < 4; i++) BB.box(C(pick([0xff5ab4, 0x16161a, 0xffffff, 0x9af0ff])), -13.8, 1.8, 1.5 + i, 0.04, 0.8, 0.7);
+  addSign([{ t: 'MERCH', s: 220 }], 1.8, 0.6, -13.84, 3.0, 3, Math.PI / 2, 'rgba(255,215,90,0.98)');
+  // LED strips along the stage and a mirror ball over the pit
+  for (const [c, y] of [[0xff3aa0, 1.18], [0x9af0ff, 0.6]]) BB.box(neon(c), 0, y, -19.98, 28, 0.04, 0.03);
+  { const mb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.55, 2), new THREE.MeshStandardMaterial({ color: 0xd8dce8, roughness: 0.05, metalness: 1, flatShading: true })); mb.position.set(0, 7.2, -8); addMesh(mb); C3.mball = mb; BB.cyl(steel, 0, 8.1, -8, 0.01, 0.01, 1.6, 4); }
+  C3.lasers = []; for (let i = 0; i < 6; i++) { const g = new THREE.Group(); g.position.set(-10 + i * 4, 7.3, -22); const beam = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 30), new THREE.MeshBasicMaterial({ color: i % 2 ? 0x40ff80 : 0xff3aa0, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false })); beam.position.z = 15; g.add(beam); addMesh(g); C3.lasers.push(g); }
+  for (let z = -12; z <= 8; z += 4) { BB.box(neon(0x6a3aff), -13.9, 0.05, z, 0.03, 0.05, 3); BB.box(neon(0x6a3aff), 13.9, 0.05, z, 0.03, 0.05, 3); }
+  // the street: string lights, a food truck, neon shops, bins, puddles, posters
+  C3.strL = []; for (let i = 0; i < 22; i++) { const x = -12 + i * 0.85, y = 4.2 - Math.sin(i / 21 * Math.PI) * 0.6; const b = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), neon([0xffd890, 0xff9ad8, 0x9af0ff][i % 3])); b.position.set(x, y, 14.8); addMesh(b); C3.strL.push(b); }
+  blk2(BB, C(0xe8c040, 0.5), -19, 1.4, 18, 2.4, 2.6, 4.6); BB.box(C(0x1a1a1a), -17.78, 1.7, 18, 0.05, 0.9, 2.6); addSign([{ t: 'ШАУРМА 24/7', s: 140 }], 2.6, 0.5, -17.74, 2.6, 18, Math.PI / 2, 'rgba(255,90,40,0.98)');
+  for (const [t, c, x] of [['КАРАОКЕ', 'rgba(255,90,200,0.98)', -12], ['АПТЕКА 24', 'rgba(60,255,120,0.98)', 4], ['ХОСТЕЛ', 'rgba(120,200,255,0.98)', 12]]) addSign([{ t, s: 160 }], 3.2, 0.7, x, 3.4, 33.95, Math.PI, c);
+  for (const [x, z] of [[-9.6, 13.6], [8, 13.6], [11.5, 29]]) { BB.cyl(C(0x2a3a2a, 0.6), x, 0.5, z, 0.32, 0.28, 1.0, 12); }
+  for (const [x, z, r] of [[-4, 22, 1.2], [6, 26, 0.9], [14, 30, 1.0], [-14, 30, 1.3], [2, 17, 0.7]]) puddle(x, z, r);
+  decoPlane(posterTex([['MELODIE', 60, '#ff5ab4'], ['LIVE', 48, '#fff'], ['СЕГОДНЯ', 30, '#9af0ff']], '#200a28', '#fff'), 1.2, 1.7, -8, 1.8, 12.17, 0);
+  decoPlane(posterTex([['ГРОМКАЯ', 46, '#fff'], ['НОЧЬ', 60, '#ff5ab4'], ['SOLD OUT', 34, '#ffd060']], '#101020', '#fff'), 1.2, 1.7, 8, 1.8, 12.17, 0);
+  C3.halos = []; for (const x of [-18, -6, 6]) { const h = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), new THREE.MeshBasicMaterial({ map: TEX.soft, color: 0xffc880, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false })); h.position.set(x, 6, 30); addMesh(h); C3.halos.push(h); }
+  BB.flush();
+}
+function c3DecoAmb(dt) {
+  if (mapId !== 'club') return; const t = performance.now() / 1000;
+  if (C3.mball) { C3.mball.rotation.y += dt * 0.6; if (Math.random() < dt * 14) { const a = rand(0, 6.28); spawnSprite(TEX.soft, _a.set(Math.cos(a) * 13.6, rand(1, 6), -8 + Math.sin(a) * 12), { color: pick([0xffffff, 0xff9ad8, 0x9af0ff]), additive: true, size: rand(0.06, 0.12), grow: 0.2, life: rand(0.3, 0.7), opacity: 0.8 }); } }
+  (C3.lasers || []).forEach((g, i) => { g.rotation.y = Math.sin(t * 0.7 + i) * 0.5; g.rotation.x = 0.25 + Math.sin(t * 1.1 + i * 2) * 0.12; g.visible = C3.ledMode === 'show' || Math.floor(t * 0.5 + i) % 3 === 0; });
+  (C3.strL || []).forEach((b, i) => (b.visible = Math.sin(t * 3 + i * 0.8) > -0.5));
+  (C3.halos || []).forEach((h) => h.lookAt(camera.position));
+  if (Math.random() < dt * 1.5) spawnSprite(TEX.smoke, _a.set(4, 0.05, 20), { color: 0xd8d8e0, size: 0.6, grow: 2.2, life: 2.6, opacity: 0.3, vel: new V3(rand(-0.1, 0.1), 0.8, rand(-0.1, 0.1)) });
+  if (Math.random() < dt * 3) spawnSprite(TEX.smoke, _a.set(rand(-12, 12), rand(0.3, 1.2), rand(-18, -2)), { color: 0x6a4a8a, size: rand(1.2, 2.4), grow: 1.6, life: rand(3, 5), opacity: 0.08, vel: new V3(rand(-0.1, 0.1), 0.05, rand(-0.1, 0.1)) });
+}
 function c2L1Rows() {
   const g = story.guards || [], kills = g.filter((x) => !x.alive).length, sec = Math.round((performance.now() - C2.t0) / 1000);
   const melTxt = C2.revived ? 'убита Марком — воскрешена' : C2.freed ? 'спасена из кладовой' : 'привела полицию';
@@ -9536,14 +9653,14 @@ function updC2(dt, tick) {
     else if (!C2.safe) tgt = C2.knowLock || C2.melAlly ? C2_SAFE : C2_SDOOR; else tgt = C2_SDOOR;
     const clues = `подсказки: ${C2.shrine ? '14' : '?'} · ${C2.cal ? '07' : '?'}`;
     if (C2.power === false) { tgt = [3.4, 21.0]; }
-    obj = (C2.power === false ? 'БЛЭКАУТ! Почините щиток в комнате охраны (юг) · ' : '') + (melTask ? melTask + ' · ' : '') + (!C2.safe ? (C2.knowLock || C2.melAlly ? `Откройте сейф Марка в кабинете (${C2.melAlly ? 'код 1407' : clues})` : 'Найдите выход из подвала (север)') : 'Ключ у вас! Откройте студию (север)') + ` · роуди: ${alive} · улики: ${C2.ev ? C2.ev.size : 0}/9` + (story.alarm ? ' · ТРЕВОГА' : '');
+    obj = (C2.power === false ? 'БЛЭКАУТ! Почините щиток в комнате охраны (юг) · ' : '') + (melTask ? melTask + ' · ' : '') + (!C2.safe ? (C2.knowLock || C2.melAlly ? `Откройте сейф Марка в кабинете (${C2.melAlly ? 'код 1407' : clues})` : 'Найдите выход из подвала (север)') : 'Ключ у вас! Откройте студию (север)') + ` · роуди: ${alive} · улики: ${C2.ev ? C2.ev.size : 0}/9` + (C2.demo ? '' : ' · секрет: котельная (запад)') + (story.alarm ? ' · ТРЕВОГА' : '');
   }
   targetArrow(tgt ? _b.set(tgt[0], 0, tgt[1]) : null); $('sObj').textContent = obj;
 }
 function startCh2(cp) {
   Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'story'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true;
   story.on = true; story.asGG = true; story.ch = 2; lastCh = 2; vmSkinGG(true); W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0;
-  Object.assign(C2, { rage: 0, open: false, pipe: false, pipeN: 0, lockN: 0, floodK: 0, spray: 0, shrine: false, cal: false, diary: false, safe: false, knowLock: false, volt: false, mel: null, melState: 'none', melAlly: false, souls: 0, corpse: null, corpsePos: null, boss: false, revived: false, freed: false, ev: new Set(), hyp: null, insp: null, cops: null, trust: 3, bluffs: 0, wrong: 0, power: true, fl: null, cones: [], talked: false, sym: 0, t0: performance.now() });
+  Object.assign(C2, { rage: 0, open: false, pipe: false, pipeN: 0, lockN: 0, floodK: 0, spray: 0, shrine: false, cal: false, diary: false, safe: false, knowLock: false, volt: false, mel: null, melState: 'none', melAlly: false, souls: 0, corpse: null, corpsePos: null, boss: false, revived: false, freed: false, ev: new Set(), hyp: null, insp: null, cops: null, trust: 3, bluffs: 0, wrong: 0, power: true, fl: null, cones: [], talked: false, sym: 0, demo: false, t0: performance.now() });
   $('resumeBtn').hidden = true; startGame.fromWaves = true;
   if (cp === 'c2b') { storyMap('c2base'); story.gg = avatar; C2.rage = 3; c2Gameplay(true); return; }
   if (cp && cp.startsWith('c3')) { C2.rage = 3; c3Start(cp); return; }
@@ -10113,7 +10230,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
