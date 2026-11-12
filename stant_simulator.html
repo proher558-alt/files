@@ -24527,6 +24527,15 @@ html.whOn #evBanner{background:linear-gradient(90deg,#0a3a6a,#2a0a5a)!important;
 #whFire b{display:block;font-size:8vw;line-height:1}#whFire small{display:block;font-size:2.3vw;font-weight:900}
 html.whOn.whPlay #whFire{display:block}
 #whFire:active{transform:scale(.9)}
+#whEnter{position:fixed;inset:0;z-index:10005;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3vw;overflow:hidden;background:radial-gradient(circle at 50% 40%,#0b3a66,#020b1a 72%);color:#fff;transition:opacity .4s;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+#whEnter.out{opacity:0;pointer-events:none}
+#whEnter .wE1{font-size:22vw;line-height:1;filter:drop-shadow(0 0 20px #00e5ff);animation:wEf 3s ease-in-out infinite}
+@keyframes wEf{50%{transform:translateY(-3vw) rotate(6deg)}}
+#whEnter .wE2{font:900 10vw Comfortaa,sans-serif;text-align:center;line-height:1.1;color:#e8fbff;text-shadow:-3px 0 #ff2bd6,3px 0 #00fff0,0 0 24px #00e5ff;animation:whGlitch 2.6s infinite steps(1)}
+#whEnter .wE3{font:700 3.6vw "Courier New",monospace;color:#5dffb4;letter-spacing:.5vw;text-shadow:0 0 8px #00ff9c}
+#whEnter .wE4{margin-top:8vw;font:900 5vw "Courier New",monospace;padding:3vw 6vw;border:.6vw solid #7ff6ff;border-radius:4vw;background:rgba(2,16,32,.6);box-shadow:0 0 20px rgba(0,229,255,.6);animation:wEp 1.2s ease-in-out infinite}
+@keyframes wEp{50%{transform:scale(1.07);box-shadow:0 0 36px rgba(0,229,255,.95)}}
+#whEnter .wES{position:absolute;top:-8%;animation:whDown linear infinite;text-shadow:0 0 10px #00e5ff}
 </style>
 <script>
 (function(){
@@ -24538,7 +24547,7 @@ const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 const say=m=>{try{toast(m)}catch(e){}};
 const act=()=>G.mode==="play"&&!G.paused&&G.phase!=="ready"&&G.phase!=="crashed"&&G.phase!=="landed";
 const LS='stWinterHack';
-const lsGet=()=>{try{return localStorage.getItem(LS)==='1'}catch(e){return false}};
+const lsGet=()=>{try{return localStorage.getItem(LS)!=='0'}catch(e){return true}};
 const lsSet=v=>{try{localStorage.setItem(LS,v?'1':'0')}catch(e){}};
 
 // ===== ЗВУКИ =====
@@ -25192,7 +25201,20 @@ try{
 }catch(e){say('⚠ зима-магазин: '+(e&&e.message||e))}
 
 // восстановление после перезагрузки (только если включали в админке)
-if(lsGet())setTimeout(()=>{try{whBegin(true)}catch(e){}},200);
+// ===== при каждом входе: экран «нажми, чтобы войти» → кино Нового года → взлом =====
+function entryPlay(){
+ try{sndInit()}catch(e){}try{if(!AudioEngine.ctx&&AudioEngine.init)AudioEngine.init();AudioEngine.resume&&AudioEngine.resume()}catch(e){}
+ if(!WH.on)return;
+ let ny=0;try{if(typeof window.hwNewYear==='function'&&!document.body.classList.contains('hwNY')){window.hwNewYear();ny=1;WH.nyS=1}}catch(e){}
+ WH.seqT=setTimeout(()=>{WH.seqT=0;if(!WH.on||WH.intro)return;introStart(null,0);WH.intro.f.begin=1},ny?9300:10)}
+function enterSplash(){if(document.getElementById('whEnter'))return;const d=document.createElement('div');d.id='whEnter';d.setAttribute('data-ui','');
+ let sn='';for(let i=0;i<16;i++)sn+='<span class="wES" style="left:'+R(0,96).toFixed(1)+'%;font-size:'+R(14,38).toFixed(0)+'px;--dx:'+R(-60,60).toFixed(0)+'px;--r:'+R(-160,160).toFixed(0)+'deg;animation-duration:'+R(5,11).toFixed(1)+'s;animation-delay:-'+R(0,10).toFixed(1)+'s">'+PK(['❄️','❄️','❄️','💾','0','1','✦'])+'</span>';
+ d.innerHTML=sn+'<div class="wE1">❄💻</div><div class="wE2">ЗИМА<br>И ХАКЕРЫ</div><div class="wE3">ЗИМНЕЕ ОБНОВЛЕНИЕ</div><div class="wE4">▶ НАЖМИ, ЧТОБЫ ВОЙТИ</div>';
+ document.body.appendChild(d);
+ const go=e=>{e.preventDefault();e.stopPropagation();d.removeEventListener('pointerdown',go);d.classList.add('out');setTimeout(()=>d.remove(),450);entryPlay()};
+ d.addEventListener('pointerdown',go)}
+window.whEntry=entryPlay;
+if(lsGet())setTimeout(()=>{try{whBegin(true)}catch(e){}try{enterSplash()}catch(e){}},200);
 })();
 </script>
 
