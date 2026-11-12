@@ -9751,18 +9751,19 @@ function lqRender() {
   }
   ms.forEach((m, t) => { m.count = cnt[t]; m.instanceMatrix.needsUpdate = true; });
   // surfaces: one or more cubes per liquid, fitted to its particles
-  let vi = 0; const RI = 0.3, RV = 0.125, SUB = 80 * RV * RV / (RI * RI - RV * RV), MAXV = 10;
+  let vi = 0; const RI = 0.3, RV = 0.125, SUB = 80 * RV * RV / (RI * RI - RV * RV), MAXV = 28, CELL = 3.0, M = RI + 0.15, S = CELL + 2 * M;
   for (let t = 0; t < 6 && vi < MAXV; t++) {
     const idx = _lqIdx[t]; if (idx.length < 2) continue;
-    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, z0 = 1e9, z1 = -1e9; for (const i of idx) { if (px[i] < x0) x0 = px[i]; if (px[i] > x1) x1 = px[i]; if (py[i] < y0) y0 = py[i]; if (py[i] > y1) y1 = py[i]; if (pz[i] < z0) z0 = pz[i]; if (pz[i] > z1) z1 = pz[i]; }
-    const tile = 3.0, nxT = Math.max(1, Math.ceil((x1 - x0) / tile)), nzT = Math.max(1, Math.ceil((z1 - z0) / tile)), tw = (x1 - x0) / nxT, td = (z1 - z0) / nzT;
-    for (let a = 0; a < nxT && vi < MAXV; a++) for (let b = 0; b < nzT && vi < MAXV; b++) {
-      const tx0 = x0 + a * tw, tz0 = z0 + b * td, M = RI + 0.15, cxm = tx0 + tw / 2, czm = tz0 + td / 2, S = Math.max(tw, td, y1 - y0) + 2 * M, ox = cxm - S / 2, oz = czm - S / 2, oy = Math.min(y0 - M, (y0 + y1) / 2 - S / 2);
-      let any = false; const v = lqVol(vi, t), st = SUB * (RI / S) * (RI / S);
-      v.reset(); v.position.set(ox + S / 2, oy + S / 2, oz + S / 2); v.scale.setScalar(S / 2);
-      for (const i of idx) { const x = px[i], z = pz[i]; if (x < tx0 - M || x > tx0 + tw + M || z < tz0 - M || z > tz0 + td + M) continue; any = true;
-        if (t === 2) v.addBall((x - ox) / S, (py[i] - oy) / S, (z - oz) / S, st, SUB, LQV.lavaCols[Math.max(0, Math.min(9, ((LQ.age[i] / 2.5) | 0) - (Math.abs(LQ.vx[i]) + Math.abs(LQ.vz[i]) > 0.3 ? 3 : 0)))]);
-        else v.addBall((x - ox) / S, (py[i] - oy) / S, (z - oz) / S, st, SUB); }
+    const cells = new Map();
+    for (const i of idx) { const cx = Math.floor(px[i] / CELL), cz = Math.floor(pz[i] / CELL), k = cx * 4096 + cz; let c = cells.get(k); if (!c) { c = { cx, cz, n: 0, y0: 1e9, y1: -1e9 }; cells.set(k, c); } c.n++; if (py[i] < c.y0) c.y0 = py[i]; if (py[i] > c.y1) c.y1 = py[i]; }
+    const list = [...cells.values()].sort((p, q) => q.n - p.n).slice(0, 8);
+    for (const c of list) { if (vi >= MAXV) break;
+      const Sy = Math.max(S, c.y1 - c.y0 + 2 * M), ox = c.cx * CELL - M, oz = c.cz * CELL - M, oy = c.y0 - M, Sx = S;
+      const SS = Math.max(Sx, Sy), v = lqVol(vi, t), st = SUB * (RI / SS) * (RI / SS); let any = false;
+      v.reset(); v.position.set(ox + SS / 2, oy + SS / 2, oz + SS / 2); v.scale.setScalar(SS / 2);
+      for (const i of idx) { const x = px[i], z = pz[i]; if (x < ox || x > ox + SS || z < oz || z > oz + SS || py[i] < oy || py[i] > oy + SS) continue; any = true;
+        if (t === 2) v.addBall((x - ox) / SS, (py[i] - oy) / SS, (z - oz) / SS, st, SUB, LQV.lavaCols[Math.max(0, Math.min(9, ((LQ.age[i] / 2.5) | 0) - (Math.abs(LQ.vx[i]) + Math.abs(LQ.vz[i]) > 0.3 ? 3 : 0)))]);
+        else v.addBall((x - ox) / SS, (py[i] - oy) / SS, (z - oz) / SS, st, SUB); }
       if (any) { v.update(); vi++; } else v.visible = false;
     }
   }
