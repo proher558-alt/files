@@ -385,7 +385,6 @@ body.touch #wAmmo{font-size:26px}
     <button class="btn" id="contStory" hidden style="width:100%;margin-bottom:10px">Продолжить главу 1<small id="contWhere"></small></button>
     <button class="btn primary" id="playStory" style="width:100%;margin-bottom:10px">Сюжет · Глава 1<small>«Преступница Свити». Награда за её устранение — 50 000 $</small></button>
     <button class="btn primary" id="playCh2" style="width:100%;margin-bottom:10px">Сюжет · Глава 2<small>«Расплата». Вы — воскреситель. Вы очнулись в клетке…</small></button>
-    <button class="btn" id="playL3" style="width:100%;margin-bottom:10px;display:none">Сюжет · Глава 2 · Локация 3<small>«Рассвет». Вы — обычный герой. Крыша на окраине.</small></button>
     <button class="btn" id="wsBtn" style="width:100%;margin-bottom:10px">Мастерская модов<small>Свой предмет и авторские моды</small></button>
     <button class="btn" id="exclBtn" style="width:100%;margin-bottom:10px">Эксклюзив<small>Награды за концовки сюжета: костюмы Свити</small></button>
     <button class="btn" id="admBtn" style="width:100%;margin-bottom:10px">Админ-панель<small>Служебный доступ по коду</small></button>
@@ -4656,7 +4655,6 @@ function ch2Lock() {
   render();
 }
 $('playCh2').onclick = () => (ch2Open() ? startCh2() : ch2Lock()); ch2Label();
-$('playL3').onclick = () => startLoc3(); setInterval(() => { const b = $('playL3'); if (b) b.style.display = ch2Open() ? '' : 'none'; }, 800);
 $('playStory').onclick = () => startStory();
 function overReset() { document.querySelector('#over .eyebrow').textContent = 'Связь с объектом потеряна'; $('againBtn').innerHTML = 'Ещё раз<small>Волна 1</small>'; }
 $('toMenuBtn').onclick = () => { $('over').hidden = true; state = 'menu'; $('menu').hidden = false; $('resumeBtn').hidden = true; };
@@ -9435,7 +9433,7 @@ function c3Epilogue() {
     ['Мелоди', (C2.sym || 0) >= 2 ? '…Тогда я буду петь громче.' : 'Тогда… спасибо. За всё.', 'mel'],
     ['', 'Воскреситель уходит в туман между фонарями. Его тень на мокром асфальте длиннее, чем должна быть.', 'street'],
     ['Воскреситель', 'Расплата закончена. Почти.', 'gg'],
-  ], (t, dt) => { c3Upd(t, dt); }, () => { showCard('ГЛАВА 2 · ЛОКАЦИЯ 2 ПРОЙДЕНА', 'Продолжение следует…', 6000); runCut([[0.1, () => subOff()]], c3Upd, 6.5, () => { C3.done = true; c2Finish(); }); });
+  ], (t, dt) => { c3Upd(t, dt); }, () => { showCard('ГЛАВА 2 · ЛОКАЦИЯ 2 ПРОЙДЕНА', 'Продолжение следует…', 6000); runCut([[0.1, () => subOff()]], c3Upd, 6.5, () => { C3.done = true; startLoc3(); }); });
 }
 /* ----- per-frame ----- */
 function updC3(dt, tick) {
