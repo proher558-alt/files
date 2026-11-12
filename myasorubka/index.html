@@ -1149,6 +1149,7 @@ const MAPS = {
   club: { name: 'Клуб «Громкая ночь»', desc: '', story: true, hx: 22, hz: 34, h: 9, spawn: [0, 28, 0], fog: 0x0a0812, fogD: 0.018, bg: 0x07060c, sun: 0.25, hemi: 0.55, lamp: [0xffd0e8, 40, 26], lamps: [[0, 7, 24], [0, 8, -22], [-18, 6, -14], [18, 6, -8]], red: [[0, 6, 0], 0xff3aa0, 6], build: buildClub, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   fluidlab: { name: 'Гидролаборатория', desc: 'Лаборатория жидкостей: вода, молоко, лава, кислота, мёд и нефть с настоящей физикой. Шланг, шесть кранов, бак, кислотная ванна и лавовый бассейн.', hx: 16, hz: 16, h: 9, spawn: [0, 12, 0], fog: 0xb8c4cc, fogD: 0.006, bg: 0xb8c4cc, sun: 1.2, hemi: 1.1, lamp: [0xffffff, 60, 30], lamps: [[0, 7.5, -10], [0, 7.5, 4], [-11, 6, 8], [11, 6, 8]], red: [[11, 1.2, 7], 0xff5a10, 4], build: buildFluidLab, npcs: { human: 5, zombie: 0, soldier: 0, dummies: [[10.6, 6.0, 0], [11.4, 7.4, 0.5], [-11, 6.6, 0]] }, props: [], pills: [] },
   rooftop3: { name: 'Крыша · рассвет', desc: '', story: true, hx: 18, hz: 18, h: 9, spawn: [0, 6, 9], fog: 0xf0c8b0, fogD: 0.012, bg: 0xf4c8a8, sun: 1.1, hemi: 0.9, lamp: [0xffd8b0, 18, 20], lamps: [[0, 6, 0], [-9, 6, -9], [9, 6, -9], [0, 6, 12]], red: [[0, 4, 0], 0xff4a4a, 0], build: buildRoof3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  street3: { name: 'Ночной город', desc: '', story: true, hx: 14, hz: 20, h: 12, spawn: [0, 6, -15], fog: 0x0a0c18, fogD: 0.02, bg: 0x080a14, sun: 0.2, hemi: 0.6, lamp: [0xffd8a0, 26, 16], lamps: [[-4, 6, -8], [4, 6, -2], [-4, 6, 4], [4, 6, 10]], red: [[0, 4, 0], 0xff3aa0, 0], build: buildStreet3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   ww2: { name: 'Поле боя 1941', desc: '', story: true, hx: 30, hz: 36, h: 30, spawn: [0, 32, 0], fog: 0x9a5c34, fogD: 0.018, bg: 0xb4683a, sun: 1.0, hemi: 0.9, lamp: [0xffb070, 34, 24], lamps: [[0, 2.8, -14], [-12, 3, 3], [14, 4, 10], [0, 5, 20]], red: [[0, 2.6, -12], 0xff7a30, 4], build: buildWW2, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   street: { name: 'Улица', desc: '', story: true, hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildStreet, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   police: { name: 'Участок полиции', desc: '', story: true, hx: 12, hz: 9, h: 3.4, spawn: [0, 7, 0], fog: 0x0b0d10, fogD: 0.03, bg: 0x070809, sun: 0.5, hemi: 0.55, lamp: [0xe8f2ff, 18, 14], lamps: [[-6, 3.1, -4], [6, 3.1, -4], [-6, 3.1, 4], [6, 3.1, 4]], red: [[11.8, 2.6, 0], 0x2a6aff, 4], build: buildPolice, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
@@ -10196,8 +10197,73 @@ function l3End() {
     [5.2, () => line('Мелоди', go ? 'Нет. Мне не нужна рядом кто-то, кто не понимает. Я хочу к воскресителю. Пойду его искать.' : 'Спасибо. За всё. Я буду петь… громко.', 1.45, 1.05)],
     [11.0, () => { if (go && M) { M.path = [[0, 16]]; M.pathSp = 2.2; } sub('', go ? 'Мелоди уходит к лестнице и скрывается за дверью.' : 'Она уходит к лестнице. Небо становится светлым.'); }],
     [16.0, () => { if (go) { Sound.siren && Sound.siren(0.3); sub('', 'Над городом гаснет розовый свет. На крыше становится тихо, слишком тихо.'); } }],
-    [21.0, () => { subOff(); if (go) { showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 ПРОЙДЕНА', 'Дальше: что-то другое…', 5000); } }],
-  ], (t, dt) => { if (M && M.path && M.path.length) walkPath(M, M.path, M.pathSp || 2, dt); if (M) { M.root.position.copy(M.pos); M.root.rotation.y = M.yaw; } camSet(7, 2.0, 4, 0, 1.2, -2); }, 22.0, () => { if (M) { M.dispose(); C3.mel = null; } subOff(); story.stage = ''; addUn('c2c'); saveCp(null); C3.done = true; c3FinishScreen(); });
+    [21.0, () => { subOff(); if (go) { showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 ПРОЙДЕНА', 'Дальше: ночной город', 3000); } }],
+  ], (t, dt) => { if (M && M.path && M.path.length) walkPath(M, M.path, M.pathSp || 2, dt); if (M) { M.root.position.copy(M.pos); M.root.rotation.y = M.yaw; } camSet(7, 2.0, 4, 0, 1.2, -2); }, 22.0, () => { if (M) { M.dispose(); C3.mel = null; } subOff(); if (go) { startStreet3(); } else { story.stage = ''; addUn('c2c'); saveCp(null); C3.done = true; c3FinishScreen(); } });
+}
+
+/* ===================== CHAPTER 2 · LOCATION 3 · PART 2 «Ночной город» =====================
+   You follow Melodie's trail through the night city and meet the resurrector on the bridge. */
+function buildStreet3() {
+  const H = WALL_H, BB = batcher(), C = (c, r = 0.85) => std({ color: c, roughness: r }), dk = C(0x1a1c22), steel = std({ color: 0x4a4c50, roughness: 0.4, metalness: 0.6 });
+  const blk = (m, x, y, z, sx, sy, sz) => { BB.box(m, x, y, z, sx, sy, sz); solid(x, y, z, sx, sy, sz); };
+  floorMesh(std({ map: texRep(TEX.asphalt, 12, 12), color: 0x3a3c42, roughness: 0.6, envMapIntensity: 0.6 }), HX * 2, HZ * 2);
+  // sidewalks and a river with a bridge across the middle (z)
+  BB.box(C(0x6a6a66), -HX + 3, 0.06, 0, 6, 0.12, HZ * 2); BB.box(C(0x6a6a66), HX - 3, 0.06, 0, 6, 0.12, HZ * 2);
+  BB.box(C(0x1a2a3a, 0.2), 0, -0.02, 6, HX * 2, 0.02, 4.5);
+  BB.box(steel, 0, 0.9, 6, 7, 0.25, 4.5); solid(0, 0.5, 6, 7, 1.0, 4.5); for (const x of [-3.4, 3.4]) for (const z of [4, 8]) BB.cyl(steel, x, 0.8, z, 0.08, 0.08, 1.6, 6);
+  // buildings on both sides, with lit windows
+  for (let i = 0; i < 8; i++) { const x = -HX + 1.5 + (i % 4) * 3.2, z = -HZ + 1.5 + Math.floor(i / 4) * 2 * 3.0; blk(C([0x2a2a34, 0x332a2a, 0x2a3330, 0x30283a][i % 4]), x, 4 + (i % 3), z, 3, 8 + (i % 3) * 2, 3);
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 2; c++) if (Math.random() < 0.55) BB.box(new THREE.MeshBasicMaterial({ color: pick([0xffd890, 0x9ad0ff, 0xff9ad8]) }), x - 0.7 + c * 1.4, 2 + r * 1.8, z + 1.52, 0.6, 0.9, 0.04); }
+  for (let i = 0; i < 6; i++) { const x = HX - 1.5 - (i % 3) * 3.2, z = -HZ + 1.5 + Math.floor(i / 3) * 2 * 3.0 + 6; blk(C(0x2a2a34), x, 5, z, 3, 10, 3); }
+  // lamp posts and a dumpster and a phone box
+  for (const z of [-8, -2, 4, 10]) for (const x of [-4.5, 4.5]) { BB.cyl(steel, x, 2.5, z, 0.06, 0.08, 5, 6); BB.geo(new THREE.MeshBasicMaterial({ color: 0xffd8a0 }), new THREE.SphereGeometry(0.2, 8, 6).translate(x, 5.1, z)); }
+  blk(C(0x2a4a2a), -5, 0.5, -4, 1.4, 1.0, 1.0); blk(C(0x2a2a80), 5, 0.6, -8, 0.8, 1.2, 0.8);
+  // a neon sign and a lit kiosk
+  addSign([{ t: 'НОЧНОЙ ПЕРЕХОД', s: 200 }], 4, 0.8, 0, 6, -HZ + 0.5, 0, 'rgba(255,90,180,0.95)');
+  BB.flush();
+}
+const S3 = { trail: { note: [-5, -4], post: [5, -8], bridge: [0, 6] }, found: new Set(), meet: false };
+function startStreet3() {
+  storyReset(); overReset(); mode = 'story'; story.on = true; story.asGG = false; story.ch = 2; story.gun = false; story.showAvatar = true; Object.assign(S3, { found: new Set(), meet: false });
+  storyMap('street3'); story.stage = 'c3s'; player.pos.set(0, 0, -15); player.yaw = 0; avatar.pos.copy(player.pos); standAvatar();
+  Music.stop(); Music.start('dread'); fadeIn(); $('black').style.opacity = ''; $('cine').classList.remove('on');
+  showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 · ПРОДОЛЖЕНИЕ', 'Ночной город', 3600);
+  runCut([
+    [0.2, () => sub('', 'Улица пуста. Фонари мигают, из реки тянет холодом. Вы идёте по её следам.')],
+    [5.4, () => { subOff(); setStage('c3s', 'Найдите три следа Мелоди: у мусорного бака, у телефонной будки и на мосту'); banner('Ночной город', 'следуйте за Мелоди'); }],
+  ], (t) => camSet(0, 3.2, -18, 0, 1.4, 0), 6.0, () => {});
+}
+function s3Act(info) {
+  const near = (p, r = 1.8) => Math.hypot(player.pos.x - p[0], player.pos.z - p[1]) < r;
+  const spots = [['note', S3.trail.note, 'Мусорный бак: её шарф и записка «Не ищи меня»'], ['post', S3.trail.post, 'Телефонная будка: монетки и номер Марка, перечёркнутый'], ['bridge', S3.trail.bridge, 'Мост: её следы на мокром асфальте, ведут на другой берег']];
+  for (const [k, p, text] of spots) if (!S3.found.has(k) && near(p)) { if (info) return 'Осмотреть след'; S3.found.add(k); Sound.chime(); line('Вы', text, 0.55, 0.95); toast(`След ${S3.found.size}/3`); if (S3.found.size === 3) setStage('c3s', 'Дойдите до моста: вас там ждут'); return null; }
+  if (S3.found.size === 3 && !S3.meet && near(S3.trail.bridge, 2.4)) { if (info) return 'Подойти к мосту'; S3.meet = true; s3Meet(); }
+  return null;
+}
+function s3Meet() {
+  story.stage = 's3-cut'; const d = c2Ui(); let R = null;
+  runCut([
+    [0.2, () => sub('', 'Фигура на другом берегу. Длинный плащ, капюшон. Он не спешит и смотрит на вас так, будто давно ждёт.')],
+    [5.6, () => { R = story.gg = new Humanoid('human', 0, 0, 0, 'gagarin'); R.scripted = true; story.extras.push(R); Object.assign(R, { pose: 'stand', poseDur: Infinity, ggWing: 0.6, ggHalo: 1, ggRage: 0, ggSlit: 0.75, ggDim: 0 }); R.pos.set(0, 0, 14); R.root.position.copy(R.pos); }],
+    [7.4, () => ggSay('Ты пришёл один. Как и она.', 2.6)],
+    [12.0, () => ggSay('Она искала меня. Ты тоже. Скажи, зачем?', 3)],
+  ], (t, dt) => { if (R) { R.pos.z = lerp(14, 7.5, clamp((t - 5.6) / 4, 0, 1)); R.root.position.copy(R.pos); R.root.rotation.y = Math.PI; } camSet(-1.6, 1.7, 10.4, 0, 1.4, 7.5); }, 13.0, () => s3Choice(R));
+}
+function s3Choice(R) {
+  story.stage = 's3-choice'; const d = c2Ui();
+  d.style.borderColor = '#d8a840';
+  d.innerHTML = '<small style="letter-spacing:.18em;color:#ffd060">ВОСКРЕСИТЕЛЬ</small><b style="display:block;margin:6px 0 8px">Что вы ему скажете?</b>' + [['Мелоди любит тебя. Я видел её лицо.', 'love'], ['Оставь её в покое. Или я найду способ тебя остановить.', 'threat'], ['Я хочу понять, кто ты на самом деле.', 'ask']].map(([t, k]) => `<button class="btn" data-k="${k}" style="width:100%;margin:4px 0;text-align:left">${t}</button>`).join('');
+  d.style.display = 'block';
+  d.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { d.style.display = 'none'; s3End(b.dataset.k, R); });
+}
+function s3End(k, R) {
+  const lines = { love: ['Любит? Ха. Она любит песню, которую я ей подарил. Не меня.', 'Тогда пусть споёт ещё раз. Для меня. Последний раз.'], threat: ['Остановить меня? Ты даже не знаешь, с чем стоишь на мосту.', 'Но я ценю смелость. Из неё получаются хорошие куски.'], ask: ['Кто я? Тот, кого ты боишься вспомнить по утрам.', 'Завтра ты узнаешь больше. Или сегодня, если не будешь спать.'] }[k];
+  runCut([
+    [0.2, () => ggSay(lines[0], 3.4)],
+    [4.6, () => ggSay(lines[1], 3.4)],
+    [9.2, () => sub('', 'Фигура поворачивается и растворяется в тумане над рекой. Мост остаётся пустым.')],
+    [13.4, () => { subOff(); showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 · ПРОДОЛЖЕНИЕ ПРОЙДЕНО', 'Продолжение следует…', 5500); }],
+  ], (t, dt) => { if (R) { R.pos.z -= dt * 0.8; R.root.position.copy(R.pos); R.root.visible = t < 9.2; } camSet(-1.6, 1.7, 10.4, 0, 1.4, 7.5); }, 18.0, () => { if (R) { R.dispose(); story.gg = null; } story.stage = ''; addUn('c2c'); saveCp(null); C3.done = true; c3FinishScreen(); });
 }
 function c3FinishScreen() {
   const sec = Math.round((performance.now() - (C3.t0 || performance.now())) / 1000), sym = C2.sym || 0;
@@ -10822,7 +10888,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { startLoc3, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { startStreet3, startLoc3, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
