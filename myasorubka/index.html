@@ -9843,7 +9843,8 @@ function flReact() {
 const FLC = { MILK: new THREE.Color(0xf6f4ec), OIL: new THREE.Color(0x0e0c0a), RAW: new THREE.Color(0xa82a22), BONE: new THREE.Color(0xe6dcc4), CHAR: new THREE.Color(0x15100c), HONEY: new THREE.Color(0xd89a20), LAVA: new THREE.Color(0xff4a00) };
 const FLX = { prints: [], pi: 0, strands: [], strandMat: null, bees: 0, stuck: [], pStuck: 0, pAnchor: new V3(), lavaT: 0 };
 const _fq = new V3(), _fq2 = new V3(), _fqq = new THREE.Quaternion(), _fup = new V3(0, 1, 0);
-function flQuery(x, y, z, R, cnt) { const H = LQ.H, R2 = R * R, ix = Math.floor(x / H), iy = Math.floor(y / H), iz = Math.floor(z / H); for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (let c = -1; c <= 1; c++) { let j = LQ.head[flHash(ix + a, iy + b, iz + c)]; while (j !== -1) { const dx = LQ.px[j] - x, dy = LQ.py[j] - y, dz = LQ.pz[j] - z; if (dx * dx + dy * dy + dz * dz < R2) { cnt[LQ.ty[j]]++; if (LQ.burn[j] > 0) cnt[7]++; } j = LQ.next[j]; } } }
+function flQuery(x, y, z, R, cnt) { const H = LQ.H, R2 = R * R, ix = Math.floor(x / H), iy = Math.floor(y / H), iz = Math.floor(z / H); for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (let c = -1; c <= 1; c++) { let j = LQ.head[flHash(ix + a, iy + b, iz + c)]; while (j !== -1) { const dx = LQ.px[j] - x, dy = LQ.py[j] - y, dz = LQ.pz[j] - z; if (dx * dx + dy * dy + dz * dz < R2) { cnt[LQ.ty[j]]++; if (LQ.burn[j] > 0) cnt[7]++; if (LQ.ty[j] === 3) { const sp = Math.hypot(LQ.vx[j], LQ.vy[j], LQ.vz[j]); if (sp > cnt[8]) cnt[8] = sp; if (LQ.py[j] > cnt[9]) cnt[9] = LQ.py[j]; if (LQ.py[j] < cnt[10]) cnt[10] = LQ.py[j]; } } j = LQ.next[j]; } } }
+function flReset(c) { c.fill(0); c[9] = -1e9; c[10] = 1e9; }
 function flPartFx(P) { if (!P.fl) { P.fl = { w: 0, m: 0, o: 0, a: 0, l: 0, h: 0, wounds: 0, torn: 0, base0: P.baseColor.clone(), r0: P.baseRough }; } return P.fl; }
 function flRepaint(P) {
   const F = P.fl, c = _flc.copy(F.base0);
@@ -9865,25 +9866,68 @@ function flStrand(i, a, b, w) {
   const len = a.distanceTo(b); m.visible = true; m.position.copy(a).add(b).multiplyScalar(0.5); _fq.subVectors(b, a).normalize(); m.quaternion.setFromUnitVectors(_fup, _fq); m.scale.set(w, len, w);
 }
 function flStick(n, leg) { if (n.flStuck) return; const P = n.parts['lLeg' + leg]; if (!P || P.gone) return; (P.foot || P.mesh).getWorldPosition(_fq); n.flStuck = { t: 5, leg, ax: _fq.x, az: _fq.z, px: n.pos.x, pz: n.pos.z, ph: 0 }; FLX.stuck.push(n); if (Math.random() < 0.6) c2Say(pick(['Ай! Нога прилипла!', 'Да что это такое?!', 'Мёд?! Отпусти!', 'Помогите, я застрял!']), 'Прохожий'); }
+function flPatch(P, fx) {
+  if (fx.uH) return; fx.uH = { value: [new THREE.Vector4(0, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0)] }; fx.uB = { value: new THREE.Vector4(0, 0, 0, 0) }; fx.uC = { value: 1e9 };
+  if (!P.matOwn) { P.mat = P.mesh.material = P.mat.clone(); P.matOwn = true; } const mm = P.mat; mm.side = THREE.DoubleSide;
+  mm.onBeforeCompile = (sh) => { sh.uniforms.uHole = fx.uH; sh.uniforms.uBand = fx.uB; sh.uniforms.uCut = fx.uC;
+    sh.vertexShader = 'varying vec3 vLoc;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vLoc = position;');
+    sh.fragmentShader = 'uniform vec4 uHole[3]; uniform vec4 uBand; uniform float uCut; varying vec3 vLoc;\n' + sh.fragmentShader.replace('void main() {', 'void main() {\n for (int hi = 0; hi < 3; hi++) { if (uHole[hi].w > 0.0 && length(vLoc.xy - uHole[hi].xy) < uHole[hi].w) discard; }\n if (uBand.w > 0.0 && abs(dot(vLoc.xy, uBand.xy) - uBand.z) < uBand.w) discard;\n if (vLoc.y > uCut) discard;'); };
+  mm.customProgramCacheKey = () => 'acidcut'; mm.needsUpdate = true; fx.hg = [];
+}
+// red muscle fibres: thin tubes fanning out from a point
+function flStrands(parent, n, o) {
+  const mat = new THREE.MeshStandardMaterial({ color: o.col || 0xd01a0a, roughness: 0.35, emissive: 0x440604, emissiveIntensity: 0.7 });
+  for (let i = 0; i < n; i++) { const d = o.dir.clone().add(new THREE.Vector3(rand(-1, 1), rand(-1, 1), rand(-1, 1)).multiplyScalar(o.spread)).normalize(), L = o.len * rand(0.55, 1.35), p0 = o.pos.clone(), p1 = p0.clone().addScaledVector(d, L * 0.5).add(new THREE.Vector3(rand(-1, 1), rand(-1, 1), rand(-1, 1)).multiplyScalar(L * 0.12)), p2 = p0.clone().addScaledVector(d, L); p2.y -= L * (o.droop || 0) * rand(0.2, 0.7);
+    const m = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([p0, p1, p2]), 7, rand(0.0028, 0.0055), 4, false), mat); parent.add(m); }
+}
+function flSlime(parent, pos, r) { const m = new THREE.Mesh(new THREE.SphereGeometry(r, 10, 8), new THREE.MeshStandardMaterial({ color: 0x7cff2a, emissive: 0x3aff10, emissiveIntensity: 1.2, roughness: 0.1, transparent: true, opacity: 0.78 })); m.position.copy(pos); m.scale.y = rand(1.0, 1.6); parent.add(m); return m; }
 function flHole(n, P, fx) {
-  if (!fx.uH) { fx.uH = { value: [new THREE.Vector4(0, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0)] };
-    const m = P.mat; if (!P.matOwn) { P.mat = P.mesh.material = m.clone(); P.matOwn = true; } const mm = P.mat; mm.side = THREE.DoubleSide;
-    mm.onBeforeCompile = (sh) => { sh.uniforms.uHole = fx.uH; sh.vertexShader = 'varying vec3 vLoc;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vLoc = position;'); sh.fragmentShader = 'uniform vec4 uHole[3];\nvarying vec3 vLoc;\n' + sh.fragmentShader.replace('void main() {', 'void main() {\n for (int hi = 0; hi < 3; hi++) { if (uHole[hi].w > 0.0 && length(vLoc.xy - uHole[hi].xy) < uHole[hi].w) discard; }'); };
-    mm.customProgramCacheKey = () => 'acidhole'; mm.needsUpdate = true; fx.hg = []; }
-  const k = fx.hg.length; if (k >= 3) return; const x = k === 0 ? rand(-0.05, 0.05) : k === 1 ? rand(0.06, 0.09) * (Math.random() < 0.5 ? -1 : 1) : rand(-0.06, 0.06), y = k === 0 ? rand(0.0, 0.08) : k === 1 ? rand(-0.08, 0.05) : rand(0.1, 0.18);
+  flPatch(P, fx); const k = fx.hg.length; if (k >= 3) return;
+  const x = k === 0 ? rand(-0.05, 0.05) : k === 1 ? rand(0.06, 0.09) * (Math.random() < 0.5 ? -1 : 1) : rand(-0.06, 0.06), y = k === 0 ? rand(0.0, 0.08) : k === 1 ? rand(-0.08, 0.05) : rand(0.1, 0.18);
   fx.uH.value[k].set(x, y, 0, 0.035);
   const g = new THREE.Group(), tube = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.24, 20, 1, true).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x8a1818, roughness: 0.5, side: THREE.DoubleSide, emissive: 0x2a0404, emissiveIntensity: 0.6 }));
   g.add(tube); for (const z of [0.121, -0.121]) { const rim = new THREE.Mesh(new THREE.TorusGeometry(1, 0.09, 6, 28), new THREE.MeshStandardMaterial({ color: 0x7cff2a, emissive: 0x4aff10, emissiveIntensity: 1.8, roughness: 0.3 })); rim.position.z = z; g.add(rim); const burn = new THREE.Mesh(new THREE.RingGeometry(1.05, 1.7, 24), new THREE.MeshBasicMaterial({ color: 0x3a1230, transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4 })); burn.position.z = z * 0.985; g.add(burn); }
   g.position.set(x, y, 0); g.scale.set(0.035, 0.035, 1); P.mesh.add(g); fx.hg.push(g);
+  // red veins around the rim, front and back
+  for (const z of [0.122, -0.122]) flStrands(P.mesh, 9, { pos: new THREE.Vector3(x, y + 0.07, z), dir: new THREE.Vector3(0, 0.25, Math.sign(z) * 0.1), spread: 1.2, len: 0.1, droop: 0.5 });
+}
+// a fast stream slices the body: a diagonal slot through it, crossed by red fibres and green slime
+function flBand(n, P, fx) {
+  flPatch(P, fx); fx.band = true; const th = (Math.random() < 0.5 ? -1 : 1) * rand(0.55, 0.95), nx = Math.sin(th), ny = Math.cos(th), d0 = rand(-0.03, 0.05), hw = 0.034; fx.uB.value.set(nx, ny, d0, hw); const tx = -ny, ty = nx;
+  const g = new THREE.Group(); P.mesh.add(g);
+  for (let i = 0; i < 17; i++) { const t0 = rand(-0.19, 0.19), t1 = t0 + rand(-0.05, 0.05), zz = rand(-0.1, 0.1), A = new THREE.Vector3(nx * (d0 - hw * 1.1) + tx * t0, ny * (d0 - hw * 1.1) + ty * t0, zz + rand(-0.02, 0.02)), B = new THREE.Vector3(nx * (d0 + hw * 1.1) + tx * t1, ny * (d0 + hw * 1.1) + ty * t1, zz + rand(-0.02, 0.02)), Mid = A.clone().lerp(B, 0.5).add(new THREE.Vector3(rand(-0.01, 0.01), rand(-0.012, 0.002), rand(-0.01, 0.01)));
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([A, Mid, B]), 6, rand(0.003, 0.006), 4, false), new THREE.MeshStandardMaterial({ color: i % 3 ? 0xd01a0a : 0x8a6a10, roughness: 0.4, emissive: 0x300400, emissiveIntensity: 0.6 }))); }
+  for (let i = 0; i < 7; i++) { const t = rand(-0.17, 0.17); flSlime(g, new THREE.Vector3(nx * d0 + tx * t, ny * d0 + ty * t, rand(-0.09, 0.09)), rand(0.012, 0.024)); }
+  for (const z of [0.12, -0.12]) { const A = new THREE.Vector3(nx * d0 + tx * -0.2, ny * d0 + ty * -0.2, z), B = new THREE.Vector3(nx * d0 + tx * 0.2, ny * d0 + ty * 0.2, z); const L = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.4, 5), new THREE.MeshStandardMaterial({ color: 0x7cff2a, emissive: 0x4aff10, emissiveIntensity: 1.6 })); L.position.copy(A).lerp(B, 0.5); L.rotation.z = Math.atan2(B.x - A.x, -(B.y - A.y)); L.rotation.z = -Math.atan2(tx, ty) + Math.PI; for (const sg of [-1, 1]) { const E = L.clone(); E.position.x += nx * hw * sg; E.position.y += ny * hw * sg; g.add(E); } }
+  Sound.splat && Sound.splat(0.7);
+}
+// the whole head dissolves: a ragged neck stump with red fibres and green slime
+function flDissolveHead(n, P, fx) {
+  P.mesh.visible = false; const pv = P.pivot, g = new THREE.Group(); pv.add(g);
+  flStrands(g, 26, { pos: new THREE.Vector3(0, 0.0, 0), dir: new THREE.Vector3(0, 1, 0), spread: 1.05, len: 0.2, droop: 0.9 });
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.012, 8, 20), new THREE.MeshStandardMaterial({ color: 0x7cff2a, emissive: 0x4aff10, emissiveIntensity: 1.8 })); ring.rotation.x = Math.PI / 2; ring.position.y = -0.01; g.add(ring);
+  for (let i = 0; i < 8; i++) { const a = i / 8 * 6.28; flSlime(g, new THREE.Vector3(Math.cos(a) * 0.05, -0.02 - rand(0, 0.06), Math.sin(a) * 0.05), rand(0.008, 0.016)); }
+  for (let i = 0; i < 14; i++) { const w = P.mesh.getWorldPosition(new V3()); spawnSprite(TEX.soft, w.add(new V3(rand(-0.1, 0.1), rand(-0.1, 0.1), rand(-0.1, 0.1))), { color: pick([0x8cff3a, 0xc8ff8a, 0x3a1a1a]), additive: false, size: rand(0.08, 0.2), grow: 1.4, life: rand(0.6, 1.2), opacity: 0.7, vel: new V3(rand(-0.4, 0.4), rand(0.5, 1.6), rand(-0.4, 0.4)) }); }
+  Sound.splat && Sound.splat(0.9); n.hp = 0; n.die('shot');
+}
+// only the top of the skull is eaten away: pink brain and fibres show
+function flCap(n, P, fx) {
+  flPatch(P, fx); fx.uC.value = 0.035; for (const c of P.mesh.children) if (c.position.y > 0.03) c.visible = false;
+  const g = new THREE.Group(); P.mesh.add(g); const brain = new THREE.Mesh(new THREE.SphereGeometry(0.108, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xe0309a, roughness: 0.25, emissive: 0x6a0a4a, emissiveIntensity: 0.8 }));
+  brain.position.y = 0.032; brain.scale.set(1, 0.55, 1); g.add(brain); for (let i = 0; i < 6; i++) { const a = i / 6 * 6.28, f = new THREE.Mesh(new THREE.TorusGeometry(0.028, 0.006, 5, 12), new THREE.MeshStandardMaterial({ color: 0xc02a82, roughness: 0.3 })); f.position.set(Math.cos(a) * 0.05, 0.05 + 0.02 * Math.sin(a * 2), Math.sin(a) * 0.05); f.rotation.set(rand(0, 3), rand(0, 3), 0); g.add(f); }
+  flStrands(g, 28, { pos: new THREE.Vector3(0, 0.034, 0), dir: new THREE.Vector3(0, 1, 0), spread: 1.3, len: 0.15, droop: 1.0 });
+  for (let i = 0; i < 12; i++) { const a = rand(0, 6.28); flStrands(g, 1, { pos: new THREE.Vector3(Math.cos(a) * 0.115, 0.034, Math.sin(a) * 0.115), dir: new THREE.Vector3(Math.cos(a), -0.8, Math.sin(a)), spread: 0.4, len: 0.09, droop: 0.2 }); }
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.117, 0.006, 6, 28), new THREE.MeshStandardMaterial({ color: 0x7cff2a, emissive: 0x4aff10, emissiveIntensity: 1.8 })); ring.rotation.x = Math.PI / 2; ring.position.y = 0.034; g.add(ring);
+  Sound.splat && Sound.splat(0.9); bloody(P, 0.4); n.hp = 0; n.die('shot');
 }
 function flEffects() {
   const isDeadOk = (n) => n.root && n.parts;
   const bodies = npcs.filter((n) => isDeadOk(n) && Math.hypot(n.pos.x, n.pos.z) < 40);
-  const cnt = [0, 0, 0, 0, 0, 0, 0, 0];
+  const cnt = [0, 0, 0, 0, 0, 0, 0, 0, 0, -1e9, 1e9];
   for (const n of bodies) {
     const alive = n.alive && n.state !== 'dead'; let hpLoss = 0, touched = false, sum = { w: 0, o: 0, m: 0, h: 0, a: 0, fire: 0 }, lava = 0, acid = 0, feet = { w: 0, o: 0, m: 0, h: 0, a: 0 };
-    for (const name in n.parts) { const P = n.parts[name]; if (!P || P.gone || !P.mesh) continue; P.mesh.getWorldPosition(_fq2); if (_fq2.y > 1.6) continue;
-      cnt.fill(0); flQuery(_fq2.x, _fq2.y, _fq2.z, 0.3, cnt); const any = cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4] + cnt[5]; const F = P.fl; if (!any && !F) continue;
+    for (const name in n.parts) { const P = n.parts[name]; if (!P || P.gone || !P.mesh) continue; P.mesh.getWorldPosition(_fq2); if (_fq2.y > 1.6 && name !== 'head') continue;
+      flReset(cnt); flQuery(_fq2.x, _fq2.y, _fq2.z, 0.3, cnt); const any = cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4] + cnt[5]; const F = P.fl; if (!any && !F) continue;
       const fx = flPartFx(P); let dirty = false; touched = touched || any > 0;
       if (cnt[0]) { fx.w = 1; fx.m *= 0.92; fx.h *= 0.9; dirty = true; }
       if (cnt[1]) { fx.m = Math.min(1, fx.m + cnt[1] * 0.06); fx.w = Math.max(fx.w, 0.6); dirty = true; }
@@ -9901,7 +9945,8 @@ function flEffects() {
         if (fx.l > 2.0 && name !== 'torso' && name !== 'pelvis' && Math.random() < 0.12) { n.detach(name, { dir: new V3(0, 0.2, 0) }); for (let k = 0; k < 6; k++) spawnSprite(TEX.smoke, _fq2.clone(), { color: 0x3a3634, size: 0.2, grow: 2, life: 1.6, opacity: 0.6, vel: randUnit(new V3()).multiplyScalar(0.8) }); } }
       else if (fx.heat > 0) { fx.heat = Math.max(0, fx.heat - 0.05); dirty = true; }
       if (fx.w > 0 && !cnt[0]) { fx.w = Math.max(0, fx.w - 0.006); if (fx.w > 0.25 && Math.random() < fx.w * 0.6) spawnSprite(TEX.soft, _fq2.clone().add(_fq.set(rand(-0.06, 0.06), -0.05, rand(-0.06, 0.06))), { color: 0x9ad0ff, additive: true, size: 0.025, grow: 0.1, life: 0.55, opacity: 0.85, vel: new V3(0, -2.2, 0) }); if (fx.w < 0.02 || Math.random() < 0.05) dirty = true; }
-      if (name === 'torso' && fx.a > 0.01) { const want = Math.min(3, 1 + Math.floor(fx.a * 1.4)); while ((fx.hg ? fx.hg.length : 0) < want) { flHole(n, P, fx); Sound.splat && Sound.splat(0.5); } fx.hg.forEach((g, k) => { const r = Math.min(0.085, 0.04 + fx.a * 0.025 * (1 - k * 0.15)); fx.uH.value[k].w = r; g.scale.set(r, r, 1); }); if (Math.random() < 0.5) { const g = fx.hg[(Math.random() * fx.hg.length) | 0]; g.getWorldPosition(_fq); spawnSprite(TEX.soft, _fq, { color: pick([0x8cff3a, 0xc8ff8a]), additive: true, size: rand(0.05, 0.1), grow: 0.5, life: 0.5, opacity: 0.9, vel: new V3(rand(-0.1, 0.1), 0.5, 0) }); } }
+      if (name === 'head' && cnt[3] > 0 && !fx.done) { fx.done = true; if (cnt[9] - _fq2.y > 0.07 && cnt[10] > _fq2.y - 0.03) flCap(n, P, fx); else flDissolveHead(n, P, fx); }
+      if (name === 'torso' && cnt[3] > 0) { if (!fx.mode) fx.mode = cnt[8] > 5 ? 'band' : 'hole'; if (fx.mode === 'band') { if (!fx.band) flBand(n, P, fx); } else if (fx.a > 0.01) { const want = Math.min(3, 1 + Math.floor(fx.a * 1.4)); while ((fx.hg ? fx.hg.length : 0) < want) { flHole(n, P, fx); Sound.splat && Sound.splat(0.5); } fx.hg.forEach((g, k) => { const r = Math.min(0.085, 0.04 + fx.a * 0.025 * (1 - k * 0.15)); fx.uH.value[k].w = r; g.scale.set(r, r, 1); }); } if (Math.random() < 0.5) { _fq.set(rand(-0.1, 0.1), rand(-0.05, 0.15), 0.12); P.mesh.localToWorld(_fq); spawnSprite(TEX.soft, _fq, { color: pick([0x8cff3a, 0xc8ff8a]), additive: true, size: rand(0.05, 0.1), grow: 0.5, life: 0.5, opacity: 0.9, vel: new V3(rand(-0.1, 0.1), 0.5, 0) }); } }
       if (dirty) flRepaint(P);
       if (name === 'lLegL' || name === 'lLegR') { if (fx.w > 0.3) feet.w++; if (fx.o > 0.2) feet.o++; if (fx.m > 0.3) feet.m++; if (fx.h > 0.3) feet.h++; if (fx.a > 0.6) feet.a++; }
       sum.w += cnt[0]; sum.o += cnt[5]; sum.fire += cnt[7];
@@ -9923,7 +9968,7 @@ function flEffects() {
     }
   }
   // the player
-  cnt.fill(0); flQuery(player.pos.x, player.pos.y + 0.3, player.pos.z, 0.55, cnt);
+  flReset(cnt); flQuery(player.pos.x, player.pos.y + 0.3, player.pos.z, 0.55, cnt);
   if (cnt[2] > 1) { damagePlayer(Math.min(12, 2 + cnt[2])); Sound.flame(0.3); }
   if (cnt[3] > 1) { damagePlayer(Math.min(8, 1 + cnt[3] * 0.4)); flashScreen('#4aff4a', 140); }
   if (cnt[7]) damagePlayer(4);
