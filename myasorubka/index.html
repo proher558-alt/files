@@ -9865,6 +9865,19 @@ function flStrand(i, a, b, w) {
   const len = a.distanceTo(b); m.visible = true; m.position.copy(a).add(b).multiplyScalar(0.5); _fq.subVectors(b, a).normalize(); m.quaternion.setFromUnitVectors(_fup, _fq); m.scale.set(w, len, w);
 }
 function flStick(n, leg) { if (n.flStuck) return; const P = n.parts['lLeg' + leg]; if (!P || P.gone) return; (P.foot || P.mesh).getWorldPosition(_fq); n.flStuck = { t: 5, leg, ax: _fq.x, az: _fq.z, px: n.pos.x, pz: n.pos.z, ph: 0 }; FLX.stuck.push(n); if (Math.random() < 0.6) c2Say(pick(['Ай! Нога прилипла!', 'Да что это такое?!', 'Мёд?! Отпусти!', 'Помогите, я застрял!']), 'Прохожий'); }
+function flHole(n, P, fx) {
+  const g = new THREE.Group(), sg = Math.random() < 0.5 ? -1 : 1, M = (c, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.55, polygonOffset: true, polygonOffsetFactor: -4 }, o));
+  const back = Math.random() < 0.3, zf = back ? -1 : 1;
+  const cav = new THREE.Mesh(new THREE.CircleGeometry(0.068, 24), new THREE.MeshBasicMaterial({ color: 0x14040a, polygonOffset: true, polygonOffsetFactor: -4 })); cav.position.z = 0.118 * zf; g.add(cav);
+  for (const sx of [-1, 1]) { const lung = new THREE.Mesh(new THREE.SphereGeometry(0.033, 12, 10), M(0xc8586a, { roughness: 0.3, emissive: 0x3a0810, emissiveIntensity: 0.5 })); lung.scale.set(0.8, 1.35, 0.5); lung.position.set(sx * 0.028, 0.0, 0.121 * zf); g.add(lung); }
+  for (const y of [-0.03, 0.01, 0.045]) { const rib = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.008, 0.008), M(0xe8e0cc)); rib.position.set(0, y, 0.125 * zf); rib.rotation.z = (y - 0.01) * 2.4; g.add(rib); }
+  const flesh = new THREE.Mesh(new THREE.RingGeometry(0.066, 0.098, 24), M(0xa01818, { emissive: 0x300404, emissiveIntensity: 0.6 })); flesh.position.z = 0.119 * zf; g.add(flesh);
+  const burn = new THREE.Mesh(new THREE.RingGeometry(0.094, 0.125, 24), M(0x4a1a3a, { transparent: true, opacity: 0.8, depthWrite: false })); burn.position.z = 0.1185 * zf; g.add(burn);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.082, 0.0075, 6, 28), M(0x7cff2a, { emissive: 0x4aff10, emissiveIntensity: 1.6 })); rim.position.z = 0.12 * zf; g.add(rim);
+  for (let k = 0; k < 4; k++) { const d = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.04 + Math.random() * 0.07, 0.004), M(0x4a1a3a, { emissive: 0x2a6a10, emissiveIntensity: 0.5 })); d.position.set((k - 1.5) * 0.03, -0.1 - Math.random() * 0.02, 0.1185 * zf); g.add(d); }
+  g.position.set(sg * rand(0.02, 0.06), rand(0.0, 0.1), 0); if (back) g.rotation.y = Math.PI; g.scale.setScalar(0.5); P.mesh.add(g);
+  (fx.holes = fx.holes || []).push(g);
+}
 function flEffects() {
   const isDeadOk = (n) => n.root && n.parts;
   const bodies = npcs.filter((n) => isDeadOk(n) && Math.hypot(n.pos.x, n.pos.z) < 40);
@@ -9890,6 +9903,7 @@ function flEffects() {
         if (fx.l > 2.0 && name !== 'torso' && name !== 'pelvis' && Math.random() < 0.12) { n.detach(name, { dir: new V3(0, 0.2, 0) }); for (let k = 0; k < 6; k++) spawnSprite(TEX.smoke, _fq2.clone(), { color: 0x3a3634, size: 0.2, grow: 2, life: 1.6, opacity: 0.6, vel: randUnit(new V3()).multiplyScalar(0.8) }); } }
       else if (fx.heat > 0) { fx.heat = Math.max(0, fx.heat - 0.05); dirty = true; }
       if (fx.w > 0 && !cnt[0]) { fx.w = Math.max(0, fx.w - 0.006); if (fx.w > 0.25 && Math.random() < fx.w * 0.6) spawnSprite(TEX.soft, _fq2.clone().add(_fq.set(rand(-0.06, 0.06), -0.05, rand(-0.06, 0.06))), { color: 0x9ad0ff, additive: true, size: 0.025, grow: 0.1, life: 0.55, opacity: 0.85, vel: new V3(0, -2.2, 0) }); if (fx.w < 0.02 || Math.random() < 0.05) dirty = true; }
+      if (name === 'torso' && fx.a > 1.0) { const want = Math.min(2, Math.floor(fx.a)); while ((fx.holes ? fx.holes.length : 0) < want) { flHole(n, P, fx); Sound.splat && Sound.splat(0.5); } for (const h of fx.holes) h.scale.setScalar(Math.min(1.6, 0.5 + (fx.a - 1) * 0.55)); if (Math.random() < 0.5) { const h = fx.holes[(Math.random() * fx.holes.length) | 0]; h.getWorldPosition(_fq); spawnSprite(TEX.soft, _fq, { color: pick([0x8cff3a, 0xc8ff8a]), additive: true, size: rand(0.05, 0.1), grow: 0.5, life: 0.5, opacity: 0.9, vel: new V3(rand(-0.1, 0.1), 0.5, 0) }); } }
       if (dirty) flRepaint(P);
       if (name === 'lLegL' || name === 'lLegR') { if (fx.w > 0.3) feet.w++; if (fx.o > 0.2) feet.o++; if (fx.m > 0.3) feet.m++; if (fx.h > 0.3) feet.h++; if (fx.a > 0.6) feet.a++; }
       sum.w += cnt[0]; sum.o += cnt[5]; sum.fire += cnt[7];
