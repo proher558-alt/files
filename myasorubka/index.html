@@ -9689,7 +9689,7 @@ function buildFluidLab() {
   box(conc, -13, 13, 0, 2.4, -16, -11.2); addDeck(-13, 13, -16, -11.2, 2.4);
   { const g = new THREE.BoxGeometry(26, 0.3, Math.hypot(6, 2.4)); const m = new THREE.Mesh(g, C(0xa8acb0, 0.4)); m.position.set(0, 1.05, -8.2); m.rotation.x = Math.atan2(2.4, 6); m.receiveShadow = true; addMesh(m); }
   LQ.ramps.push({ x0: -13, x1: 13, z0: -11.2, z1: -5.2, y0: 2.4, s: -0.4 });
-  for (let i = 0; i < 8; i++) addDeck(-13, 13, -11.2 + i * 0.75, -11.2 + (i + 1) * 0.75, Math.max(0, 2.4 - (i + 0.5) * 0.3));
+  for (let i = 0; i < 8; i++) { const top = Math.max(0.15, 2.4 - (i + 0.5) * 0.3), zc = -11.2 + (i + 0.5) * 0.75; addDeck(-13, 13, -11.2 + i * 0.75, -11.2 + (i + 1) * 0.75, top); solid(0, top / 2, zc, 26, top, 0.75); }
   for (const s of [-1, 1]) box(steel, s * 13.2 - 0.1, s * 13.2 + 0.1, 0, 2.8, -16, -5.2, false);
   FLU.taps = [];
   LQT.slice(0, 6).forEach((t, i) => { const x = -10 + i * 4; BB.box(steel, x, 3.6, -15.5, 0.24, 0.24, 1.0); BB.cyl(steel, x, 4.6, -15.9, 0.12, 0.12, 2.0, 10); BB.geo(std({ color: t.color, roughness: 0.4, emissive: t.emis || 0 }), new THREE.SphereGeometry(0.22, 12, 8).translate(x, 4.0, -15.75));
@@ -9751,7 +9751,7 @@ function lqRender() {
   }
   ms.forEach((m, t) => { m.count = cnt[t]; m.instanceMatrix.needsUpdate = true; });
   // surfaces: one or more cubes per liquid, fitted to its particles
-  LQV.f = (LQV.f || 0) + 1; if (LQV.f % 2) return; let vi = 0; const RI = 0.3, RV = 0.125, SUB = 80 * RV * RV / (RI * RI - RV * RV), MAXV = 10;
+  let vi = 0; const RI = 0.3, RV = 0.125, SUB = 80 * RV * RV / (RI * RI - RV * RV), MAXV = 10;
   for (let t = 0; t < 6 && vi < MAXV; t++) {
     const idx = _lqIdx[t]; if (idx.length < 2) continue;
     let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, z0 = 1e9, z1 = -1e9; for (const i of idx) { if (px[i] < x0) x0 = px[i]; if (px[i] > x1) x1 = px[i]; if (py[i] < y0) y0 = py[i]; if (py[i] > y1) y1 = py[i]; if (pz[i] < z0) z0 = pz[i]; if (pz[i] > z1) z1 = pz[i]; }
