@@ -10190,12 +10190,14 @@ function roofFinal() {
   d.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { d.style.display = 'none'; L3.choice = b.dataset.k; l3End(); });
 }
 function l3End() {
-  const stay = L3.choice === 'go';
+  const go = L3.choice === 'go', M = C3.mel;
   runCut([
-    [0.2, () => line('Вы', stay ? 'Я буду рядом. Если понадобится.' : 'Ты свободна. Пой, как хочешь.', 0.55, 0.95)],
-    [5.2, () => line('Мелоди', stay ? 'Тогда я буду петь громче. Чтобы ты слышал.' : 'Спасибо. За всё. Я буду петь… громко.', 1.45, 1.05)],
-    [10.8, () => sub('', 'Она уходит к лестнице. Небо становится светлым.')],
-  ], (t, dt) => camSet(7, 2.0, 4, 0, 1.2, -2), 14.0, () => { subOff(); story.stage = ''; addUn('c2c'); saveCp(null); C3.done = true; c3FinishScreen(); });
+    [0.2, () => line('Вы', go ? 'Я останусь рядом, если понадобится.' : 'Ты свободна. Пой, как хочешь.', 0.55, 0.95)],
+    [5.2, () => line('Мелоди', go ? 'Нет. Мне не нужна рядом кто-то, кто не понимает. Я хочу к воскресителю. Пойду его искать.' : 'Спасибо. За всё. Я буду петь… громко.', 1.45, 1.05)],
+    [11.0, () => { if (go && M) { M.path = [[0, 16]]; M.pathSp = 2.2; } sub('', go ? 'Мелоди уходит к лестнице и скрывается за дверью.' : 'Она уходит к лестнице. Небо становится светлым.'); }],
+    [16.0, () => { if (go) { Sound.siren && Sound.siren(0.3); sub('', 'Над городом гаснет розовый свет. На крыше становится тихо, слишком тихо.'); } }],
+    [21.0, () => { subOff(); if (go) { showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 ПРОЙДЕНА', 'Дальше: что-то другое…', 5000); } }],
+  ], (t, dt) => { if (M && M.path && M.path.length) walkPath(M, M.path, M.pathSp || 2, dt); if (M) { M.root.position.copy(M.pos); M.root.rotation.y = M.yaw; } camSet(7, 2.0, 4, 0, 1.2, -2); }, 22.0, () => { if (M) { M.dispose(); C3.mel = null; } subOff(); story.stage = ''; addUn('c2c'); saveCp(null); C3.done = true; c3FinishScreen(); });
 }
 function c3FinishScreen() {
   const sec = Math.round((performance.now() - (C3.t0 || performance.now())) / 1000), sym = C2.sym || 0;
