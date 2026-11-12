@@ -7660,6 +7660,26 @@ function syncUltra() { $('ultraChips').querySelectorAll('.chip').forEach((b) => 
 $('ultraChips').querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.ultra = b.dataset.v === '1'; saveSettings(); syncUltra(); Sound.click(settings.ultra ? 1600 : 700, 0.2); toast(settings.ultra ? 'ULTRA: до 888%' : 'ULTRA выключен'); });
 
 
+
+/* ----- floating admin button: appears after the code is entered, drag it anywhere, tap to open ----- */
+(function admFloat() {
+  let b = null, drag = null, moved = 0;
+  const pos = (() => { try { return JSON.parse(localStorage.getItem('myasorubka-admpos') || 'null'); } catch (e) { return null; } })();
+  function make() {
+    b = document.createElement('button'); b.id = 'admFloat'; b.textContent = '🛠';
+    b.style.cssText = 'position:fixed;z-index:70;width:46px;height:46px;border-radius:50%;border:2px solid #d8a840;background:rgba(20,8,12,.85);color:#ffd060;font:20px var(--ui);box-shadow:0 0 14px rgba(216,168,64,.5);touch-action:none;display:none;user-select:none;-webkit-user-select:none';
+    const p = pos || { x: innerWidth - 64, y: innerHeight * 0.45 }; b.style.left = Math.max(0, Math.min(innerWidth - 46, p.x)) + 'px'; b.style.top = Math.max(0, Math.min(innerHeight - 46, p.y)) + 'px';
+    b.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, bx: b.offsetLeft, by: b.offsetTop }; moved = 0; b.setPointerCapture(e.pointerId); });
+    b.addEventListener('pointermove', (e) => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; moved = Math.max(moved, Math.hypot(dx, dy)); b.style.left = Math.max(0, Math.min(innerWidth - 46, drag.bx + dx)) + 'px'; b.style.top = Math.max(0, Math.min(innerHeight - 46, drag.by + dy)) + 'px'; });
+    b.addEventListener('pointerup', () => { if (!drag) return; drag = null; try { localStorage.setItem('myasorubka-admpos', JSON.stringify({ x: b.offsetLeft, y: b.offsetTop })); } catch (e) {} if (moved < 6) { Sound.click(1000, 0.15); $('admin').hidden = false; admRender(); } });
+    document.body.appendChild(b);
+  }
+  setInterval(() => {
+    if (!b) { if (!document.body) return; make(); }
+    const show = !!(adm && adm.ok) && state !== 'pause' || (adm && adm.ok && state === 'pause');
+    b.style.display = show ? 'block' : 'none';
+  }, 400);
+})();
 /* ===== admin panel, code 6508: endings, scene gallery, resurrector, cheats ===== */
 const ADM_CODE = '6508';
 const adm = { in: '', tab: 'end', ok: false };
@@ -7748,6 +7768,13 @@ function admCh2() {
     { l: 'Обезвредить все заряды', s: 'Во время поиска', f: () => { admClose(); if (story.stage === 'c3-pyro') { C3.charges.forEach((c) => { c.done = true; c.led.material.color.setHex(0x20ff40); }); C3.defused = 4; c3Finale(); } else toast('Сначала «Поиск зарядов»'); } },
     { l: 'Таймер +60 с', s: 'Во время поиска', f: () => { admClose(); C3.timer += 60; toast('+60 секунд'); } },
     { l: 'Симпатия Мелоди ♥♥', s: 'Влияет на её слова на сцене', f: () => { C2.sym = 3; toast('Симпатия: ♥♥'); } },
+    { sec: 'Клуб: сцены и моменты' },
+    { l: 'Клуб: улица у входа', s: 'Очередь, Стас, инспектор', f: () => { admClose(); startCh2('c3'); } },
+    { l: 'Клуб: поиск пропуска', s: 'Техник у служебного входа', f: () => { admClose(); startCh2('c3'); setTimeout(() => { admSkipTo(() => story.stage === 'c3-out'); }, 400); } },
+    { l: 'Клуб: гримёрка Мелоди', s: 'Разговор после телефона', f: () => { admClose(); startCh2('c3b'); } },
+    { l: 'Клуб: сцена на сцене', s: 'Мелоди объявляет басиста', f: () => { admClose(); startCh2('c3b'); setTimeout(() => { C3.phone = true; c3Show(); }, 600); } },
+    { l: 'Клуб: ритм-игра (хайп 100%)', s: 'Сразу финал песни', f: () => { admClose(); startCh2('c3b'); setTimeout(() => { C3.phone = true; c3Show(); setTimeout(() => { C3.hype = 1; }, 300); }, 600); } },
+    { l: 'Клуб: осмотр тестера', s: 'Таймер и заряды', f: () => { admClose(); startCh2('c3c'); } },
     { sec: 'Телепорт · по подвалу (во время главы)' },
     { l: 'Клетка', s: 'Внутри', f: () => c2AdmTp(-7.6, 11.8, -Math.PI / 2) },
     { l: 'Стол допроса', s: 'Медиатор', f: () => c2AdmTp(-4.4, 9.6, Math.PI) },
