@@ -10217,7 +10217,7 @@ function d3Abacus(n = 2, vol = 0.22) { for (let i = 0; i < n; i++) later(i * 0.1
 function d3Talk(lines, upd, after) {
   let t = 0.2; const steps = [];
   for (const [who, txt, shot, fn] of lines) { const at = t; steps.push([at, () => { if (shot) D3.shot = shot; if (fn) fn(); if (txt) d3Say(who, txt); }]); t += txt ? 1.3 + txt.length * 0.058 : 1.2; }
-  story.stage = 'd3-cut'; runCut(steps, (tt, dt) => { if (upd) upd(tt, dt); d3CutCam(tt); }, t, () => { subOff(); after && after(); });
+  story.stage = 'd3-cut'; d3Hud().style.display = 'none'; screenSplats.length = 0; runCut(steps, (tt, dt) => { if (upd) upd(tt, dt); d3CutCam(tt); }, t, () => { subOff(); after && after(); });
 }
 function d3CutCam(t) { const s = D3.shot; if (typeof s === 'function') s(t); else if (D3.cam) D3.cam(s, t); }
 function d3Sync(list, dt) { for (const n of list) if (n && n.root && n.state === 'alive') { if (n.path && n.path.length) walkPath(n, n.path, n.pathSp || 1.6, dt); else n.speed = 0; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; } }
@@ -10344,6 +10344,7 @@ function d3Start(cp = null) {
   if (cp === 'd3b') d3Eclipse(true); else if (cp === 'd3c') d3DriveStart(); else if (cp === 'd3d') d3CityStart(true); else if (cp === 'd3e') d3OfficeStart(true); else if (cp === 'd3f') d3BossStart(true);
   else { saveCp('d3'); d3RoofStart(); }
 }
+function d3Map(id) { d3HollowsClear(); D3.allies = []; D3.onBreach = null; storyMap(id); }
 function d3Cp(id) { saveCp(id); d3Save(); }
 /* ===================== LOCATION 3 · ACT I «Рассвет на крыше» ===================== */
 const R3 = { photo: [-13, -10.6], pick: [2.7, -13.2], letter: [15.2, 3], radio: [-2.6, -8.6], scope: [8, -19.4], coop: [-15.2, 7], pipe: [15.6, -9.6], gate: [-18.9, -2], door: [0, 18.3], mel: [0, -12.2] };
@@ -10584,7 +10585,7 @@ function d3DrvPlan() {
   return P.sort((a, b) => a[0] - b[0]);
 }
 function d3DriveStart() {
-  storyMap('ave3'); d3Cp('d3c'); D3.amb = null; D3.lamp = true; FL.light.color.setHex(0xffd27a);
+  d3Map('ave3'); d3Cp('d3c'); D3.amb = null; D3.lamp = true; FL.light.color.setHex(0xffd27a);
   const DV = D3.drive; Object.assign(DV, { x: 0, v: 0, dist: 0, hp: 100, plan: d3DrvPlan(), pi: 0, cp: 0, tilt: 0, t: 0, fin: false, tramWarn: false, smoke: 0 });
   player.pos.set(0, -6, 0); player.yaw = 0; player.pitch = 0; Music.stop(); Music.start('dread'); Sound.droneLoop(0.2); story.showAvatar = false; story.gun = false;
   showCard('ЛОКАЦИЯ 3 · ЧАСТЬ II', 'Проспект', 3000, true);
@@ -10712,7 +10713,7 @@ function d3CityPeople() {
   W(-14, -23, [[-18, -22.6], [-8, -23]]); W(12, -23, [[18, -22.6], [8, -23]]); W(14, 15, [[11, 14], [11, 18]]); W(5, 6, [[5, 8], [-4, 9], [5, 2]]);
 }
 function d3CityStart(fromCp) {
-  storyMap('street3'); d3Cp('d3d'); D3.amb = d3CityAmb; D3.lamp = true; FL.light.color.setHex(0xffd27a); D3.H = null; D3.found = new Set(); D3.resc = new Set(); D3.surv = []; D3.city.ring = true;
+  d3Map('street3'); d3Cp('d3d'); D3.amb = d3CityAmb; D3.lamp = true; FL.light.color.setHex(0xffd27a); D3.H = null; D3.found = new Set(); D3.resc = new Set(); D3.surv = []; D3.city.ring = true;
   d3CityPeople(); Music.stop(); Music.start('dread'); Sound.droneLoop(0.2); story.showAvatar = true; story.gun = false; d3Put(0.2, 35.6, S3.insp[0], S3.insp[1]); d3FaceTo(D3.insp, 0.2, 35.6);
   showCard('ЛОКАЦИЯ 3 · ЧАСТЬ III', 'Набережная', 3000, true); const I = D3.insp;
   d3Talk([
@@ -10839,6 +10840,328 @@ function d3DoorIn() {
     ['', 'Вы открываете. Изнутри пахнет пылью, чернилами и чем-то, чему нет названия.', (t) => camSet(0.6, 1.6, -50.6, 0, 1.3, -54), () => { op = 1; SC.doorGlow.visible = true; Sound.thud(0.5); Sound.rise(2.5); }],
   ], (t, dt) => { d3CityAmb(dt); SC.doorLeaf.rotation.y = lerp(SC.doorLeaf.rotation.y, -1.5 * op, Math.min(1, dt * 2)); }, () => { flashScreen('#d8ffb0', 1200); d3HollowsClear(); D3.allies = []; d3OfficeStart(false); });
 }
+/* ===================== LOCATION 3 · ACT V «Контора Счетовода» ===================== */
+const O3 = { ticket: [-9, 29.2], w1: [-7, -4.2], w2: [6, -4.2], gate: [0, -4.4], arch: [-13.4, 18], file: [-19, -25.4], pledge: [-24, 26.6], pact: [-24.2, -6], pneu: [19, 33.6], cage: [22.6, 5], desk: [19, -26.6], coll: [13.6, 0], boss: [0, -34.6] };
+function d3Faceless(n) { n.parts.head.mesh.traverse((o) => { if (o.userData && o.userData.face) o.visible = false; }); if (n.mouthOpen) n.mouthOpen.visible = false; return n; }
+function buildOffice3() {
+  const H = 6, BB = batcher(), C = (c, r = 0.85, m = 0) => std({ color: c, roughness: r, metalness: m }), wall = C(0x5a6452, 0.95), wall2 = C(0x4a4438, 0.95), wood = std({ map: TEX.wood, roughness: 0.7, color: 0x8a6a4a }), dark = C(0x1a1c1a, 0.7), brass = C(0xb89a48, 0.35, 0.8), glow = (c) => new THREE.MeshBasicMaterial({ color: c }), O = D3.O = { lamps: [], cones: [] };
+  const blk = (m, x, y, z, sx, sy, sz) => { BB.box(m, x, y, z, sx, sy, sz); solid(x, y, z, sx, sy, sz); };
+  const W = (x0, x1, z0, z1, m = wall) => blk(m, (x0 + x1) / 2, H / 2, (z0 + z1) / 2, Math.max(0.4, x1 - x0), H, Math.max(0.4, z1 - z0));
+  floorMesh(std({ map: cvTex(128, 128, (g) => { g.fillStyle = '#3a4034'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#2c3228'; g.fillRect(0, 0, 64, 64); g.fillRect(64, 64, 64, 64); grime(g, 128, 128, 30, 0.2); }), roughness: 0.5, envMapIntensity: 0.5 }), HX * 2, HZ * 2).material.map.repeat.set(26, 40);
+  { const c = new THREE.Mesh(new THREE.PlaneGeometry(HX * 2, HZ * 2).rotateX(Math.PI / 2), C(0x2a2c26, 1)); c.position.y = H; addMesh(c); }
+  W(-26, 26, -40.2, -39.8); W(-26, 26, 39.8, 40.2); W(-26.2, -25.8, -40, 40); W(25.8, 26.2, -40, 40);
+  W(-12.2, -11.8, -40, 17); W(-12.2, -11.8, 19.4, 40); BB.box(wall, -12, 4.2, 18.2, 0.4, 3.6, 2.4);
+  W(11.8, 12.2, -40, -1.2); W(11.8, 12.2, 1.2, 22.8); W(11.8, 12.2, 25.2, 40); BB.box(wall, 12, 4.2, 0, 0.4, 3.6, 2.4); BB.box(wall, 12, 4.2, 24, 0.4, 3.6, 2.4);
+  W(12, 26, 10.8, 11.2); W(12, 26, -30.2, -29.8); W(-26, -12, -30.2, -29.8); W(-26, -12, 29.8, 30.2);
+  W(-4.2, -3.8, -36, -6); W(3.8, 4.2, -36, -6); W(-4, 4, -36.4, -36);
+  // the windows wall: counters with glass, and the gate in the middle
+  for (const [x0, x1] of [[-12, -1.6], [1.6, 12]]) { blk(wall2, (x0 + x1) / 2, 0.6, -6, x1 - x0, 1.2, 0.5); BB.box(wood, (x0 + x1) / 2, 1.23, -5.8, x1 - x0, 0.06, 0.9); BB.box(wall2, (x0 + x1) / 2, 4.5, -6, x1 - x0, 3, 0.5); solid((x0 + x1) / 2, 3, -6, x1 - x0, 6, 0.3); }
+  { const gl = new THREE.Mesh(new THREE.BoxGeometry(20.8, 1.8, 0.04), std({ color: 0xb8e0c0, roughness: 0.1, transparent: true, opacity: 0.16, depthWrite: false })); gl.position.set(0, 2.1, -6); addMesh(gl); }
+  const plate = (t, x, y, z, ry = 0, w = 2.2, col = '#e8e0c0', bg = '#1a140c') => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.2), new THREE.MeshBasicMaterial({ map: toTex(textCanvas([{ t, s: 56 }], 640, 128, bg, col)) })); m.position.set(x, y, z); m.rotation.y = ry; addMesh(m); return m; };
+  plate('№ 1 · СПРАВКИ', -7, 3.25, -5.72); plate('№ 2 · ЖАЛОБЫ', 6, 3.25, -5.72); plate('№ 3 · ПЕРЕРЫВ', -10.2, 3.25, -5.72, 0, 1.8); plate('№ 4 · ТОЛЬКО ДОЛЖНИКАМ', 10, 3.25, -5.72, 0, 2.6);
+  plate('К СЧЕТОВОДУ · ПО ОБХОДНОМУ ЛИСТУ', 0, 3.8, -5.72, 0, 3.0, '#ffd890'); plate('АРХИВ · ТОЛЬКО ПЕРСОНАЛ', -11.76, 3.3, 18.2, Math.PI / 2, 2.6); plate('ПНЕВМОПОЧТА', 11.76, 3.3, 24, -Math.PI / 2, 2.0); plate('ОТДЕЛ ВЗЫСКАНИЯ', 11.76, 3.3, 0, -Math.PI / 2, 2.4, '#ff9a8a');
+  { const m = new THREE.Mesh(new THREE.BoxGeometry(2.8, 3.2, 0.3), C(0x2e2a22, 0.6, 0.3)); m.position.set(0, 1.6, -6); addMesh(m); O.gateM = m; O.gateR = c2Removable(0, 2, -6, 3.2, 4, 0.5); }
+  // the counter board
+  O.boardC = makeCanvas(1024, 160); O.boardT = toTex(O.boardC); { const m = new THREE.Mesh(new THREE.PlaneGeometry(9, 1.4), new THREE.MeshBasicMaterial({ map: O.boardT })); m.position.set(0, 5.0, -5.7); addMesh(m); }
+  // vestibule: turnstiles, the surrender window, the ticket machine
+  for (const x of [-3, 0, 3]) { blk(C(0x6a6e72, 0.4, 0.6), x, 0.55, 34, 0.5, 1.1, 1.4); } BB.box(brass, -1.5, 0.95, 34, 2.5, 0.06, 0.06); BB.box(brass, 1.5, 0.95, 34, 2.5, 0.06, 0.06);
+  for (const x of [-12, 12]) BB.box(wall2, x * 0.63, 0.6, 34, 9, 1.2, 0.4); solid(-7.6, 0.6, 34, 8.8, 1.2, 0.4); solid(7.6, 0.6, 34, 8.8, 1.2, 0.4);
+  plate('ОКНО № 0 · СДАЧА ОРУЖИЯ', 7, 3.0, 39.74, Math.PI, 2.8);
+  blk(C(0x8a2a22, 0.5, 0.3), -9, 0.8, 30, 0.8, 1.6, 0.6); BB.box(glow(0xffe0a0), -9, 1.25, 29.68, 0.5, 0.25, 0.02); plate('ВОЗЬМИТЕ ТАЛОН', -9, 1.75, 29.68, Math.PI, 0.8);
+  // benches, stanchions, dead plants, columns, hanging lamps
+  for (const x of [-8.5, -5.5, 5.5, 8.5]) for (let z = 12; z <= 26; z += 3.5) { BB.box(wood, x, 0.45, z, 2.2, 0.08, 0.5); BB.box(wood, x, 0.78, z + 0.26, 2.2, 0.6, 0.06); BB.box(dark, x - 0.9, 0.22, z, 0.06, 0.44, 0.4); BB.box(dark, x + 0.9, 0.22, z, 0.06, 0.44, 0.4); solid(x, 0.3, z, 2.2, 0.6, 0.6); }
+  for (let z = -3; z <= 11; z += 2) for (const x of [-0.8, 0.8]) { BB.cyl(brass, x, 0.5, z, 0.03, 0.05, 1.0, 6); BB.box(C(0x6a1420, 1), x, 0.9, z + 1, 0.03, 0.03, 2); }
+  for (const [x, z] of [[-11, 38], [11, 38], [-11, -4], [11, -4]]) { BB.cyl(C(0x6a4a3a), x, 0.3, z, 0.3, 0.24, 0.6, 10); for (let i = 0; i < 5; i++) BB.box(C(0x4a3e24, 1), x + rand(-0.2, 0.2), 0.9 + i * 0.1, z + rand(-0.2, 0.2), 0.02, 0.7, 0.02, 0, rand(-0.5, 0.5), rand(-0.5, 0.5)); }
+  for (const [x, z] of [[-11, 8], [11, 8], [-11, 30], [11, 30]]) BB.box(wall2, x, 3, z, 0.9, 6, 0.9);
+  const hang = (x, z, c = 0xd8f0c0) => { BB.cyl(dark, x, 5.4, z, 0.01, 0.01, 1.2, 4); BB.cyl(C(0x2a4a2e, 0.5, 0.4), x, 4.75, z, 0.12, 0.42, 0.25, 12); const b = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), glow(c)); b.position.set(x, 4.62, z); addMesh(b); O.lamps.push(b); };
+  for (const z of [36, 26, 16, 6, -2]) for (const x of [-6, 6]) hang(x, z); for (const z of [-12, -20, -28]) hang(0, z, 0xffd0a0);
+  for (const z of [24, 12, 0, -12, -24]) hang(-19, z); for (const z of [32, 20]) hang(19, z); for (const z of [4, -8, -20]) hang(19, z, 0xff9a80);
+  // ARCHIVE: rows of shelves with gaps, the desk with a stamp machine, the nook
+  const shelf = (x0, x1, z) => { blk(C(0x4a3a28, 0.85), (x0 + x1) / 2, 2.1, z, x1 - x0, 4.2, 0.9); for (let y = 0.5; y < 4.2; y += 0.7) for (let x = x0 + 0.3; x < x1 - 0.2; x += 0.34) if (Math.random() < 0.85) { const hh = rand(0.4, 0.6); for (const s of [-1, 1]) BB.box(C(pick([0x8a7a5a, 0x6a5a40, 0x9a8a6a, 0x5a4a34, 0x7a3a2a]), 0.9), x, y + hh / 2 - 0.2, z + s * 0.4, 0.26, hh, 0.14); } };
+  shelf(-25.6, -14.4, 22); shelf(-23.4, -12.2, 14); shelf(-25.6, -14.6, 6); shelf(-23.4, -12.2, -2); shelf(-25.6, -14.6, -10); shelf(-23.4, -12.2, -18);
+  blk(wood, -19, 0.5, -27, 3, 1.0, 1.2); blk(brass, -17.6, 1.3, -27, 0.5, 0.6, 0.5); BB.box(glow(0xffe8b0), -20, 1.03, -27, 0.5, 0.02, 0.34); plate('ДЕЛА НА «В» — «Я»', -19, 3.4, -29.74, 0, 2.4);
+  blk(wood, -24.6, 0.6, 27, 1.4, 1.2, 1.0); BB.box(glow(0xffb0d8), -24.6, 1.22, 27, 0.4, 0.02, 0.3); blk(C(0x5a5e62, 0.4, 0.6), -25.2, 1.0, -6, 0.8, 2.0, 1.4); BB.box(glow(0xffa040), -24.78, 1.2, -6, 0.02, 0.2, 0.5);
+  // PNEUMATIC MAIL: a wall of tubes and a console
+  for (let i = 0; i < 12; i++) { const x = 13.5 + i * 1.0; BB.cyl(brass, x, 3.4, 39.4, 0.09, 0.09, 4.4, 8); BB.cyl(brass, x, 1.3, 39.0, 0.09, 0.09, 0.8, 8, Math.PI / 2); } blk(C(0x3a4a40, 0.5, 0.4), 19, 0.9, 35.4, 3.0, 1.8, 1.0); BB.box(glow(0x80ffa0), 19, 1.5, 34.88, 2.2, 0.8, 0.02); BB.cyl(brass, 21, 2.4, 35.4, 0.12, 0.12, 3.0, 10);
+  // COLLECTIONS: cages of confiscated things, the chief's desk, hooks
+  for (const [x, z] of [[23.4, 6], [23.4, -2], [14.6, -10], [23.4, -16]]) { for (let i = 0; i < 6; i++) { BB.box(C(0x3a3a3e, 0.5, 0.6), x - 1.2 + i * 0.48, 1.3, z - 1.2, 0.05, 2.6, 0.05); BB.box(C(0x3a3a3e, 0.5, 0.6), x - 1.2 + i * 0.48, 1.3, z + 1.2, 0.05, 2.6, 0.05); } solid(x, 1.3, z, 2.4, 2.6, 2.4); BB.box(C(0x5a4a3a, 0.9), x, 0.4, z, 1.6, 0.8, 1.6); }
+  blk(C(0x3a1a18, 0.7), 19, 0.55, -27.6, 4, 1.1, 1.4); BB.box(glow(0xfff0c0), 20.2, 1.12, -27.6, 0.6, 0.02, 0.4); BB.box(brass, 17.8, 1.4, -27.6, 0.4, 0.6, 0.4); plate('С ВАС — НЕМЕДЛЕННО', 19, 3.8, -29.74, 0, 3.0, '#ff7060', '#1a0606');
+  // the corridor and the Bookkeeper's door
+  BB.box(C(0x5a1420, 1), 0, 0.012, -21, 2.4, 0.02, 30); blk(C(0x2a1e16, 0.6), 0, 2.2, -36, 2.6, 4.4, 0.3); BB.box(brass, 0.9, 2.0, -35.8, 0.08, 0.3, 0.08); plate('СЧЕТОВОД', 0, 4.9, -35.82, 0, 2.2, '#ffd890');
+  BB.flush();
+  O.board = (txt) => { const g = O.boardC.getContext('2d'); g.fillStyle = '#060a06'; g.fillRect(0, 0, 1024, 160); g.fillStyle = '#7dff8a'; g.font = '700 46px monospace'; g.textAlign = 'center'; g.fillText('СЕЙЧАС ОБСЛУЖИВАЕТСЯ', 512, 58); g.font = '700 66px monospace'; g.fillText(txt, 512, 132); O.boardT.needsUpdate = true; }; O.board('№ 0 000 000 003');
+}
+function d3OfficeAmb(dt) {
+  const O = D3.O; if (!O) return; O.bt = (O.bt || 0) - dt;
+  if (O.bt <= 0) { O.bt = rand(7, 12); O.bn = (O.bn || 3) + (Math.random() < 0.15 ? 1 : 0); O.board('№ 0 000 000 00' + (O.bn % 10)); d3Abacus(4, 0.1); }
+  if (Math.random() < dt * 1.2) { const l = pick(O.lamps); l.visible = Math.random() < 0.6; }
+}
+function d3Clerk(x, z, yaw, pts) {
+  const n = d3Faceless(c3Npc('clerk', x, z, yaw)); n.protMsg = 'Писари — имущество Конторы'; n.pat = pts || null; n.patI = 0; n.wait = 0;
+  if (pts) { const cone = new THREE.Mesh(new THREE.CircleGeometry(6, 14, -Math.PI / 2 - 0.55, 1.1).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xffe080, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide })); cone.position.y = 0.04; cone.rotation.y = Math.PI; n.root.add(cone); const lm = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffe080 })); lm.position.set(0.3, 1.0, 0.3); n.root.add(lm); }
+  return n;
+}
+function d3OfficeStart(fromCp) {
+  d3Map('office3'); d3Cp('d3e'); D3.amb = d3OfficeAmb; D3.lamp = true; FL.light.color.setHex(0xffd27a); D3.form = false; D3.tube = false; D3.ticket = false; D3.collDone = false; D3.collOn = false; D3.fileGot = D3.ev.has('file'); D3.stamps = new Set();
+  const O = D3.O; Music.stop(); Music.start('dread'); Sound.droneLoop(0.15); d3Disarm();
+  // the hall: sitters, the queue, the clerks, the doorman
+  for (const x of [-8.5, -5.5, 5.5, 8.5]) for (let z = 12; z <= 26; z += 3.5) if (Math.random() < 0.6) d3Hollow(x + rand(-0.6, 0.6), z - 0.05, { state: 'sit', yaw: Math.PI, y: -0.05 });
+  for (let i = 0; i < 8; i++) d3Hollow(rand(-0.15, 0.15), 10.4 - i * 1.75, { state: 'queue', yaw: Math.PI, touchy: true });
+  O.c1 = d3Clerk(-7, -7.3, 0); O.c2 = d3Clerk(6, -7.3, 0); O.c0 = d3Clerk(7, 38.6, Math.PI);
+  O.door = d3Hollow(0, -4.6, { kind: 'collector', state: 'queue', yaw: 0, big: true, hp: 9999 }); O.door.protect = true; O.door.protMsg = 'Вахтёр даже не моргнул'; d3Faceless(O.door);
+  O.clerks = [d3Clerk(-18, 18, 1.57, [[-24.6, 18], [-13.4, 18]]), d3Clerk(-20, 10, 1.57, [[-14, 10], [-25, 10]]), d3Clerk(-18, 2, 1.57, [[-25, 2], [-13.6, 2]]), d3Clerk(-19, -6, 1.57, [[-13.6, -6], [-23.2, -6]]), d3Clerk(-19, -14, 1.57, [[-25, -14], [-13.6, -14]])];
+  story.showAvatar = true; story.gun = false; d3Put(0, 37.4, 0, 20);
+  if (fromCp) { d3OfficeHall(); return; }
+  showCard('ЛОКАЦИЯ 3 · ЧАСТЬ V', 'Контора Счетовода', 3600);
+  d3Talk([
+    ['', 'Зал без окон. Зелёные лампы, скамьи, турникеты. На скамьях сидят пустые — сотни. Очередь уходит к окошкам и не движется.', (t) => camSet(-9 + t * 0.15, 4.6, 36, 0, 1.4, 8)],
+    ['', 'Над окошками щёлкает табло: «Сейчас обслуживается № 3».', (t) => camSet(0, 3.2, 6, 0, 4.9, -5.7)],
+    ['Писарь', 'Оружие — в окно ноль. Осветительные приборы — на усмотрение посетителя.', () => d3CamFace(O.c0, 0.3, 1.2), () => { Sound.click(400, 0.4); }],
+    ['Вы', 'У вас нет лица.', () => d3CamFace(avatar, 0.3, 1.0)],
+    ['Писарь', 'Лицо — личное имущество. Сдано при поступлении на службу. Ваш обходной лист: три печати. «Учтено» — в архиве. «Рассмотрено» — в жалобах. «Погашено» — во взыскании.', () => d3CamFace(O.c0, -0.3, 1.0)],
+    ['Писарь', 'С тремя печатями вас примет Счетовод. Без них — ожидайте. Возьмите талон.', () => d3CamFace(O.c0, 0.3, 1.2)],
+  ], (t, dt) => d3OfficeAmb(dt), () => { toast('Оружие сдано. Остались кулаки и фонарь'); d3OfficeHall(); });
+}
+function d3Stamp(k, name) { if (D3.stamps.has(k)) return; D3.stamps.add(k); Sound.thud(1); shake = Math.max(shake, 0.3); showCard('ПЕЧАТЬ', `«${name}» · ${D3.stamps.size}/3`, 2400, true); d3Chip(); d3Save(); }
+function d3OfficeHall() {
+  const O = D3.O, need = (k) => !D3.stamps.has(k);
+  d3Play('d3-office', { rsp: [0, 36.6, 0],
+    spots: [
+      { x: O3.ticket[0], z: O3.ticket[1], r: 1.8, when: () => !D3.ticket, label: 'Взять талон', do: () => { D3.ticket = true; Sound.click(1200, 0.3); d3Abacus(5); toast('Талон № 7 304 811 902. Перед вами: 7 304 811 899'); c2Say(D3.ev.has('ring') ? 'Тот самый номер. С кольца голубя. Меня записали сюда заранее.' : 'Семь миллиардов. Я не доживу. Хотя… это здесь не препятствие.', 'Вы'); } },
+      { x: O3.w1[0], z: O3.w1[1], r: 1.9, label: 'Окно № 1 · Справки', do: () => c2Say(!D3.ticket ? 'Без талона не обслуживаем. Автомат — у входа, слева.' : need('count') ? 'Печать «Учтено» ставят в архиве на личное дело. Архив — западная дверь. Посетителям вход воспрещён. Писари обходят ряды с лампами.' : need('seen') ? 'Жалобы — окно два. Бланк заполняется без ошибок. Отправка — пневмопочтой, восточная дверь у входа.' : need('paid') ? 'Взыскание — восточная дверь. Заходят туда все. Выходят — погашенные.' : 'Обходной лист заполнен. Вахтёр у двери.', 'Писарь') },
+      { x: O3.w2[0], z: O3.w2[1], r: 1.9, when: () => !D3.form, label: 'Окно № 2 · Жалобы', do: () => { if (!D3.ticket) return c2Say('Без талона не обслуживаем.', 'Писарь'); d3Form(0); } },
+      { x: O3.gate[0], z: O3.gate[1] + 1.4, r: 2.0, when: () => !O.open, label: 'Вахтёр', do: () => { if (D3.stamps.size < 3) { c2Say(`Обходной лист. Печатей: ${D3.stamps.size} из трёх. Ожидайте.`, 'Вахтёр'); Sound.thud(0.3); } else d3GateOpen(); } },
+      { x: O3.pneu[0], z: O3.pneu[1], r: 2.0, when: () => need('seen'), label: 'Пневмопочта', do: () => { if (!D3.form) return c2Say('Отправлять нечего. Сначала бланк жалобы — окно № 2.', 'Вы'); d3Tubes(); } },
+      { x: O3.file[0], z: O3.file[1] + 0.9, r: 1.9, when: () => need('count'), label: () => D3.fileGot ? 'Поставить печать «Учтено»' : 'Найти своё дело', do: () => d3File() },
+      { x: O3.pledge[0], z: O3.pledge[1], r: 1.8, when: () => !D3.ev.has('pledge'), label: 'Розовая папка', do: () => d3Talk([['', 'Розовая папка: «Залоговая расписка. Залогодатель: Мелоди. Предмет залога: голос (1 шт.), сценический».', (t) => camSet(-23, 1.9, 25.4, -24.6, 1.2, 27)], ['Вы', 'Приписка от руки: «Неотчуждаемое в залог не принимается, см. правила Конторы, п. 0». И всё равно печать.']], (t, dt) => d3OfficeAmb(dt), () => { d3Ev('pledge'); d3OfficeHall(); }) },
+      { x: O3.pact[0] + 0.9, z: O3.pact[1], r: 1.8, when: () => !D3.ev.has('pact'), label: 'Сейф с оранжевой лампой', do: () => d3Talk([['', 'Сейф не заперт. Внутри — договор, подписанный углём: «Заёмщик: воскреситель. Проценты: сто душ за ночь».', (t) => camSet(-22.8, 1.8, -4.6, -24.8, 1.2, -6)], ['Вы', '«Заимодавец: Счетовод. Взыскатель: Счетовод. Проценты назначил: Счетовод». Он сам себе и банк, и суд.']], (t, dt) => d3OfficeAmb(dt), () => { d3Ev('pact'); d3OfficeHall(); }) },
+      { x: O3.cage[0] - 1.3, z: O3.cage[1], r: 2.0, when: () => D3.collOn && !D3.armed, label: 'Забрать своё оружие', do: () => { D3.armed = true; d3Arm('pipe'); d3Arm('pistol'); d3Arm('shotgun'); Sound.click(500, 0.5); toast('Оружие возвращено: труба, пистолет, дробовик'); } },
+      { x: O3.desk[0], z: O3.desk[1] + 1.2, r: 2.0, when: () => D3.collDone && need('paid'), label: 'Печать «Погашено»', do: () => d3Stamp('paid', 'ПОГАШЕНО') },
+      { x: O3.desk[0] + 1.2, z: O3.desk[1] + 1.2, r: 1.7, when: () => D3.collDone && !D3.ev.has('page'), label: 'Ящик стола', do: () => d3Talk([['', 'В ящике стола главного взыскателя — вырванная страница гроссбуха. Столбец «Удержано в пользу Счетовода».', (t) => camSet(21.4, 1.9, -25.4, 20.2, 1.1, -27.6)], ['Вы', 'Он брал души из очереди себе. Тысячами. Он сам должен больше всех.']], (t, dt) => d3OfficeAmb(dt), () => { d3Ev('page'); d3OfficeHall(); }) },
+      { x: O3.boss[0], z: O3.boss[1], r: 2.0, when: () => O.open, label: 'Войти к Счетоводу', do: () => d3BossStart(false) },
+    ],
+    obj: () => { const s = D3.stamps; if (D3.collOn && !D3.collDone) return `Отдел взыскания: уцелейте · взыскателей: ${D3.coll.filter((n) => n.state === 'alive').length} · оружие — в клетке у входа`; if (!D3.ticket) return 'Возьмите талон в автомате (у входа, слева)'; if (s.size >= 3) return O.open ? 'Идите по коридору к двери Счетовода (север)' : 'Обходной лист заполнен. Покажите его вахтёру (север зала)';
+      return `Соберите три печати: «Учтено» ${s.has('count') ? '✔' : '— архив (запад), тихо'} · «Рассмотрено» ${s.has('seen') ? '✔' : D3.form ? '— пневмопочта (восток, у входа)' : '— окно № 2'} · «Погашено» ${s.has('paid') ? '✔' : '— взыскание (восток)'}`; },
+    tgt: () => { const s = D3.stamps; if (D3.collOn && !D3.collDone) return D3.armed ? null : [O3.cage[0] - 1.3, O3.cage[1]]; if (!D3.ticket) return O3.ticket; if (s.size >= 3) return O.open ? O3.boss : O3.gate; if (!s.has('seen')) return D3.form ? O3.pneu : O3.w2; if (!s.has('count')) return player.pos.x > -12 ? O3.arch : O3.file; return D3.collDone ? O3.desk : O3.coll; },
+    upd: d3OfficeUpd, onRevive: () => { if (D3.collOn && !D3.collDone) { D3.rsp = [14.6, 4, -Math.PI / 2]; } } });
+}
+function d3OfficeUpd(dt) {
+  const O = D3.O;
+  // archive patrols with lamps
+  for (const c of O.clerks) { if (!c.root || c.state !== 'alive') continue; if (c.wait > 0) { c.wait -= dt; c.speed = 0; } else { const p = c.pat[c.patI % 2]; if (walkNpc(c, p[0], p[1], 1.25, dt)) { c.patI++; c.wait = rand(0.8, 2.2); } } c.root.position.copy(c.pos); c.root.rotation.y = c.yaw;
+    if (player.pos.x < -12.4 && !player.dead) { const dx = player.pos.x - c.pos.x, dz = player.pos.z - c.pos.z, d = Math.hypot(dx, dz) || 1, fw = (Math.sin(c.yaw) * dx + Math.cos(c.yaw) * dz) / d; if (d < 1.1 || (d < 6 && fw > 0.82 && Math.abs(dz) < 3.2)) { d3Caught(); return; } } }
+  // the collections room
+  if (!D3.collOn && !D3.collDone && player.pos.x > 13.2 && player.pos.z < 9 && player.pos.z > -29) d3CollStart();
+  if (D3.collOn && !D3.collDone) { const al = D3.coll.filter((n) => n.state === 'alive').length; if (D3.collW === 1 && al <= 1) { D3.collW = 2; d3CollWave(2, 3); } if (al === 0 && D3.collW === 2) { D3.collDone = true; D3.collOn = false; c2Remove(O.collR); O.collR = null; if (O.collM) O.collM.visible = false; Sound.chime(); toast('Взыскатели погашены. Печать — на столе в глубине'); D3.rsp = [0, 36.6, 0]; d3Save(); } }
+}
+function d3Caught() {
+  Sound.tink(0.9); for (let i = 0; i < 5; i++) later(i * 0.12, () => Sound.click(2200, 0.3)); c2Say('Посторонний в архиве! Пошлина за пронос личности!', 'Писарь'); d3Fine('ШТРАФ АРХИВА'); d3Put(-10.4, 18, -20, 18); player.yaw = Math.PI / 2;
+}
+function d3File() {
+  if (!D3.fileGot) { D3.fileGot = true; return d3Talk([
+    ['', 'Ящик «В — Я». Ваша фамилия — на толстой папке. Внутри сорок семь листов, и на каждом одна дата и одна причина.', (t) => camSet(-17.6, 2.0, -25.2, -19.6, 1.05, -27)],
+    ['Вы', '«Пуля. Падение. Пуля. Взрыв. Зубы». И напротив каждой — две отметки вместо одной. Меня посчитали дважды.', () => d3CamFace(avatar, 0.3, 0.95)],
+    ['', D3.debt ? `Последние листы ещё тёплые: сегодняшние. Их ${D3.debt}.` : 'Последний лист пуст. Сегодня вы ещё не умирали — и папка будто ждёт.', (t) => camSet(-17.6, 2.0, -25.2, -19.6, 1.05, -27)],
+  ], (t, dt) => d3OfficeAmb(dt), () => { d3Ev('file'); d3OfficeHall(); toast('Теперь поставьте на дело печать'); }); }
+  d3Stamp('count', 'УЧТЕНО');
+}
+/* ----- the complaint form ----- */
+function d3Form(i, bad) {
+  const O = D3.O, n = 47 + D3.debt, Q = [
+    ['1. Номер дела заявителя', [['№ 7 304 811 902', 1], ['№ 0 000 000 003', 0], ['№ 1407', 0]], D3.ev.has('ring') || D3.ticket ? 'у вас на талоне' : ''],
+    ['2. Основание жалобы', [['Очередь слишком длинная', 0], ['Двойная запись воскрешений', 1], ['Писари без лиц', 0]], D3.fileGot ? 'в вашем деле: по две отметки на лист' : 'подсказка есть в вашем личном деле (архив)'],
+    ['3. Число воскрешений по делу', [[String(n * 2), 0], [String(n), 1], ['0', 0]], D3.fileGot ? `в деле: 47 листов и ${D3.debt} сегодняшних` : 'подсказка есть в вашем личном деле (архив)'],
+  ];
+  d3Hold((t, dt) => { d3OfficeAmb(dt); camSet(6.9, 1.9, -2.6, 6, 1.6, -7.3); }); story.showAvatar = false;
+  if (i >= Q.length) { D3.form = true; d3Choice('ОКНО № 2', 'Бланк принят.', [['«Отправьте пневмопочтой. Самостоятельно»', 'ok']], () => { story.cut = null; d3OfficeHall(); toast('Жалоба заполнена. Пневмопочта — восточная дверь у входа'); }); return; }
+  d3Choice('БЛАНК ЖАЛОБЫ · форма Ж-1' + (bad ? ' · НОВЫЙ БЛАНК' : ''), Q[i][0] + (Q[i][2] ? ` <small style="display:block;color:#aaa;font-weight:400">(${Q[i][2]})</small>` : ''), [...Q[i][1].map(([t, ok]) => [t, ok ? 'y' : 'n']), ['Отойти от окна', 'x']], (k) => {
+    if (k === 'x') { story.cut = null; d3OfficeHall(); } else if (k === 'y') { Sound.click(1100, 0.3); d3Form(i + 1); } else { c2Say('Бланк испорчен. Новый бланк — платный.', 'Писарь'); d3Fine('ИСПОРЧЕННЫЙ БЛАНК'); d3Form(0, true); } }, '#7dff8a');
+}
+/* ----- pneumatic mail: turn the tiles so the capsule can travel from IN to OUT ----- */
+function d3Tubes() {
+  const N = 4, D = [[0, -1], [1, 0], [0, 1], [-1, 0]], base = { I: [0, 2], L: [0, 1], T: [0, 1, 2] };
+  // a fixed solvable layout (path: in at left of row 0 -> out at right of row 3), then scrambled
+  const types = ['I', 'L', 'L', 'T', 'I', 'I', 'L', 'I', 'L', 'L', 'L', 'T', 'T', 'L', 'L', 'I'], sol = [1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1];
+  const rot = sol.map((r, i) => (r + 1 + ((i * 7) % 3)) % 4);
+  const open = (i) => base[types[i]].map((d) => (d + rot[i]) % 4);
+  const flow = () => { const seen = new Set(); if (!open(0).includes(3)) return seen; const st = [0]; seen.add(0); while (st.length) { const i = st.pop(), x = i % N, y = (i / N) | 0; for (const d of open(i)) { const nx = x + D[d][0], ny = y + D[d][1]; if (nx < 0 || ny < 0 || nx >= N || ny >= N) continue; const j = ny * N + nx; if (seen.has(j) || !open(j).includes((d + 2) % 4)) continue; seen.add(j); st.push(j); } } return seen; };
+  const done = (s) => s.has(15) && open(15).includes(1);
+  d3Hold((t, dt) => { d3OfficeAmb(dt); camSet(19, 2.0, 31.6, 19, 1.5, 35); }); story.showAvatar = false; const d = c2Ui(); d.style.borderColor = '#7dff8a';
+  const svg = (i, lit) => { const o = open(i), c = lit ? '#7dff8a' : '#8a7a4a', L = { 0: 'M24 24V0', 1: 'M24 24H48', 2: 'M24 24V48', 3: 'M24 24H0' }; return `<svg viewBox="0 0 48 48" width="100%" height="100%"><rect width="48" height="48" fill="#141a14"/>${o.map((q) => `<path d="${L[q]}" stroke="${c}" stroke-width="11" fill="none"/>`).join('')}<circle cx="24" cy="24" r="7" fill="${c}"/></svg>`; };
+  const render = () => { const s = flow();
+    d.innerHTML = '<small style="letter-spacing:.18em;color:#7dff8a">ПНЕВМОПОЧТА</small><small style="display:block;margin:3px 0 6px;color:#bbb">Поворачивайте колена труб: капсула должна дойти от ВХОДА (слева сверху) до ВЫХОДА (справа снизу)</small><div style="display:flex;align-items:center;justify-content:center;gap:6px"><b style="align-self:flex-start;color:#7dff8a;font-size:11px;margin-top:14px">ВХОД▶</b><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;width:min(232px,46vh)">' + types.map((_, i) => `<button data-i="${i}" style="aspect-ratio:1;padding:0;border:1px solid #3a4a3a;background:none;display:block">${svg(i, s.has(i))}</button>`).join('') + '</div><b style="align-self:flex-end;color:#7dff8a;font-size:11px;margin-bottom:14px">▶ВЫХОД</b></div><button class="btn" data-x="1" style="width:100%;margin-top:6px">Отойти</button>';
+    d.querySelectorAll('[data-i]').forEach((b) => b.onclick = () => { const i = +b.dataset.i; rot[i] = (rot[i] + 1) % 4; Sound.click(700 + i * 20, 0.25); const s2 = flow(); if (done(s2)) { d.style.display = 'none'; story.cut = null; D3.tube = true; Sound.whoosh(); later(0.9, () => { Sound.thud(0.7); d3Stamp('seen', 'РАССМОТРЕНО'); c2Say('Капсула вернулась через секунду. На жалобе печать: «Рассмотрено. Отказать». Но печать есть печать.', 'Вы'); }); d3OfficeHall(); return; } render(); });
+    d.querySelector('[data-x]').onclick = () => { d.style.display = 'none'; story.cut = null; d3OfficeHall(); }; };
+  render(); d.style.display = 'block'; D3.tubeApi = { solve: () => { for (let i = 0; i < 16; i++) rot[i] = sol[i]; return done(flow()); }, tap: (i) => d.querySelector(`[data-i="${i}"]`).click() };
+}
+/* ----- collections ----- */
+function d3CollWave(big, small) {
+  const hpK = D3.gift === 'fang' ? 0.67 : 1;
+  for (let i = 0; i < big; i++) { const n = d3Faceless(d3Hollow(17 + i * 4, -22 + rand(-2, 2), { kind: 'collector', big: true, hp: 300 * hpK, sp: 1.9, dmg: [15, 21], yaw: 0, stun: 1 + i })); for (const k in n.parts) n.parts[k].hp *= 3; D3.coll.push(n); }
+  for (let i = 0; i < small; i++) d3Hollow(14.5 + i * 3.5, -12 + rand(-2, 2), { yaw: 0, stun: 0.5 + i * 0.8, sp: 1.3 });
+}
+function d3CollStart() {
+  const O = D3.O; D3.collOn = true; D3.armed = false; D3.coll = []; D3.collW = 1; D3.rsp = [14.6, 4, -Math.PI / 2];
+  { const m = new THREE.Mesh(new THREE.BoxGeometry(0.3, 3.2, 2.4), std({ color: 0x3a1a18, roughness: 0.6, metalness: 0.4 })); m.position.set(12, 1.6, 0); addMesh(m); O.collM = m; O.collR = c2Removable(12, 2, 0, 0.5, 4, 2.4); }
+  Sound.thud(1); Sound.boom(); shake = Math.max(shake, 0.5); c2Say('Отдел взыскания. С вас — немедленно.', 'Взыскатель'); showCard('ОТДЕЛ ВЗЫСКАНИЯ', 'Дверь заперта. Заберите оружие из клетки', 3000, true);
+  d3CollWave(2, 3);
+}
+function d3GateOpen() {
+  const O = D3.O, V = O.door; story.showAvatar = true; d3Put(0, -1.6, 0, -6); let op = 0;
+  d3Talk([
+    ['Вахтёр', 'Учтено. Рассмотрено. Погашено.', () => d3CamFace(V, 0.3, 1.5, 0.1), () => d3Abacus(3, 0.4)],
+    ['Вахтёр', 'Счетовод примет. Он вас давно ждёт. Он всех ждёт.', () => d3CamOver(avatar, V, 0.5, 1.2), () => { op = 1; V.path = [[2.6, -3.6]]; Sound.thud(0.8); }],
+    ['', 'Створка уходит в стену. За ней — коридор с красной дорожкой и одна дверь в конце.', (t) => camSet(0, 1.8, -2, 0, 1.6, -30)],
+  ], (t, dt) => { d3OfficeAmb(dt); if (V.path && V.path.length) walkPath(V, V.path, 1.2, dt); V.root.position.copy(V.pos); if (op) O.gateM.position.y = Math.min(6, O.gateM.position.y + dt * 2.2); },
+  () => { c2Remove(O.gateR); O.gateR = null; O.gateM.visible = false; O.open = true; V.pos.set(2.6, 0, -3.6); V.yaw = Math.PI; d3OfficeHall(); });
+}
+/* ===================== LOCATION 3 · ACTS VI–VII: the Bookkeeper, the endings, the real dawn ===================== */
+const B3 = { rows: [-9, -5, -1, 3, 7, 11], press: [[-13.5, -3], [13.5, -3], [0, 14.5]], dais: [0, -15.5] };
+function buildLedger3() {
+  const BB = batcher(), C = (c, r = 0.85, m = 0) => std({ color: c, roughness: r, metalness: m }), wood = std({ map: TEX.wood, roughness: 0.6, color: 0x5a4030 }), dark = C(0x141216, 0.7), brass = C(0xb89a48, 0.35, 0.8), glow = (c) => new THREE.MeshBasicMaterial({ color: c }), B = D3.B = { rows: [], press: [], notes: [], rings: [], lamps: [] };
+  const blk = (m, x, y, z, sx, sy, sz) => { BB.box(m, x, y, z, sx, sy, sz); solid(x, y, z, sx, sy, sz); };
+  floorMesh(std({ map: texRep(TEX.wood, 9, 11), color: 0x4a3626, roughness: 0.45, envMapIntensity: 0.6 }), HX * 2, HZ * 2);
+  for (const [x, z, sx, sz] of [[0, -HZ, HX * 2, 0.6], [0, HZ, HX * 2, 0.6], [-HX, 0, 0.6, HZ * 2], [HX, 0, 0.6, HZ * 2]]) blk(C(0x1e1a1c, 0.9), x, 8, z, sx, 16, sz);
+  // the wall of the abacus behind the dais, towers of folders, hanging lamps
+  for (let r = 0; r < 7; r++) { BB.cyl(brass, 0, 3 + r * 1.7, -HZ + 0.7, 0.05, 0.05, 32, 6, 0, Math.PI / 2); for (let i = 0; i < 10; i++) { const x = -15 + ((i * 3.1 + r * 1.7) % 30); BB.geo(C(pick([0x7a1a1a, 0x1a1a1a, 0x8a6a2a]), 0.4), new THREE.SphereGeometry(0.62, 12, 8).scale(0.7, 1, 1).translate(x, 3 + r * 1.7, -HZ + 0.7)); } }
+  for (const [x, z, h] of [[-15, -14, 7], [15, -13, 9], [-15.5, 6, 5], [15.5, 9, 6], [-12, 19, 4], [11, 19.5, 8], [-16, -8, 10], [16, 0, 4]]) { blk(C(pick([0x6a5a40, 0x5a4a34, 0x7a6a50]), 0.9), x, h / 2, z, 1.6, h, 1.4); for (let y = 0.4; y < h; y += 0.42) BB.box(C(0xd8d0b8, 0.9), x + rand(-0.06, 0.06), y, z, 1.66, 0.03, 1.46); }
+  for (const [x, z] of [[-9, -6], [9, -6], [-9, 10], [9, 10], [0, 2]]) { BB.cyl(dark, x, 12, z, 0.015, 0.015, 6, 4); BB.cyl(C(0x2a4a2e, 0.5, 0.4), x, 8.9, z, 0.2, 0.7, 0.4, 12); const b = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), glow(0xffe0a8)); b.position.set(x, 8.7, z); addMesh(b); B.lamps.push(b); }
+  // the dais with the great ledger
+  blk(C(0x2a1a14, 0.7), 0, 0.5, -16.5, 12, 1.0, 7); BB.box(C(0x5a1420, 1), 0, 1.01, -16.5, 11, 0.02, 6); BB.box(C(0x3a2a20, 0.7), 0, 0.25, -12.6, 5, 0.5, 0.9); solid(0, 0.2, -12.6, 5, 0.4, 0.9, false); addDeck(-6, 6, -20, -13, 1.0); addDeck(-2.5, 2.5, -13.05, -12.15, 0.5);
+  { const g = new THREE.Group(), cov = new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.5, 4.6), C(0x3a0e12, 0.6)); cov.position.y = 0.25; g.add(cov); for (const s of [-1, 1]) { const pg = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.5, 4.2), C(0xe8dfc6, 0.9)); pg.position.set(s * 1.8, 0.6, 0); pg.rotation.z = -s * 0.07; g.add(pg); } const ln = new THREE.Mesh(new THREE.PlaneGeometry(6.8, 3.8), new THREE.MeshBasicMaterial({ map: cvTex(512, 288, (c) => { c.fillStyle = 'rgba(0,0,0,0)'; c.clearRect(0, 0, 512, 288); c.fillStyle = 'rgba(40,20,20,0.75)'; for (let y = 14; y < 280; y += 13) for (const x0 of [14, 270]) { let x = x0; while (x < x0 + 220) { const w = 6 + Math.random() * 30; c.fillRect(x, y, w, 2.5); x += w + 6; } } c.fillStyle = 'rgba(160,20,20,0.85)'; c.fillRect(300, 196, 170, 4); }), transparent: true })); ln.rotation.x = -Math.PI / 2; ln.position.y = 0.87; g.add(ln); g.position.set(0, 2.2, -17.6); g.rotation.x = 0.42; addMesh(g); B.book = g; }
+  blk(C(0x2a1a14, 0.7), 0, 1.7, -18.6, 6, 1.4, 1.6);
+  // three stamp presses
+  B3.press.forEach(([x, z], i) => { blk(C(0x3a3a3e, 0.45, 0.6), x, 0.5, z, 2.2, 1.0, 2.2); for (const s of [-1, 1]) BB.box(C(0x3a3a3e, 0.45, 0.6), x + s * 0.95, 2.4, z, 0.18, 2.8, 0.3); BB.box(C(0x3a3a3e, 0.45, 0.6), x, 3.85, z, 2.2, 0.3, 0.4); const head = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.7, 1.5), C(0x8a1a1a, 0.4, 0.3)); head.position.set(x, 3.2, z); addMesh(head); const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff3020 })); lamp.position.set(x, 4.2, z); addMesh(lamp); B.press.push({ x, z, head, lamp, n: 0, done: false, name: ['УЧТЕНО', 'РАССМОТРЕНО', 'ПОГАШЕНО'][i] }); });
+  // bead rows across the hall
+  for (const z of B3.rows) { const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, HX * 2, 6).rotateZ(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x4a3a22 })); rail.position.set(0, 1.0, z); addMesh(rail); const g = new THREE.Group(); for (let i = 0; i < 5; i++) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.95, 14, 10), C(i % 2 ? 0x7a1a1a : 0x1a1a1a, 0.35, 0.2)); b.scale.set(0.75, 1, 1); b.position.x = i * 1.6; b.castShadow = true; g.add(b); } g.position.set(-30, 1.0, z); addMesh(g); B.rows.push({ z, rail, g, st: 0, t: 0, dir: 1 }); }
+  blk(C(0x2a1e16, 0.6), 0, 2.2, HZ - 0.5, 2.6, 4.4, 0.4);
+  BB.flush();
+}
+function d3BossMake() {
+  const n = d3Faceless(c3Npc('ledger', 0, -15.2, 0)); n.pos.y = 1.0; n.root.position.copy(n.pos); n.d3Boss = true; n.d3Shield = true; n.protect = false; n.voiceCd = 1e9;
+  const H = n.parts.head.mesh, vis = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.012, 16, 1, false, -1.2, 2.4), std({ color: 0x1a6a3a, roughness: 0.3, transparent: true, opacity: 0.85, side: THREE.DoubleSide })); vis.position.set(0, 0.05, 0.03); vis.rotation.x = 0.25; H.add(vis);
+  n.gl = []; for (const s of [-1, 1]) { const g = new THREE.Mesh(new THREE.CircleGeometry(0.036, 14), new THREE.MeshBasicMaterial({ color: 0xfff0b0 })); g.position.set(s * 0.045, 0.015, 0.112); H.add(g); n.gl.push(g); const r = new THREE.Mesh(new THREE.TorusGeometry(0.038, 0.005, 6, 16), goldMat); r.position.copy(g.position); H.add(r); }
+  const ruler = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.02, 2.6), std({ color: 0xc8a860, roughness: 0.5 })); ruler.position.set(0, -0.1, 1.2); n.parts.lArmR.mesh.add(ruler); n.ruler = ruler;
+  for (const k of ['lArmL', 'lArmR']) { const g = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.14, 10), std({ color: 0x2a2a30, roughness: 0.5 })); g.position.y = 0.06; n.parts[k].mesh.add(g); }
+  return n;
+}
+function d3ShieldHit(npc, h) { sparks(h.point, 6, UP, 3); for (let i = 0; i < 4; i++) spawnSprite(TEX.soft, h.point.clone().add(new V3(rand(-0.3, 0.3), rand(-0.3, 0.3), rand(-0.3, 0.3))), { color: 0xf0e8d0, size: 0.12, grow: 0.2, life: 0.7, opacity: 0.9, gravity: 2, vel: new V3(rand(-1, 1), rand(0.5, 2), rand(-1, 1)) }); Sound.tink(0.4); if (performance.now() - (D3.shT || 0) > 3000) { D3.shT = performance.now(); toast('Его закрывают бумаги. Сначала три пресса-печати по углам зала'); } }
+function d3BossStart(fromCp) {
+  d3Map('ledger3'); d3Cp('d3f'); D3.amb = null; D3.lamp = true; FL.light.color.setHex(0xffd27a); D3.stamps = new Set(['count', 'seen', 'paid']);
+  const Bs = D3.boss = d3BossMake(), B = D3.B; Music.stop(); Sound.droneLoop(0.3); story.showAvatar = true; story.gun = false; d3Put(0, 17, 0, -15);
+  Object.assign(B, { ph: 1, hpMax: 900 * (D3.gift === 'fang' ? 0.67 : 1), rowT: 4, noteT: 3, sumT: 12, ringT: 9, atk: 2, wind: 0, sayT: 6 });
+  showCard('ЛОКАЦИЯ 3 · ЧАСТЬ VI', 'Счетовод', 3600);
+  d3Talk([
+    ['', 'Кабинет без потолка. Счёты во всю стену, башни папок до темноты и гроссбух размером с автобус. За ним — он.', (t) => camSet(-6 + t * 0.2, 3.2, 14, 0, 4, -16)],
+    ['Счетовод', 'Номер семь миллиардов триста четыре миллиона восемьсот одиннадцать тысяч девятьсот два. Вы пришли раньше срока. Это не запрещено. Это начисляется.', () => d3CamFace(Bs, 0.4, 1.9, 0.05)],
+    ['Вы', 'Верни ей голос. А людям — души.', () => d3CamFace(avatar, 0.3, 1.0)],
+    ['Счетовод', 'Души взяты законно. Заёмщик не платил. Вы — предмет займа: сорок семь раз вас выдавали на руки' + (D3.debt ? `, сегодня — ещё ${D3.debt}.` : '.') + ' Голос — добровольный залог.', (t) => camSet(3.5, 3.4, -9.5, 0, 3.4, -16)],
+    ['Вы', D3.ev.size >= 5 ? 'У меня жалоба. С доводами. И печатями.' : 'Тогда я пришёл это оспорить.', () => d3CamFace(avatar, -0.3, 1.0)],
+    ['Счетовод', 'Жалобы рассматриваются в порядке очереди. Ваша очередь наступит через одиннадцать тысяч лет. А текущую задолженность погасим сейчас.', () => d3CamFace(Bs, -0.4, 1.6, 0.05), () => { Sound.boom(); Music.start('dread'); }],
+  ], null, () => { d3Arm('pipe'); d3Arm('pistol'); d3Arm('shotgun'); d3Bar('СЧЕТОВОД · бумажный щит').style.display = 'block'; d3BarSet(1); d3BossPlay(); banner('БОСС', 'Счетовод'); });
+}
+function d3BossPlay() {
+  const B = D3.B;
+  d3Play('d3-boss', { rsp: [0, 16, 0],
+    spots: B.press.map((p) => ({ x: p.x, z: p.z + (p.z > 10 ? -1.9 : 1.9), r: 2.1, when: () => B.ph === 1 && !p.done, label: () => `Пресс «${p.name}» (${p.n}/3)`, do: () => d3Press(p) })),
+    obj: () => B.ph === 1 ? `Ударьте тремя прессами-печатями: ${B.press.filter((p) => p.done).length}/3 · уходите с рядов, где загорелась спица` : B.ph === 2 ? 'Счетовод сошёл с помоста. Бейте! · усмиряйте или гоните пустых · берегитесь линейки' : 'ИТОГ: перепрыгивайте кольца строк · добейте Счетовода',
+    tgt: () => { if (B.ph !== 1) return null; let b = null, bd = 1e9; for (const p of B.press) if (!p.done) { const d = Math.hypot(player.pos.x - p.x, player.pos.z - p.z); if (d < bd) { bd = d; b = [p.x, p.z]; } } return b; },
+    upd: d3BossUpd });
+}
+function d3Press(p) {
+  const B = D3.B; p.n++; Sound.thud(0.6); Sound.click(300, 0.4); p.head.position.y = 3.2 - p.n * 0.25;
+  if (p.n < 3) return; p.done = true; p.lamp.material.color.setHex(0x40ff60); p.slam = 0.35; Sound.boom(); shake = Math.max(shake, 0.8); flashScreen('#fff0c8', 300); toast(`«${p.name}»!`);
+  const left = B.press.filter((q) => !q.done).length; d3BarSet(left / 3); c2Say(['Печать поставлена не уполномоченным лицом!', 'Это нарушение регламента!', 'Вы… вы портите отчётность!'][2 - left] || '…', 'Счетовод');
+  if (!left) d3Phase2();
+}
+function d3Phase2() {
+  const B = D3.B, Bs = D3.boss; B.ph = 2; Bs.d3Shield = false; Bs.hp = Bs.maxHp = B.hpMax; for (const k in Bs.parts) Bs.parts[k].hp = 1e9; Bs.pos.y = 0; Bs.pos.set(0, 0, -10.5);
+  for (let i = 0; i < 40; i++) spawnSprite(TEX.soft, _a.set(rand(-3, 3), rand(1, 4), rand(-17, -13)), { color: 0xf0e8d0, size: rand(0.1, 0.25), grow: 0.2, life: rand(1, 2.5), opacity: 0.9, gravity: 1.5, vel: new V3(rand(-3, 3), rand(1, 5), rand(0, 4)) });
+  d3Bar('СЧЕТОВОД'); d3BarSet(1); showCard('ВЗЫСКАНИЕ', 'Щит сорван. Он сходит с помоста', 2600, true); c2Say('Хорошо. Взыщем лично.', 'Счетовод'); Sound.rise(2);
+}
+function d3BossUpd(dt, tick) {
+  const B = D3.B, Bs = D3.boss, alive = !player.dead, t = performance.now() / 1000; if (!Bs || !Bs.root) return;
+  // bead rows: a spoke lights up, then the beads sweep it
+  B.rowT -= dt; if (B.rowT <= 0) { B.rowT = B.ph === 1 ? 3.0 : B.ph === 2 ? 4.4 : 2.6; const free = B.rows.filter((r) => r.st === 0).sort((a, b) => Math.abs(a.z - player.pos.z) - Math.abs(b.z - player.pos.z)); for (let i = 0; i < (B.ph === 3 ? 2 : 1) && free[i]; i++) { const r = free[i]; r.st = 1; r.t = 1.15; r.dir = Math.random() < 0.5 ? 1 : -1; Sound.click(260, 0.5); } }
+  for (const r of B.rows) {
+    if (r.st === 1) { r.t -= dt; r.rail.material.color.setHex(Math.sin(t * 30) > 0 ? 0xff3020 : 0x802010); if (r.t <= 0) { r.st = 2; r.g.position.x = r.dir > 0 ? -HX - 8 : HX + 1.6; Sound.whoosh(); } }
+    else if (r.st === 2) { r.g.position.x += r.dir * 17 * dt; r.g.rotation.x += dt * 9; if (alive && Math.abs(player.pos.z - r.z) < 1.15 && player.pos.y < 1.6 && player.pos.x > r.g.position.x - 0.8 && player.pos.x < r.g.position.x + 7.2 && !(r.hitT > 0)) { r.hitT = 0.8; damagePlayer(15); Sound.thud(0.9); shake = Math.max(shake, 0.5); player.vel.x += r.dir * 9; player.vel.y = 3; }
+      r.hitT = Math.max(0, (r.hitT || 0) - dt); if (Math.abs(r.g.position.x) > HX + 9) { r.st = 0; r.g.position.x = -30; r.rail.material.color.setHex(0x4a3a22); } }
+  }
+  for (const p of B.press) if (p.slam > 0) { p.slam -= dt; p.head.position.y = lerp(1.35, 2.2, 1 - p.slam / 0.35); }
+  // paper notices that home in
+  B.noteT -= dt; if (B.noteT <= 0 && alive) { B.noteT = B.ph === 1 ? 2.6 : 3.6; headPos(Bs, _d3a); const m = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.24), new THREE.MeshBasicMaterial({ color: 0xf4eeda, side: THREE.DoubleSide })); m.position.copy(_d3a); m.position.y += 0.4; scene.add(m); mapObjs.push(m); B.notes.push({ m, v: new V3(rand(-2, 2), 3, 2), life: 6 }); Sound.swoosh(); }
+  for (let i = B.notes.length - 1; i >= 0; i--) { const n = B.notes[i]; n.life -= dt; _d3b.set(player.pos.x, player.pos.y + 1.2, player.pos.z).sub(n.m.position); const d = _d3b.length() || 1; n.v.lerp(_d3b.multiplyScalar(6.2 / d), Math.min(1, dt * 1.6)); n.m.position.addScaledVector(n.v, dt); n.m.rotation.x += dt * 7; n.m.rotation.y += dt * 5;
+    if (alive && d < 0.75) { damagePlayer(7); Sound.click(1800, 0.3); toast('Извещение вручено'); n.life = 0; } if (n.life <= 0) { scene.remove(n.m); B.notes.splice(i, 1); } }
+  B.sayT -= dt; if (B.sayT <= 0) { B.sayT = rand(8, 13); c2Say(pick(B.ph === 1 ? ['Начислено. Начислено. Начислено.', 'Пеня за каждый шаг.', 'Сдайте лицо и распишитесь.'] : ['Вы — строка. Строки не спорят.', 'Счёт должен сойтись!', 'Я считал, когда вашего города ещё не было.', 'Каждый ваш вдох — в рассрочку.']), 'Счетовод'); d3Abacus(4); }
+  Bs.bleed = 0; Bs.burn = 0; if (Bs.pose !== 'stand') { Bs.pose = 'stand'; Bs.poseDur = 0; }
+  const gk = 0.6 + Math.sin(t * 5) * 0.4; for (const g of Bs.gl) g.material.color.setRGB(1, 0.9 * gk + 0.1, 0.6 * gk);
+  if (B.ph === 1) { Bs.pos.set(Math.sin(t * 0.5) * 2.5, 1.0, -15.2); d3FaceTo(Bs, player.pos.x, player.pos.z); Bs.root.position.copy(Bs.pos); return; }
+  // phases 2 and 3: he walks, swings the ruler, calls the queue, and at the end reads out the total
+  const k = Bs.hp / Bs.maxHp, dx = player.pos.x - Bs.pos.x, dz = player.pos.z - Bs.pos.z, d = Math.hypot(dx, dz) || 1; d3BarSet(k);
+  if (B.ph === 2 && k < 0.42) { B.ph = 3; B.ringT = 2.5; showCard('ИТОГ', D3.debt ? `К оплате: ${D3.debt} сегодняшних и всё остальное` : 'К оплате: всё', 2600, true); c2Say('Подводим итог.', 'Счетовод'); Sound.boom(); shake = 0.6; if (B.book) B.bookUp = 1; }
+  Bs.yaw += angDiff(Bs.yaw, Math.atan2(dx, dz)) * Math.min(1, dt * 5);
+  if (!B.wind && d > 2.6) { walkNpc(Bs, player.pos.x, player.pos.z, B.ph === 3 ? 2.9 : 2.2, dt); pushOutAABBs(Bs.pos, 0.4, 0); Bs.pos.x = clamp(Bs.pos.x, -16, 16); Bs.pos.z = clamp(Bs.pos.z, -11.5, 20); } else Bs.speed = 0;
+  B.atk -= dt; if (!B.wind && d < 3.6 && B.atk <= 0 && alive) { B.wind = 0.75; B.atk = B.ph === 3 ? 1.7 : 2.3; Sound.whoosh(); }
+  if (B.wind) { B.wind -= dt; Bs.attackAnim = 1; Bs.ruler.rotation.x = -Math.sin((0.75 - B.wind) / 0.75 * Math.PI) * 1.2; if (B.wind <= 0) { B.wind = 0; Bs.ruler.rotation.x = 0; if (alive && d < 4.1) { damagePlayer(17); Sound.thud(1); shake = Math.max(shake, 0.6); player.vel.x += dx / d * 8; player.vel.z += dz / d * 8; } } }
+  B.sumT -= dt; if (B.sumT <= 0 && alive) { B.sumT = B.ph === 3 ? 16 : 21; if (d3Threats() < 4) { for (let i = 0; i < 3; i++) d3Hollow(-3 + i * 3, 20.5, { yaw: Math.PI, stun: 0.5 + i * 0.7, sp: 1.4 }); c2Say('Следующий!', 'Счетовод'); Sound.thud(0.6); } }
+  if (B.ph === 3) { B.ringT -= dt; if (B.ringT <= 0) { B.ringT = clamp(5.2 - D3.debt * 0.35, 2.4, 5.2); const m = new THREE.Mesh(new THREE.TorusGeometry(1, 0.09, 6, 40).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff4030, transparent: true, opacity: 0.9 })); m.position.set(Bs.pos.x, 0.22, Bs.pos.z); scene.add(m); mapObjs.push(m); B.rings.push({ m, r: 1, hit: false }); Sound.zap(0.6); d3Abacus(5, 0.4); } }
+  for (let i = B.rings.length - 1; i >= 0; i--) { const r = B.rings[i]; r.r += dt * 8.5; r.m.scale.set(r.r, 1, r.r); r.m.material.opacity = clamp(1.2 - r.r / 26, 0, 0.9); const pd = Math.hypot(player.pos.x - r.m.position.x, player.pos.z - r.m.position.z); if (!r.hit && alive && Math.abs(pd - r.r) < 0.55 && player.pos.y < 0.4) { r.hit = true; damagePlayer(12); toast('Строка вписана. Прыгайте через кольца'); } if (r.r > 30) { scene.remove(r.m); B.rings.splice(i, 1); } }
+  if (B.bookUp) { B.book.rotation.x = lerp(B.book.rotation.x, 1.15, Math.min(1, dt)); }
+  Bs.root.position.copy(Bs.pos); Bs.root.rotation.y = Bs.yaw;
+  if (k <= 0.04) d3BossEnd();
+}
+function d3BossEnd() {
+  const B = D3.B, Bs = D3.boss; d3Bar().style.display = 'none'; for (const n of B.notes) scene.remove(n.m); B.notes = []; for (const r of B.rings) scene.remove(r.m); B.rings = []; for (const n of D3.hollows) if (n.state === 'alive' && n.hState !== 'calm') d3Pacify(n);
+  Bs.d3Shield = true; Bs.pos.set(0, 0, -11); Bs.yaw = 0; Bs.pose = 'kneel'; Bs.poseDur = Infinity; Bs.root.position.copy(Bs.pos); Bs.root.rotation.y = 0; story.showAvatar = true; story.gun = false; d3Put(0, -6.6, 0, -11); Music.stop(); d3Save();
+  const n = D3.ev.size, can = n >= 5;
+  d3Talk([
+    ['', 'Счетовод опускается на колено у подножия помоста. Очки гаснут и загораются, как лампа с плохим контактом.', (t) => camSet(3.2, 1.5, -7.6, 0, 1.1, -11)],
+    ['Счетовод', 'Счёт… должен… сойтись. Меня нельзя закрыть. Меня можно только оплатить.', () => d3CamFace(Bs, 0.3, 1.5, 0.3)],
+    ['', 'Гроссбух раскрыт. Перо лежит рядом. Фонарь в вашей руке вдруг становится горячим.', (t) => camSet(0, 4.2, -10.5, 0, 2.6, -17.6)],
+  ], null, () => { d3Hold((t) => camSet(0, 4.2, -10.5 + Math.sin(t * 0.3) * 0.3, 0, 2.6, -17.6));
+    d3Choice('ГРОССБУХ ОТКРЫТ', 'Как вы закроете долг?', [['Заплатить собой: «Запишите всё на меня»', 'pay'], ['Сжечь гроссбух фонарём воскресителя', 'burn'], [can ? `Встречный иск: предъявить доводы (${n}/8)` : `Встречный иск — нужно 5 доводов, у вас ${n}`, 'law', !can]], (k) => d3Ending(k), '#ffd890'); });
+}
+function d3Ending(k) {
+  D3.ending = k; const Bs = D3.boss, B = D3.B, bk = (t) => camSet(0, 4.2, -10.5, 0, 2.6, -17.6), face = () => d3CamFace(Bs, 0.3, 1.5, 0.3), you = () => d3CamFace(avatar, 0.3, 1.0); let fire = false, sink = false;
+  const L = k === 'pay' ? [
+    ['Вы', 'Запишите всё на меня. Его долг. Её залог. Весь город.', you],
+    ['Счетовод', 'Перевод долга. Допускается. Распишитесь. Углём.', face, () => d3Abacus(6, 0.4)],
+    ['', 'Вы пишете своё имя. Строчки над ним бледнеют и исчезают — тысячи, одна за другой. Последней исчезает слово «голос».', bk, () => { Sound.chime(); Sound.heal(); }],
+    ['Счетовод', 'Принято. Вам начислено: сто душ за ночь. Первый взнос — завтра. Капюшон выдадут.', face],
+    ['Вы', 'Я знаю, где взять сто душ. У тех, кто сажает людей в клетки.', you],
+  ] : k === 'burn' ? [
+    ['Вы', 'Он светит тем, кто потерялся. Вы все тут потерялись.', you],
+    ['', 'Вы кладёте фонарь на раскрытые страницы. Бумага занимается сразу, будто ждала этого одиннадцать тысяч лет.', bk, () => { fire = true; Sound.whoosh(); Sound.flame(1); }],
+    ['Счетовод', 'Вы… уничтожаете учёт! Без записи нет долга. Без долга нет… нет…', face, () => { sink = true; Sound.bigScream(); }],
+    ['', 'Он осыпается пеплом, как сгоревшая квитанция. С ним гаснут счёты, лампы и номер над окошком.', (t) => camSet(2.4, 1.8, -8, 0, 0.6, -11)],
+    ['Воскреситель', 'Нет записи — нет и меня. Я ведь тоже был строчкой. Скажи ей… нет. Ничего не говори. Пусть поёт.', bk, () => { Sound.ghostVoice(3); }],
+  ] : [
+    ['Вы', 'Встречный иск. Довод первый…', you],
+    ...[...D3.ev].slice(0, 5).map((e, i) => ['Вы', `${D3_EV[e][0]}: ${D3_EV[e][1]}.`, i % 2 ? bk : you, () => { Sound.thud(0.8); shake = Math.max(shake, 0.25); }]),
+    ['Счетовод', 'Это… это не предусмотрено формой.', face, () => d3Abacus(8, 0.4)],
+    ['Вы', 'Предусмотрено. Форма Ж-1. Печать «Рассмотрено». Вашей же Конторы.', you],
+    ['', 'Счёты на стене приходят в движение сами. Костяшки летят справа налево — весь долг, строка за строкой, переписывается на одно имя.', (t) => camSet(0, 5, 2, 0, 7, -22), () => { Sound.rise(3); }],
+    ['Счетовод', 'Должник… Счетовод. Нет. Нет! Я — учёт! Меня нельзя…', face, () => { sink = true; }],
+    ['', 'Из зала ожидания доносится: «Следующий». Дверь открывается, и семь миллиардов номеров смотрят на него.', (t) => camSet(0, 2.2, -4, 0, 1.6, 22), () => { Sound.boom(); }],
+  ];
+  d3Talk(L, (t, dt) => { if (fire && Math.random() < 0.8) spawnSprite(TEX.soft, _a.set(rand(-3.4, 3.4), rand(2.6, 3.6), rand(-19.4, -15.8)), { color: pick([0xff6a10, 0xffb040, 0xff3a00]), additive: true, size: rand(0.5, 1.1), grow: 1.8, life: 0.7, vel: new V3(rand(-0.4, 0.4), rand(1.6, 3.2), rand(-0.3, 0.3)) }); if (sink && Bs.root) { Bs.pos.y -= dt * 0.35; Bs.root.position.copy(Bs.pos); if (Math.random() < 0.5) spawnSprite(TEX.smoke, _a.set(Bs.pos.x + rand(-0.4, 0.4), Bs.pos.y + rand(0.4, 2.4), Bs.pos.z + rand(-0.4, 0.4)), { color: 0x2a2a2a, size: 0.3, grow: 1.5, life: 1.0, opacity: 0.6, vel: new V3(0, 0.8, 0) }); } },
+  () => { flashScreen('#fff', 1600); fadeOut(); later(1.2, () => { fadeIn(); d3Epilogue(); }); });
+}
+function d3Epilogue() {
+  const k = D3.ending; if (D3.boss && D3.boss.root) D3.boss.dispose(); D3.boss = null; d3HollowsClear(); D3.lamp = false; FL.on = false;
+  d3RoofLook(0, true); d3Map('rooftop3'); d3RoofLook(0); D3.ek = 0; D3.amb = d3RoofAmb; D3.cam = d3RoofCam; D3.mel = null; story.showAvatar = true; story.gun = false; d3Put(0, -10.5, 0, -40); Music.stop(); Music.start('tender'); Sound.droneLoop(0);
+  const lost = D3.broken + D3.brokenAlly, L = [
+    ['', 'Та же крыша. Солнце целое — будто его и не трогали. Внизу люди моргают, трут глаза и не помнят, до скольки досчитали.', 'sky'],
+    ['', lost ? `Не все. ${lost} ${lost % 10 === 1 && lost % 100 !== 11 ? 'окно так и осталось тёмным' : 'окон так и остались тёмными'}: разбитую оболочку душе занять нельзя.` : 'Все до одного. Ни одно окно не осталось тёмным.', 'city'],
+  ];
+  if (D3.saved >= 2) L.push(['Инспектор', 'Это Лисова. Они встают. Все, кого вы усмирили, — встают и спрашивают, который час. Что вы там сделали?', 'you'], ['Вы', 'Подал жалобу.', 'you']);
+  if (k === 'pay') L.push(['', 'На диване лежит свёрток: чёрный капюшон и оранжевые штаны в клетку. Сверху записка углём: «Первый взнос — сегодня ночью».', 'wide'], ['', 'С соседней крыши кто-то поёт. Вы узнаёте голос. Она не знает, кто теперь за неё платит, — и не узнает.', 'back']);
+  else if (k === 'burn') L.push(['', 'Фонаря больше нет. Воскресителя — тоже. Следующая ваша смерть будет настоящей. Удивительно, как сразу хочется жить аккуратнее.', 'wide'], ['', 'С соседней крыши кто-то поёт про человека в капюшоне. Она помнит песню, но уже не может вспомнить его лица.', 'back']);
+  else L.push(['', 'Фонарь на парапете гаснет сам: тот, кто потерялся, нашёлся. На перилах сидит голубь без кольца.', 'wide'], ['Воскреситель', 'Впервые за одиннадцать тысяч лет я никому не должен. Не привыкай: возвращать тебя я буду и дальше. Бесплатно.', 'back', () => Sound.ghostVoice(3)], ['', 'С соседней крыши кто-то поёт — громко, во весь голос. Вы не идёте туда. Некоторые песни надо слушать издалека.', 'sky']);
+  L.push(['Вы', k === 'pay' ? 'Сто душ за ночь. Что ж. Работа есть работа.' : k === 'burn' ? 'Одна жизнь. Как у всех. Попробуем.' : 'Счёт закрыт.', 'you']);
+  d3Talk(L, (t, dt) => d3RoofAmb(dt), () => { showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 ПРОЙДЕНА', D3_END[k][0], 5200); story.stage = 'd3-cut'; runCut([[0.1, () => subOff()]], (t, dt) => { d3RoofAmb(dt); d3RoofCam('sky', t + 6); }, 5.4, () => { D3.done = true; d3Finish(); }); });
+}
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
@@ -10851,12 +11174,57 @@ function d3Finish() {
   $('overStats').innerHTML = rows.map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join(''); $('againBtn').innerHTML = 'Ещё раз<small>Глава 2 сначала</small>';
   $('over').hidden = false; $('hud').hidden = true; $('touch').hidden = true;
 }
-function d3OfficeStart() { d3BossStart(); }
-function d3BossStart() { D3.done = true; d3Finish(); }
-function d3ShieldHit(npc, h) { sparks(h.point, 6, UP, 3); }
-function buildOffice3() { floorMesh(std({ color: 0x333333 }), HX * 2, HZ * 2); }
-function buildLedger3() { floorMesh(std({ color: 0x333333 }), HX * 2, HZ * 2); }
-function d3Adm() { return []; }
+/* ----- admin entries for location 3 ----- */
+let D3_TOK = 0;
+function d3AdmWhen(cond, fn, ms = 60000) { const t0 = performance.now(), tok = D3_TOK; const iv = setInterval(() => { if (performance.now() - t0 > ms || mode !== 'story' || !D3.on || tok !== D3_TOK) { clearInterval(iv); return; } if (cond()) { clearInterval(iv); fn(); return; } if (story.cut) { story.lastSkip = 0; storySkip(); } }, 140); }
+function d3AdmGo(cp, fn, stage) { admClose(); try { localStorage.setItem('myasorubka-ch2', '1'); } catch (e) {} D3_TOK++; d3Start(cp); const tk = D3_TOK; if (fn) setTimeout(() => tk === D3_TOK && d3AdmWhen(() => state === 'play' && (!stage || story.stage === stage), fn), 500); }
+function d3AdmChoice(i) { d3AdmWhen(() => { const d = document.getElementById('c2q'); return d && d.style.display === 'block' && d.querySelectorAll('[data-k]').length > i; }, () => document.querySelectorAll('#c2q [data-k]')[i].click()); }
+function d3AdmIn() { const ok = mode === 'story' && D3.on && state !== 'over'; if (!ok) toast('Сначала запустите локацию 3'); return ok; }
+function d3Adm() {
+  const all = () => { for (const k in D3_EV) D3.ev.add(k); }, end = (k, i) => ({ l: 'Концовка: ' + D3_END[k][0], s: D3_END[k][1], f: () => d3AdmGo('d3f', () => { all(); d3BossEnd(); d3AdmChoice(i); }) });
+  return [
+    { sec: 'Локация 3 · «Долг» · сюжет' },
+    { l: 'Акт I: рассвет на крыше', s: 'С самого начала', f: () => d3AdmGo(null) },
+    { l: 'Крыша: осмотр (после вступления)', s: 'Три вещи и три находки', f: () => d3AdmGo(null, () => {}) },
+    { l: 'Крыша: разговор с Мелоди', s: 'Три вопроса', f: () => d3AdmGo(null, () => { D3.items = new Set(['photo', 'pick', 'letter']); d3RoofTalk(0); }) },
+    { l: 'Крыша: финальный выбор', s: '«Свободна» или «Останусь рядом»', f: () => d3AdmGo(null, () => { D3.items = new Set(['photo', 'pick', 'letter']); D3.talk0 = true; d3RoofTalk(3); }) },
+    { l: 'Крыша: Мелоди уходит', s: '«Хочу к воскресителю. Пойду его искать»', f: () => d3AdmGo(null, () => { D3.choice = 'go'; d3RoofLeave(); }) },
+    { l: 'Затмение', s: 'Кат-сцена и первые пустые', f: () => d3AdmGo('d3b') },
+    { l: 'Побег с крыши', s: 'Труба, задвижка, пожарная лестница', f: () => d3AdmGo('d3b', () => {}) },
+    { l: 'Акт II: проспект', s: 'Поездка на машине', f: () => d3AdmGo('d3c') },
+    { l: 'Проспект: финиш', s: 'Сразу к баррикаде', f: () => d3AdmGo('d3c', () => { D3.drive.dist = DR_LEN - 30; }) },
+    { l: 'Акт III: набережная', s: 'Лисова, следы, выжившие', f: () => d3AdmGo('d3d') },
+    { l: 'Набережная: оборона баррикады', s: 'Три волны, генератор', f: () => d3AdmGo('d3d', () => { D3.found = new Set(['note', 'post', 'chalk']); d3Put(0, 31); d3HoldStart(); }) },
+    { l: 'Набережная: после обороны', s: 'Протокол Лисовой, путь на мост', f: () => d3AdmGo('d3d', () => { D3.saved = 3; D3.H = { gen: true }; d3HoldEnd(); }) },
+    { l: 'Акт IV: мост · воскреситель', s: 'Встреча и выбор ответа', f: () => d3AdmGo('d3d', () => d3Meet()) },
+    { l: 'Мост: «Мелоди любит тебя»', s: 'Дар: медиатор', f: () => d3AdmGo('d3d', () => { d3Meet(); d3AdmChoice(0); }) },
+    { l: 'Мост: «Оставь её в покое»', s: 'Дар: клык', f: () => d3AdmGo('d3d', () => { d3Meet(); d3AdmChoice(1); }) },
+    { l: 'Мост: «Кто ты на самом деле»', s: 'Дар: смерть без записи', f: () => d3AdmGo('d3d', () => { d3Meet(); d3AdmChoice(2); }) },
+    { l: 'Акт V: Контора', s: 'Вступление, окно № 0', f: () => d3AdmGo('d3e', () => { d3HollowsClear(); d3OfficeStart(false); }) },
+    { l: 'Контора: зал', s: 'Талон, окна, три двери', f: () => d3AdmGo('d3e', () => { D3.ticket = true; }) },
+    { l: 'Контора: архив', s: 'Стелс между писарями', f: () => d3AdmGo('d3e', () => { D3.ticket = true; d3Put(-10.6, 18); player.yaw = Math.PI / 2; }) },
+    { l: 'Контора: бланк жалобы', s: 'Три вопроса формы Ж-1', f: () => d3AdmGo('d3e', () => { D3.ticket = true; D3.fileGot = true; d3Form(0); }) },
+    { l: 'Контора: пневмопочта', s: 'Головоломка с трубами', f: () => d3AdmGo('d3e', () => { D3.ticket = true; D3.form = true; d3Put(19, 31.6); d3Tubes(); }) },
+    { l: 'Контора: отдел взыскания', s: 'Бой со взыскателями', f: () => d3AdmGo('d3e', () => { D3.ticket = true; d3Put(14.6, 4); }) },
+    { l: 'Контора: вахтёр открывает', s: 'Три печати собраны', f: () => d3AdmGo('d3e', () => { D3.ticket = true; D3.stamps = new Set(['count', 'seen', 'paid']); d3GateOpen(); }) },
+    { l: 'Акт VI: Счетовод', s: 'Вступление и бой', f: () => d3AdmGo('d3f') },
+    { l: 'Счетовод: щит сорван', s: 'Фаза «Взыскание»', f: () => d3AdmGo('d3f', () => { for (const p of D3.B.press) { p.done = true; p.lamp.material.color.setHex(0x40ff60); } d3Phase2(); }) },
+    { l: 'Счетовод: «Итог»', s: 'Последняя фаза', f: () => d3AdmGo('d3f', () => { for (const p of D3.B.press) p.done = true; d3Phase2(); D3.boss.hp = D3.boss.maxHp * 0.4; }) },
+    { l: 'Гроссбух открыт: выбор', s: 'Три способа закрыть долг', f: () => d3AdmGo('d3f', () => { all(); d3BossEnd(); }) },
+    end('pay', 0), end('burn', 1), end('law', 2),
+    { l: 'Эпилог: настоящий рассвет', s: 'После «Встречного иска»', f: () => d3AdmGo('d3f', () => { D3.ending = 'law'; d3Epilogue(); }) },
+    { l: 'Итоговый экран', s: 'Статистика локации', f: () => d3AdmGo('d3f', () => { D3.ending = 'law'; d3Finish(); }) },
+    { sec: 'Локация 3 · во время игры' },
+    { l: 'Все 8 доводов', s: 'Открывает «Встречный иск»', f: () => { if (!d3AdmIn()) return; all(); d3Chip(); toast('Доводы: 8/8'); } },
+    { l: 'Все 3 печати', s: 'В Конторе', f: () => { if (!d3AdmIn()) return; D3.stamps = new Set(['count', 'seen', 'paid']); D3.ticket = true; d3Chip(); toast('Печати: 3/3'); } },
+    { l: 'Усмирить всех пустых', s: 'Свет фонаря на всю карту', f: () => { if (!d3AdmIn()) return; admClose(); for (const n of D3.hollows) if (n.state === 'alive' && !n.big && n.hState !== 'calm' && n.hState !== 'sit' && n.hState !== 'queue') d3Pacify(n); } },
+    { l: 'Обнулить долг', s: 'Счёт: 0', f: () => { if (!d3AdmIn()) return; D3.debt = 0; d3Chip(); toast('Долг: 0'); } },
+    { l: 'Долг +5', s: 'Усложняет «Итог» босса', f: () => { if (!d3AdmIn()) return; D3.debt += 5; d3Chip(); toast('Долг: ' + D3.debt); } },
+    { l: 'Дар: медиатор / клык / без записи', s: 'Переключить по кругу', f: () => { if (!d3AdmIn()) return; D3.gift = { pick: 'fang', fang: 'free', free: 'pick' }[D3.gift] || 'pick'; D3.freeUsed = false; toast('Дар: ' + D3.gift); } },
+    { l: 'Оружие героя', s: 'Труба, пистолет, дробовик', f: () => { if (!d3AdmIn()) return; admClose(); d3Arm('pipe'); d3Arm('pistol'); d3Arm('shotgun'); } },
+    { l: 'Счетовод: −25% здоровья', s: 'Во время боя', f: () => { if (!d3AdmIn() || !D3.boss) return; admClose(); D3.boss.hp -= D3.boss.maxHp * 0.25; } },
+  ];
+}
 function c3FinishScreen() {
   const sec = Math.round((performance.now() - (C3.t0 || performance.now())) / 1000), sym = C2.sym || 0;
   const rows = [...(C3.l1rows || []), ['Клуб · время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Хайп на сцене', Math.round(C3.hype * 100) + '%'], ['Заряды обезврежены', C3.defused + ' / 4'], ['Стас Громов', C3.fate === 'mad' ? 'выброшен в зал драконом' : C3.fate === 'soul' ? 'без души' : 'арестован'], ['Симпатия Мелоди', sym >= 2 ? '♥♥' : sym >= 1 ? '♥' : sym <= -1 ? '💔' : '—'], ['Смертей', '0 — воскреситель не умирает']];
@@ -11480,7 +11848,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, d3Adm, d3OfficeStart, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
