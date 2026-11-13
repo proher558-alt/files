@@ -1148,8 +1148,11 @@ const MAPS = {
   c2base: { name: 'Подвал Марка', desc: '', story: true, hx: 9, hz: 22, h: 3.4, spawn: [-7.6, 11.8, -Math.PI / 2], fog: 0x0d0b0a, fogD: 0.03, bg: 0x050404, sun: 0.12, hemi: 0.5, lamp: [0xffd8a0, 28, 13], lamps: [[-7.4, 2.4, 11.8], [0, 3.0, 1], [2.2, 3.0, -9], [3, 3.0, -19]], red: [[2, 2.6, 19.5], 0xff2a20, 1.6], build: buildC2Base, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   club: { name: 'Клуб «Громкая ночь»', desc: '', story: true, hx: 22, hz: 34, h: 9, spawn: [0, 28, 0], fog: 0x0a0812, fogD: 0.018, bg: 0x07060c, sun: 0.25, hemi: 0.55, lamp: [0xffd0e8, 40, 26], lamps: [[0, 7, 24], [0, 8, -22], [-18, 6, -14], [18, 6, -8]], red: [[0, 6, 0], 0xff3aa0, 6], build: buildClub, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   fluidlab: { name: 'Гидролаборатория', desc: 'Лаборатория жидкостей: вода, молоко, лава, кислота, мёд и нефть с настоящей физикой. Шланг, шесть кранов, бак, кислотная ванна и лавовый бассейн.', hx: 16, hz: 16, h: 9, spawn: [0, 12, 0], fog: 0xb8c4cc, fogD: 0.006, bg: 0xb8c4cc, sun: 1.2, hemi: 1.1, lamp: [0xffffff, 60, 30], lamps: [[0, 7.5, -10], [0, 7.5, 4], [-11, 6, 8], [11, 6, 8]], red: [[11, 1.2, 7], 0xff5a10, 4], build: buildFluidLab, npcs: { human: 5, zombie: 0, soldier: 0, dummies: [[10.6, 6.0, 0], [11.4, 7.4, 0.5], [-11, 6.6, 0]] }, props: [], pills: [] },
-  rooftop3: { name: 'Крыша · рассвет', desc: '', story: true, hx: 18, hz: 18, h: 9, spawn: [0, 6, 9], fog: 0xf0c8b0, fogD: 0.012, bg: 0xf4c8a8, sun: 1.1, hemi: 0.9, lamp: [0xffd8b0, 18, 20], lamps: [[0, 6, 0], [-9, 6, -9], [9, 6, -9], [0, 6, 12]], red: [[0, 4, 0], 0xff4a4a, 0], build: buildRoof3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
-  street3: { name: 'Ночной город', desc: '', story: true, hx: 14, hz: 20, h: 12, spawn: [0, 6, -15], fog: 0x0a0c18, fogD: 0.02, bg: 0x080a14, sun: 0.2, hemi: 0.6, lamp: [0xffd8a0, 26, 16], lamps: [[-4, 6, -8], [4, 6, -2], [-4, 6, 4], [4, 6, 10]], red: [[0, 4, 0], 0xff3aa0, 0], build: buildStreet3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  rooftop3: { name: 'Крыша · рассвет', desc: '', story: true, hx: 20, hz: 22, h: 40, backdrop: 'dawn', own: () => ({ w: 40.9, d: 44.9, segs: [[0, 59.2]], kind: 'concrete' }), spawn: [0, 15, 0], fog: 0xe8b898, fogD: 0.0075, bg: 0xe8b898, sun: 1.5, hemi: 1.0, lamp: [0xffc890, 0, 15], lamps: [[0, 3, -11.5], [0, 3.2, 17.4], [-15, 2.6, 7], [14, 2.6, -10]], red: [[10, 7.3, -3], 0xff2a20, 3], build: buildRoof3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  ave3: { name: 'Проспект', desc: '', story: true, hx: 13, hz: 60, h: 40, backdrop: 'eclipse', spawn: [0, 0, 0], fog: 0x100e1a, fogD: 0.014, bg: 0x100e1a, sun: 0.1, hemi: 0.55, lamp: [0xffd8a0, 22, 26], lamps: [[0, 5, -6], [0, 5, -20], [0, 5, -36], [0, 5, 8]], red: [[0, 4, -50], 0xff2a20, 0], build: buildAve3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  street3: { name: 'Набережная', desc: '', story: true, hx: 26, hz: 62, h: 40, backdrop: 'eclipse', spawn: [0, 40, 0], fog: 0x100e1a, fogD: 0.013, bg: 0x100e1a, sun: 0.1, hemi: 0.6, lamp: [0xffd8a0, 30, 20], lamps: [[0, 6, 31], [-10, 5, 10], [9, 5, -6], [0, 5, -24]], red: [[0, 2.2, 30], 0x3a6aff, 5], build: buildStreet3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  office3: { name: 'Контора Счетовода', desc: '', story: true, hx: 26, hz: 40, h: 6, spawn: [0, 37, 0], fog: 0x0c100c, fogD: 0.016, bg: 0x060806, sun: 0.1, hemi: 0.62, lamp: [0xd8f0c0, 34, 24], lamps: [[0, 5.4, 26], [0, 5.4, 6], [-20, 5.2, 0], [20, 5.2, 0]], red: [[0, 4.6, -30], 0x60ff80, 4], build: buildOffice3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  ledger3: { name: 'Кабинет Счетовода', desc: '', story: true, hx: 18, hz: 22, h: 16, spawn: [0, 18, 0], fog: 0x08060a, fogD: 0.012, bg: 0x040305, sun: 0.1, hemi: 0.6, lamp: [0xffe0a8, 44, 30], lamps: [[-9, 9, -6], [9, 9, -6], [-9, 9, 10], [9, 9, 10]], red: [[0, 6, -18], 0xff3020, 5], build: buildLedger3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   ww2: { name: 'Поле боя 1941', desc: '', story: true, hx: 30, hz: 36, h: 30, spawn: [0, 32, 0], fog: 0x9a5c34, fogD: 0.018, bg: 0xb4683a, sun: 1.0, hemi: 0.9, lamp: [0xffb070, 34, 24], lamps: [[0, 2.8, -14], [-12, 3, 3], [14, 4, 10], [0, 5, 20]], red: [[0, 2.6, -12], 0xff7a30, 4], build: buildWW2, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   street: { name: 'Улица', desc: '', story: true, hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildStreet, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   police: { name: 'Участок полиции', desc: '', story: true, hx: 12, hz: 9, h: 3.4, spawn: [0, 7, 0], fog: 0x0b0d10, fogD: 0.03, bg: 0x070809, sun: 0.5, hemi: 0.55, lamp: [0xe8f2ff, 18, 14], lamps: [[-6, 3.1, -4], [6, 3.1, -4], [-6, 3.1, 4], [6, 3.1, 4]], red: [[11.8, 2.6, 0], 0x2a6aff, 4], build: buildPolice, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
@@ -1243,6 +1246,8 @@ const bgSun = new THREE.DirectionalLight(0xffffff, 1); bgScene.add(bgSun); bgSce
 const BG = { on: false, style: null, root: new THREE.Group(), cluster: new THREE.Group(), near: null, own: [], blinks: [], clouds: [], built: false, elev: 0, sky: null, glow: null, stars: null, painted: null };
 bgScene.add(BG.root); BG.root.add(BG.cluster);
 const BG_STYLES = {
+  dawn: { top: 0x24386e, mid: 0xe8a07a, hor: 0xffc48a, low: 0x5a4038, fog: 0xe4a888, fogD: 0.00021, lights: 0.4, hemi: [0xffd8c0, 0x4a3a34, 1.0], sun: [0xffc090, 1.5], sunDir: [0.08, 0.17, -0.98], glow: [0xffd8a8, 2600, 0.95], stars: 0.06, cloud: 0xffb8a0, cluster: [700, -1500], near: true },
+  eclipse: { top: 0x030308, mid: 0x0c0a18, hor: 0x2e2238, low: 0x07060a, fog: 0x120e1a, fogD: 0.00042, lights: 0.1, hemi: [0x3a3a5c, 0x100c0a, 0.4], sun: [0x8a90c0, 0.22], sunDir: [0.08, 0.17, -0.98], glow: [0xfff0d8, 1500, 1.0], stars: 0.75, cloud: 0x1a1824, cluster: [700, -1500], near: true, disc: 1, discSize: 640 },
   night: { top: 0x020309, mid: 0x0c0d22, hor: 0x2a1c3a, low: 0x0a0910, fog: 0x1c1529, fogD: 0.00034, lights: 1.15, hemi: [0x334466, 0x120e0a, 0.45], sun: [0x8a9acc, 0.45], sunDir: [0.5, 0.42, -0.6], glow: [0xc8d4ff, 380, 0.6], stars: 0.9, cloud: 0x2a2436, cluster: [1500, -1700], near: true },
   dusk: { top: 0x0b1530, mid: 0x3b3466, hor: 0xff8a4a, low: 0x2a1a1a, fog: 0x7a5060, fogD: 0.00022, lights: 0.85, hemi: [0x8a96c0, 0x3a2a24, 0.85], sun: [0xffa060, 1.5], sunDir: [-0.85, 0.1, 0.25], glow: [0xffb070, 2600, 0.85], stars: 0.25, cloud: 0xc07a70, cluster: [0, 0], near: true },
   grey: { top: 0x27313d, mid: 0x55606c, hor: 0x9aa0a4, low: 0x5a5a58, fog: 0x7c8288, fogD: 0.00048, lights: 0.3, hemi: [0xb8c2cc, 0x4a4640, 1.0], sun: [0xe6ecf4, 0.7], sunDir: [0.3, 0.6, 0.5], glow: [0xffffff, 1400, 0.22], stars: 0, cloud: 0xa0a6ac, cluster: [-1100, -1500], near: true },
@@ -1377,7 +1382,7 @@ function setBackdrop(style, elev = 0, own = null) {
   BG.stars.material.opacity = S.stars; BG.stars.visible = S.stars > 0;
   for (const c of BG.clouds) c.material.color.setHex(S.cloud);
   BG.cluster.position.set(S.cluster[0], 0, S.cluster[1]); BG.near.visible = S.near;
-  setOwnTower(own); setBackdropHeight(elev);
+  d3MoonSync(S); setOwnTower(own); setBackdropHeight(elev);
 }
 function setBackdropHeight(elev) { BG.elev = elev; BG.root.position.y = -elev; }
 function updateBackdrop(dt, now, lk) {
@@ -1704,7 +1709,7 @@ function loadMap(id) {
   mapId = MAPS[id] && (id !== 'moon' || moonOpen()) && ((id !== 'factory' && id !== 'factoryIn') || getMods().huggy) ? id : 'polygon'; const M = MAPS[mapId];
   if (M.pre) M.pre();
   if (!M.npcs.soldier) M.npcs.soldier = 0;
-  HX = M.hx; HZ = M.hz; WALL_H = M.h;
+  HX = M.hx; HZ = M.hz; WALL_H = M.h; sun.position.set(9, 19, 7);
   Object.assign(LV, { open: false, decks: [], groundY: 0, bounds: [{ x0: -HX, x1: HX, z0: -HZ, z1: HZ }], ceil: true, walls: true, elev: 0, wind: 0, grav: 1 });
   scene.fog.color.setHex(M.fog); scene.fog.density = M.fogD; scene.background.setHex(M.bg);
   sun.intensity = M.sun; hemi.intensity = M.hemi;
@@ -2817,6 +2822,10 @@ function applyLookKind(L, k) {
   else if (k === 'gagarin') { L.female = false; L.skin = 0x0b0b0e; L.skinTex = null; L.shirt = 0x0c0c10; L.pants = 0xe07a1a; L.sleeves = 'long'; L.hair = null; L.gagarin = true; L.cap = false; }
   else if (k === 'cop') { L.shirt = 0x1b2236; L.pants = 0x161c2c; L.sleeves = 'short'; L.cap = true; L.badge = true; }
   else if (k === 'fan') { L.shirt = pick([0xc8a040, 0x8a1a3a, 0xf0f0ea, 0x1a3a6a, 0x5a1a6a, 0xd84a7a]); L.pants = pick([0x1a1a1e, 0x2a2420, 0xf0f0ea]); L.sleeves = 'long'; }
+  else if (k === 'hollow') { L.skin = pick([0xcfcac4, 0xc4c0bc, 0xd6d0c8, 0xbcb8b6]); L.eyes = hollowEyes(); L.shirt = d3Grey(L.shirt); L.pants = d3Grey(L.pants); L.lips = L.female ? 0x9a8a8a : null; L.hollow = true; }
+  else if (k === 'clerk') { L.female = false; L.skin = 0xd9d5cc; L.shirt = 0x4a4c52; L.pants = 0x3a3c42; L.sleeves = 'long'; L.tie = 0x101012; L.hair = null; L.hairStyle = null; L.cap = false; L.helmet = false; L.eyes = hollowEyes(); L.prop = { height: 1.06, build: 0.8, head: 0.95 }; }
+  else if (k === 'collector') { L.female = false; L.skin = 0xb8b4ae; L.shirt = 0x2a1c1c; L.pants = 0x18181c; L.sleeves = 'long'; L.hair = null; L.hairStyle = null; L.cap = false; L.helmet = false; L.eyes = hollowEyes(); L.prop = { height: 1.28, build: 1.55, arms: 1.15, head: 0.9, hands: 1.4 }; }
+  else if (k === 'ledger') { L.female = false; L.skin = 0xe6e2d8; L.shirt = 0x0e0e12; L.pants = 0x0e0e12; L.sleeves = 'long'; L.tie = 0x8a1020; L.hair = null; L.hairStyle = null; L.cap = false; L.helmet = false; L.eyes = hollowEyes(); L.prop = { height: 1.62, build: 0.7, arms: 1.4, legs: 1.2, head: 0.86, hands: 1.3 }; }
   else if (k === 'baby') { L.shirt = 0xa8d0f0; L.pants = 0xa8d0f0; L.sleeves = 'long'; L.hair = null; L.female = false; }
 }
 
@@ -2913,7 +2922,7 @@ class Humanoid {
   die(cause) {
     if (this.look && this.look.melodie && !this.c2kill) { this.hp = this.maxHp; return; }
     if (this.mark && story.asGG && C2.boss) { this.hp = Math.max(1, this.hp); return; }
-    if (this.gg) return; if (this.state === 'dead') return; const wasLimp = this.state === 'limp'; this.state = 'dead'; this.deadT = 0; this.killedBy = cause; this.clutch = this.clutch2 = null; if (this.sv) this.svUpdate(0);
+    if (this.d3Boss) { this.hp = Math.max(1, this.hp); return; } if (this.gg) return; if (this.state === 'dead') return; const wasLimp = this.state === 'limp'; this.state = 'dead'; this.deadT = 0; this.killedBy = cause; this.clutch = this.clutch2 = null; if (this.sv) this.svUpdate(0);
     if (!wasLimp) {
       this.root.updateMatrixWorld(true);
       const names = ORDER.filter((n) => { const P = this.parts[n]; return !P.gone && !P.body; });
@@ -3862,6 +3871,7 @@ function updatePlayer(dt) {
   player.lastHurt += dt; player.lastFall = Math.max(0, (player.lastFall || 0) - dt);
   if (player.dead) { if (mode !== 'waves' && player.respawnT > 0) { player.respawnT -= dt; if (player.respawnT <= 0) respawnPlayer(); } player.deathT = (player.deathT || 0) + dt; return; }
   if (player.rag) { updatePlayerRag(dt); return; }
+  if (story.ride) { story.ride(dt); return; }
   if (player.getup > 0) player.getup -= dt;
   if (player.lastHurt > 4 && player.hp < 100) player.hp = Math.min(100, player.hp + dt * (mode === 'waves' ? 3 : 10));
   let mx = 0, mz = 0;
@@ -3897,6 +3907,7 @@ function updatePlayer(dt) {
   eye.updateMatrixWorld();
 }
 function placeCamera(dt) {
+  if (story.rideCam && !player.dead) { story.rideCam(dt); return; }
   if (player.rag || (player.dead && avatar && avatar.state === 'dead')) { updateRagCam(dt); return; }
   if (view3() && state !== 'cutscene') { placeTPSCamera(dt); return; }
   const hs = Math.hypot(player.vel.x, player.vel.z);
@@ -4274,7 +4285,8 @@ function hitPart(npc, P, h, dir, dmg, w) {
   // Melodie dodges every bullet: she sidesteps across the shot and takes no damage
   if (npc.alive && npc.look && npc.look.melodie) { melDodge(npc, dir); return; }
   if (npc.gg && !npc.protect) { gagHit(npc, P, h, dir, w); return; }
-  if (npc.protect) { if (performance.now() - (story.warnT || 0) > 2500) { story.warnT = performance.now(); toast('Рано! Нужны доказательства'); } sparks(h.point, 4, hitNormal(h), 2); return; }
+  if (npc.d3Shield) { d3ShieldHit(npc, h); return; }
+  if (npc.protect) { if (performance.now() - (story.warnT || 0) > 2500) { story.warnT = performance.now(); toast(npc.protMsg || 'Рано! Нужны доказательства'); } sparks(h.point, 4, hitNormal(h), 2); return; }
   const kind = P.def.kind, wasAlive = npc.alive;
   if (w.id === 'flame' && npc.alive) npc.burn = Math.min(6, npc.burn + 1.5);
   const ln = h.face ? h.face.normal.clone() : new V3(0, 0, 1);
@@ -5681,7 +5693,7 @@ function showCard(small, big, ms = 2600, mini = false) { const c = $('chapter');
 function sub(who, text) { const c = $('cut'); c.classList.remove('ghost'); $('cutWho').textContent = who; story.typ = { text, n: 0, k: -1 }; $('cutText').textContent = ''; c._want = true; if (c.hidden) { c.hidden = false; requestAnimationFrame(() => { if (c._want) c.classList.add('on'); }); } else c.classList.add('on'); }
 function subOff() { story.typ = null; const c = $('cut'); c._want = false; c.classList.remove('on'); setTimeout(() => { if (!c.classList.contains('on')) c.hidden = true; }, 650); }
 function speakAs(text, pitch = 1, rate = 1) { try { if (!window.speechSynthesis) return; const u = new SpeechSynthesisUtterance(text); u.lang = 'ru-RU'; u.pitch = pitch; u.rate = rate; const v = speechSynthesis.getVoices().find((x) => /^ru/i.test(x.lang)); if (v) u.voice = v; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} }
-function speakerOf(who) { return who === 'Продюсер' ? story.prod : who === 'Полиция' ? story.copSpk : who === 'Свити' ? story.svity : who === 'Дежурный' ? story.desk : who === 'Вы' ? avatar : who === 'Воскреситель' ? story.gg : who === 'Марк' ? story.mark : who === 'Стас' ? C3.stas : who === 'Мелоди' ? (C3.mel || C2.mel) : null; }
+function speakerOf(who) { return who === 'Продюсер' ? story.prod : who === 'Полиция' ? story.copSpk : who === 'Свити' ? story.svity : who === 'Дежурный' ? story.desk : who === 'Вы' ? avatar : who === 'Воскреситель' ? story.gg : who === 'Марк' ? story.mark : who === 'Стас' ? C3.stas : who === 'Мелоди' ? (D3.mel || C3.mel || C2.mel) : who === 'Счетовод' ? D3.boss : who === 'Инспектор' ? (D3.insp || C3.insp) : null; }
 function line(who, text, pitch, rate) { sub(who, text); { const sp = speakerOf(who); story.spk = sp || null; if (sp) sp.talkT = Math.max(sp.talkT || 0, Math.min(9, text.length * 0.075)); } speakAs(text.replace(/50 000 \$/g, 'пятьдесят тысяч долларов'), pitch, rate); }
 function fadeOut() { $('black').classList.add('on'); }
 function fadeIn() { $('black').classList.remove('on'); }
@@ -5718,8 +5730,8 @@ function setStage(stage, obj) { story.stage = stage; $('sObj').textContent = obj
 const NOTE_STAGES = new Set(['street', 'photo', 'search', 'complain', 'gala-talk', 'gala-find', 'flat', 'cafe', 'port', 'studio', 'studio-usb']);
 function renderNotes() { $('sNotes').innerHTML = story.notes.length ? '<b>БЛОКНОТ · СВИТИ</b>' + story.notes.map((n) => '— ' + n).join('<br>') : ''; }
 function storyReset() {
-  if (typeof vmSkinGG === 'function' && story.asGG) vmSkinGG(false); const hadPipe = story.c2pipe;
-  Object.assign(story, { asGG: false, c2pipe: false, ch: 1, mark: null, on: false, stage: '', cut: null, zoom: false, tv: false, noFire: false, showAvatar: false, gun: true, svity: null, desk: null, notes: [], wp: null, lidT: 0, doorT: 0, lockT: 0, chase: 0, taxi: null, drive: false, svIn: false, svWalk: false, siren: false, talked: new Set(), huntGoal: 12, huntNext: null, huntPts: null, huntFade: true, huntTxt: '', curCase: null, portAll: false, ev: new Set(), prod: null, guards: [], hostages: [], freed: 0, noise: 0, walk: false, alarm: false, cops: null, copSpk: null, barista: null, boatGo: false });
+  if (typeof vmSkinGG === 'function' && story.asGG) vmSkinGG(false); const hadPipe = story.c2pipe; if (story.d3) d3Off();
+  Object.assign(story, { d3: false, ride: null, rideCam: null, asGG: false, c2pipe: false, ch: 1, mark: null, on: false, stage: '', cut: null, zoom: false, tv: false, noFire: false, showAvatar: false, gun: true, svity: null, desk: null, notes: [], wp: null, lidT: 0, doorT: 0, lockT: 0, chase: 0, taxi: null, drive: false, svIn: false, svWalk: false, siren: false, talked: new Set(), huntGoal: 12, huntNext: null, huntPts: null, huntFade: true, huntTxt: '', curCase: null, portAll: false, ev: new Set(), prod: null, guards: [], hostages: [], freed: 0, noise: 0, walk: false, alarm: false, cops: null, copSpk: null, barista: null, boatGo: false });
   $('sMeter').hidden = true; $('paper').hidden = true; CAFE.paper = false; $('quest').hidden = true; if (ULT.on) ultStop(); if (hadPipe) syncMods();
   MAPS.home.red[2] = 2.5; $('cine').classList.remove('on'); $('credits').hidden = true; $('actBtn').hidden = true; story.notesOpen = false; story.notesT = 0; story.noteVis = null; story.canNote = null; story.typ = null; story.fov = 0; fxStory.whip = 0; fxStory.grade = 0; story.gg = null; story.spk = null; $('sNotes').hidden = true; $('noteBtn').hidden = true; $('bloodout').style.opacity = 0; LFX.on = false;
   for (const e of story.extras) e.dispose(); story.extras.length = 0;
@@ -5729,15 +5741,16 @@ function storyReset() {
 function startStory(cp = null) {
   Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'story'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true;
   story.on = true; story.asGG = false; story.ch = 1; lastCh = 1; W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0; selectWeapon(cp ? 1 : 0);
+  if ((cp || '').startsWith('d3')) { d3Start(cp); return; }
   if (['c2b', 'c3', 'c3b', 'c3c'].includes(cp)) { startCh2(cp); return; }
   $('resumeBtn').hidden = true; startGame.fromWaves = true;
   if (CP_FN[cp]) { cpRestore(cp); CP_FN[cp](); renderNotes(); return; }
   saveCp(null); cutIntro();
 }
-const CP_NAME = { c2b: 'главу 2 из подвала', c3: 'главу 2 · клуб «Громкая ночь»', c3b: 'главу 2 · за кулисами', c3c: 'главу 2 · поиск зарядов', cafe: 'с кафе «Полночь»', police: 'с участка полиции', port: 'с порта', studio: 'со студии', gala: 'с ужина принцессы' };
+const CP_NAME = { d3: 'главу 2 · рассвет на крыше', d3b: 'главу 2 · затмение', d3c: 'главу 2 · проспект', d3d: 'главу 2 · набережную', d3e: 'главу 2 · Контору', d3f: 'главу 2 · Счетовода', c2b: 'главу 2 из подвала', c3: 'главу 2 · клуб «Громкая ночь»', c3b: 'главу 2 · за кулисами', c3c: 'главу 2 · поиск зарядов', cafe: 'с кафе «Полночь»', police: 'с участка полиции', port: 'с порта', studio: 'со студии', gala: 'с ужина принцессы' };
 function saveCp(cp) { cpStore(cp); try { if (cp) localStorage.setItem('myasorubka-story', cp); else localStorage.removeItem('myasorubka-story'); } catch (e) {} syncCont(); }
 function loadCp() { try { return localStorage.getItem('myasorubka-story'); } catch (e) { return null; } }
-function syncCont() { const cp = loadCp(); $('contStory').hidden = !CP_NAME[cp]; if ($('contStory').firstChild) $('contStory').firstChild.textContent = (cp === 'c2b' || (cp || '').startsWith('c3')) ? 'Продолжить главу 2' : 'Продолжить главу 1'; if (CP_NAME[cp]) $('contWhere').textContent = 'Продолжить ' + CP_NAME[cp]; }
+function syncCont() { const cp = loadCp(); $('contStory').hidden = !CP_NAME[cp]; if ($('contStory').firstChild) $('contStory').firstChild.textContent = (cp === 'c2b' || (cp || '').startsWith('c3') || (cp || '').startsWith('d3')) ? 'Продолжить главу 2' : 'Продолжить главу 1'; if (CP_NAME[cp]) $('contWhere').textContent = 'Продолжить ' + CP_NAME[cp]; }
 $('contStory').onclick = () => startStory(loadCp());
 // things she says when you are close, like a blogger on a live stream
 const SV_SAY = {
@@ -5970,6 +5983,7 @@ function nearLocker() { return Math.hypot(player.pos.x - LOCKER_X, player.pos.z 
 function actInfo(st) {
   if (st.startsWith('c2')) return c2Act(true);
   if (st.startsWith('c3')) return c3Act(true);
+  if (st.startsWith('d3')) return d3Act(true);
   if (st === 'search') return nearLocker() ? 'Обыскать' : null;
   if (st === 'flat') return nearClue() ? 'Осмотреть' : null;
   if (st === 'cafe') return CAFE.paper ? 'Убрать газету' : 'Газета';
@@ -5991,6 +6005,7 @@ function storyAct() {
   else if (st === 'studio') cutCable();
   else if (st.startsWith('c2')) c2Act(false);
   else if (st.startsWith('c3')) c3Act(false);
+  else if (st.startsWith('d3')) d3Act(false);
   else if (st === 'studio-usb' && nearConsole()) cutStudioLive();
 }
 function cutSearch() {
@@ -7777,16 +7792,7 @@ function admCh2() {
     { l: 'Клуб: сцена на сцене', s: 'Мелоди объявляет басиста', f: () => { admClose(); startCh2('c3b'); setTimeout(() => { C3.phone = true; c3Show(); }, 600); } },
     { l: 'Клуб: ритм-игра (хайп 100%)', s: 'Сразу финал песни', f: () => { admClose(); startCh2('c3b'); setTimeout(() => { C3.phone = true; c3Show(); setTimeout(() => { C3.hype = 1; }, 300); }, 600); } },
     { l: 'Клуб: осмотр тестера', s: 'Таймер и заряды', f: () => { admClose(); startCh2('c3c'); } },
-    { sec: 'Локация 3 · Рассвет и Ночной город' },
-    { l: 'Крыша: начало', s: 'Вы один, Мелоди ждёт', f: () => { admClose(); startLoc3(); } },
-    { l: 'Крыша: финальный выбор Мелоди', s: 'Сразу разговор и выбор', f: () => { admClose(); startLoc3(); setTimeout(() => { L3.items = new Set(['photo', 'pick', 'letter']); roofFinal(); }, 800); } },
-    { l: 'Крыша: Мелоди уходит', s: 'Ответ «Я останусь рядом»', f: () => { admClose(); startLoc3(); setTimeout(() => { L3.choice = 'go'; l3End(); }, 800); } },
-    { l: 'Ночной город: начало', s: 'Пустая улица, следы', f: () => { admClose(); startStreet3(); } },
-    { l: 'Ночной город: все следы найдены', s: 'Идите к мосту', f: () => { admClose(); startStreet3(); setTimeout(() => { S3.found = new Set(['note', 'post', 'bridge']); }, 800); } },
-    { l: 'Мост: воскреситель и выбор', s: 'Разговор на мосту', f: () => { admClose(); startStreet3(); setTimeout(() => { S3.found = new Set(['note', 'post', 'bridge']); s3Meet(); }, 800); } },
-    { l: 'Мост: ответ «Мелоди любит тебя»', s: 'Концовка продолжения', f: () => { admClose(); startStreet3(); setTimeout(() => { s3End('love', null); }, 800); } },
-    { l: 'Мост: ответ «Оставь её в покое»', s: 'Концовка продолжения', f: () => { admClose(); startStreet3(); setTimeout(() => { s3End('threat', null); }, 800); } },
-    { l: 'Мост: ответ «Кто ты на самом деле»', s: 'Концовка продолжения', f: () => { admClose(); startStreet3(); setTimeout(() => { s3End('ask', null); }, 800); } },
+    ...d3Adm(),
     { sec: 'Телепорт · по подвалу (во время главы)' },
     { l: 'Клетка', s: 'Внутри', f: () => c2AdmTp(-7.6, 11.8, -Math.PI / 2) },
     { l: 'Стол допроса', s: 'Медиатор', f: () => c2AdmTp(-4.4, 9.6, Math.PI) },
@@ -7986,6 +7992,7 @@ function updateStory(dt) {
   else if (st === 'port') updPort(dt, tick);
   else if (st.startsWith('c2')) updC2(dt, tick);
   else if (st.startsWith('c3')) updC3(dt, tick);
+  else if (st.startsWith('d3')) updD3(dt, tick);
   else if (st === 'studio' || st === 'studio-usb') updStudio(dt, tick);
   else if (st === 'choice') { story.choiceT -= dt; $('chBar').style.width = Math.max(0, story.choiceT / 7 * 100) + '%'; if (story.choiceT <= 0) chooseMarry(); }
   else if (st === 'hunted') {
@@ -8041,7 +8048,7 @@ function syncMods() {
   if (M.mikushka) WEAPONS.push({ id: 'mikushka', name: 'Микушка', melee: true, cat: true, rate: 0.7, dmg: 0 });
   if (M.sawgun) WEAPONS.push({ id: 'sawgun', name: 'Пиломёт', mag: 8, rate: 0.45, auto: false, spread: 0.01, pellets: 1, dmg: 70, force: 60, pen: 2, reload: 1.6 });
   if (mapId === 'fluidlab') WEAPONS.push({ id: 'hose', name: 'Шланг', auto: true, hose: true, rate: 0.03 });
-  if (story.asGG && story.c2pipe) WEAPONS.push({ id: 'pipe', name: 'Труба', melee: true, rate: 0.7, dmg: 55 });
+  if ((story.asGG || story.d3) && story.c2pipe) WEAPONS.push({ id: 'pipe', name: 'Труба', melee: true, rate: 0.7, dmg: 55 });
   if (M.axe) WEAPONS.push({ id: 'axe', name: 'Топор', melee: true, rate: 0.75, dmg: 80 });
   if (M.molotov) WEAPONS.push({ id: 'molotov', name: 'Молотов', thrown: true, molotov: true, rate: 1.0 });
   if (M.sledge) WEAPONS.push({ id: 'sledge', name: 'Кувалда', melee: true, rate: 1.25, dmg: 170 });
@@ -9156,7 +9163,6 @@ function c3Out() {
   story.showAvatar = false; setStage('c3-out', ''); banner('Громкая ночь', 'проберитесь внутрь через служебный вход');
 }
 function c3Act(info) {
-  if (story.stage === 'c3roof') { const r = l3Act(info); return info ? r : undefined; }
   const st = story.stage, near = (x, z, r = 1.4) => Math.hypot(player.pos.x - x, player.pos.z - z) < r;
   if (st === 'c3-out') {
     if (!C3.hood && near(18.5, 18.6, 1.5)) return info ? 'Взять худи техника' : (C3.hood = true, Sound.click(700, 0.3), toast('Худи техника надето'), c2Say('Чёрное худи с надписью «CREW». Мне идёт чёрное.'));
@@ -9444,7 +9450,7 @@ function c3Epilogue() {
     ['Мелоди', (C2.sym || 0) >= 2 ? '…Тогда я буду петь громче.' : 'Тогда… спасибо. За всё.', 'mel'],
     ['', 'Воскреситель уходит в туман между фонарями. Его тень на мокром асфальте длиннее, чем должна быть.', 'street'],
     ['Воскреситель', 'Расплата закончена. Почти.', 'gg'],
-  ], (t, dt) => { c3Upd(t, dt); }, () => { showCard('ГЛАВА 2 · ЛОКАЦИЯ 2 ПРОЙДЕНА', 'Продолжение следует…', 6000); runCut([[0.1, () => subOff()]], c3Upd, 6.5, () => { C3.done = true; startLoc3(); }); });
+  ], (t, dt) => { c3Upd(t, dt); }, () => { showCard('ГЛАВА 2 · ЛОКАЦИЯ 2 ПРОЙДЕНА', 'Продолжение следует…', 6000); runCut([[0.1, () => subOff()]], c3Upd, 6.5, () => { C3.done = true; d3Start(); }); });
 }
 /* ----- per-frame ----- */
 function updC3(dt, tick) {
@@ -10137,144 +10143,720 @@ function c2L1Rows() {
 }
 function c3Begin() { C3.l1rows = c2L1Rows(); fadeOut(); subOff(); later(1.4, () => { c3Start(); }); }
 
-/* ===================== CHAPTER 2 · LOCATION 3 «Рассвет» (small) =====================
-   You are yourself, no resurrector. A quiet rooftop at dawn. Melodie is waiting for you. */
+/* ===================== CHAPTER 2 · LOCATION 3 «ДОЛГ» =====================
+   You are yourself. A dawn rooftop with Melodie, an eclipse nobody forecast, the hollow ones, a drive down the avenue,
+   the embankment, the resurrector on the bridge, the Counting-House and its Bookkeeper.
+   Every death here is a resurrection, and every resurrection goes on the bill. */
+const D3 = { on: false, debt: 0, broken: 0, brokenAlly: 0, calm: 0, saved: 0, hollows: [], allies: [], ev: new Set(), items: new Set(), extra: new Set(), stamps: new Set(), rsp: [0, 0, 0], t0: 0, spots: [], allow: ['fists'], trust: 0 };
+const D3_EV = {
+  ring: ['Кольцо голубя', 'номер вашего талона выбит заранее: вас поставили в очередь ещё до первой смерти'],
+  scope: ['Инвентарный номер', 'на диске, закрывшем солнце, стоит «ИНВ. № 1»: затмение устроено имуществом Конторы'],
+  call: ['Звонок в будку', 'Счетовод сам звонит и зазывает в очередь: навязывание услуг'],
+  proto: ['Протокол Лисовой', 'души забирали у тех, кто ничего не занимал'],
+  file: ['Ваше личное дело', 'каждое воскрешение записано дважды: двойной счёт'],
+  pledge: ['Залог Мелоди', 'голос принят в залог, хотя неотчуждаемое в залог не берут'],
+  pact: ['Договор воскресителя', 'заимодавец и взыскатель — одно лицо, проценты он назначал сам'],
+  page: ['Страница гроссбуха', 'Счетовод брал души из очереди себе: он сам должник'],
+};
+const D3_VOICE = { 'Вы': [0.55, 0.95], 'Мелоди': [1.45, 1.05], 'Инспектор': [1.1, 1.0], 'Счетовод': [0.1, 0.72], 'Писарь': [0.7, 1.2], 'Вахтёр': [0.35, 0.8], 'Радио': [0.9, 1.12], 'Выживший': [1.0, 1.1], 'Выжившая': [1.4, 1.1], 'Пустой': [0.8, 0.7], 'Взыскатель': [0.3, 0.85], 'Трубка': [0.1, 0.72] };
+const D3_COUNT = ['Сто сорок один… сто сорок два…', 'Четыреста двенадцать… четыреста тринадцать…', 'Девятьсот девяносто девять… тысяча…', 'Две тысячи шесть… две тысячи семь…', 'Семь… восемь… девять…', 'Тридцать три… тридцать четыре…', 'Шестьсот шестьдесят… шестьсот шестьдесят один…'];
+const D3_REVIVE = ['Вставай. Я записал это на твой счёт.', 'Ещё одна строчка. Вставай.', 'Ты падаешь, я поднимаю. Он считает.', 'Не привыкай. Каждая смерть стоит дороже предыдущей.', 'Вставай. Долг сам себя не выплатит.'];
+const _d3a = new V3(), _d3b = new V3(), _d3f = new V3(), _d3c1 = new THREE.Color(), _d3c2 = new THREE.Color();
+let D3_HEYE = null;
+function hollowEyes() { return D3_HEYE || (D3_HEYE = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xdfe6f0, emissiveIntensity: 0.85, roughness: 0.3 })); }
+function d3Grey(hex, k = 0.62) { _d3c1.setHex(hex); const l = _d3c1.r * 0.3 + _d3c1.g * 0.59 + _d3c1.b * 0.11; _d3c2.setRGB(l * 0.9 + 0.05, l * 0.9 + 0.05, l * 0.95 + 0.06); return _d3c1.lerp(_d3c2, k).getHex(); }
+function d3Sec() { return Math.round((performance.now() - (D3.t0 || performance.now())) / 1000); }
+function d3Save() { try { localStorage.setItem('myasorubka-d3', JSON.stringify({ debt: D3.debt, broken: D3.broken, brokenAlly: D3.brokenAlly, calm: D3.calm, saved: D3.saved, ev: [...D3.ev], extra: [...D3.extra], stamps: [...D3.stamps], choice: D3.choice, reply: D3.reply, gift: D3.gift, freeUsed: D3.freeUsed, trust: D3.trust, sec: d3Sec(), car: D3.carHits || 0 })); } catch (e) {} }
+function d3Load() { try { return JSON.parse(localStorage.getItem('myasorubka-d3') || 'null'); } catch (e) { return null; } }
+function d3Reset() {
+  Object.assign(D3, { on: true, debt: 0, broken: 0, brokenAlly: 0, calm: 0, saved: 0, hollows: [], allies: [], ev: new Set(), items: new Set(), extra: new Set(), stamps: new Set(), rsp: [0, 0, 0], t0: performance.now(), spots: [], allow: ['fists'], trust: 0, choice: null, reply: null, gift: null, freeUsed: false, lamp: false, mel: null, gg: null, insp: null, boss: null, wasDead: false, upd: null, obj: () => '', tgt: () => null, onRevive: null, onBreach: null, cntT: 6, shot: '', cam: null, carHits: 0, ending: '', done: false, form: false, tube: false, ticket: false, surv: [], cops: [], drive: null, B: null, O: null });
+}
+function d3Off() {
+  D3.on = false; const h = document.getElementById('d3hud'); if (h) h.style.display = 'none'; const b = document.getElementById('d3bar'); if (b) b.style.display = 'none'; const dr = document.getElementById('d3drv'); if (dr) dr.style.display = 'none';
+  FL.light.color.setHex(0xfff2dc); if (D3.lamp) FL.on = false; D3.lamp = false; d3RoofLook(0, true);
+}
+/* ----- sky: dawn and eclipse, and a live blend between them ----- */
+function d3Moon() {
+  if (BG.moon || !BG.sky) return BG.moon;
+  const t = cvTex(256, 256, (g) => { g.clearRect(0, 0, 256, 256); g.fillStyle = '#000'; g.beginPath(); g.arc(128, 128, 120, 0, 7); g.fill(); g.fillStyle = 'rgba(255,255,255,0.05)'; g.font = '700 15px Arial'; g.textAlign = 'center'; g.fillText('ИНВ. № 1', 128, 208); });
+  BG.moon = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false, depthTest: false, fog: false })); BG.moon.renderOrder = -7; BG.moon.visible = false; BG.sky.add(BG.moon); return BG.moon;
+}
+function d3MoonSync(S) { const m = d3Moon(); if (!m) return; const k = S && S.disc ? S.disc : 0; m.visible = k > 0.001; if (!m.visible) return; _d3a.set(...S.sunDir).normalize().multiplyScalar(9900); m.position.set(_d3a.x + (1 - k) * 900, _d3a.y + (1 - k) * 260, _d3a.z); m.scale.setScalar(S.discSize || 620); }
+function d3MixHex(a, b, k) { return _d3c1.setHex(a).lerp(_d3c2.setHex(b), k).getHex(); }
+function d3Sky(k) {
+  if (!BG.on || !BG.sky) return; const A = BG_STYLES.dawn, B = BG_STYLES.eclipse, M = BG_STYLES.d3mix || (BG_STYLES.d3mix = {});
+  for (const f of ['top', 'mid', 'hor', 'low', 'fog', 'cloud']) M[f] = d3MixHex(A[f], B[f], k);
+  M.fogD = lerp(A.fogD, B.fogD, k); M.lights = lerp(A.lights, B.lights, k); M.stars = lerp(A.stars, B.stars, k * k);
+  M.hemi = [d3MixHex(A.hemi[0], B.hemi[0], k), d3MixHex(A.hemi[1], B.hemi[1], k), lerp(A.hemi[2], B.hemi[2], k)];
+  M.sun = [d3MixHex(A.sun[0], B.sun[0], k), lerp(A.sun[1], B.sun[1], k)]; M.sunDir = A.sunDir; M.cluster = A.cluster; M.near = true; M.disc = k; M.discSize = B.discSize;
+  M.glow = [d3MixHex(A.glow[0], B.glow[0], k), lerp(A.glow[1], B.glow[1], k), lerp(A.glow[2], B.glow[2], k)];
+  BG.style = 'd3mix'; BG.painted = null; paintSky(M);
+  bgScene.background.setHex(M.hor); bgScene.fog.color.setHex(M.fog); bgScene.fog.density = M.fogD; bgHemi.color.setHex(M.hemi[0]); bgHemi.groundColor.setHex(M.hemi[1]); bgSun.color.setHex(M.sun[0]);
+  BG.glow.material.color.setHex(M.glow[0]); BG.glow.scale.setScalar(M.glow[1]); BG.glow.material.opacity = M.glow[2]; BG.stars.material.opacity = M.stars; BG.stars.visible = M.stars > 0.01;
+  for (const c of BG.clouds) c.material.color.setHex(M.cloud); d3MoonSync(M);
+}
+// the rooftop in two lights: 0 = dawn, 1 = eclipse
+const D3_ROOF = { fog: [0xe8b898, 0x100e1a], fogD: [0.0075, 0.016], sun: [1.5, 0.12], hemi: [1.0, 0.5], lamp: [0, 16] };
+function d3RoofLook(k, quiet) {
+  const M = MAPS.rooftop3; M.fog = d3MixHex(D3_ROOF.fog[0], D3_ROOF.fog[1], k); M.bg = M.fog; M.fogD = lerp(D3_ROOF.fogD[0], D3_ROOF.fogD[1], k); M.sun = lerp(D3_ROOF.sun[0], D3_ROOF.sun[1], k); M.hemi = lerp(D3_ROOF.hemi[0], D3_ROOF.hemi[1], k); M.lamp[1] = lerp(D3_ROOF.lamp[0], D3_ROOF.lamp[1], k); M.backdrop = k > 0.99 ? 'eclipse' : 'dawn';
+  if (quiet || mapId !== 'rooftop3') return; scene.fog.color.setHex(M.fog); scene.fog.density = M.fogD; scene.background.setHex(M.bg); d3Sky(k);
+}
+/* ----- small helpers: cameras, talk, choices, evidence, HUD ----- */
+function d3FaceTo(n, x, z) { n.yaw = Math.atan2(x - n.pos.x, z - n.pos.z); if (n.root) n.root.rotation.y = n.yaw; }
+function d3PlayerFace(x, z) { player.yaw = Math.atan2(-(x - player.pos.x), -(z - player.pos.z)); player.pitch = 0; }
+function d3Put(x, z, lx, lz) { player.pos.set(x, 0, z); player.vel.set(0, 0, 0); if (lx !== undefined) d3PlayerFace(lx, lz); if (avatar) { avatar.pos.copy(player.pos); standAvatar(); } }
+function d3CamFace(n, side = 0.35, dist = 0.95, up = 0.04) { if (!n || !n.parts) return; headPos(n, _d3a); const fx = Math.sin(n.yaw), fz = Math.cos(n.yaw); camSet(_d3a.x + fx * dist + fz * side, _d3a.y + up, _d3a.z + fz * dist - fx * side, _d3a.x, _d3a.y - 0.02, _d3a.z); }
+function d3CamTwo(ax, az, bx, bz, side = 1, dist = 3.2, h = 1.55, ly = 1.25) { const mx = (ax + bx) / 2, mz = (az + bz) / 2, dx = bx - ax, dz = bz - az, l = Math.hypot(dx, dz) || 1; camSet(mx - dz / l * dist * side, h, mz + dx / l * dist * side, mx, ly, mz); }
+function d3CamOver(a, b, side = 0.5, back = 1.0, up = 0.22) { if (!a || !b || !a.parts || !b.parts) return; headPos(a, _d3a); headPos(b, _d3b); const dx = _d3b.x - _d3a.x, dz = _d3b.z - _d3a.z, l = Math.hypot(dx, dz) || 1; camSet(_d3a.x - dx / l * back - dz / l * side, _d3a.y + up, _d3a.z - dz / l * back + dx / l * side, _d3b.x, _d3b.y - 0.05, _d3b.z); }
+function d3Say(who, txt) {
+  if (who === '') sub('', txt); else if (who === 'Воскреситель') ggSay(txt, Math.min(4.2, 0.6 + txt.length * 0.05));
+  else { const v = D3_VOICE[who] || [1, 1.05]; line(who, txt, v[0], v[1]); if (who === 'Счетовод' || who === 'Трубка') d3Abacus(3); }
+}
+function d3Abacus(n = 2, vol = 0.22) { for (let i = 0; i < n; i++) later(i * 0.11 + rand(0, 0.03), () => Sound.click(rand(520, 760), vol)); }
+// lines: [who, text, shot]; shot is a key for D3.cam(shot, t) or a function (t) => void
+function d3Talk(lines, upd, after) {
+  let t = 0.2; const steps = [];
+  for (const [who, txt, shot, fn] of lines) { const at = t; steps.push([at, () => { if (shot) D3.shot = shot; if (fn) fn(); if (txt) d3Say(who, txt); }]); t += txt ? 1.3 + txt.length * 0.058 : 1.2; }
+  story.stage = 'd3-cut'; runCut(steps, (tt, dt) => { if (upd) upd(tt, dt); d3CutCam(tt); }, t, () => { subOff(); after && after(); });
+}
+function d3CutCam(t) { const s = D3.shot; if (typeof s === 'function') s(t); else if (D3.cam) D3.cam(s, t); }
+function d3Sync(list, dt) { for (const n of list) if (n && n.root && n.state === 'alive') { if (n.path && n.path.length) walkPath(n, n.path, n.pathSp || 1.6, dt); else n.speed = 0; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; } }
+function d3Choice(title, head, opts, cb, color = '#d8a840') {
+  const d = c2Ui(); d.style.borderColor = color;
+  d.innerHTML = `<small style="letter-spacing:.18em;color:#ffd060">${title}</small><b style="display:block;margin:6px 0 8px">${head}</b>` + opts.map(([t, k, off]) => `<button class="btn" data-k="${k}" ${off ? 'data-off="1"' : ''} style="width:100%;margin:4px 0;text-align:left${off ? ';opacity:.45' : ''}">${t}</button>`).join('');
+  d.style.display = 'block';
+  d.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { if (b.dataset.off) { Sound.click(300, 0.2); return; } d.style.display = 'none'; Sound.click(900, 0.2); cb(b.dataset.k); });
+}
+function d3Hold(camFn) { story.stage = 'd3-cut'; runCut([], (t, dt) => camFn(t, dt), 99999, () => {}); }
+function d3Ev(k) { if (D3.ev.has(k)) return false; D3.ev.add(k); Sound.chime(); toast(`Довод против Счетовода: ${D3_EV[k][0]} (${D3.ev.size}/8)`); d3Chip(); d3Save(); return true; }
+function d3Hud() { let d = document.getElementById('d3hud'); if (d) return d; d = document.createElement('div'); d.id = 'd3hud'; d.style.cssText = 'position:fixed;right:calc(10px + env(safe-area-inset-right,0px));top:calc(46px + env(safe-area-inset-top,0px));z-index:35;pointer-events:none;display:none;font:700 11px var(--ui);letter-spacing:.1em;color:#f2e2c0;text-align:right;text-shadow:0 0 4px #000;line-height:1.5'; document.body.appendChild(d); return d; }
+function d3Chip() {
+  const d = d3Hud(); if (!D3.on || state !== 'play') { d.style.display = 'none'; return; }
+  d.style.display = 'block';
+  d.innerHTML = `<span style="color:${D3.debt ? '#ff8a6a' : '#f2e2c0'}">ДОЛГ: ${D3.debt}</span>` + (D3.lamp ? `<br>🕯 усмирено ${D3.calm} · ✖ разбито ${D3.broken}` : '') + (D3.ev.size ? `<br>доводы ${D3.ev.size}/8` : '') + (D3.stamps.size ? `<br>печати ${D3.stamps.size}/3` : '');
+}
+function d3Bar(title) { let d = document.getElementById('d3bar'); if (!d) { d = document.createElement('div'); d.id = 'd3bar'; d.style.cssText = 'position:fixed;left:50%;top:calc(52px + env(safe-area-inset-top,0px));transform:translateX(-50%);width:min(380px,60vw);z-index:36;pointer-events:none;display:none;font:700 12px var(--ui);letter-spacing:.14em;color:#e8e0c8;text-align:center;text-shadow:0 0 4px #000'; d.innerHTML = '<div id="d3barT"></div><div style="height:9px;margin-top:3px;border:1px solid #c8b888;border-radius:5px;background:rgba(0,0,0,.6);overflow:hidden"><div id="d3barF" style="height:100%;width:100%;background:linear-gradient(90deg,#6a8a4a,#d8c060)"></div></div>'; document.body.appendChild(d); } if (title !== undefined) document.getElementById('d3barT').textContent = title; return d; }
+function d3BarSet(k) { const f = document.getElementById('d3barF'); if (f) f.style.width = Math.max(0, Math.min(1, k)) * 100 + '%'; }
+/* ----- the hollow ones: people whose souls are already on the bill ----- */
+function d3Hollow(x, z, o = {}) {
+  const n = mkNpc(o.kind || 'hollow', x, z, o.yaw ?? rand(0, 6.28), 'human');
+  n.scripted = true; n.hollow = true; n.hSp = o.sp ?? rand(0.95, 1.4); n.hAtk = rand(0.3, 0.9); n.calmV = 0; n.stun = o.stun || 0; n.hState = o.state || 'hunt'; n.wake = o.wake ?? 7; n.goal = o.goal || null; n.patrol = o.patrol || null; n.patI = 0; n.touchy = !!o.touchy; n.big = !!o.big; n.dmg = o.dmg || [8, 13];
+  n.hp = n.maxHp = o.hp ?? 80; n.pos.set(x, 0, z); n.root.position.copy(n.pos); n.voiceCd = 1e9;
+  if (o.state === 'sit') { n.pose = 'sit'; n.poseDur = Infinity; n.poseRate = 1000; n.animate(0.02); n.poseRate = 8; if (o.y) n.pos.y = o.y; }
+  D3.hollows.push(n); return n;
+}
+function d3Pacify(n) {
+  if (n.hState === 'calm') return; n.hState = 'calm'; n.pose = 'kneel'; n.poseT = 0; n.poseDur = Infinity; n.speed = 0; D3.calm++; Sound.chime(); d3Chip();
+  chestOf(n, _d3a); for (let i = 0; i < 12; i++) spawnSprite(TEX.soft, _d3a.clone().add(new V3(rand(-0.3, 0.3), rand(-0.4, 0.5), rand(-0.3, 0.3))), { color: 0xffe2a0, additive: true, size: rand(0.05, 0.14), grow: 0.5, life: rand(0.6, 1.3), opacity: 0.85, vel: new V3(rand(-0.2, 0.2), rand(0.3, 0.9), rand(-0.2, 0.2)) });
+  if (!D3.tipCalm) { D3.tipCalm = true; toast('Пустой усмирён. Его душу ещё можно вернуть'); }
+}
+function d3HollowUpd(dt) {
+  const beam = D3.lamp && state === 'play' && !player.dead, f = beam ? forwardDir(_d3f) : null, alive = state === 'play' && !player.dead;
+  for (let i = D3.hollows.length - 1; i >= 0; i--) {
+    const n = D3.hollows[i];
+    if (n.state === 'dead' || !n.root) { D3.hollows.splice(i, 1); if (n.hState === 'calm') D3.calm = Math.max(0, D3.calm - 1); if (n.byAlly) D3.brokenAlly++; else D3.broken++; d3Chip(); if (n.onGone) n.onGone(n); continue; }
+    if (n.state !== 'alive') continue;
+    const dx = player.pos.x - n.pos.x, dz = player.pos.z - n.pos.z, d = Math.hypot(dx, dz) || 1, hs = n.hState;
+    if (hs === 'calm' || hs === 'sit') { n.speed = 0; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; continue; }
+    if (n.hp < n.maxHp - 1 && (hs === 'queue' || hs === 'idle' || hs === 'wander')) { n.hState = 'hunt'; n.pose === 'sit' && (n.pose = 'stand'); }
+    let inBeam = false;
+    if (beam && !n.big && hs !== 'queue' && d < 10.5) { const ex = n.pos.x - eye.position.x, ey = n.pos.y + 1.25 - eye.position.y, ez = n.pos.z - eye.position.z, el = Math.hypot(ex, ey, ez) || 1; if ((ex * f.x + ey * f.y + ez * f.z) / el > 0.93) { n.losT = (n.losT || 0) - dt; if (n.losT <= 0) { n.losT = 0.25; n.losOk = losFrom(eye.position, _d3a.set(n.pos.x, n.pos.y + 1.25, n.pos.z)); } inBeam = !!n.losOk; } }
+    if (inBeam) { n.calmV += dt; n.flinch = Math.max(n.flinch, 0.5); if (Math.random() < dt * 9) spawnSprite(TEX.soft, _d3a.set(n.pos.x + rand(-0.25, 0.25), n.pos.y + rand(0.8, 1.7), n.pos.z + rand(-0.25, 0.25)), { color: 0xffe2a0, additive: true, size: 0.06, grow: 0.4, life: 0.5, opacity: 0.8, vel: new V3(0, 0.5, 0) }); if (n.calmV >= 2.3) { d3Pacify(n); continue; } }
+    else n.calmV = Math.max(0, n.calmV - dt * 0.35);
+    if (n.stun > 0) { n.stun -= dt; n.speed = 0; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; continue; }
+    const low = LOW_POSE[n.pose], sp = n.hSp * (inBeam ? 0.3 : 1) * (n.limp ? 0.6 : 1);
+    if (hs === 'queue') { n.speed = 0; if (n.touchy && alive && d < 1.15 && D3.gift !== 'pick') { n.hState = 'hunt'; c2Say('Без… очереди…', 'Пустой'); } }
+    else if (hs === 'idle') { n.speed = 0; if (alive && d < n.wake) n.hState = 'hunt'; }
+    else if (hs === 'wander') { if (alive && d < n.wake) n.hState = 'hunt'; else if (n.patrol && !low) { const p = n.patrol[n.patI % n.patrol.length]; if (walkNpc(n, p[0], p[1], sp * 0.7, dt)) n.patI++; pushOutAABBs(n.pos, 0.3, 0); } else n.speed = 0; }
+    else {
+      const toP = !n.goal || (alive && d < 3.2) || n.atGoal === false;
+      if (low || !alive && !n.goal) n.speed = 0;
+      else if (n.goal && !toP) { if (walkNpc(n, n.goal[0], n.goal[1], sp, dt)) { n.speed = 0; if (D3.onBreach) D3.onBreach(n, dt); } pushOutAABBs(n.pos, 0.3, 0); }
+      else if (d > 1.15) { walkNpc(n, player.pos.x, player.pos.z, sp, dt); pushOutAABBs(n.pos, 0.3, 0); clampBounds(n.pos, 0.3); }
+      else { n.speed = 0; n.yaw += angDiff(n.yaw, Math.atan2(dx, dz)) * Math.min(1, dt * 6); }
+      if (alive && !low && d < 1.35) { n.hAtk -= dt; if (n.hAtk <= 0) { n.hAtk = n.big ? rand(1.5, 2.0) : rand(1.0, 1.5); n.attackAnim = 1; later(n.big ? 0.4 : 0.28, () => { if (n.state === 'alive' && n.hState === 'hunt' && !player.dead && Math.hypot(player.pos.x - n.pos.x, player.pos.z - n.pos.z) < 1.7) { damagePlayer(rand(n.dmg[0], n.dmg[1])); if (n.big) { Sound.thud(0.8); shake = Math.max(shake, 0.4); player.vel.x += dx / d * 6; player.vel.z += dz / d * 6; } } }); } }
+    }
+    n.root.position.copy(n.pos); n.root.rotation.y = n.yaw;
+  }
+  D3.cntT -= dt;
+  if (D3.cntT <= 0 && alive) { D3.cntT = rand(9, 15); let best = null, bd = 9; for (const n of D3.hollows) if (n.state === 'alive' && n.hState !== 'calm') { const d = Math.hypot(player.pos.x - n.pos.x, player.pos.z - n.pos.z); if (d < bd) { bd = d; best = n; } } if (best) { c2Say(pick(D3_COUNT), 'Пустой'); best.talkT = 2.5; } }
+}
+function d3HollowsClear() { for (const n of D3.hollows) if (n.root) n.dispose(); D3.hollows = []; }
+function d3Threats() { let c = 0; for (const n of D3.hollows) if (n.state !== 'dead' && n.hState !== 'calm' && n.hState !== 'sit' && n.hState !== 'queue') c++; return c; }
+/* ----- allies that shoot: the inspector and her officers ----- */
+function d3Ally(n, range = 15) { n.scripted = true; n.protect = true; n.protMsg = 'Свои! Не стрелять'; n.al = { cd: rand(0.6, 1.8), range }; D3.allies.push(n); return n; }
+function d3AllyUpd(dt) {
+  for (const a of D3.allies) {
+    if (!a.root || a.state !== 'alive') continue; let best = null, bd = a.al.range;
+    if (!a.al.hold) for (const n of D3.hollows) if (n.state === 'alive' && (n.hState === 'hunt') && n.calmV < 0.4) { const d = Math.hypot(n.pos.x - a.pos.x, n.pos.z - a.pos.z); if (d < bd) { bd = d; best = n; } }
+    if (best) { a.yaw += angDiff(a.yaw, Math.atan2(best.pos.x - a.pos.x, best.pos.z - a.pos.z)) * Math.min(1, dt * 7); a.al.cd -= dt;
+      if (a.al.cd <= 0) { a.al.cd = rand(1.5, 2.6); const from = _d3a.set(a.pos.x + Math.sin(a.yaw) * 0.4, a.pos.y + 1.4, a.pos.z + Math.cos(a.yaw) * 0.4).clone(), to = chestOf(best, new V3()); tracer(from, to); Sound.shot('pistol', 0.5 * dv(from)); a.attackAnim = 0.5;
+        if (Math.random() < 0.55) { const dir = to.clone().sub(from).normalize(); best.hp -= 28; bloodSpray(to, dir, 10, 0.5, 0.6, 2, 0.004, 0.01); best.flinch = 1; best.stun = Math.max(best.stun, 0.35); if (best.hp <= 0) { best.byAlly = true; best.die('zombie'); } } } }
+    a.root.position.copy(a.pos); a.root.rotation.y = a.yaw;
+  }
+}
+/* ----- death is a loan ----- */
+function d3Death() {
+  if (player.dead && !D3.wasDead) { D3.wasDead = true; D3.freeNow = false; if (D3.gift === 'free' && !D3.freeUsed) { D3.freeUsed = true; D3.freeNow = true; } else D3.debt++; d3Save(); }
+  else if (!player.dead && D3.wasDead) { D3.wasDead = false; d3Revive(); }
+}
+function d3Revive() {
+  const r = D3.rsp; player.pos.set(r[0], r[3] || 0, r[1]); player.yaw = r[2] || 0; player.vel.set(0, 0, 0); if (avatar) avatar.pos.copy(player.pos);
+  flashScreen('#fff', 900); Sound.ghostVoice(1.6); Sound.heal && Sound.heal();
+  showCard(D3.freeNow ? 'ВОСКРЕШЕНИЕ · БЕЗ ЗАПИСИ' : 'ВОСКРЕШЕНИЕ', D3.freeNow ? 'Дар воскресителя: эта смерть не в счёт' : `Долг: ${D3.debt}`, 2600, true);
+  c2Say(D3.freeNow ? 'Эта — за мой счёт. Больше таких нет.' : pick(D3_REVIVE), 'Воскреситель');
+  for (const n of D3.hollows) if (n.state === 'alive' && Math.hypot(n.pos.x - r[0], n.pos.z - r[1]) < 6) n.stun = 3.5;
+  d3Chip(); if (D3.onRevive) D3.onRevive();
+}
+// a death that is not a physical one (the car, the archive fine, the barricade)
+function d3Fine(why) { D3.debt++; d3Save(); flashScreen('#fff', 700); Sound.ghostVoice(1.2); showCard(why, `Долг: ${D3.debt}`, 2400, true); d3Chip(); }
+/* ----- gameplay frame ----- */
+function d3Play(stage, o = {}) {
+  D3.spots = o.spots || []; D3.obj = o.obj || (() => ''); D3.tgt = o.tgt || (() => null); D3.upd = o.upd || null; D3.onRevive = o.onRevive || null; if (o.rsp) D3.rsp = o.rsp;
+  story.showAvatar = false; story.gun = true; story.noFire = !!o.noFire; setStage(stage, D3.obj()); d3Chip();
+}
+function d3Near(s) { const x = s.npc ? s.npc.pos.x : s.x, z = s.npc ? s.npc.pos.z : s.z; return Math.hypot(player.pos.x - x, player.pos.z - z) < (s.r || 1.6) && Math.abs(player.pos.y - (s.y || 0)) < 1.6; }
+function d3Act(info) {
+  if (state !== 'play' || player.dead || story.stage === 'd3-cut') return null;
+  for (const s of D3.spots) { if (s.done || (s.when && !s.when()) || !d3Near(s)) continue; if (info) return typeof s.label === 'function' ? s.label() : s.label; if (s.once) s.done = true; s.do(s); return null; }
+  return null;
+}
+function d3Arm(id) { if (!D3.allow.includes(id)) D3.allow.push(id); if (id === 'pipe') { story.c2pipe = true; syncMods(); } const i = WEAPONS.findIndex((w) => w.id === id); if (i >= 0) { W.ammo[i] = WEAPONS[i].mag || 0; selectWeapon(i); W.switchT = 0.2; } }
+function d3Disarm() { D3.allow = ['fists']; const i = WEAPONS.findIndex((w) => w.id === 'fists'); selectWeapon(i); }
+function updD3(dt, tick) {
+  if (!D3.on) return;
+  d3Death(); if (D3.amb) D3.amb(dt);
+  if (D3.lamp) { if (!FL.on) FL.on = true; }
+  if (!D3.allow.includes(curW().id)) { const i = WEAPONS.findIndex((w) => w.id === D3.allow[D3.allow.length - 1]); if (i >= 0) { selectWeapon(i); if (performance.now() - (D3.wT || 0) > 4000) { D3.wT = performance.now(); toast('В этой истории у вас только то, что вы нашли'); } } }
+  d3HollowUpd(dt); d3AllyUpd(dt);
+  if (D3.upd) D3.upd(dt, tick);
+  if (tick && story.stage.startsWith('d3') && state === 'play') { const t = D3.tgt(); targetArrow(t ? _b.set(t[0], 0, t[1]) : null); const o = D3.obj(); if (o) $('sObj').textContent = o; d3Chip(); }
+}
+/* ----- start, checkpoints ----- */
+function d3Start(cp = null) {
+  Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'story'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true;
+  story.on = true; story.asGG = false; story.d3 = true; story.ch = 2; lastCh = 2; story.gun = false; $('resumeBtn').hidden = true; startGame.fromWaves = true; invReset();
+  d3Reset(); syncMods(); W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0; selectWeapon(WEAPONS.findIndex((w) => w.id === 'fists')); W.switchT = 0;
+  const sv = cp && cp !== 'd3' ? d3Load() : null;
+  if (sv) { Object.assign(D3, { debt: sv.debt || 0, broken: sv.broken || 0, brokenAlly: sv.brokenAlly || 0, calm: sv.calm || 0, saved: sv.saved || 0, ev: new Set(sv.ev || []), extra: new Set(sv.extra || []), stamps: new Set(sv.stamps || []), choice: sv.choice || 'go', reply: sv.reply || null, gift: sv.gift || null, freeUsed: !!sv.freeUsed, trust: sv.trust || 0, carHits: sv.car || 0 }); D3.t0 = performance.now() - (sv.sec || 0) * 1000; }
+  fadeIn(); $('black').style.opacity = ''; $('cine').classList.remove('on'); d3RoofLook(0, true);
+  if (cp && cp !== 'd3') { D3.lamp = true; FL.light.color.setHex(0xffd27a); if (!D3.choice) D3.choice = 'go'; }
+  if (cp === 'd3b') d3Eclipse(true); else if (cp === 'd3c') d3DriveStart(); else if (cp === 'd3d') d3CityStart(true); else if (cp === 'd3e') d3OfficeStart(true); else if (cp === 'd3f') d3BossStart(true);
+  else { saveCp('d3'); d3RoofStart(); }
+}
+function d3Cp(id) { saveCp(id); d3Save(); }
+/* ===================== LOCATION 3 · ACT I «Рассвет на крыше» ===================== */
+const R3 = { photo: [-13, -10.6], pick: [2.7, -13.2], letter: [15.2, 3], radio: [-2.6, -8.6], scope: [8, -19.4], coop: [-15.2, 7], pipe: [15.6, -9.6], gate: [-18.9, -2], door: [0, 18.3], mel: [0, -12.2] };
 function buildRoof3() {
-  const H = WALL_H, BB = batcher(), C = (c, r = 0.85) => std({ color: c, roughness: r }), con = C(0x6a6660), steel = std({ color: 0x4a4c50, roughness: 0.4, metalness: 0.6 }), wood = std({ map: TEX.wood, roughness: 0.8 });
-  const blk = (m, x, y, z, sx, sy, sz) => { BB.box(m, x, y, z, sx, sy, sz); solid(x, y, z, sx, sy, sz); };
-  floorMesh(std({ map: texRep(TEX.asphalt, 9, 9), color: 0x5a5854, roughness: 0.9 }), HX * 2, HZ * 2);
-  // parapet all around, with a gap at the stairwell (south)
-  for (const [x, z, sx, sz] of [[0, -HZ + 0.3, HX * 2, 0.6], [-HX + 0.3, 0, 0.6, HZ * 2], [HX - 0.3, 0, 0.6, HZ * 2]]) blk(con, x, 0.5, z, sx, 1.0, sz);
-  for (const x of [-HX + 1.3, -HX + 1.3]) {}
-  blk(con, -6, 0.5, HZ - 0.3, 8, 1.0, 0.6); blk(con, 6, 0.5, HZ - 0.3, 6, 1.0, 0.6);
-  // stairwell housing (the way in), and a door
-  blk(C(0x8a7e72), 0, 1.6, HZ - 1.4, 3.6, 3.2, 2.6); BB.box(C(0x3a3a40, 0.5), 0, 1.1, HZ - 2.7, 1.2, 2.2, 0.08);
-  addSign([{ t: 'ВЫХОД НА КРЫШУ', s: 120 }], 2.6, 0.4, 0, 2.9, HZ - 2.66, Math.PI, 'rgba(255,230,160,0.95)');
-  // water tower with a ladder (photo hidden on the ladder platform)
-  BB.cyl(steel, -9, 2.6, -9, 1.3, 1.3, 2.4, 14); BB.cyl(C(0x3a3a3a), -9, 4.4, -9, 1.45, 1.45, 0.3, 14); for (const [x, z] of [[-10.2, -10.2], [-7.8, -10.2], [-10.2, -7.8], [-7.8, -7.8]]) BB.cyl(steel, x, 0.7, z, 0.08, 0.08, 1.4, 6); solid(-9, 2.5, -9, 2.6, 5, 2.6);
-  for (let y = 0.2; y < 4.2; y += 0.4) BB.box(steel, -7.0, y, -9, 0.06, 0.05, 0.5);
-  // AC units and pipes
-  for (const [x, z] of [[7, -6], [9, -6], [7, -9]]) { blk(C(0x9aa0a6, 0.4), x, 0.6, z, 1.8, 1.2, 1.2); BB.cyl(C(0x2a2a2a), x, 1.25, z, 0.5, 0.5, 0.05, 14); }
-  BB.cyl(steel, 4, 1.4, -2, 0.08, 0.08, 2.8, 6); BB.cyl(steel, 4.6, 1.4, -2, 0.08, 0.08, 2.8, 6);
-  // a bench with a tin of paint and a pot with a tree
-  BB.box(wood, 4, 0.45, 8, 2.2, 0.1, 0.5); BB.box(wood, 4, 0.3, 8, 2.2, 0.12, 0.45); solid(4, 0.3, 8, 2.2, 0.6, 0.5);
-  BB.cyl(C(0x6a3a2a), -4, 0.4, 7, 0.5, 0.45, 0.8, 12); BB.geo(C(0x3a7a3a, 0.9), new THREE.SphereGeometry(0.9, 12, 10).translate(-4, 1.5, 7));
-  // a rusty tank with a letter inside, on the east side
-  BB.cyl(C(0x6a3a22, 0.7), 11, 0.5, 3, 0.6, 0.6, 1.0, 14); solid(11, 0.5, 3, 1.2, 1.0, 1.2);
-  // roof vent with a light
-  BB.cyl(steel, 0, 0.6, 2, 0.4, 0.5, 1.2, 12); const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffb070 })); lamp.position.set(0, 1.4, 2); addMesh(lamp);
-  addSign([{ t: 'ЗАКРЫТО', s: 220 }], 2.2, 0.6, -HX + 0.4, 2.4, 0, Math.PI / 2, 'rgba(255,90,90,0.9)');
+  Object.assign(LV, { walls: false, ceil: false, elev: 60, wind: 0.22 }); sun.position.set(-4, 7.5, -20);
+  const BB = batcher(), C = (c, r = 0.85, m = 0) => std({ color: c, roughness: r, metalness: m }), con = C(0x7a746c), con2 = C(0x8c857c), steel = C(0x55585e, 0.4, 0.6), rust = C(0x7a4226, 0.75, 0.2), wood = std({ map: TEX.wood, roughness: 0.8 }), dark = C(0x26262a, 0.6), glow = (c) => new THREE.MeshBasicMaterial({ color: c });
+  const blk = (m, x, y, z, sx, sy, sz, ry = 0) => { BB.box(m, x, y, z, sx, sy, sz, ry); solid(x, y, z, sx, sy, sz); };
+  floorMesh(std({ map: texRep(TEX.asphalt, 10, 11), color: 0x6c6862, roughness: 0.92 }), HX * 2, HZ * 2);
+  { const slab = new THREE.Mesh(new THREE.BoxGeometry(HX * 2 + 0.8, 0.8, HZ * 2 + 0.8), con); slab.position.y = -0.41; addMesh(slab); }
+  // parapet with a rail on top, a gap for the fire escape on the west side
+  const PH = 1.15, rail = (x, z, sx, sz) => { blk(con2, x, PH / 2, z, sx, PH, sz); BB.box(steel, x, PH + 0.32, z, Math.max(0.05, sx - 0.5), 0.05, Math.max(0.05, sz - 0.5)); solid(x, PH + 0.3, z, sx, 0.9, sz); };
+  rail(0, -HZ + 0.3, HX * 2, 0.6); rail(0, HZ - 0.3, HX * 2, 0.6); rail(HX - 0.3, 0, 0.6, HZ * 2); rail(-HX + 0.3, 10.2, 0.6, HZ * 2 - 22.4); rail(-HX + 0.3, -12.6, 0.6, HZ * 2 - 25.2);
+  for (let x = -HX + 1; x < HX; x += 2) for (const z of [-HZ + 0.3, HZ - 0.3]) BB.box(steel, x, PH + 0.16, z, 0.04, 0.32, 0.04);
+  // the fire-escape gate (removable) and its landing
+  { const g = new THREE.Group(); for (let i = 0; i < 6; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1.5, 0.05), rust); b.position.set(0, 0.75, -0.9 + i * 0.36); g.add(b); } const t = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 2.0), rust); t.position.y = 1.5; g.add(t); const l = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.2, 0.3), C(0x9a3a1a, 0.6, 0.4)); l.position.set(0.08, 0.9, 0); g.add(l); g.position.set(-HX + 0.3, 0, -2); addMesh(g); D3.gateM = g; D3.gateR = c2Removable(-HX + 0.3, 1, -2, 0.6, 2, 2.4); }
+  BB.box(steel, -HX - 0.6, -0.05, -2, 1.4, 0.08, 2.2); for (const z of [-3, -1]) BB.box(rust, -HX - 1.25, 0.6, z, 0.05, 1.3, 0.05);
+  addSign([{ t: 'ПОЖАРНЫЙ ВЫХОД', s: 110 }], 2.2, 0.36, -HX + 0.64, 1.9, -4.6, Math.PI / 2, 'rgba(120,255,140,0.9)');
+  // stairwell housing with a door and a lamp over it
+  blk(C(0x94887a), 0, 1.7, HZ - 1.8, 4.4, 3.4, 3.0); BB.box(C(0x6a5f54), 0, 3.5, HZ - 1.8, 4.8, 0.2, 3.4);
+  { const d = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.2, 0.08), C(0x3a3d44, 0.5, 0.3)); d.geometry.translate(0.6, 0, 0); d.position.set(-0.6, 1.1, HZ - 3.34); addMesh(d); D3.doorM = d; }
+  addSign([{ t: 'ВЫХОД НА КРЫШУ', s: 120 }], 2.6, 0.4, 0, 2.75, HZ - 3.32, Math.PI, 'rgba(255,230,160,0.95)');
+  decoPlane(posterTex([['ГРОМКАЯ', 40, '#ff5ab4'], ['НОЧЬ', 56, '#fff'], ['МЕЛОДИ', 30, '#9af0ff']], '#16101c', '#fff'), 1.0, 1.4, 1.5, 1.6, HZ - 3.31, Math.PI);
+  // water tower on legs, with a ladder and a photo pinned to one leg
+  BB.cyl(steel, -13, 4.2, -13, 1.9, 1.9, 3.0, 16); BB.cyl(C(0x3a3a3c, 0.6), -13, 5.95, -13, 2.05, 0.3, 0.6, 16); BB.cyl(rust, -13, 2.75, -13, 1.95, 1.95, 0.12, 16);
+  for (const [x, z] of [[-14.4, -14.4], [-11.6, -14.4], [-14.4, -11.6], [-11.6, -11.6]]) { BB.cyl(steel, x, 1.35, z, 0.09, 0.09, 2.7, 6); solid(x, 1.35, z, 0.3, 2.7, 0.3); }
+  for (let y = 0.3; y < 5.6; y += 0.36) BB.box(steel, -10.9, y, -13, 0.05, 0.04, 0.5); BB.box(steel, -10.9, 2.8, -12.75, 0.04, 5.6, 0.04); BB.box(steel, -10.9, 2.8, -13.25, 0.04, 5.6, 0.04);
+  decoPlane(cvTex(128, 96, (g) => { g.fillStyle = '#f4efe2'; g.fillRect(0, 0, 128, 96); g.fillStyle = '#2a2030'; g.fillRect(6, 6, 116, 70); for (const [x, c] of [[34, '#c81830'], [64, '#f0e8f8'], [94, '#8a8e96']]) { g.fillStyle = c; g.fillRect(x - 9, 34, 18, 40); g.fillStyle = '#e8c0a0'; g.beginPath(); g.arc(x, 26, 8, 0, 7); g.fill(); } }), 0.36, 0.27, -11.44, 1.35, -11.6 + 0.16, 0.5);
+  // Melodie's corner: a pallet stage, an amp, a mic stand, a guitar, a sofa, a rug, string lights
+  for (let i = 0; i < 4; i++) BB.box(wood, -1.5 + i, 0.09, -13.4, 0.92, 0.18, 2.6); solid(0, 0.02, -13.4, 4, 0.1, 2.6, false);
+  blk(dark, 2.7, 0.55, -14.0, 0.9, 0.75, 0.5); BB.box(C(0x8a7a4a, 0.5), 2.7, 0.62, -13.74, 0.7, 0.5, 0.02); BB.geo(glow(0xff3020), new THREE.SphereGeometry(0.02, 6, 4).translate(3.0, 0.86, -13.74));
+  BB.cyl(steel, -0.9, 0.95, -13.0, 0.015, 0.015, 1.55, 6); BB.cyl(steel, -0.9, 0.2, -13.0, 0.2, 0.22, 0.03, 10); BB.geo(dark, new THREE.SphereGeometry(0.05, 8, 6).translate(-0.9, 1.74, -13.0));
+  { const g = new THREE.Group(), body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.24, 0.09, 18), C(0xb86a2a, 0.35)); body.rotation.x = Math.PI / 2; g.add(body); const nk = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.62, 0.03), dark); nk.position.y = 0.5; g.add(nk); const hl = new THREE.Mesh(new THREE.CircleGeometry(0.06, 12), dark); hl.position.z = 0.047; g.add(hl); g.position.set(1.3, 0.62, -14.3); g.rotation.z = 0.18; addMesh(g); }
+  blk(C(0x5a3a4a, 0.95), 0, 0.3, -8.6, 2.6, 0.55, 0.9); BB.box(C(0x4a2e3c, 0.95), 0, 0.72, -8.2, 2.6, 0.6, 0.22); for (const x of [-1.2, 1.2]) BB.box(C(0x4a2e3c, 0.95), x, 0.55, -8.6, 0.22, 0.4, 0.9);
+  BB.box(C(0x6a2a2a, 1), 0, 0.012, -10.9, 3.6, 0.02, 2.4); BB.box(C(0xc8a060, 1), 0, 0.016, -10.9, 3.0, 0.02, 1.8); BB.box(C(0x6a2a2a, 1), 0, 0.02, -10.9, 2.2, 0.02, 1.1);
+  // the boombox on the sofa arm
+  BB.box(dark, -2.6 + 1.3, 0.85, -8.6, 0.5, 0.26, 0.16); for (const x of [-1.42, -1.18]) BB.geo(C(0x9a9aa0, 0.4, 0.5), new THREE.CircleGeometry(0.08, 12).rotateY(Math.PI).translate(x, 0.84, -8.69));
+  for (const x of [-4.2, 4.2]) { BB.cyl(steel, x, 1.6, -15.6, 0.04, 0.05, 3.2, 6); BB.cyl(steel, x, 1.6, -7.4, 0.04, 0.05, 3.2, 6); }
+  D3.bulbs = []; for (const [x0, z0, x1, z1] of [[-4.2, -15.6, 4.2, -15.6], [-4.2, -7.4, 4.2, -7.4], [-4.2, -15.6, -4.2, -7.4], [4.2, -15.6, 4.2, -7.4]]) for (let i = 1; i < 8; i++) { const k = i / 8, m = new THREE.Mesh(new THREE.SphereGeometry(0.055, 6, 5), new THREE.MeshBasicMaterial({ color: pick([0xffd890, 0xffb060, 0xff9ad0, 0xfff0c0]) })); m.position.set(lerp(x0, x1, k), 3.1 - Math.sin(k * Math.PI) * 0.35, lerp(z0, z1, k)); addMesh(m); D3.bulbs.push(m); }
+  // a rusty mailbox-tank with a letter, AC units with pipes, vents, a skylight
+  BB.cyl(rust, 15.2, 0.55, 3.9, 0.55, 0.55, 1.1, 14); solid(15.2, 0.55, 3.9, 1.1, 1.1, 1.1); BB.box(dark, 15.2, 0.8, 3.34, 0.4, 0.05, 0.03);
+  for (const [x, z] of [[13, -11.6], [15.6, -11.6], [13, -14.2]]) { blk(C(0xa6acb2, 0.4, 0.3), x, 0.65, z, 2.0, 1.3, 1.4); BB.cyl(dark, x, 1.32, z, 0.55, 0.55, 0.05, 14); }
+  for (const y of [0.5, 0.9]) BB.cyl(rust, 17.6, y, -9.6, 0.07, 0.07, 9, 8, Math.PI / 2); for (const z of [-13.6, -9.6, -5.6]) BB.box(steel, 17.6, 0.35, z, 0.2, 0.7, 0.1);
+  { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.15, 8), rust); p.rotation.z = Math.PI / 2; p.position.set(16.4, 0.9, -9.6); addMesh(p); D3.pipeM = p; }
+  for (const [x, z] of [[-6, 3], [7, 6], [-3, 12]]) { BB.cyl(steel, x, 0.6, z, 0.4, 0.5, 1.2, 12); BB.cyl(steel, x, 1.3, z, 0.6, 0.6, 0.12, 12); solid(x, 0.6, z, 0.9, 1.2, 0.9); }
+  blk(C(0x8a8478), -8, 0.3, -3, 3.2, 0.6, 2.2); BB.box(std({ color: 0x9ad0f0, roughness: 0.1, metalness: 0.4, transparent: true, opacity: 0.55 }), -8, 0.66, -3, 2.8, 0.1, 1.8, 0, 0, 0.12);
+  // the pigeon coop, a telescope, clotheslines, a mast, dishes, puddles
+  blk(wood, -16.4, 0.9, 7, 1.6, 1.8, 2.4); BB.box(C(0x6a3a2a, 0.9), -16.4, 1.95, 7, 2.0, 0.12, 2.8, 0, 0, 0.12); for (let i = 0; i < 5; i++) BB.box(steel, -15.58, 0.9, 6.0 + i * 0.5, 0.02, 1.6, 0.02);
+  D3.birds = []; for (let i = 0; i < 7; i++) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 5), C(pick([0x8a8e96, 0xb0b4ba, 0x6a6e78]), 0.9)); b.scale.set(1, 0.8, 1.5); b.position.set(-16.6 + rand(-0.6, 0.6), 2.1, 6 + i * 0.32); addMesh(b); D3.birds.push({ m: b, v: null }); }
+  BB.cyl(steel, 8, 0.7, -19.4, 0.02, 0.02, 1.4, 6, 0.2); BB.cyl(steel, 8.3, 0.7, -19.2, 0.02, 0.02, 1.4, 6, -0.15, 0.2); BB.cyl(steel, 7.7, 0.7, -19.2, 0.02, 0.02, 1.4, 6, -0.15, -0.2); BB.cyl(C(0xe8e4dc, 0.4), 8, 1.5, -19.6, 0.07, 0.09, 0.9, 10, Math.PI / 2 - 0.25);
+  D3.cloth = []; for (const [x0, x1, z] of [[6, 13, 12], [6, 13, 14.2]]) { BB.box(steel, x0, 1.1, z, 0.06, 2.2, 0.06); BB.box(steel, x1, 1.1, z, 0.06, 2.2, 0.06); BB.box(dark, (x0 + x1) / 2, 2.15, z, x1 - x0, 0.015, 0.015); for (let i = 0; i < 3; i++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.3, 4, 3), std({ color: pick([0xf4f0e8, 0xe8d8e8, 0xd8e8f4, 0xf4e8c8]), roughness: 1, side: THREE.DoubleSide })); m.position.set(x0 + 1.4 + i * 2.1, 1.48, z); addMesh(m); D3.cloth.push(m); } }
+  BB.cyl(steel, 10, 3.6, -3, 0.05, 0.07, 7.2, 8); for (const y of [4.5, 5.6, 6.4]) BB.box(steel, 10, y, -3, 1.4 - (y - 4.5) * 0.3, 0.03, 0.03); solid(10, 1, -3, 0.3, 2, 0.3);
+  for (const [x, z, r] of [[-17.4, 15, 0.6], [17.4, 16, 2.5]]) { BB.geo(C(0xd8d8dc, 0.4, 0.3), new THREE.SphereGeometry(0.55, 14, 8, 0, 6.28, 0, 1.0).rotateX(-1.2).rotateY(r).translate(x, 1.7, z)); BB.cyl(steel, x, 0.85, z, 0.04, 0.04, 1.7, 6); }
+  for (const [x, z, r] of [[-4, 6, 1.2], [5, -3, 0.9], [11, 8, 0.7], [-10, 14, 1.1], [3, 15, 0.6]]) puddle(x, z, r);
+  decoPlane(cvTex(256, 128, (g) => { g.font = '900 44px Arial'; g.fillStyle = 'rgba(255,90,180,0.85)'; g.fillText('ОН ТАКОЙ', 8, 50); g.fillStyle = 'rgba(154,240,255,0.85)'; g.fillText('ЗАГАДОЧНЫЙ', 8, 104); }), 3.0, 1.5, 2.21, 1.4, HZ - 1.8, Math.PI / 2);
   BB.flush();
 }
-const L3 = { items: new Set(), choice: null, done: false, spots: { photo: [-7.2, -9], pick: [4, 8], letter: [11, 3] } };
-function startLoc3() {
-  if (state === 'over') return; Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'story'; resetStats(); setMadness(false); madness.amt = 0;
-  story.on = true; story.asGG = false; story.ch = 2; lastCh = 2; story.gun = false; W.ammo = WEAPONS.map((w) => w.mag || 0);
-  Object.assign(L3, { items: new Set(), choice: null, done: false });
-  fadeIn(); $('black').style.opacity = ''; $('cine').classList.remove('on');
-  storyMap('rooftop3'); story.stage = 'c3roof'; story.showAvatar = true;
-  const M = C3.mel = c3Npc('melodie', 0, -2.5, 0); M.pos.set(0, 0, -2.5); M.yaw = Math.PI; M.root.position.copy(M.pos);
-  player.pos.set(0, 0, 9); player.yaw = Math.PI; avatar.pos.copy(player.pos); standAvatar();
-  Music.stop(); Music.start('tender'); fadeIn(); showCard('ГЛАВА 2 · ЛОКАЦИЯ 3', 'Рассвет на крыше', 3600);
-  runCut([
-    [0.2, () => sub('', 'Крыша дома на окраине. Город только просыпается, над ним розовеет небо.')],
-    [4.4, () => line('Мелоди', 'Ты пришёл один. Как я и просила.', 1.45, 1.05)],
-    [9.0, () => line('Вы', 'Я пришёл сказать, что всё закончилось. Марк в тюрьме, Стас тоже.', 0.55, 0.95)],
-    [14.2, () => { subOff(); setStage('c3roof', 'Осмотрите крышу: 3 вещи, которые Мелоди хочет вам показать (фото · медиатор · письмо)'); banner('Крыша', 'найдите три вещи'); }],
-  ], (t, dt) => { camSet(M.pos.x + 2.6, 2.0, M.pos.z - 2.2, M.pos.x, 1.3, M.pos.z); M.yaw = Math.atan2(player.pos.x - M.pos.x, player.pos.z - M.pos.z); M.root.rotation.y = M.yaw; M.root.position.copy(M.pos); }, 15.0, () => {});
+function d3RoofAmb(dt) {
+  const t = performance.now() / 1000;
+  if (D3.cloth) for (let i = 0; i < D3.cloth.length; i++) { const m = D3.cloth[i]; m.rotation.x = Math.sin(t * 1.3 + i) * 0.16; m.rotation.z = Math.sin(t * 0.9 + i * 2) * 0.05; }
+  if (D3.bulbs) { const on = (D3.ek || 0) < 0.6 || Math.sin(t * 23) > 0.2; if (on !== D3.bulbOn) { D3.bulbOn = on; for (const b of D3.bulbs) b.visible = on; } }
+  if (D3.birds) for (const b of D3.birds) { if (!b.v && (D3.birdGo || Math.hypot(player.pos.x - b.m.position.x, player.pos.z - b.m.position.z) < 3.4)) { b.v = new V3(rand(-2, 2), rand(2.5, 4.5), rand(-5, -2)); if (!D3.birdSnd) { D3.birdSnd = true; Sound.whoosh(); } } if (b.v) { b.m.position.addScaledVector(b.v, dt); b.m.position.y += Math.sin(t * 22 + b.v.x) * 0.02; if (b.m.position.y > 40) b.m.visible = false; } }
 }
-function l3Act(info) {
-  const near = (p, r = 1.5) => Math.hypot(player.pos.x - p[0], player.pos.z - p[1]) < r;
-  for (const k of ['photo', 'pick', 'letter']) if (!L3.items.has(k) && near(L3.spots[k], 1.5)) { if (info) return { photo: 'Фото на лестнице', pick: 'Медиатор на скамейке', letter: 'Письмо в цистерне' }[k];
-    L3.items.add(k); Sound.chime(); toast(`Найдено: ${{ photo: 'фото', pick: 'медиатор', letter: 'письмо' }[k]} (${L3.items.size}/3)`);
-    if (k === 'letter') line('Вы', 'Письмо… Она написала его в тот вечер, когда Марк угрожал ей. Тихо, без подписи.', 0.55, 0.95);
-    if (L3.items.size === 3) setStage('c3roof', 'Поговорите с Мелоди'); return null; }
-  if (L3.items.size === 3 && !L3.done && near([0, -2.5], 2.2)) { if (info) return 'Поговорить с Мелоди'; L3.done = true; roofFinal(); }
-  return null;
+function d3RoofCam(shot, t) {
+  const M = D3.mel;
+  if (shot === 'sky') camSet(-6 + t * 0.25, 5.5, 14 - t * 0.2, 2, 6.5, -40);
+  else if (shot === 'wide') camSet(7 + Math.sin(t * 0.15) * 0.5, 2.6, -3.5, 0, 1.3, -12);
+  else if (shot === 'mel') d3CamFace(M, 0.35, 1.05);
+  else if (shot === 'you') d3CamFace(avatar, -0.35, 1.05);
+  else if (shot === 'over') d3CamOver(avatar, M, 0.5, 1.1);
+  else if (shot === 'overM') d3CamOver(M, avatar, -0.5, 1.1);
+  else if (shot === 'door') camSet(3.2, 1.9, 13.4, 0, 1.4, 18.6);
+  else if (shot === 'sun') camSet(0, 2.2, -6, 3.4 - (D3.ek || 0) * 0.6, 7.2, -42);
+  else if (shot === 'city') camSet(-17.5, 3.4, -19.5, -60, -14, -70);
+  else if (shot === 'back') { headPos(avatar, _d3a); camSet(_d3a.x + 0.5, _d3a.y + 0.35, _d3a.z + 1.7, _d3a.x, _d3a.y + 0.6, _d3a.z - 30); }
+  else if (shot === 'gate') camSet(-14.6, 2.2, 0.8, -19, 1.2, -2);
+  else camSet(6, 3, 6, 0, 1.3, -10);
 }
-function roofFinal() {
-  story.stage = 'c3roof-cut'; const d = c2Ui(); const M = C3.mel;
-  runCut([[0.1, () => line('Мелоди', 'Ты нашёл всё. Теперь ты знаешь, что я чувствую. И чего не чувствую.', 1.45, 1.05)]], (t, dt) => { if (M) { M.yaw = Math.atan2(player.pos.x - M.pos.x, player.pos.z - M.pos.z); M.root.rotation.y = M.yaw; } camSet(M.pos.x + 2.0, 1.8, M.pos.z - 1.8, M.pos.x, 1.3, M.pos.z); }, 99999, () => {});
-  d.style.borderColor = '#d8a840';
-  d.innerHTML = '<small style="letter-spacing:.18em;color:#ffd060">ФИНАЛ НА КРЫШЕ</small><b style="display:block;margin:6px 0 8px">Что вы ответите Мелоди?</b>' + [['Ты свободна. Живи так, как хочешь.', 'stay'], ['Я останусь рядом, если ты захочешь.', 'go']].map(([t, k]) => `<button class="btn" data-k="${k}" style="width:100%;margin:4px 0;text-align:left">${t}</button>`).join('');
-  d.style.display = 'block';
-  d.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { d.style.display = 'none'; L3.choice = b.dataset.k; l3End(); });
+function d3RoofUpd(t, dt) { d3RoofAmb(dt); const M = D3.mel; if (M && M.root) { if (M.path && M.path.length) walkPath(M, M.path, M.pathSp || 1.5, dt); else { M.speed = 0; if (M.look2) d3FaceTo(M, M.look2[0], M.look2[1]); } M.root.position.copy(M.pos); M.root.rotation.y = M.yaw; } }
+function d3RoofStart() {
+  d3RoofLook(0, true); storyMap('rooftop3'); d3RoofLook(0); D3.ek = 0; D3.amb = d3RoofAmb; D3.cam = d3RoofCam; story.showAvatar = true; story.gun = false;
+  const M = D3.mel = c3Npc('melodie', R3.mel[0], R3.mel[1], Math.PI); M.look2 = [0, -40];
+  d3Put(0, 15.5, 0, -12); Music.stop(); Music.start('tender'); showCard('ГЛАВА 2 · ЛОКАЦИЯ 3', 'Долг', 4200);
+  let walk = false;
+  d3Talk([
+    ['', 'Шесть утра. Крыша старого дома на окраине. Город внизу ещё спит, а небо над ним — цвета её сценического платья.', 'sky'],
+    ['', 'Она стоит у края своей маленькой сцены из поддонов и смотрит, как встаёт солнце.', 'wide'],
+    ['Мелоди', 'Ты пришёл. Один. Как я и просила.', 'mel', () => { M.look2 = null; walk = true; }],
+    ['Вы', 'Марк в камере. Стас даёт показания. Всё закончилось, Мелоди.', 'you'],
+    ['Мелоди', 'Закончилось… А он? Ты видел его после той ночи?', 'overM'],
+    ['Вы', 'Воскресителя? Нет. Его никто не видел.', 'over'],
+    ['Мелоди', 'Вот и я — нет. Я прихожу сюда каждое утро. Здесь лежат три вещи: фото, медиатор и письмо. Посмотри на них. Потом поговорим.', 'mel'],
+  ], (t, dt) => { d3RoofUpd(t, dt); if (walk) { if (walkPlayer(0.6, -8.2 + 2.6, 1.5, dt)) { walk = false; d3PlayerFace(M.pos.x, M.pos.z); } } if (!M.look2) d3FaceTo(M, player.pos.x, player.pos.z); }, () => { d3Put(0.6, -5.6, M.pos.x, M.pos.z); d3RoofPlay(); banner('Крыша', 'найдите три вещи Мелоди'); });
 }
-function l3End() {
-  const go = L3.choice === 'go', M = C3.mel;
-  runCut([
-    [0.2, () => line('Вы', go ? 'Я останусь рядом, если понадобится.' : 'Ты свободна. Пой, как хочешь.', 0.55, 0.95)],
-    [5.2, () => line('Мелоди', go ? 'Нет. Мне не нужна рядом кто-то, кто не понимает. Я хочу к воскресителю. Пойду его искать.' : 'Спасибо. За всё. Я буду петь… громко.', 1.45, 1.05)],
-    [11.0, () => { if (go && M) { M.path = [[0, 16]]; M.pathSp = 2.2; } sub('', go ? 'Мелоди уходит к лестнице и скрывается за дверью.' : 'Она уходит к лестнице. Небо становится светлым.'); }],
-    [16.0, () => { if (go) { Sound.siren && Sound.siren(0.3); sub('', 'Над городом гаснет розовый свет. На крыше становится тихо, слишком тихо.'); } }],
-    [21.0, () => { subOff(); if (go) { showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 ПРОЙДЕНА', 'Дальше: ночной город', 3000); } }],
-  ], (t, dt) => { if (M && M.path && M.path.length) walkPath(M, M.path, M.pathSp || 2, dt); if (M) { M.root.position.copy(M.pos); M.root.rotation.y = M.yaw; } camSet(7, 2.0, 4, 0, 1.2, -2); }, 22.0, () => { if (M) { M.dispose(); C3.mel = null; } subOff(); if (go) { startStreet3(); } else { story.stage = ''; addUn('c2c'); saveCp(null); C3.done = true; c3FinishScreen(); } });
+const R3_ITEMS = {
+  photo: ['Фото под башней', [['', 'Фотография, приколотая к опоре башни. Трое на сцене: Марк с басом, Стас в сером костюме, а посередине Мелоди — смеётся.'], ['Мелоди', 'Первый концерт. Тогда я думала, что они — моя семья.'], ['Вы', 'Теперь оба за решёткой.']], () => camSet(-10.4, 1.5, -10.4, -11.5, 1.35, -11.5)],
+  pick: ['Медиатор на усилителе', [['', 'Медиатор на усилителе. Сточен с левой стороны — так его стачивает левша.'], ['Мелоди', 'Это Марка. Я не выбросила. Наверное, чтобы помнить, чем кончается любовь, которая хочет владеть.']], () => camSet(3.9, 1.5, -12.4, 2.7, 0.95, -13.9)],
+  letter: ['Письмо в ржавом баке', [['', 'В ржавом баке — конверт без марки. Адресат: «Тому, кто в капюшоне».'], ['Вы', '«Ты не просил меня петь о тебе. Ты вообще ни о чём не просил. Поэтому я и пою».'], ['Мелоди', 'Я писала их каждую ночь. Это — последнее. Отправлять всё равно некуда.']], () => camSet(13.6, 1.7, 2.2, 15.2, 0.9, 3.8)],
+};
+function d3RoofItem(k) {
+  const I = R3_ITEMS[k]; D3.items.add(k); Sound.chime(); const M = D3.mel;
+  d3Talk(I[1].map(([w, t]) => [w, t, I[2]]), (t, dt) => { d3RoofUpd(t, dt); if (M) d3FaceTo(M, player.pos.x, player.pos.z); }, () => { d3RoofPlay(); toast(`Вещи Мелоди: ${D3.items.size}/3`); });
 }
-
-/* ===================== CHAPTER 2 · LOCATION 3 · PART 2 «Ночной город» =====================
-   You follow Melodie's trail through the night city and meet the resurrector on the bridge. */
+function d3RoofExtra(k) {
+  D3.extra.add(k); const fin = () => d3RoofPlay();
+  if (k === 'radio') d3Talk([['', 'Старая магнитола на подлокотнике дивана. Вы крутите ручку.', () => camSet(-0.2, 1.3, -7.2, -1.3, 0.85, -8.6)], ['Радио', '…и о погоде. Астрономы в недоумении: сегодня утром Луна окажется там, где её быть не должно. Затмения нет ни в одном календаре.'], ['Мелоди', 'Выключи. Они каждое утро чем-нибудь пугают.']], d3RoofUpd, fin);
+  else if (k === 'scope') d3Talk([['', 'Самодельный телескоп смотрит прямо на восход. Вы прикладываетесь к окуляру.', () => camSet(9.4, 1.8, -17.6, 8, 1.4, -19.6)], ['', 'На самом краю солнечного диска — чёрная щербинка. А на ней, если приглядеться, крошечные буквы: «ИНВ. № 1».', () => camSet(0, 2.2, -19, 3.4, 7.2, -42)], ['Вы', 'Инвентарный номер? На Луне?..']], d3RoofUpd, () => { d3Ev('scope'); fin(); });
+  else d3Talk([['', 'Голубятня. Птицы срываются с крыши, но один голубь остаётся — у него на лапе кольцо.', () => camSet(-13.4, 1.9, 8.6, -16.2, 1.6, 7)], ['Вы', '«№ 7 304 811 902». Длинноватый номер для голубя.']], d3RoofUpd, () => { D3.birdGo = true; d3Ev('ring'); fin(); });
+}
+function d3RoofPlay() {
+  const M = D3.mel, need = () => D3.items.size < 3, sp = [];
+  for (const k of ['photo', 'pick', 'letter']) sp.push({ x: R3[k][0], z: R3[k][1], r: 1.7, label: R3_ITEMS[k][0], when: () => !D3.items.has(k), do: () => d3RoofItem(k) });
+  for (const [k, l] of [['radio', 'Магнитола'], ['scope', 'Телескоп'], ['coop', 'Голубятня']]) sp.push({ x: R3[k][0], z: R3[k][1], r: 1.8, label: l, when: () => !D3.extra.has(k), do: () => d3RoofExtra(k) });
+  sp.push({ npc: M, r: 2.2, label: () => need() ? 'Мелоди' : 'Поговорить с Мелоди', do: () => { if (need()) c2Say(pick(['Сначала посмотри. Фото, медиатор, письмо.', 'Не торопись. Утро длинное.', 'Письмо — в ржавом баке у восточной стены.']), 'Мелоди'); else d3RoofTalk(0); } });
+  d3Play('d3-roof', { spots: sp, rsp: [0, 14, 0],
+    obj: () => need() ? `Осмотрите крышу: вещи Мелоди ${D3.items.size}/3 (фото у башни · медиатор на усилителе · письмо в баке)` + (D3.extra.size < 3 ? ' · есть и другое любопытное' : '') : 'Поговорите с Мелоди',
+    tgt: () => { if (!need()) return [M.pos.x, M.pos.z]; let b = null, bd = 1e9; for (const k of ['photo', 'pick', 'letter']) if (!D3.items.has(k)) { const d = Math.hypot(player.pos.x - R3[k][0], player.pos.z - R3[k][1]); if (d < bd) { bd = d; b = R3[k]; } } return b; },
+    upd: (dt) => { if (M && M.root) { d3FaceTo(M, player.pos.x, player.pos.z); M.root.position.copy(M.pos); } } });
+}
+const R3_TALK = [
+  { q: 'Скажи честно. Ты пришёл как друг — или тебя прислала Лисова?', a: [['Как друг.', 1, '…Спасибо. Я уже забыла, как это звучит.'], ['Лисова просила присмотреть.', 0, 'Хотя бы не врёшь.'], ['Я охотник. Я всегда кого-то ищу.', -1, 'Тогда ищи не меня.']] },
+  { q: 'Он ведь возвращал тебя, да? Оттуда. Много раз. Что там?', a: [['Тишина. И кто-то считает.', 1, 'Считает?.. Мне снится то же самое.'], ['Не помню. И не хочу.', 0, 'Счастливый.'], ['Там ничего. Он просто фокусник.', -1, 'Ты сам в это не веришь.']] },
+  { q: 'Я хочу его найти. Скажи, что я дура.', a: [['Ты не дура. Ты не умеешь бросать песню на середине.', 1, 'Вот. Вот именно.'], ['Он опасен, Мелоди.', 0, 'Знаю. Меня это давно не пугает.'], ['Ты дура.', -1, 'Ха. Наконец-то честный мужчина.']] },
+];
+function d3RoofTalk(i) {
+  const M = D3.mel; d3Put(M.pos.x + 0.5, M.pos.z + 1.9, M.pos.x, M.pos.z); d3FaceTo(M, player.pos.x, player.pos.z); story.showAvatar = true; story.gun = false;
+  if (i === 0 && !D3.talk0) { D3.talk0 = true; return d3Talk([['Мелоди', 'Ты нашёл всё. Теперь ты знаешь, что я чувствую. И чего не чувствую.', 'mel']], d3RoofUpd, () => d3RoofTalk(0)); }
+  if (i >= R3_TALK.length) return d3RoofFinal();
+  const Q = R3_TALK[i];
+  d3Talk([['Мелоди', Q.q, 'overM']], d3RoofUpd, () => { d3Hold((t, dt) => { d3RoofUpd(t, dt); d3RoofCam('over', t); });
+    d3Choice('РАЗГОВОР НА КРЫШЕ · ' + (i + 1) + '/3', Q.q, Q.a.map((a, k) => [a[0], k]), (k) => { const a = Q.a[+k]; D3.trust += a[1]; d3Talk([['Вы', a[0], 'you'], ['Мелоди', a[2], 'mel']], d3RoofUpd, () => d3RoofTalk(i + 1)); }); });
+}
+function d3RoofFinal() {
+  d3Hold((t, dt) => { d3RoofUpd(t, dt); d3RoofCam('over', t); });
+  d3Choice('ФИНАЛ НА КРЫШЕ', 'Что вы ответите Мелоди?', [['Ты свободна. Живи так, как хочешь.', 'stay'], ['Я останусь рядом, если ты захочешь.', 'go']], (k) => { D3.choice = k; d3RoofLeave(); });
+}
+function d3RoofLeave() {
+  const M = D3.mel, go = D3.choice === 'go'; let gone = false;
+  d3Talk([
+    ['Вы', go ? 'Я останусь рядом, если понадобится.' : 'Ты свободна. Живи так, как хочешь.', 'you'],
+    ['Мелоди', go ? 'Нет. Хочу к воскресителю. Пойду его искать.' : 'Свободна… Тогда я знаю, чего хочу. Хочу к воскресителю. Пойду его искать.', 'mel'],
+    ['Мелоди', go ? 'Ты хороший. Но ты не понимаешь. Никто не понимает.' : 'Спасибо, что не стал держать.', 'overM'],
+    ['Мелоди', 'Возьми. Это его фонарь — он оставил его в подвале в ту ночь. Он светит тем, кто потерялся. Мне он больше не нужен: я знаю, куда иду.', 'mel', () => { Sound.chime(); }],
+    ['', 'Фонарь воскресителя тёплый, как будто его только что держали в руке.', 'you', () => { D3.lamp = true; FL.light.color.setHex(0xffd27a); toast('Получено: фонарь воскресителя'); }],
+    ['', 'Мелоди идёт к лестнице. У двери оборачивается — и ничего не говорит.', 'door', () => { M.path = [[1.6, -6], [1.6, 12], [0, 17.6]]; M.pathSp = 1.9; }],
+  ], (t, dt) => { d3RoofUpd(t, dt); if (!gone && M.pos.z > 17.2) { gone = true; M.root.visible = false; Sound.thud(0.4); } if (D3.doorM) D3.doorM.rotation.y = -1.5 * sm(15.5, 17.4, M.pos.z) * (gone ? 0 : 1); }, () => { M.dispose(); D3.mel = null; d3Save(); d3Eclipse(false); });
+}
+/* ----- the eclipse ----- */
+function d3Eclipse(fromCp) {
+  if (fromCp) { d3RoofLook(0, true); storyMap('rooftop3'); d3RoofLook(0); D3.amb = d3RoofAmb; D3.cam = d3RoofCam; D3.lamp = true; FL.light.color.setHex(0xffd27a); if (D3.mel) { D3.mel = null; } }
+  story.showAvatar = true; story.gun = false; d3Put(0, -6.5, 0, -40); D3.ek = 0; Music.stop(); let H = null, open = 0;
+  d3Talk([
+    ['', 'Вы остаётесь на крыше один. Солнце поднимается над домами — и останавливается.', 'back'],
+    ['', 'На его край наползает чёрная щербина. Потом ещё. Затмения сегодня не было ни в одном календаре.', 'sun', () => { D3.ekGo = true; Sound.rise(6); }],
+    ['', 'Внизу волнами гаснут окна и фонари. Город не кричит. Город замолкает.', 'city', () => { Music.start('dread'); }],
+    ['', 'И становится слышно, как во всех квартирах сразу кто-то считает вслух.', 'sun', () => { Sound.droneLoop(0.5); }],
+    ['Пустой', 'Раз… два… три… четыре…', 'back'],
+    ['', 'Дверь на лестницу распахивается. На крышу выходит сосед в халате. Глаза у него белые.', 'door', () => { open = 1; Sound.thud(0.8); H = d3Hollow(0, 18.0, { yaw: Math.PI, state: 'calmwalk', kind: 'hollow' }); H.path = [[0, 14.5]]; H.pathSp = 0.8; d3PlayerFace(0, 18); }],
+    ['Пустой', 'Сто сорок один… сто сорок два…', () => d3CamFace(H, 0.3, 1.2)],
+    ['Вы', 'Эй. Вы в порядке?..', 'you'],
+    ['', 'Он не в порядке. За ним идут ещё.', 'door', () => { showCard('ЗАТМЕНИЕ', 'Души города взяты в счёт долга', 3600); Sound.boom(); }],
+  ], (t, dt) => { d3RoofAmb(dt); if (D3.ekGo && D3.ek < 1) { D3.ek = Math.min(1, D3.ek + dt / 13); d3RoofLook(D3.ek); } if (D3.doorM) D3.doorM.rotation.y = -1.5 * open; if (H && H.root && H.state === 'alive') { if (H.path.length) walkPath(H, H.path, 0.8, dt); else H.speed = 0; H.root.position.copy(H.pos); H.root.rotation.y = H.yaw; } },
+  () => { D3.ek = 1; D3.ekGo = false; d3RoofLook(1); Sound.droneLoop(0.25); if (H) { H.hState = 'hunt'; H.stun = 1.5; } d3RoofEsc(); });
+}
+function d3RoofEsc() {
+  d3Cp('d3b'); D3.pipeN = 0; D3.gateN = 0; D3.escW = 0; if (D3.doorM) D3.doorM.rotation.y = -1.5;
+  const wave = (n) => { for (let i = 0; i < n; i++) d3Hollow(rand(-1.2, 1.2), 18.2 - i * 0.2, { yaw: Math.PI, stun: 0.6 + i * 1.6, sp: rand(0.9, 1.25) }); c2Say(pick(['Двести… двести один…', 'Сорок… сорок один…']), 'Пустой'); };
+  wave(2);
+  d3Play('d3-esc', { rsp: [-6, -6, Math.PI],
+    spots: [
+      { x: R3.pipe[0], z: R3.pipe[1], r: 1.9, when: () => D3.pipeN < 3, label: () => `Вырвать трубу (${D3.pipeN}/3)`, do: () => { D3.pipeN++; Sound.thud(0.7); Sound.tink(0.5); shake = Math.max(shake, 0.25); if (D3.pipeM) D3.pipeM.rotation.y = D3.pipeN * 0.25; if (D3.pipeN >= 3) { if (D3.pipeM) D3.pipeM.visible = false; d3Arm('pipe'); toast('Ржавая труба. Но помните: разбитого пустого уже не вернуть'); if (!D3.escW) { D3.escW = 1; wave(3); } } } },
+      { x: R3.gate[0], z: R3.gate[1], r: 2.0, when: () => D3.gateN < 3, label: () => D3.pipeN < 3 ? 'Задвижка заржавела' : `Сбить задвижку (${D3.gateN}/3)`, do: () => { if (D3.pipeN < 3) { c2Say('Руками не открыть. Нужна труба — у кондиционеров, на востоке.', 'Вы'); return; } D3.gateN++; Sound.thud(0.9); Sound.tink(0.7); shake = Math.max(shake, 0.3); sparks(_a.set(-HX + 0.4, 0.9, -2), 10, UP, 3); if (D3.gateN === 2 && D3.escW < 2) { D3.escW = 2; wave(2); } if (D3.gateN >= 3) { c2Remove(D3.gateR); D3.gateR = null; if (D3.gateM) D3.gateM.rotation.y = 1.3; toast('Пожарная лестница открыта'); } } },
+      { x: R3.gate[0], z: R3.gate[1], r: 2.0, when: () => D3.gateN >= 3, label: 'Спуститься по пожарной лестнице', do: () => d3RoofDown() },
+    ],
+    obj: () => (D3.pipeN < 3 ? 'Лестницу заняли пустые. Вырвите трубу у кондиционеров (восток)' : D3.gateN < 3 ? `Сбейте задвижку пожарного выхода (запад): ${D3.gateN}/3` : 'Спускайтесь по пожарной лестнице') + ` · пустых рядом: ${d3Threats()} · луч фонаря их усмиряет`,
+    tgt: () => D3.pipeN < 3 ? R3.pipe : R3.gate });
+  later(1.2, () => toast('Держите луч фонаря на пустом пару секунд — он успокоится'));
+}
+function d3RoofDown() {
+  story.showAvatar = true; let y = 0;
+  d3Talk([
+    ['', 'Ржавые ступени гудят под ногами. Шесть этажей вниз, и на каждом за окном кто-то стоит и считает.', 'gate', () => { Sound.thud(0.5); }],
+    ['Вы', 'Мелоди ушла по той лестнице. Прямо через них.', (t) => camSet(-22.6, 2.4 - y, 1.5, -21, 1.2 - y, -2)],
+    ['', 'Внизу, у подъезда, ваша машина. Телефон оживает: инспектор Лисова.', (t) => camSet(-26, 1.5 - y, -6, -21.2, 1 - y, -2)],
+    ['Инспектор', 'Вы живы? Слушайте. Набережная, баррикада у моста. Если можете ехать — сюда. И не останавливайтесь. Ни ради кого.'],
+  ], (t, dt) => { d3RoofAmb(dt); y = Math.min(6, y + dt * 0.7); player.pos.set(-21.2, -y, -2); avatar.pos.copy(player.pos); if (t > 0.5 && Math.random() < dt * 2.2) Sound.tink(0.3); },
+  () => { d3HollowsClear(); fadeOut(); later(0.9, () => { fadeIn(); d3DriveStart(); }); });
+}
+/* ===================== LOCATION 3 · ACT II «Проспект»: a drive through the dark ===================== */
+const DR_LEN = 720, DR_LANES = [-4, 0, 4];
+function d3WinTex(lit = 0.06) { return cvTex(128, 256, (g) => { g.fillStyle = '#000'; g.fillRect(0, 0, 128, 256); for (let y = 0; y < 16; y++) for (let x = 0; x < 6; x++) { const on = Math.random() < lit; g.fillStyle = on ? pick(['#ffd890', '#ffe8c0', '#9ad0ff']) : (Math.random() < 0.5 ? '#0c0e14' : '#10131a'); g.fillRect(6 + x * 20, 6 + y * 15.6, 14, 10); } }); }
+function d3Car(color = 0x2a3a5a, police = false) {
+  const g = new THREE.Group(), paint = std({ color, roughness: 0.35, metalness: 0.5, envMapIntensity: 0.8 });
+  const body = new THREE.Mesh(new RoundedBoxGeometry(1.8, 0.6, 4.3, 2, 0.12), paint); body.position.y = 0.62; body.castShadow = true; g.add(body);
+  const cab = new THREE.Mesh(new RoundedBoxGeometry(1.6, 0.52, 2.1, 2, 0.12), matGlass); cab.position.set(0, 1.16, 0.25); g.add(cab);
+  for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.33, 0.24, 14), matRubber); w.rotation.z = Math.PI / 2; w.position.set(dx * 0.82, 0.33, dz * 1.35); g.add(w); }
+  for (const dx of [-0.6, 0.6]) { const a = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.1, 0.03), new THREE.MeshBasicMaterial({ color: 0xfff2d0 })); a.position.set(dx, 0.72, -2.16); g.add(a); const b = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.1, 0.03), new THREE.MeshBasicMaterial({ color: 0xff1a0a })); b.position.set(dx, 0.72, 2.16); g.add(b); }
+  if (police) { const bar = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.12, 0.3), new THREE.MeshBasicMaterial({ color: 0x2a50ff })); bar.position.set(0, 1.5, 0.25); g.add(bar); g.userData.bar = bar; const st = new THREE.Mesh(new THREE.BoxGeometry(1.82, 0.16, 4.32), std({ color: 0xf0f0f0, roughness: 0.4 })); st.position.y = 0.66; g.add(st); }
+  return g;
+}
+function buildAve3() {
+  Object.assign(LV, { walls: false, ceil: false, bounds: null });
+  const BB = batcher(), C = (c, r = 0.85) => std({ color: c, roughness: r }), DV = D3.drive = { scen: [], objs: [], peds: [] };
+  const at = texRep(TEX.asphalt, 4, 40); DV.roadTex = at; floorMesh(std({ map: at, color: 0x4a4c52, roughness: 0.7 }), 12.6, 240, 0, -40);
+  const lt = cvTex(64, 256, (g) => { g.clearRect(0, 0, 64, 256); g.fillStyle = 'rgba(230,225,200,0.85)'; g.fillRect(14, 20, 5, 110); g.fillRect(45, 20, 5, 110); }); lt.repeat.set(1, 30); DV.lineTex = lt;
+  { const m = new THREE.Mesh(new THREE.PlaneGeometry(8.2, 240).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: lt, transparent: true, opacity: 0.55, depthWrite: false })); m.position.set(0, 0.012, -40); addMesh(m); }
+  for (const s of [-1, 1]) { BB.box(C(0x6a6a66), s * 9.4, 0.08, -40, 6, 0.16, 240); BB.box(C(0x8a8a84), s * 6.4, 0.1, -40, 0.3, 0.2, 240); }
+  BB.flush();
+  const wt = [d3WinTex(0.05), d3WinTex(0.02), d3WinTex(0.09)], cols = [0x2a2a34, 0x332a2a, 0x2a3330, 0x30283a, 0x3a342c];
+  for (let i = 0; i < 20; i++) for (const s of [-1, 1]) { const h = rand(10, 30), w = rand(9, 13), g = new THREE.Group(), tx = pick(wt).clone(); tx.needsUpdate = true; tx.repeat.set(w / 7, h / 16);
+    const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 9), new THREE.MeshLambertMaterial({ color: pick(cols), emissiveMap: tx, emissive: 0xffffff, emissiveIntensity: 0.9 })); b.position.y = h / 2; g.add(b);
+    if (Math.random() < 0.5) { const sg = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.7), new THREE.MeshBasicMaterial({ map: toTex(signCanvas([{ t: pick(['АПТЕКА', 'ПРОДУКТЫ', 'ЛОМБАРД', 'ЦВЕТЫ', '24 ЧАСА', 'КРЕДИТЫ', 'ОБУВЬ']), s: 150 }], 512, 106, pick(['rgba(255,90,180,1)', 'rgba(120,255,160,1)', 'rgba(120,200,255,1)', 'rgba(255,200,90,1)']))), transparent: true, opacity: Math.random() < 0.5 ? 0.25 : 0.9 })); sg.position.set(-s * 4.56, 3.4, rand(-2, 2)); sg.rotation.y = -s * Math.PI / 2; g.add(sg); }
+    g.position.set(s * 17, 0, -200 + i * 12); addMesh(g); DV.scen.push({ g, span: 240 }); }
+  for (let i = 0; i < 12; i++) for (const s of [-1, 1]) { const g = new THREE.Group(), p = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.1, 6, 6), matMetal); p.position.y = 3; g.add(p); const a = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.08, 0.1), matMetal); a.position.set(-s * 0.8, 5.9, 0); g.add(a); const on = Math.random() < 0.3, l = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 6), new THREE.MeshBasicMaterial({ color: on ? 0xffd8a0 : 0x2a2622 })); l.position.set(-s * 1.5, 5.8, 0); g.add(l); g.userData.lamp = on ? l : null; g.position.set(s * 6.9, 0, -200 + i * 20); addMesh(g); DV.scen.push({ g, span: 240 }); }
+  const car = DV.car = d3Car(0x3a4a6a); addMesh(car);
+  { const cone = new THREE.Mesh(new THREE.ConeGeometry(4.5, 26, 16, 1, true).rotateX(Math.PI / 2).translate(0, 0, -15), new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: 0.045, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })); cone.position.y = 0.7; car.add(cone); }
+}
+function d3DrvObj(kind, x, z) {
+  const DV = D3.drive; let g, hw, hl;
+  if (kind === 'car') { g = d3Car(pick([0x6a2020, 0x9a9aa0, 0x20402a, 0xd8d0c0, 0x1a1a1e, 0xb8862a])); g.rotation.y = rand(-0.5, 0.5) + (Math.random() < 0.5 ? Math.PI : 0); hw = 1.05; hl = 2.2; }
+  else if (kind === 'bus') { g = new THREE.Group(); const b = new THREE.Mesh(new RoundedBoxGeometry(7.6, 2.6, 2.5, 2, 0.15), std({ color: 0xc8a020, roughness: 0.5 })); b.position.y = 1.6; g.add(b); const w = new THREE.Mesh(new THREE.BoxGeometry(7.0, 0.8, 2.54), matGlass); w.position.y = 2.1; g.add(w); for (const dx of [-2.6, 2.6]) for (const dz of [-1.1, 1.1]) { const wh = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.3, 12), matRubber); wh.rotation.x = Math.PI / 2; wh.position.set(dx, 0.45, dz); g.add(wh); } hw = 3.9; hl = 1.35; }
+  else if (kind === 'tram') { g = new THREE.Group(); const b = new THREE.Mesh(new RoundedBoxGeometry(13, 2.8, 2.5, 2, 0.2), std({ color: 0xa02020, roughness: 0.45 })); b.position.y = 1.8; g.add(b); const w = new THREE.Mesh(new THREE.BoxGeometry(12.4, 0.9, 2.54), new THREE.MeshBasicMaterial({ color: 0xffe0a0 })); w.position.y = 2.3; g.add(w); const p = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.6, 0.06), matMetal); p.position.y = 3.9; g.add(p); hw = 6.6; hl = 1.35; }
+  else { g = new THREE.Group(); for (let i = 0; i < 3; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.9, 0.5), std({ color: i % 2 ? 0xf0f0f0 : 0xd82020, roughness: 0.6 })); b.position.set(-1 + i, 0.45, 0); g.add(b); } hw = 1.55; hl = 0.35; }
+  g.position.set(x, 0, z); addMesh(g); const o = { g, kind, hw, hl, hit: false, vx: 0 }; DV.objs.push(o); return o;
+}
+function d3DrvPed(x, z) { const DV = D3.drive, n = mkNpc('hollow', x, z, rand(0, 6.28), 'human'); n.scripted = true; n.voiceCd = 1e9; n.drvV = rand(-0.5, 0.5); DV.peds.push(n); return n; }
+function d3DrvPlan() {
+  const P = []; let s = 7;
+  const R = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  for (let d = 70; d < DR_LEN - 60; d += 30 + R() * 12) {
+    if (d > 235 && d < 300) continue; if (d > 440 && d < 520) continue;
+    const free = Math.floor(R() * 3), two = R() < 0.3 + d / 2000;
+    for (let l = 0; l < 3; l++) { if (l === free) continue; if (!two && R() < 0.5) continue; P.push([d + R() * 5, R() < 0.2 ? 'bar' : 'car', DR_LANES[l] + (R() - 0.5)]); }
+    if (R() < 0.3) P.push([d + 11, 'ped', -5 + R() * 10]);
+  }
+  P.push([150, 'bus', -2.2]); P.push([340, 'bus', 2.4]); P.push([400, 'bus', -2.4]); P.push([268, 'tram', -24]);
+  for (let i = 0; i < 14; i++) P.push([455 + (i % 5) * 9 + R() * 4, 'ped', i % 3 === 1 ? (R() < 0.5 ? -5.4 : 5.4) : -4.8 + (i * 2.3) % 9.6]);
+  P.push([600, 'bus', 0.5]); P.push([640, 'bar', -4]); P.push([640, 'bar', 4]);
+  return P.sort((a, b) => a[0] - b[0]);
+}
+function d3DriveStart() {
+  storyMap('ave3'); d3Cp('d3c'); D3.amb = null; D3.lamp = true; FL.light.color.setHex(0xffd27a);
+  const DV = D3.drive; Object.assign(DV, { x: 0, v: 0, dist: 0, hp: 100, plan: d3DrvPlan(), pi: 0, cp: 0, tilt: 0, t: 0, fin: false, tramWarn: false, smoke: 0 });
+  player.pos.set(0, -6, 0); player.yaw = 0; player.pitch = 0; Music.stop(); Music.start('dread'); Sound.droneLoop(0.2); story.showAvatar = false; story.gun = false;
+  showCard('ЛОКАЦИЯ 3 · ЧАСТЬ II', 'Проспект', 3000, true);
+  d3Talk([
+    ['', 'Мотор заводится со второго раза. Фары выхватывают из темноты проспект, которого вы не узнаёте.', (t) => camSet(3.4, 1.7, 5.5 - t * 0.2, 0, 1, -4)],
+    ['Радио', 'Повторяем: оставайтесь дома. Не открывайте тем, кто считает вслух. Не смотрите им в глаза. Повторяем…', (t) => camSet(-0.3, 1.25, 0.9, 0, 1.1, -8)],
+    ['Вы', 'Набережная. Семьсот метров по прямой. Только бы никого не сбить.', (t) => camSet(0, 2.6, 7.5, 0, 1.2, -6)],
+  ], null, () => {
+    story.ride = d3DrvRide; story.rideCam = d3DrvCam;
+    d3Play('d3-drive', { noFire: true, obj: () => `До баррикады: ${Math.max(0, Math.round(DR_LEN - DV.dist))} м · машина: ${Math.max(0, Math.round(DV.hp))}% · руль — джойстик влево-вправо, вперёд — газ, назад — тормоз`, tgt: () => null });
+    story.gun = false; toast('Объезжайте машины и людей. Сбитого пустого уже не вернуть');
+  });
+}
+function d3DrvCam(dt) { const DV = D3.drive, k = DV.v / 25; camera.position.set(DV.x * 0.82, 2.5 + k * 0.25 + (Math.random() - 0.5) * shake * 0.2, 6.6 + k * 0.8); camera.lookAt(DV.x * 0.9 + DV.tilt * 2.5, 1.1, -9); }
+function d3DrvRide(dt) {
+  const DV = D3.drive; if (!DV || DV.fin) return; DV.t += dt;
+  let jx = 0, jy = 0; if (touch.moveId !== null) { jx = clamp(touch.jx, -1, 1); jy = clamp(touch.jy, -1, 1); }
+  const want = jy < -0.35 ? 26 : jy > 0.35 ? 9 : 19; DV.v = lerp(DV.v, want, Math.min(1, dt * (want > DV.v ? 0.9 : 2.2)));
+  DV.x = clamp(DV.x + jx * 7.5 * Math.min(1, DV.v / 12) * dt, -5.3, 5.3); DV.tilt = lerp(DV.tilt, jx, Math.min(1, dt * 6));
+  const step = DV.v * dt; DV.dist += step;
+  DV.car.position.set(DV.x, Math.sin(DV.t * 31) * 0.008, 0); DV.car.rotation.set(0, -DV.tilt * 0.16, DV.tilt * 0.04);
+  player.pos.set(DV.x, -6, 0); eye.position.set(DV.x, 1.3, 0); eye.rotation.set(0, 0, 0); eye.updateMatrixWorld();
+  DV.roadTex.offset.y += step / 6; DV.lineTex.offset.y += step / 8;
+  for (const s of DV.scen) { s.g.position.z += step; if (s.g.position.z > 40) s.g.position.z -= s.span; if (s.g.userData.lamp && Math.random() < dt * 3) s.g.userData.lamp.visible = Math.random() < 0.7; }
+  while (DV.pi < DV.plan.length && DV.plan[DV.pi][0] < DV.dist + 115) { const [d, k, x] = DV.plan[DV.pi++], z = -(d - DV.dist); if (k === 'ped') d3DrvPed(x, z); else { const o = d3DrvObj(k, x, z); if (k === 'tram') o.vx = 6.2; } }
+  for (let i = DV.objs.length - 1; i >= 0; i--) {
+    const o = DV.objs[i]; o.g.position.z += step; o.g.position.x += o.vx * dt;
+    if (o.kind === 'tram' && !DV.tramWarn && o.g.position.z > -75) { DV.tramWarn = true; c2Say('Трамвай! Он едет сам по себе — тормозите или проскакивайте!', 'Вы'); for (let k = 0; k < 4; k++) later(k * 0.3, () => Sound.tink(0.8)); }
+    if (o.g.position.z > 16) { scene.remove(o.g); DV.objs.splice(i, 1); continue; }
+    if (!o.hit && Math.abs(o.g.position.z) < o.hl + 2.1 && Math.abs(o.g.position.x - DV.x) < o.hw + 0.9) {
+      o.hit = true; const big = o.kind === 'bus' || o.kind === 'tram'; DV.hp -= o.kind === "bar" ? 10 : big ? 34 : 22; DV.v *= big ? 0.15 : 0.4; shake = Math.max(shake, big ? 0.9 : 0.6); Sound.thud(1); Sound.glass(0.7); D3.carHits++;
+      sparks(_a.set(DV.x, 0.7, -2.2), 24, UP, 6); flashScreen('#fff', 160); if (!big) { o.vx = (o.g.position.x >= DV.x ? 1 : -1) * 9; later(0.5, () => { o.vx = 0; }); o.g.rotation.y += 0.6; } else DV.x = clamp(DV.x + (DV.x >= o.g.position.x ? 1 : -1) * 1.2, -5.3, 5.3);
+    }
+  }
+  for (let i = DV.peds.length - 1; i >= 0; i--) {
+    const n = DV.peds[i]; if (!n.root) { DV.peds.splice(i, 1); continue; }
+    if (n.state === 'alive') { n.pos.z += step; n.pos.x = clamp(n.pos.x + n.drvV * dt, -5.6, 5.6); n.speed = 0.6; n.yaw = n.drvV > 0 ? 1.57 : -1.57; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw;
+      if (Math.abs(n.pos.z + 1.4) < 1.5 && Math.abs(n.pos.x - DV.x) < 1.15) { n.vel.set(rand(-3, 3), 4.5, -DV.v * 0.35); n.die('zombie'); D3.broken++; DV.hp -= 5; Sound.thud(0.9); Sound.splat(1); screenBlood(0.3); shake = Math.max(shake, 0.35); n.goneT = 1.3; d3Chip(); if (!D3.tipHit) { D3.tipHit = true; c2Say('Чёрт… Он даже не обернулся.', 'Вы'); } }
+      else if (n.pos.z > 14) { n.dispose(); DV.peds.splice(i, 1); } }
+    else { n.goneT = (n.goneT ?? 1.3) - dt; if (n.goneT <= 0) { n.dispose(); DV.peds.splice(i, 1); } }
+  }
+  if (DV.hp < 45) { DV.smoke -= dt; if (DV.smoke <= 0) { DV.smoke = 0.07; spawnSprite(TEX.smoke, _a.set(DV.x + rand(-0.3, 0.3), 1.0, -1.9), { color: DV.hp < 20 ? 0x1a1a1a : 0x8a8a8a, size: 0.5, grow: 2.5, life: 0.8, opacity: 0.5, vel: new V3(0, 1.2, DV.v * 0.5) }); } }
+  if (Math.floor(DV.dist / 240) > DV.cp) { DV.cp = Math.floor(DV.dist / 240); toast('Контрольная точка'); }
+  if (DV.hp <= 0) {
+    Sound.explosion(0.8); d3Fine('МАШИНА РАЗБИТА · ВОСКРЕШЕНИЕ'); c2Say('Машину я тоже записал. Вставай и заводи.', 'Воскреситель');
+    for (const o of DV.objs) scene.remove(o.g); DV.objs.length = 0; for (const n of DV.peds) if (n.root) n.dispose(); DV.peds.length = 0;
+    DV.dist = DV.cp * 240; DV.hp = 100; DV.v = 0; DV.x = 0; DV.tramWarn = false; DV.pi = DV.plan.findIndex((p) => p[0] > DV.dist + 50); if (DV.pi < 0) DV.pi = DV.plan.length;
+  }
+  if (DV.dist >= DR_LEN) d3DriveEnd();
+}
+function d3DriveEnd() {
+  const DV = D3.drive; DV.fin = true; story.ride = null; story.rideCam = null; let v = DV.v;
+  for (const o of DV.objs) scene.remove(o.g); DV.objs.length = 0; for (const n of DV.peds) if (n.root) n.dispose(); DV.peds.length = 0;
+  const pc = [d3Car(0x1a2a5a, true), d3Car(0x1a2a5a, true)]; pc[0].position.set(-3.2, 0, -30); pc[0].rotation.y = 1.2; pc[1].position.set(3.4, 0, -31); pc[1].rotation.y = -1.3; pc.forEach((c) => addMesh(c));
+  d3Talk([
+    ['', 'Впереди — синие маячки. Две патрульные машины поперёк дороги, мешки с песком и люди, которые ещё моргают.', (t) => camSet(DV.x + 4, 2.2, 5, 0, 1.2, -26)],
+    ['', DV.hp < 50 ? 'Машина дотягивает до баррикады на честном слове и глохнет.' : 'Вы тормозите у самой баррикады.', (t) => camSet(-6, 1.6, -14, DV.x, 0.9, -6)],
+  ], (t, dt) => { v = Math.max(0, v - dt * 7); const st = v * dt; for (const c of pc) c.position.z = Math.min(-9, c.position.z + st); for (const s of DV.scen) { s.g.position.z += st; } DV.roadTex.offset.y += st / 6; DV.lineTex.offset.y += st / 8; for (const c of pc) if (c.userData.bar) c.userData.bar.material.color.setHex(Math.floor(t * 4) % 2 ? 0x2a50ff : 0xff2a2a); },
+  () => { d3Save(); fadeOut(); later(0.8, () => { fadeIn(); d3CityStart(false); }); });
+}
+/* ===================== LOCATION 3 · ACTS III–IV «Набережная» and «Мост» ===================== */
+const S3 = { note: [-15.5, 11], post: [8.2, 1.5], chalk: [0, -23.6], tram: [-0.9, -12], pharm: [-8.2, -3], kiosk: [13.2, 16.6], gen: [6.6, 33.4], insp: [1.6, 33.2], door: [0, -53], line: 29 };
 function buildStreet3() {
-  const H = WALL_H, BB = batcher(), C = (c, r = 0.85) => std({ color: c, roughness: r }), dk = C(0x1a1c22), steel = std({ color: 0x4a4c50, roughness: 0.4, metalness: 0.6 });
-  const blk = (m, x, y, z, sx, sy, sz) => { BB.box(m, x, y, z, sx, sy, sz); solid(x, y, z, sx, sy, sz); };
-  floorMesh(std({ map: texRep(TEX.asphalt, 12, 12), color: 0x3a3c42, roughness: 0.6, envMapIntensity: 0.6 }), HX * 2, HZ * 2);
-  // sidewalks and a river with a bridge across the middle (z)
-  BB.box(C(0x6a6a66), -HX + 3, 0.06, 0, 6, 0.12, HZ * 2); BB.box(C(0x6a6a66), HX - 3, 0.06, 0, 6, 0.12, HZ * 2);
-  BB.box(C(0x1a2a3a, 0.2), 0, -0.02, 6, HX * 2, 0.02, 4.5);
-  BB.box(steel, 0, 0.9, 6, 7, 0.25, 4.5); solid(0, 0.5, 6, 7, 1.0, 4.5); for (const x of [-3.4, 3.4]) for (const z of [4, 8]) BB.cyl(steel, x, 0.8, z, 0.08, 0.08, 1.6, 6);
-  // buildings on both sides, with lit windows
-  for (let i = 0; i < 8; i++) { const x = -HX + 1.5 + (i % 4) * 3.2, z = -HZ + 1.5 + Math.floor(i / 4) * 2 * 3.0; blk(C([0x2a2a34, 0x332a2a, 0x2a3330, 0x30283a][i % 4]), x, 4 + (i % 3), z, 3, 8 + (i % 3) * 2, 3);
-    for (let r = 0; r < 4; r++) for (let c = 0; c < 2; c++) if (Math.random() < 0.55) BB.box(new THREE.MeshBasicMaterial({ color: pick([0xffd890, 0x9ad0ff, 0xff9ad8]) }), x - 0.7 + c * 1.4, 2 + r * 1.8, z + 1.52, 0.6, 0.9, 0.04); }
-  for (let i = 0; i < 6; i++) { const x = HX - 1.5 - (i % 3) * 3.2, z = -HZ + 1.5 + Math.floor(i / 3) * 2 * 3.0 + 6; blk(C(0x2a2a34), x, 5, z, 3, 10, 3); }
-  // lamp posts and a dumpster and a phone box
-  for (const z of [-8, -2, 4, 10]) for (const x of [-4.5, 4.5]) { BB.cyl(steel, x, 2.5, z, 0.06, 0.08, 5, 6); BB.geo(new THREE.MeshBasicMaterial({ color: 0xffd8a0 }), new THREE.SphereGeometry(0.2, 8, 6).translate(x, 5.1, z)); }
-  blk(C(0x2a4a2a), -5, 0.5, -4, 1.4, 1.0, 1.0); blk(C(0x2a2a80), 5, 0.6, -8, 0.8, 1.2, 0.8);
-  // a neon sign and a lit kiosk
-  addSign([{ t: 'НОЧНОЙ ПЕРЕХОД', s: 200 }], 4, 0.8, 0, 6, -HZ + 0.5, 0, 'rgba(255,90,180,0.95)');
+  Object.assign(LV, { walls: false, ceil: false, bounds: [{ x0: -HX, x1: HX, z0: -26, z1: 46 }, { x0: -3.5, x1: 3.5, z0: -58, z1: -25 }] });
+  const BB = batcher(), C = (c, r = 0.85, m = 0) => std({ color: c, roughness: r, metalness: m }), steel = C(0x4a4c50, 0.4, 0.6), dark = C(0x1c1e24, 0.7), glow = (c) => new THREE.MeshBasicMaterial({ color: c }), SC = D3.city = { bars: [], beams: [], neon: [] };
+  const blk = (m, x, y, z, sx, sy, sz, ry = 0) => { BB.box(m, x, y, z, sx, sy, sz, ry); solid(x, y, z, sx, sy, sz); };
+  floorMesh(std({ map: texRep(TEX.asphalt, 14, 20), color: 0x3c3e44, roughness: 0.55, envMapIntensity: 0.6 }), HX * 2, 72, 0, 10);
+  for (const s of [-1, 1]) BB.box(C(0x6a6a66), s * 8, 0.07, 13, 2, 0.14, 66);
+  for (let z = -18; z < 44; z += 4) BB.box(C(0xd8d4c0, 0.7), 0, 0.012, z, 0.16, 0.01, 1.8);
+  BB.box(C(0x77746c), 0, 0.07, -23, HX * 2, 0.14, 6);
+  // buildings: blocks with dark windows, a few lit; shop fronts
+  const wt = [d3WinTex(0.05), d3WinTex(0.1), d3WinTex(0.02)], cols = [0x2a2a34, 0x332a2a, 0x2a3330, 0x30283a, 0x3a342c];
+  const bld = (x0, x1, z0, z1, h) => { const w = x1 - x0, d = z1 - z0, tx = pick(wt).clone(); tx.needsUpdate = true; tx.repeat.set(Math.max(w, d) / 7, h / 16); const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: pick(cols), emissiveMap: tx, emissive: 0xffffff, emissiveIntensity: 0.9 })); m.position.set((x0 + x1) / 2, h / 2, (z0 + z1) / 2); m.userData.kind = 'env'; addMesh(m); envMeshes.push(m); solid((x0 + x1) / 2, h / 2, (z0 + z1) / 2, w, h, d); };
+  bld(-26, -9, 14, 46, 18); bld(-26, -9, -8, 8, 24); bld(-26, -9, -20, -12, 14); bld(-26, -19, 8, 14, 16);
+  bld(9, 26, 20, 46, 22); bld(9, 26, -4, 12, 16); bld(9, 26, -20, -10, 20); bld(17, 26, 12, 20, 14); bld(15, 26, -10, -4, 12);
+  const sign = (t, x, y, z, ry, col, w = 3.2) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.22), new THREE.MeshBasicMaterial({ map: toTex(signCanvas([{ t, s: 150 }], 512, 112, col)), transparent: true })); m.position.set(x, y, z); m.rotation.y = ry; addMesh(m); SC.neon.push(m); };
+  sign('АПТЕКА', -8.94, 3.3, -3, Math.PI / 2, 'rgba(120,255,160,1)'); sign('ЛОМБАРД «СРОК»', 8.94, 3.3, 6, -Math.PI / 2, 'rgba(255,200,90,1)', 3.8); sign('ЦВЕТЫ', -8.94, 3.3, 22, Math.PI / 2, 'rgba(255,90,180,1)'); sign('КРЕДИТЫ ЗА 5 МИНУТ', 8.94, 3.3, 30, -Math.PI / 2, 'rgba(120,200,255,1)', 4.4); sign('НАБЕРЕЖНАЯ', 0, 5.4, -19.4, 0, 'rgba(255,230,160,1)', 4.2);
+  // pharmacy shutter, kiosk, dumpster alley, phone booth, bus stop
+  { const m = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.4, 3.2), C(0x8a8e94, 0.5, 0.6)); m.position.set(-8.95, 1.2, -3); addMesh(m); SC.shutter = m; }
+  blk(C(0x2a5a4a), 14.6, 1.3, 16.6, 2.6, 2.6, 2.6); BB.box(C(0xd8c890), 14.6, 2.75, 16.6, 3.0, 0.15, 3.0); BB.box(glow(0x40382a), 13.28, 1.5, 16.6, 0.04, 0.9, 1.6);
+  blk(C(0x2a4a2a), -16.8, 0.6, 11, 1.6, 1.2, 1.1); BB.box(C(0x1e361e), -16.8, 1.24, 11, 1.66, 0.08, 1.16); BB.box(C(0xc81830, 1), -15.9, 0.75, 11, 0.5, 0.06, 0.12, 0, 0, 0.9);
+  blk(C(0x8a2020, 0.5, 0.3), 8.2, 1.2, 2.4, 0.9, 2.4, 0.9); BB.box(glow(0xffe0a0), 8.2, 2.25, 1.94, 0.7, 0.2, 0.02); BB.box(std({ color: 0x9ad0f0, roughness: 0.1, transparent: true, opacity: 0.35 }), 8.2, 1.3, 1.94, 0.7, 1.4, 0.02);
+  BB.box(steel, -7.6, 1.3, 20, 0.08, 2.6, 0.08); BB.box(steel, -7.6, 1.3, 23, 0.08, 2.6, 0.08); BB.box(dark, -7.6, 2.6, 21.5, 1.4, 0.08, 3.4); blk(C(0x5a4a3a), -7.9, 0.4, 21.5, 0.4, 0.5, 2.6);
+  // a stopped tram with weak light inside
+  blk(C(0xa02020, 0.45), -3, 1.75, -12, 2.5, 2.8, 12); BB.box(glow(0x6a5a3a), -3, 2.3, -12, 2.54, 0.9, 11.4); BB.box(steel, -3, 0.25, -12, 2.2, 0.3, 11); BB.box(steel, -3, 3.9, -12, 0.06, 1.5, 0.06);
+  for (let z = -19; z < 46; z += 1.2) for (const x of [-3.7, -2.3]) BB.box(steel, x, 0.02, z, 0.07, 0.03, 1.2);
+  // abandoned cars, lamp posts, a hydrant, benches, the embankment balustrade
+  for (const [x, z, r, c] of [[4.6, 14, 0.2, 0x6a2020], [-5, 3, -0.3, 0x9a9aa0], [5.4, -9, 1.2, 0x20402a], [3.6, 22, 0.05, 0xd8d0c0]]) { const g = d3Car(c); g.position.set(x, 0, z); g.rotation.y = r; addMesh(g); solid(x, 0.7, z, 2.2, 1.4, 2.6); }
+  SC.lamps = []; for (const z of [36, 22, 8, -6]) for (const s of [-1, 1]) { BB.cyl(steel, s * 7.2, 3, z, 0.07, 0.1, 6, 6); BB.box(steel, s * 6.5, 5.9, z, 1.5, 0.08, 0.1); const l = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 6), glow(0xffd8a0)); l.position.set(s * 5.9, 5.8, z); addMesh(l); SC.lamps.push(l); }
+  BB.cyl(C(0xc82020, 0.5), 7.6, 0.4, 26, 0.16, 0.2, 0.8, 8);
+  for (const x of [-18, -10, 10, 18]) { blk(C(0x5a4a3a), x, 0.3, -22, 2.2, 0.5, 0.6); BB.cyl(steel, x + 3, 2.2, -24.6, 0.06, 0.08, 4.4, 6); BB.geo(glow(0x3a342a), new THREE.SphereGeometry(0.22, 8, 6).translate(x + 3, 4.5, -24.6)); }
+  for (const [x0, x1] of [[-26, -3.8], [3.8, 26]]) { blk(C(0x9a968c), (x0 + x1) / 2, 0.55, -25.6, x1 - x0, 1.1, 0.5); }
+  // the river and the bridge, fading into fog
+  { const w = new THREE.Mesh(new THREE.PlaneGeometry(160, 60).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x06090e, roughness: 0.08, metalness: 0.85, envMapIntensity: 0.7 })); w.position.set(0, -2.2, -52); addMesh(w); }
+  floorMesh(std({ map: texRep(TEX.asphalt, 2, 9), color: 0x4a4c52, roughness: 0.6 }), 7.6, 36, 0, -43, 0.01); BB.box(C(0x55524c), 0, -0.4, -43, 8, 0.8, 36);
+  for (const s of [-1, 1]) { blk(C(0x6a6660), s * 3.75, 0.55, -43, 0.4, 1.1, 36); for (let z = -58; z <= -28; z += 6) { BB.cyl(steel, s * 3.75, 3.2, z, 0.07, 0.1, 4.2, 6); const l = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), glow(0xffe8c0)); l.position.set(s * 3.75, 5.4, z); addMesh(l); SC.lamps.push(l); } }
+  for (const s of [-1, 1]) for (let i = 0; i < 9; i++) BB.box(steel, s * 3.75, 5.4 + Math.sin(i / 8 * Math.PI) * 2.6, -58 + i * 3.75, 0.1, 0.1, 3.9, 0, (i < 4 ? -1 : i > 4 ? 1 : 0) * 0.5);
+  // the door in the middle of the bridge
+  { const g = new THREE.Group(), fr = C(0x3a2e22, 0.7); for (const x of [-0.62, 0.62]) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.14, 2.4, 0.2), fr); p.position.set(x, 1.2, 0); g.add(p); } const tp = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.16, 0.2), fr); tp.position.y = 2.46; g.add(tp); const d = new THREE.Mesh(new THREE.BoxGeometry(1.1, 2.3, 0.07), C(0x5a4632, 0.6)); d.geometry.translate(0.55, 0, 0); d.position.set(-0.55, 1.15, 0); g.add(d); const gl = new THREE.Mesh(new THREE.PlaneGeometry(1.08, 2.28), glow(0xd8ffb0)); gl.position.set(0, 1.15, -0.02); gl.visible = false; g.add(gl); const pl = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.34), new THREE.MeshBasicMaterial({ map: toTex(textCanvas([{ t: 'ОТДЕЛ УЧЁТА ДУШ', s: 44 }, { t: 'приём круглосуточно', s: 30 }], 512, 192, '#e8e0c0', '#1a140c')) })); pl.position.set(0, 2.9, 0.05); g.add(pl); g.position.set(0, 0, -54); g.visible = false; addMesh(g); SC.door = g; SC.doorLeaf = d; SC.doorGlow = gl; }
+  // the barricade: sandbags with a passage, two patrol cars, searchlights, a generator, a tent
+  for (const [x0, x1] of [[-7, -1.2], [1.2, 7]]) { for (let x = x0 + 0.5; x < x1; x += 1) { BB.box(C(0x8a7a5a, 1), x, 0.22, 29.4, 0.95, 0.42, 0.55); BB.box(C(0x7a6a4c, 1), x + 0.3, 0.62, 29.4, 0.95, 0.4, 0.5); } solid((x0 + x1) / 2, 0.45, 29.4, x1 - x0, 0.9, 0.6); }
+  for (const [x, r] of [[-5, 1.35], [5, -1.4]]) { const g = d3Car(0x1a2a5a, true); g.position.set(x, 0, 34.5); g.rotation.y = r; addMesh(g); SC.bars.push(g.userData.bar); solid(x, 0.7, 34.5, 4.2, 1.4, 2.0); }
+  for (const x of [-5.4, 5.4]) { BB.cyl(steel, x, 1.3, 31, 0.05, 0.05, 2.6, 6); for (const a of [0, 2.1, 4.2]) BB.cyl(steel, x + Math.cos(a) * 0.3, 0.3, 31 + Math.sin(a) * 0.3, 0.03, 0.03, 0.7, 5, 0.4 * Math.sin(a), -0.4 * Math.cos(a)); const h = new THREE.Group(), lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.2, 0.3, 12).rotateX(Math.PI / 2), dark); h.add(lamp); const cone = new THREE.Mesh(new THREE.ConeGeometry(3.6, 22, 14, 1, true).rotateX(Math.PI / 2).translate(0, 0, -11), new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: 0.07, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })); h.add(cone); const face = new THREE.Mesh(new THREE.CircleGeometry(0.26, 12).rotateY(Math.PI), glow(0xfff4d8)); face.position.z = -0.16; h.add(face); h.position.set(x, 2.7, 31); h.rotation.x = -0.1; addMesh(h); SC.beams.push({ h, cone, face, ph: x }); }
+  blk(C(0xc8a020, 0.5), 6.6, 0.45, 34.4, 1.2, 0.9, 0.8); BB.cyl(dark, 6.6, 1.0, 34.4, 0.08, 0.08, 0.3, 6);
+  BB.box(C(0x4a5a3a, 1), -1, 2.4, 40, 5, 0.1, 4, 0, 0, 0.1); for (const [x, z] of [[-3.4, 38.2], [1.4, 38.2], [-3.4, 41.8], [1.4, 41.8]]) BB.cyl(steel, x, 1.2, z, 0.04, 0.04, 2.4, 5);
+  // traces: her scarf at the dumpster (drawn above), chalk numbers by the bridge
+  decoPlane(cvTex(256, 128, (g) => { g.font = '700 30px Arial'; g.fillStyle = 'rgba(240,240,230,0.8)'; for (let i = 0; i < 9; i++) g.fillText(String(7304811893 + i).slice(-4 - (i % 3)), 8 + (i % 3) * 84, 36 + Math.floor(i / 3) * 40); }), 3.4, 1.7, 0, 0.16, -23.6, 0).rotation.x = -Math.PI / 2;
+  for (const [x, z, r] of [[-3, 18, 1.3], [4, 4, 1.0], [-5, -17, 1.4], [2, -22, 0.9], [0, -40, 1.2], [6, 30, 0.8]]) puddle(x, z, r);
   BB.flush();
 }
-const S3 = { trail: { note: [-5, -4], post: [5, -8], bridge: [0, 6] }, found: new Set(), meet: false };
-function startStreet3() {
-  storyReset(); overReset(); mode = 'story'; story.on = true; story.asGG = false; story.ch = 2; story.gun = false; story.showAvatar = true; Object.assign(S3, { found: new Set(), meet: false });
-  storyMap('street3'); story.stage = 'c3s'; player.pos.set(0, 0, -15); player.yaw = 0; avatar.pos.copy(player.pos); standAvatar();
-  Music.stop(); Music.start('dread'); fadeIn(); $('black').style.opacity = ''; $('cine').classList.remove('on');
-  showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 · ПРОДОЛЖЕНИЕ', 'Ночной город', 3600);
-  runCut([
-    [0.2, () => sub('', 'Улица пуста. Фонари мигают, из реки тянет холодом. Вы идёте по её следам.')],
-    [5.4, () => { subOff(); setStage('c3s', 'Найдите три следа Мелоди: у мусорного бака, у телефонной будки и на мосту'); banner('Ночной город', 'следуйте за Мелоди'); }],
-  ], (t) => camSet(0, 3.2, -18, 0, 1.4, 0), 6.0, () => {});
+function d3CityAmb(dt) {
+  const SC = D3.city, t = performance.now() / 1000; if (!SC) return;
+  for (let i = 0; i < SC.bars.length; i++) if (SC.bars[i]) SC.bars[i].material.color.setHex(Math.floor(t * 4 + i) % 2 ? 0x2a50ff : 0xff2a2a);
+  const on = !D3.H || D3.H.gen; for (const b of SC.beams) { b.cone.visible = on; b.face.visible = on; b.h.rotation.y = Math.sin(t * 0.35 + b.ph) * 0.45; }
+  if (Math.random() < dt * 2) { const l = pick(SC.lamps); l.visible = Math.random() < 0.45; } if (Math.random() < dt * 1.5) { const n = pick(SC.neon); n.material.opacity = Math.random() < 0.5 ? 0.2 : 1; }
+  if (SC.ring && !D3.ev.has('call') && !D3.calledOff) { SC.ringT = (SC.ringT || 0) - dt; if (SC.ringT <= 0) { SC.ringT = 2.6; const v = clamp(1 - Math.hypot(player.pos.x - S3.post[0], player.pos.z - S3.post[1]) / 26, 0, 1); if (v > 0.05) for (let i = 0; i < 6; i++) later(i * 0.09, () => Sound.click(1900, 0.22 * v)); } }
+  if (SC.doorGlow && SC.doorGlow.visible) SC.doorGlow.material.color.setHex(Math.sin(t * 3) > 0 ? 0xd8ffb0 : 0xc0f0a0);
 }
-function s3Act(info) {
-  const near = (p, r = 1.8) => Math.hypot(player.pos.x - p[0], player.pos.z - p[1]) < r;
-  const spots = [['note', S3.trail.note, 'Мусорный бак: её шарф и записка «Не ищи меня»'], ['post', S3.trail.post, 'Телефонная будка: монетки и номер Марка, перечёркнутый'], ['bridge', S3.trail.bridge, 'Мост: её следы на мокром асфальте, ведут на другой берег']];
-  for (const [k, p, text] of spots) if (!S3.found.has(k) && near(p)) { if (info) return 'Осмотреть след'; S3.found.add(k); Sound.chime(); line('Вы', text, 0.55, 0.95); toast(`След ${S3.found.size}/3`); if (S3.found.size === 3) setStage('c3s', 'Дойдите до моста: вас там ждут'); return null; }
-  if (S3.found.size === 3 && !S3.meet && near(S3.trail.bridge, 2.4)) { if (info) return 'Подойти к мосту'; S3.meet = true; s3Meet(); }
-  return null;
+function d3CityPeople() {
+  const I = D3.insp = c3Npc('cop', S3.insp[0], S3.insp[1], Math.PI); I.protMsg = 'Это инспектор Лисова. Не стрелять';
+  D3.cops = [c3Npc('cop', -3.6, 31.2, Math.PI), c3Npc('cop', 3.8, 31.2, Math.PI)]; for (const c of [I, ...D3.cops]) d3Ally(c, 13);
+  const W = (x, z, pts) => d3Hollow(x, z, { state: 'wander', patrol: pts, wake: 7.5, sp: rand(0.95, 1.3) });
+  W(-13, 10, [[-12, 10], [-17, 12], [-12, 12]]); W(-14, 12, [[-17, 10], [-12, 11]]); W(-11, 11.5, [[-11, 12], [-16, 10.4]]);
+  W(1, -8, [[1, -6], [5, -14], [1, -17]]); W(3, -15, [[3, -16], [1, -7]]); W(-6, -16, [[-6, -17], [-6.4, -8]]);
+  W(-14, -23, [[-18, -22.6], [-8, -23]]); W(12, -23, [[18, -22.6], [8, -23]]); W(14, 15, [[11, 14], [11, 18]]); W(5, 6, [[5, 8], [-4, 9], [5, 2]]);
 }
-function s3Meet() {
-  story.stage = 's3-cut'; const d = c2Ui(); let R = null;
-  runCut([
-    [0.2, () => sub('', 'Фигура на другом берегу. Длинный плащ, капюшон. Он не спешит и смотрит на вас так, будто давно ждёт.')],
-    [5.6, () => { R = story.gg = new Humanoid('human', 0, 0, 0, 'gagarin'); R.scripted = true; story.extras.push(R); Object.assign(R, { pose: 'stand', poseDur: Infinity, ggWing: 0.6, ggHalo: 1, ggRage: 0, ggSlit: 0.75, ggDim: 0 }); R.pos.set(0, 0, 14); R.root.position.copy(R.pos); }],
-    [7.4, () => ggSay('Ты пришёл один. Как и она.', 2.6)],
-    [12.0, () => ggSay('Она искала меня. Ты тоже. Скажи, зачем?', 3)],
-  ], (t, dt) => { if (R) { R.pos.z = lerp(14, 7.5, clamp((t - 5.6) / 4, 0, 1)); R.root.position.copy(R.pos); R.root.rotation.y = Math.PI; } camSet(-1.6, 1.7, 10.4, 0, 1.4, 7.5); }, 13.0, () => s3Choice(R));
+function d3CityStart(fromCp) {
+  storyMap('street3'); d3Cp('d3d'); D3.amb = d3CityAmb; D3.lamp = true; FL.light.color.setHex(0xffd27a); D3.H = null; D3.found = new Set(); D3.resc = new Set(); D3.surv = []; D3.city.ring = true;
+  d3CityPeople(); Music.stop(); Music.start('dread'); Sound.droneLoop(0.2); story.showAvatar = true; story.gun = false; d3Put(0.2, 35.6, S3.insp[0], S3.insp[1]); d3FaceTo(D3.insp, 0.2, 35.6);
+  showCard('ЛОКАЦИЯ 3 · ЧАСТЬ III', 'Набережная', 3000, true); const I = D3.insp;
+  d3Talk([
+    ['', 'Баррикада у набережной. Два прожектора бьют вдоль улицы, и там, куда падает свет, фигуры замирают.', (t) => camSet(-9 + t * 0.2, 4.6, 40, 0, 1.6, 26)],
+    ['Инспектор', 'Живой. Я уже не надеялась. Смотрите сами.', () => d3CamFace(I, 0.35, 1.0)],
+    ['Инспектор', 'Началось полчаса назад. Люди выходят из домов и считают. Глаза белые. Не отвечают. Мешаешь — рвут.', () => d3CamOver(avatar, I, 0.5, 1.1)],
+    ['Инспектор', 'Мы стреляли. В двоих. Потом я увидела лица: мой сосед и его дочь. Больше не могу.', () => d3CamFace(I, -0.3, 0.85)],
+    ['Вы', 'Свет их останавливает. У меня есть фонарь… особенный. Они успокаиваются.', () => d3CamFace(avatar, 0.35, 1.0)],
+    ['Инспектор', 'Тогда светите. Вдруг их ещё можно вернуть. А это — на случай, если нельзя.', () => d3CamOver(avatar, I, -0.5, 1.1), () => { Sound.click(500, 0.4); }],
+    ['Инспектор', 'Певица прошла здесь полчаса назад. Одна. Они её не тронули — расступались. Пошла к реке. Найдите её следы.', () => d3CamFace(I, 0.35, 1.0)],
+  ], (t, dt) => { d3CityAmb(dt); }, () => { d3Arm('pistol'); toast('Получено: пистолет'); d3CityPlay(); banner('Набережная', 'найдите три следа Мелоди'); });
 }
-function s3Choice(R) {
-  story.stage = 's3-choice'; const d = c2Ui();
-  d.style.borderColor = '#d8a840';
-  d.innerHTML = '<small style="letter-spacing:.18em;color:#ffd060">ВОСКРЕСИТЕЛЬ</small><b style="display:block;margin:6px 0 8px">Что вы ему скажете?</b>' + [['Мелоди любит тебя. Я видел её лицо.', 'love'], ['Оставь её в покое. Или я найду способ тебя остановить.', 'threat'], ['Я хочу понять, кто ты на самом деле.', 'ask']].map(([t, k]) => `<button class="btn" data-k="${k}" style="width:100%;margin:4px 0;text-align:left">${t}</button>`).join('');
-  d.style.display = 'block';
-  d.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { d.style.display = 'none'; s3End(b.dataset.k, R); });
+const S3_TR = {
+  note: ['Осмотреть бак', [['', 'Мусорный бак в переулке. На крышке — её шарф, под ним записка губной помадой: «Не ищи меня».'], ['Вы', 'Поздно. Уже ищу.']], () => camSet(-14.2, 1.7, 12.6, -16.6, 1.0, 11)],
+  chalk: ['Осмотреть следы', [['', 'У въезда на мост мокрые следы её ботинок. Рядом кто-то вывел мелом столбик чисел — и последнее обведено.'], ['Вы', '«…811 902». Опять этот номер.'], ['', 'Следы ведут на мост. Обратно — не ведут.']], () => camSet(1.8, 2.4, -20.6, 0, 0.1, -23.8)],
+};
+function d3CityTrace(k) {
+  D3.found.add(k); Sound.chime(); story.showAvatar = true;
+  const fin = () => { story.showAvatar = false; toast(`Следы Мелоди: ${D3.found.size}/3`); if (D3.found.size >= 3) d3HoldCall(); else d3CityPlay(); };
+  if (k === 'post') { D3.calledOff = true; return d3Talk([
+    ['', 'Телефонная будка. Телефон звонит — в городе без электричества. На полке монетки и номер Марка, перечёркнутый её рукой.', () => camSet(9.8, 1.8, 0.2, 8.2, 1.3, 2.2)],
+    ['', 'Вы снимаете трубку.', () => camSet(8.9, 1.6, 1.2, 8.2, 1.4, 2.3), () => Sound.click(700, 0.4)],
+    ['Трубка', 'Абонент Мелоди внесена в очередь. Залог принят. Ваш номер — следующий. Ожидайте.', () => camSet(8.9, 1.6, 1.2, 8.2, 1.4, 2.3)],
+    ['Вы', 'Кто это?! Какой залог?', () => d3CamFace(avatar, 0.3, 0.9)],
+    ['Трубка', 'Приём круглосуточно. Дверь — на мосту.', () => d3CamFace(avatar, 0.3, 0.9)],
+  ], (t, dt) => d3CityAmb(dt), () => { d3Ev('call'); fin(); }); }
+  const T = S3_TR[k]; d3Talk(T[1].map(([w, t]) => [w, t, T[2]]), (t, dt) => d3CityAmb(dt), fin);
 }
-function s3End(k, R) {
-  const lines = { love: ['Любит? Ха. Она любит песню, которую я ей подарил. Не меня.', 'Тогда пусть споёт ещё раз. Для меня. Последний раз.'], threat: ['Остановить меня? Ты даже не знаешь, с чем стоишь на мосту.', 'Но я ценю смелость. Из неё получаются хорошие куски.'], ask: ['Кто я? Тот, кого ты боишься вспомнить по утрам.', 'Завтра ты узнаешь больше. Или сегодня, если не будешь спать.'] }[k];
-  runCut([
-    [0.2, () => ggSay(lines[0], 3.4)],
-    [4.6, () => ggSay(lines[1], 3.4)],
-    [9.2, () => sub('', 'Фигура поворачивается и растворяется в тумане над рекой. Мост остаётся пустым.')],
-    [13.4, () => { subOff(); showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 · ПРОДОЛЖЕНИЕ ПРОЙДЕНО', 'Продолжение следует…', 5500); }],
-  ], (t, dt) => { if (R) { R.pos.z -= dt * 0.8; R.root.position.copy(R.pos); R.root.visible = t < 9.2; } camSet(-1.6, 1.7, 10.4, 0, 1.4, 7.5); }, 18.0, () => { if (R) { R.dispose(); story.gg = null; } story.stage = ''; addUn('c2c'); saveCp(null); C3.done = true; c3FinishScreen(); });
+function d3CitySurv(k) {
+  D3.resc.add(k); const P = { tram: [-1.0, -12, 'Выжившая', 'Они стоят и считают… Мой муж там, среди них. Не стреляйте в него!', 'Вы'], pharm: [-8.0, -3, 'Выживший', 'Я запер ставни, когда соседи пошли по лестнице. Все разом. Как по команде.'], kiosk: [12.6, 16.6, 'Выжившая', 'Мне позвонили и сказали: «Ваш номер подошёл». Я бросила трубку.'] }[k];
+  if (k === 'pharm' && D3.city.shutter) { D3.city.shutter.position.y = 3.2; Sound.thud(0.6); }
+  const n = c3Npc(undefined, P[0], P[1], 0); n.protMsg = 'Это выживший!'; d3FaceTo(n, player.pos.x, player.pos.z); c2Say(P[3], P[2]); Sound.click(900, 0.3);
+  n.path = [[k === 'kiosk' ? 6 : -1, n.pos.z], [0.5, 20], [0, 30.5], [-1.5 + D3.surv.length * 1.2, 37.5]]; n.pathSp = 3.6; n.sv3 = true; D3.surv.push(n); toast('Выживший бежит к баррикаде. Прикройте его');
 }
+function d3CityPlay() {
+  const tr = (k, p, l) => ({ x: p[0], z: p[1], r: 2.0, label: l, when: () => !D3.found.has(k), do: () => d3CityTrace(k) });
+  const sv = (k, p, l) => ({ x: p[0], z: p[1], r: 2.0, label: l, when: () => !D3.resc.has(k), do: () => d3CitySurv(k) });
+  d3Play('d3-city', { rsp: [0, 36, 0],
+    spots: [tr('note', S3.note, S3_TR.note[0]), tr('post', S3.post, 'Снять трубку'), tr('chalk', S3.chalk, S3_TR.chalk[0]), sv('tram', S3.tram, 'Постучать в трамвай'), sv('pharm', S3.pharm, 'Поднять ставни аптеки'), sv('kiosk', S3.kiosk, 'Постучать в киоск'),
+      { npc: D3.insp, r: 2.2, label: 'Инспектор Лисова', do: () => c2Say(pick(['Бак в переулке на западе, будка на востоке, а дальше — мост.', 'В трамвае, аптеке и киоске кто-то прячется. Вытащите их, если сможете.', 'Не геройствуйте. Светите — и отходите.']), 'Инспектор') }],
+    obj: () => `Найдите следы Мелоди: ${D3.found.size}/3 (бак в переулке · телефонная будка · въезд на мост) · выжившие: ${D3.saved}/3 · пустых рядом: ${d3Threats()}`,
+    tgt: () => { let b = null, bd = 1e9; for (const [k, p] of [['note', S3.note], ['post', S3.post], ['chalk', S3.chalk]]) if (!D3.found.has(k)) { const d = Math.hypot(player.pos.x - p[0], player.pos.z - p[1]); if (d < bd) { bd = d; b = p; } } return b; },
+    upd: d3CityUpd });
+}
+function d3CityUpd(dt) {
+  for (const n of D3.surv) if (n.root && n.state === 'alive') { if (n.path && n.path.length) { walkPath(n, n.path, n.pathSp, dt); if (!n.path.length && !n.safe) { n.safe = true; D3.saved++; Sound.chime(); toast(`Выживший в безопасности: ${D3.saved}/3`); d3Save(); } } else n.speed = 0; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; }
+}
+/* ----- the barricade holds ----- */
+function d3HoldCall() {
+  c2Say('Они идут на баррикаду! Все сразу! Возвращайтесь!', 'Инспектор (рация)'); Sound.siren(0.4);
+  d3Play('d3-back', { rsp: [0, 36, 0], spots: D3.spots.filter((s) => s.do && !s.npc && String(s.label).match(/Постучать|Поднять/)), obj: () => `Баррикада зовёт на помощь! Возвращайтесь (юг) · выжившие: ${D3.saved}/3`, tgt: () => [0, 32],
+    upd: (dt) => { d3CityUpd(dt); if (player.pos.z > 28 && Math.abs(player.pos.x) < 9) d3HoldStart(); } });
+}
+function d3HoldWave(n) { for (let i = 0; i < n; i++) { const x = rand(-6, 6); d3Hollow(x, rand(-4, 6) - i * 0.6, { goal: [clamp(x + rand(-1.5, 1.5), -6.4, 6.4), S3.line - 0.6], sp: rand(1.1, 1.6), yaw: 0 }); } c2Say(pick(['Тысяча один… тысяча два…', 'Восемьсот… восемьсот один…']), 'Пустые'); }
+function d3HoldStart() {
+  for (const n of D3.hollows) if (n.state === 'alive' && n.hState !== 'calm') { n.hState = 'hunt'; n.goal = [clamp(n.pos.x, -6, 6), S3.line - 0.6]; }
+  const H = D3.H = { t: 0, hp: 100, wave: 0, gen: true, genN: 0, stall: 0 }; d3Arm('shotgun'); toast('Из багажника патрульной машины: дробовик'); d3Bar('БАРРИКАДА').style.display = 'block'; d3BarSet(1);
+  D3.onBreach = (n, dt) => { H.hp -= dt * 3; n.attackAnim = Math.max(n.attackAnim, 0.4); if (Math.random() < dt * 2) Sound.thud(0.4); };
+  d3Play('d3-hold', { rsp: [0, 36, 0],
+    spots: [{ x: S3.gen[0], z: S3.gen[1], r: 2.0, when: () => !H.gen, label: () => `Завести генератор (${H.genN}/3)`, do: () => { H.genN++; Sound.thud(0.5); Sound.click(300, 0.4); if (H.genN >= 3) { H.gen = true; H.genN = 0; Sound.rise(1.2); toast('Прожекторы снова горят'); } } }],
+    obj: () => `Держите баррикаду: ${Math.max(0, Math.round(75 - H.t))} с · целость ${Math.max(0, Math.round(H.hp))}% · пустых: ${d3Threats()}` + (H.gen ? ' · прожекторы усмиряют тех, кто в луче' : ' · ГЕНЕРАТОР ЗАГЛОХ — заведите его (справа за мешками)'),
+    tgt: () => H.gen ? null : S3.gen, onRevive: () => {},
+    upd: (dt) => {
+      d3CityUpd(dt); H.t += dt; d3BarSet(H.hp / 100);
+      if (H.wave === 0) { H.wave = 1; d3HoldWave(4); } else if (H.wave === 1 && H.t > 26) { H.wave = 2; d3HoldWave(5); } else if (H.wave === 2 && H.t > 52) { H.wave = 3; d3HoldWave(6); }
+      if (H.gen && ((H.stall === 0 && H.t > 20) || (H.stall === 1 && H.t > 48))) { H.stall++; H.gen = false; H.genN = 0; Sound.boom(); c2Say('Генератор! Прожекторы погасли!', 'Инспектор'); }
+      if (H.gen) for (const n of D3.hollows) if (n.state === 'alive' && n.hState === 'hunt' && n.pos.z > 12 && n.pos.z < S3.line + 0.2 && Math.abs(n.pos.x) < 7) { n.calmV += dt * 0.5; if (n.calmV >= 2.3) d3Pacify(n); }
+      if (H.hp <= 0) { d3Fine('БАРРИКАДА ПАЛА · ВОСКРЕШЕНИЕ'); for (const n of D3.hollows.slice()) if (n.hState !== 'calm' && n.root) { n.dispose(); D3.hollows.splice(D3.hollows.indexOf(n), 1); } Object.assign(H, { t: 0, hp: 100, wave: 0, gen: true, genN: 0, stall: 0 }); d3Put(0, 36); }
+      else if (H.t > 75 && d3Threats() === 0) d3HoldEnd();
+      else if (H.t > 105) { for (const n of D3.hollows) if (n.state === 'alive' && n.hState !== 'calm') d3Pacify(n); flashScreen('#fff0c8', 900); }
+    } });
+}
+function d3HoldEnd() {
+  D3.onBreach = null; d3Bar().style.display = 'none'; const I = D3.insp, ok = D3.saved >= 2; story.showAvatar = true; d3Put(0.4, 34.6, I.pos.x, I.pos.z); d3FaceTo(I, 0.4, 34.6); for (const a of D3.allies) a.al.hold = true;
+  const L = [
+    ['', 'Улица затихает. Те, кого коснулся свет, сидят на асфальте и считают шёпотом, как дети перед сном.', (t) => camSet(0, 5, 24, 0, 0.6, 12)],
+    ['Инспектор', D3.broken > 6 ? 'Вы многих положили. Я не осуждаю. Но списки… списки писать мне.' : 'Вы их почти не трогали. Спасибо. Здесь у каждого есть имя.', () => d3CamFace(I, 0.35, 1.0)],
+  ];
+  if (ok) L.push(['Инспектор', 'Возьмите. Протокол: показания тех, кого вы вывели. Ни один из них в жизни ничего не занимал — а за ними пришли.', () => d3CamOver(avatar, I, 0.5, 1.1), () => d3Ev('proto')]);
+  L.push(['Инспектор', 'На мосту горит свет. Один фонарь на весь город. Она пошла туда. Идите. Мы удержим.', () => d3CamFace(I, -0.3, 0.9)], ['', 'Над рекой висит туман, а в нём, на середине моста, кто-то стоит и ждёт.', (t) => camSet(0, 3, -18, 0, 2.6, -50)]);
+  d3Talk(L, (t, dt) => d3CityAmb(dt), () => { d3Save(); d3Play('d3-bridge', { rsp: [0, -20, 0], spots: [], obj: () => 'Идите на мост (север). Вас там ждут', tgt: () => [0, -40], upd: (dt) => { d3CityUpd(dt); if (player.pos.z < -38) d3Meet(); } }); });
+}
+/* ----- the bridge: the resurrector ----- */
+function d3Meet() {
+  story.showAvatar = true; story.gun = false; d3Put(0, -39, 0, -48); Music.stop(); Music.start('tender'); let R = null, rz = -58;
+  const mk = () => { R = D3.gg = story.gg = c3Npc('gagarin', 0, -58, 0); R.protMsg = 'Его это только рассмешит'; Object.assign(R, { pose: 'stand', poseDur: Infinity, ggWing: 0.28, ggHalo: 0.6, ggRage: 0, ggSlit: 0.75, ggDim: 0.45 }); };
+  const shots = { r: () => d3CamFace(R, 0.35, 1.25, 0.02), y: () => d3CamFace(avatar, -0.35, 1.0), o: () => d3CamOver(avatar, R, 0.55, 1.2), or: () => d3CamOver(R, avatar, -0.6, 1.3), w: (t) => camSet(-3.1, 1.9, -41, 0, 1.5, -45) };
+  const upd = (t, dt) => { d3CityAmb(dt); if (R && R.root) { rz = Math.min(-43.2, rz + dt * 2.2); R.pos.z = rz; R.root.position.copy(R.pos); R.root.rotation.y = 0; R.ggHalo = 0.45 + Math.sin(t * 9) * 0.2; } };
+  d3Talk([
+    ['', 'Фонари на мосту гаснут за вашей спиной — один за другим. Впереди остаётся один.', (t) => camSet(0, 2.4, -34, 0, 2.2, -50)],
+    ['', 'Из тумана выходит он. Капюшон, крылья — рваные, как старые афиши. Свет над головой мигает, будто садится батарейка.', (t) => camSet(1.6, 1.5, -41.4, 0, 1.6, -50), mk],
+    ['Воскреситель', 'Ты пришёл один. Как и она.', shots.r],
+    ['Воскреситель', 'Она искала меня. Ты тоже. Скажи, зачем?', shots.or],
+  ], upd, () => { d3Hold((t, dt) => { upd(t, dt); shots.o(); });
+    d3Choice('ВОСКРЕСИТЕЛЬ', 'Что вы ему скажете?', [['Мелоди любит тебя. Я видел её лицо.', 'love'], ['Оставь её в покое. Или я найду способ тебя остановить.', 'threat'], ['Я хочу понять, кто ты на самом деле.', 'ask']], (k) => d3MeetReply(k, R, upd, shots)); });
+}
+function d3MeetReply(k, R, upd, shots) {
+  D3.reply = k; D3.gift = { love: 'pick', threat: 'fang', ask: 'free' }[k];
+  const A = { love: [['Вы', 'Мелоди любит тебя. Я видел её лицо.'], ['Воскреситель', 'Любит? Ха. Она любит песню, которую я ей подарил. Не меня.'], ['Воскреситель', '…Так я думал. Пока она не пришла сюда и не отдала за меня единственное, что у неё было.']],
+    threat: [['Вы', 'Оставь её в покое. Или я найду способ тебя остановить.'], ['Воскреситель', 'Остановить меня? Ты даже не знаешь, с чем стоишь на мосту.'], ['Воскреситель', 'Но я ценю смелость. Из неё получаются хорошие куски. Только останавливать надо не меня.']],
+    ask: [['Вы', 'Я хочу понять, кто ты на самом деле.'], ['Воскреситель', 'Кто я? Тот, кого ты боишься вспомнить по утрам.'], ['Воскреситель', 'А если честно — должник. Самый большой должник в этом городе.']] }[k];
+  const G = { pick: ['Возьми её медиатор. Пустые помнят её песню: в очереди тебя не тронут, пока ты сам не начнёшь.', 'медиатор Мелоди · очередь в Конторе вас не трогает'], fang: ['Возьми мой клык. Раз уж пришёл драться — бей больнее.', 'клык воскресителя · урон по Счетоводу и взыскателям ×1,5'], free: ['Возьми одну смерть без записи. Последнюю бесплатную, что у меня осталась.', 'смерть без записи · первая гибель не увеличит долг'] }[D3.gift];
+  const s = (w) => w === 'Вы' ? shots.y : shots.r;
+  d3Talk([
+    ...A.map(([w, t]) => [w, t, s(w)]),
+    ['Воскреситель', 'Каждый раз, когда ты падал, я тебя поднимал. Сорок семь раз, не считая сегодняшних. Ты думал, это бесплатно?', shots.or],
+    ['Воскреситель', 'Душу нельзя вернуть из ничего. Её берут взаймы. Я брал. У того, кто считает.', shots.r],
+    ['Вы', D3.trust >= 2 ? 'Тот, кто считает в тишине. Я его слышал. Каждый раз.' : 'Счетовод.', shots.y],
+    ['Воскреситель', 'Сегодня срок. Он пришёл за всем сразу и взял у города. Каждый пустой внизу — строчка в моём счёте.', shots.w],
+    ['Вы', 'А Мелоди?', shots.y],
+    ['Воскреситель', 'Пришла час назад. Сказала: «Запишите его долг на меня». Он взял в залог её голос. И она вошла в дверь. Сама.', shots.r],
+    ['Воскреситель', 'Мне туда нельзя: должник входит в Контору один раз и остаётся. А ты не должник. Ты — то, что куплено. Товар. А товар имеет право на жалобу.', shots.or],
+    ['Воскреситель', G[0], shots.r, () => { Sound.chime(); toast('Дар: ' + G[1]); }],
+    ['Воскреситель', 'Дверь на середине моста. Он любит, когда к нему приходят сами.', shots.r, () => { D3.city.door.visible = true; Sound.thud(0.6); }],
+    ['', 'Он делает шаг назад — и туман закрывается за ним, как занавес.', (t) => camSet(0, 1.8, -42, 0, 1.6, -54), () => { R.fade = true; }],
+  ], (t, dt) => { upd(t, dt); if (R.fade && R.root) { R.pos.z -= dt * 3.4; R.root.position.copy(R.pos); if (R.pos.z < -51) R.root.visible = false; } },
+  () => { if (R.root) R.dispose(); D3.gg = story.gg = null; d3Save(); showCard('ЛОКАЦИЯ 3 · ЧАСТЬ IV', 'Дверь на мосту', 3000, true);
+    d3Play('d3-door', { rsp: [0, -40, 0], spots: [{ x: S3.door[0], z: S3.door[1], r: 2.0, label: 'Войти в «Отдел учёта душ»', do: () => d3DoorIn() }], obj: () => 'Войдите в дверь на середине моста', tgt: () => S3.door, upd: (dt) => d3CityUpd(dt) }); });
+}
+function d3DoorIn() {
+  const SC = D3.city; story.showAvatar = true; d3Put(0, -51.6, 0, -54); let op = 0;
+  d3Talk([
+    ['', 'Обычная конторская дверь посреди моста. За ней нет ни стены, ни дома — только туман. Ручка тёплая.', (t) => camSet(1.8, 1.7, -50.2, 0, 1.4, -54)],
+    ['', 'Вы открываете. Изнутри пахнет пылью, чернилами и чем-то, чему нет названия.', (t) => camSet(0.6, 1.6, -50.6, 0, 1.3, -54), () => { op = 1; SC.doorGlow.visible = true; Sound.thud(0.5); Sound.rise(2.5); }],
+  ], (t, dt) => { d3CityAmb(dt); SC.doorLeaf.rotation.y = lerp(SC.doorLeaf.rotation.y, -1.5 * op, Math.min(1, dt * 2)); }, () => { flashScreen('#d8ffb0', 1200); d3HollowsClear(); D3.allies = []; d3OfficeStart(false); });
+}
+/* ----- the final screen of location 3 ----- */
+const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
+function d3Finish() {
+  const sec = d3Sec(), E = D3_END[D3.ending || ''], t = D3.trust;
+  const rows = [['Локация 3 · время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Концовка', E[1]], ['Долг (воскрешений)', String(D3.debt)], ['Пустые: усмирено', String(D3.calm)], ['Пустые: разбито вами', String(D3.broken)], ['Выжившие спасены', D3.saved + ' / 3'], ['Доводы против Счетовода', D3.ev.size + ' / 8'], ['Печати', D3.stamps.size + ' / 3'], ['Дар воскресителя', D3.gift === 'pick' ? 'медиатор Мелоди' : D3.gift === 'fang' ? 'клык' : D3.gift === 'free' ? 'смерть без записи' : '—'], ['Мелоди на крыше', t >= 2 ? '♥♥' : t >= 1 ? '♥' : t <= -1 ? '💔' : '—']];
+  addUn('c2a'); addUn('c2b'); addUn('c2c'); if (D3.ending) addUn('d3' + D3.ending); saveCp(null); try { localStorage.removeItem('myasorubka-d3'); } catch (e) {}
+  fadeIn(); $('cut').hidden = true; $('cut').classList.remove('on', 'ghost'); $('credits').hidden = true; storyReset(); mode = 'story'; lastCh = 2; Music.stop(); Sound.droneLoop(0);
+  document.body.classList.remove('playing'); state = 'over';
+  document.querySelector('#over .eyebrow').textContent = 'Глава 2 · Локация 3 · Долг'; $('overTitle').textContent = E[0];
+  $('overStats').innerHTML = rows.map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join(''); $('againBtn').innerHTML = 'Ещё раз<small>Глава 2 сначала</small>';
+  $('over').hidden = false; $('hud').hidden = true; $('touch').hidden = true;
+}
+function d3OfficeStart() { d3BossStart(); }
+function d3BossStart() { D3.done = true; d3Finish(); }
+function d3ShieldHit(npc, h) { sparks(h.point, 6, UP, 3); }
+function buildOffice3() { floorMesh(std({ color: 0x333333 }), HX * 2, HZ * 2); }
+function buildLedger3() { floorMesh(std({ color: 0x333333 }), HX * 2, HZ * 2); }
+function d3Adm() { return []; }
 function c3FinishScreen() {
   const sec = Math.round((performance.now() - (C3.t0 || performance.now())) / 1000), sym = C2.sym || 0;
   const rows = [...(C3.l1rows || []), ['Клуб · время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Хайп на сцене', Math.round(C3.hype * 100) + '%'], ['Заряды обезврежены', C3.defused + ' / 4'], ['Стас Громов', C3.fate === 'mad' ? 'выброшен в зал драконом' : C3.fate === 'soul' ? 'без души' : 'арестован'], ['Симпатия Мелоди', sym >= 2 ? '♥♥' : sym >= 1 ? '♥' : sym <= -1 ? '💔' : '—'], ['Смертей', '0 — воскреситель не умирает']];
@@ -10898,7 +11480,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { startStreet3, startLoc3, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
