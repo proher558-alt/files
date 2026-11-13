@@ -1153,6 +1153,8 @@ const MAPS = {
   street3: { name: 'Набережная', desc: '', story: true, hx: 26, hz: 62, h: 40, backdrop: 'eclipse', spawn: [0, 40, 0], fog: 0x100e1a, fogD: 0.013, bg: 0x100e1a, sun: 0.1, hemi: 0.6, lamp: [0xffd8a0, 30, 20], lamps: [[0, 6, 31], [-10, 5, 10], [9, 5, -6], [0, 5, -24]], red: [[0, 2.2, 30], 0x3a6aff, 5], build: buildStreet3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   office3: { name: 'Контора Счетовода', desc: '', story: true, hx: 26, hz: 40, h: 6, spawn: [0, 37, 0], fog: 0x0c100c, fogD: 0.016, bg: 0x060806, sun: 0.1, hemi: 0.62, lamp: [0xd8f0c0, 34, 24], lamps: [[0, 5.4, 26], [0, 5.4, 6], [-20, 5.2, 0], [20, 5.2, 0]], red: [[0, 4.6, -30], 0x60ff80, 4], build: buildOffice3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   ledger3: { name: 'Кабинет Счетовода', desc: '', story: true, hx: 18, hz: 22, h: 16, spawn: [0, 18, 0], fog: 0x08060a, fogD: 0.012, bg: 0x040305, sun: 0.1, hemi: 0.6, lamp: [0xffe0a8, 44, 30], lamps: [[-9, 9, -6], [9, 9, -6], [-9, 9, 10], [9, 9, 10]], red: [[0, 6, -18], 0xff3020, 5], build: buildLedger3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  yard3: { name: 'Двор', desc: '', story: true, hx: 12, hz: 14, h: 40, backdrop: 'dawn', spawn: [-5, -9, 0], fog: 0xe8b898, fogD: 0.009, bg: 0xe8b898, sun: 1.2, hemi: 0.95, lamp: [0xffd8b0, 30, 18], lamps: [[-5, 4, -8], [5, 4, -8], [-5, 4, 6], [5, 4, 6]], red: [[0, 4, 0], 0xff6a40, 0], build: buildYard3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  flat3: { name: 'Квартира', desc: '', story: true, hx: 5, hz: 14, h: 3.1, spawn: [0, 11, Math.PI], fog: 0x140c0a, fogD: 0.03, bg: 0x0a0605, sun: 0.1, hemi: 0.5, lamp: [0xffd0a0, 8, 12], lamps: [[0, 2.7, 4], [0, 2.7, 10], [0, 2.7, -3], [3.4, 2.4, -10.6]], red: [[-1.4, 2.5, 8], 0xff3020, 3], build: buildFlat3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   ww2: { name: 'Поле боя 1941', desc: '', story: true, hx: 30, hz: 36, h: 30, spawn: [0, 32, 0], fog: 0x9a5c34, fogD: 0.018, bg: 0xb4683a, sun: 1.0, hemi: 0.9, lamp: [0xffb070, 34, 24], lamps: [[0, 2.8, -14], [-12, 3, 3], [14, 4, 10], [0, 5, 20]], red: [[0, 2.6, -12], 0xff7a30, 4], build: buildWW2, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   street: { name: 'Улица', desc: '', story: true, hx: 14, hz: 34, h: 30, backdrop: 'dusk', spawn: [0, 28, 0], fog: 0x6a4a58, fogD: 0.006, bg: 0x2a1c26, sun: 1.3, hemi: 0.75, lamp: [0xffd29a, 20, 18], lamps: [[-6, 5, -15], [6, 5, -15], [-6, 5, 15], [6, 5, 15]], red: [[0, 3, -30], 0xff2412, 0], build: buildStreet, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   police: { name: 'Участок полиции', desc: '', story: true, hx: 12, hz: 9, h: 3.4, spawn: [0, 7, 0], fog: 0x0b0d10, fogD: 0.03, bg: 0x070809, sun: 0.5, hemi: 0.55, lamp: [0xe8f2ff, 18, 14], lamps: [[-6, 3.1, -4], [6, 3.1, -4], [-6, 3.1, 4], [6, 3.1, 4]], red: [[11.8, 2.6, 0], 0x2a6aff, 4], build: buildPolice, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
@@ -2826,6 +2828,7 @@ function applyLookKind(L, k) {
   else if (k === 'clerk') { L.female = false; L.skin = 0xd9d5cc; L.shirt = 0x4a4c52; L.pants = 0x3a3c42; L.sleeves = 'long'; L.tie = 0x101012; L.hair = null; L.hairStyle = null; L.cap = false; L.helmet = false; L.eyes = hollowEyes(); L.prop = { height: 1.06, build: 0.8, head: 0.95 }; }
   else if (k === 'collector') { L.female = false; L.skin = 0xb8b4ae; L.shirt = 0x2a1c1c; L.pants = 0x18181c; L.sleeves = 'long'; L.hair = null; L.hairStyle = null; L.cap = false; L.helmet = false; L.eyes = hollowEyes(); L.prop = { height: 1.28, build: 1.55, arms: 1.15, head: 0.9, hands: 1.4 }; }
   else if (k === 'ledger') { L.female = false; L.skin = 0xe6e2d8; L.shirt = 0x0e0e12; L.pants = 0x0e0e12; L.sleeves = 'long'; L.tie = 0x8a1020; L.hair = null; L.hairStyle = null; L.cap = false; L.helmet = false; L.eyes = hollowEyes(); L.prop = { height: 1.62, build: 0.7, arms: 1.4, legs: 1.2, head: 0.86, hands: 1.3 }; }
+  else if (k === 'sirius') { L.female = false; L.skin = 0xe6a070; L.skinTex = TEX.skin; L.shirt = 0xb42050; L.pants = 0xe8e4ee; L.sleeves = 'long'; L.hair = null; L.hairStyle = null; L.cap = false; L.helmet = false; L.prop = { build: 0.92, head: 1.08 }; L.sirius = true; }
   else if (k === 'baby') { L.shirt = 0xa8d0f0; L.pants = 0xa8d0f0; L.sleeves = 'long'; L.hair = null; L.female = false; }
 }
 
@@ -2878,6 +2881,7 @@ class Humanoid {
     if (L.melodie) addMelodieExtras(this);
     if (L.hitler) addHitlerExtras(this);
     if (L.huggy) addHuggyExtras(this);
+    if (L.sirius) addSiriusExtras(this);
     if (L.mark) addMarkExtras(this);
     if (L.gagarin) addGagarin(this); else if (!L.plastic && !L.svity) { this.mouthOpen = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.03, 0.01), mouthDarkMat); this.mouthOpen.position.set(0, -0.06, 0.103); this.mouthOpen.scale.y = 0.001; head.add(this.mouthOpen); }
     bodyExtras(this, L);
@@ -4282,6 +4286,7 @@ function playerFoot(dt) {
 }
 function hitPart(npc, P, h, dir, dmg, w) {
   if (WW.boss && npc === WW.boss && (WW.shield || !WW.provoked)) { WW.provoked = true; sparks(h.point, 8, hitNormal(h), 4); if (!WW.shT2 || performance.now() - WW.shT2 > 2500) { WW.shT2 = performance.now(); toast('Босс неуязвим: сначала перебейте охрану'); } return; }
+  if (npc.d3Mel) { d3MelHit(npc, P, h, dir, dmg, w); return; }
   // Melodie dodges every bullet: she sidesteps across the shot and takes no damage
   if (npc.alive && npc.look && npc.look.melodie) { melDodge(npc, dir); return; }
   if (npc.gg && !npc.protect) { gagHit(npc, P, h, dir, w); return; }
@@ -5747,7 +5752,7 @@ function startStory(cp = null) {
   if (CP_FN[cp]) { cpRestore(cp); CP_FN[cp](); renderNotes(); return; }
   saveCp(null); cutIntro();
 }
-const CP_NAME = { d3: 'главу 2 · рассвет на крыше', d3b: 'главу 2 · затмение', d3c: 'главу 2 · проспект', d3d: 'главу 2 · набережную', d3e: 'главу 2 · Контору', d3f: 'главу 2 · Счетовода', c2b: 'главу 2 из подвала', c3: 'главу 2 · клуб «Громкая ночь»', c3b: 'главу 2 · за кулисами', c3c: 'главу 2 · поиск зарядов', cafe: 'с кафе «Полночь»', police: 'с участка полиции', port: 'с порта', studio: 'со студии', gala: 'с ужина принцессы' };
+const CP_NAME = { d3g: 'главу 2 · расплату Мелоди', d3: 'главу 2 · рассвет на крыше', d3b: 'главу 2 · затмение', d3c: 'главу 2 · проспект', d3d: 'главу 2 · набережную', d3e: 'главу 2 · Контору', d3f: 'главу 2 · Счетовода', c2b: 'главу 2 из подвала', c3: 'главу 2 · клуб «Громкая ночь»', c3b: 'главу 2 · за кулисами', c3c: 'главу 2 · поиск зарядов', cafe: 'с кафе «Полночь»', police: 'с участка полиции', port: 'с порта', studio: 'со студии', gala: 'с ужина принцессы' };
 function saveCp(cp) { cpStore(cp); try { if (cp) localStorage.setItem('myasorubka-story', cp); else localStorage.removeItem('myasorubka-story'); } catch (e) {} syncCont(); }
 function loadCp() { try { return localStorage.getItem('myasorubka-story'); } catch (e) { return null; } }
 function syncCont() { const cp = loadCp(); $('contStory').hidden = !CP_NAME[cp]; if ($('contStory').firstChild) $('contStory').firstChild.textContent = (cp === 'c2b' || (cp || '').startsWith('c3') || (cp || '').startsWith('d3')) ? 'Продолжить главу 2' : 'Продолжить главу 1'; if (CP_NAME[cp]) $('contWhere').textContent = 'Продолжить ' + CP_NAME[cp]; }
@@ -10169,7 +10174,7 @@ function d3Sec() { return Math.round((performance.now() - (D3.t0 || performance.
 function d3Save() { try { localStorage.setItem('myasorubka-d3', JSON.stringify({ debt: D3.debt, broken: D3.broken, brokenAlly: D3.brokenAlly, calm: D3.calm, saved: D3.saved, ev: [...D3.ev], extra: [...D3.extra], stamps: [...D3.stamps], choice: D3.choice, reply: D3.reply, gift: D3.gift, freeUsed: D3.freeUsed, trust: D3.trust, sec: d3Sec(), car: D3.carHits || 0 })); } catch (e) {} }
 function d3Load() { try { return JSON.parse(localStorage.getItem('myasorubka-d3') || 'null'); } catch (e) { return null; } }
 function d3Reset() {
-  Object.assign(D3, { on: true, debt: 0, broken: 0, brokenAlly: 0, calm: 0, saved: 0, hollows: [], allies: [], ev: new Set(), items: new Set(), extra: new Set(), stamps: new Set(), rsp: [0, 0, 0], t0: performance.now(), spots: [], allow: ['fists'], trust: 0, choice: null, reply: null, gift: null, freeUsed: false, lamp: false, mel: null, gg: null, insp: null, boss: null, wasDead: false, upd: null, obj: () => '', tgt: () => null, onRevive: null, onBreach: null, cntT: 6, shot: '', cam: null, carHits: 0, ending: '', done: false, form: false, tube: false, ticket: false, surv: [], cops: [], drive: null, B: null, O: null });
+  Object.assign(D3, { on: true, debt: 0, broken: 0, brokenAlly: 0, calm: 0, saved: 0, hollows: [], allies: [], ev: new Set(), items: new Set(), extra: new Set(), stamps: new Set(), rsp: [0, 0, 0], t0: performance.now(), spots: [], allow: ['fists'], trust: 0, choice: null, reply: null, gift: null, freeUsed: false, lamp: false, mel: null, gg: null, insp: null, boss: null, wasDead: false, upd: null, obj: () => '', tgt: () => null, onRevive: null, onBreach: null, cntT: 6, shot: '', cam: null, carHits: 0, ending: '', done: false, noDebt: false, sirius: false, form: false, tube: false, ticket: false, surv: [], cops: [], drive: null, B: null, O: null });
 }
 function d3Off() {
   D3.on = false; const h = document.getElementById('d3hud'); if (h) h.style.display = 'none'; const b = document.getElementById('d3bar'); if (b) b.style.display = 'none'; const dr = document.getElementById('d3drv'); if (dr) dr.style.display = 'none';
@@ -10297,14 +10302,14 @@ function d3AllyUpd(dt) {
 }
 /* ----- death is a loan ----- */
 function d3Death() {
-  if (player.dead && !D3.wasDead) { D3.wasDead = true; D3.freeNow = false; if (D3.gift === 'free' && !D3.freeUsed) { D3.freeUsed = true; D3.freeNow = true; } else D3.debt++; d3Save(); }
+  if (player.dead && !D3.wasDead) { D3.wasDead = true; D3.freeNow = false; if (D3.gift === 'free' && !D3.freeUsed) { D3.freeUsed = true; D3.freeNow = true; } else if (!D3.noDebt) D3.debt++; d3Save(); }
   else if (!player.dead && D3.wasDead) { D3.wasDead = false; d3Revive(); }
 }
 function d3Revive() {
   const r = D3.rsp; player.pos.set(r[0], r[3] || 0, r[1]); player.yaw = r[2] || 0; player.vel.set(0, 0, 0); if (avatar) avatar.pos.copy(player.pos);
   flashScreen('#fff', 900); Sound.ghostVoice(1.6); Sound.heal && Sound.heal();
-  showCard(D3.freeNow ? 'ВОСКРЕШЕНИЕ · БЕЗ ЗАПИСИ' : 'ВОСКРЕШЕНИЕ', D3.freeNow ? 'Дар воскресителя: эта смерть не в счёт' : `Долг: ${D3.debt}`, 2600, true);
-  c2Say(D3.freeNow ? 'Эта — за мой счёт. Больше таких нет.' : pick(D3_REVIVE), 'Воскреситель');
+  showCard(D3.noDebt ? 'ВЫ ОЧНУЛИСЬ' : D3.freeNow ? 'ВОСКРЕШЕНИЕ · БЕЗ ЗАПИСИ' : 'ВОСКРЕШЕНИЕ', D3.noDebt ? 'Долгов больше нет' : D3.freeNow ? 'Дар воскресителя: эта смерть не в счёт' : `Долг: ${D3.debt}`, 2600, true);
+  if (!D3.noDebt) c2Say(D3.freeNow ? 'Эта — за мой счёт. Больше таких нет.' : pick(D3_REVIVE), 'Воскреситель');
   for (const n of D3.hollows) if (n.state === 'alive' && Math.hypot(n.pos.x - r[0], n.pos.z - r[1]) < 6) n.stun = 3.5;
   d3Chip(); if (D3.onRevive) D3.onRevive();
 }
@@ -10341,7 +10346,7 @@ function d3Start(cp = null) {
   if (sv) { Object.assign(D3, { debt: sv.debt || 0, broken: sv.broken || 0, brokenAlly: sv.brokenAlly || 0, calm: sv.calm || 0, saved: sv.saved || 0, ev: new Set(sv.ev || []), extra: new Set(sv.extra || []), stamps: new Set(sv.stamps || []), choice: sv.choice || 'go', reply: sv.reply || null, gift: sv.gift || null, freeUsed: !!sv.freeUsed, trust: sv.trust || 0, carHits: sv.car || 0 }); D3.t0 = performance.now() - (sv.sec || 0) * 1000; }
   fadeIn(); $('black').style.opacity = ''; $('cine').classList.remove('on'); d3RoofLook(0, true);
   if (cp && cp !== 'd3') { D3.lamp = true; FL.light.color.setHex(0xffd27a); if (!D3.choice) D3.choice = 'go'; }
-  if (cp === 'd3b') d3Eclipse(true); else if (cp === 'd3c') d3DriveStart(); else if (cp === 'd3d') d3CityStart(true); else if (cp === 'd3e') d3OfficeStart(true); else if (cp === 'd3f') d3BossStart(true);
+  if (cp === 'd3b') d3Eclipse(true); else if (cp === 'd3c') d3DriveStart(); else if (cp === 'd3d') d3CityStart(true); else if (cp === 'd3e') d3OfficeStart(true); else if (cp === 'd3f') d3BossStart(true); else if (cp === 'd3g') d3MelStart();
   else { saveCp('d3'); d3RoofStart(); }
 }
 function d3Map(id) { d3HollowsClear(); D3.allies = []; D3.onBreach = null; storyMap(id); }
@@ -10352,7 +10357,7 @@ function buildRoof3() {
   Object.assign(LV, { walls: false, ceil: false, elev: 60, wind: 0.22 }); sun.position.set(-4, 7.5, -20);
   const BB = batcher(), C = (c, r = 0.85, m = 0) => std({ color: c, roughness: r, metalness: m }), con = C(0x7a746c), con2 = C(0x8c857c), steel = C(0x55585e, 0.4, 0.6), rust = C(0x7a4226, 0.75, 0.2), wood = std({ map: TEX.wood, roughness: 0.8 }), dark = C(0x26262a, 0.6), glow = (c) => new THREE.MeshBasicMaterial({ color: c });
   const blk = (m, x, y, z, sx, sy, sz, ry = 0) => { BB.box(m, x, y, z, sx, sy, sz, ry); solid(x, y, z, sx, sy, sz); };
-  floorMesh(std({ map: texRep(TEX.asphalt, 10, 11), color: 0x6c6862, roughness: 0.92 }), HX * 2, HZ * 2);
+  floorMesh(std({ map: texRep(TEX.asphalt, 10, 11), color: 0xa09b92, roughness: 0.92 }), HX * 2, HZ * 2);
   { const slab = new THREE.Mesh(new THREE.BoxGeometry(HX * 2 + 0.8, 0.8, HZ * 2 + 0.8), con); slab.position.y = -0.41; addMesh(slab); }
   // parapet with a rail on top, a gap for the fire escape on the west side
   const PH = 1.15, rail = (x, z, sx, sz) => { blk(con2, x, PH / 2, z, sx, PH, sz); BB.box(steel, x, PH + 0.32, z, Math.max(0.05, sx - 0.5), 0.05, Math.max(0.05, sz - 0.5)); solid(x, PH + 0.3, z, sx, 0.9, sz); };
@@ -10398,7 +10403,7 @@ function buildRoof3() {
   BB.cyl(steel, 10, 3.6, -3, 0.05, 0.07, 7.2, 8); for (const y of [4.5, 5.6, 6.4]) BB.box(steel, 10, y, -3, 1.4 - (y - 4.5) * 0.3, 0.03, 0.03); solid(10, 1, -3, 0.3, 2, 0.3);
   for (const [x, z, r] of [[-17.4, 15, 0.6], [17.4, 16, 2.5]]) { BB.geo(C(0xd8d8dc, 0.4, 0.3), new THREE.SphereGeometry(0.55, 14, 8, 0, 6.28, 0, 1.0).rotateX(-1.2).rotateY(r).translate(x, 1.7, z)); BB.cyl(steel, x, 0.85, z, 0.04, 0.04, 1.7, 6); }
   for (const [x, z, r] of [[-4, 6, 1.2], [5, -3, 0.9], [11, 8, 0.7], [-10, 14, 1.1], [3, 15, 0.6]]) puddle(x, z, r);
-  decoPlane(cvTex(256, 128, (g) => { g.font = '900 44px Arial'; g.fillStyle = 'rgba(255,90,180,0.85)'; g.fillText('ОН ТАКОЙ', 8, 50); g.fillStyle = 'rgba(154,240,255,0.85)'; g.fillText('ЗАГАДОЧНЫЙ', 8, 104); }), 3.0, 1.5, 2.21, 1.4, HZ - 1.8, Math.PI / 2);
+  decoPlane(cvTex(256, 128, (g) => { g.font = '900 44px Arial'; g.fillStyle = 'rgba(255,90,180,0.85)'; g.fillText('ПЕСНЯ ДЛЯ', 8, 50); g.fillStyle = 'rgba(154,240,255,0.85)'; g.fillText('ВОСКРЕСИТЕЛЯ', 8, 104); }), 3.0, 1.5, 2.21, 1.4, HZ - 1.8, Math.PI / 2);
   BB.flush();
 }
 function d3RoofAmb(dt) {
@@ -10441,7 +10446,7 @@ function d3RoofStart() {
 const R3_ITEMS = {
   photo: ['Фото под башней', [['', 'Фотография, приколотая к опоре башни. Трое на сцене: Марк с басом, Стас в сером костюме, а посередине Мелоди — смеётся.'], ['Мелоди', 'Первый концерт. Тогда я думала, что они — моя семья.'], ['Вы', 'Теперь оба за решёткой.']], () => camSet(-10.4, 1.5, -10.4, -11.5, 1.35, -11.5)],
   pick: ['Медиатор на усилителе', [['', 'Медиатор на усилителе. Сточен с левой стороны — так его стачивает левша.'], ['Мелоди', 'Это Марка. Я не выбросила. Наверное, чтобы помнить, чем кончается любовь, которая хочет владеть.']], () => camSet(3.9, 1.5, -12.4, 2.7, 0.95, -13.9)],
-  letter: ['Письмо в ржавом баке', [['', 'В ржавом баке — конверт без марки. Адресат: «Тому, кто в капюшоне».'], ['Вы', '«Ты не просил меня петь о тебе. Ты вообще ни о чём не просил. Поэтому я и пою».'], ['Мелоди', 'Я писала их каждую ночь. Это — последнее. Отправлять всё равно некуда.']], () => camSet(13.6, 1.7, 2.2, 15.2, 0.9, 3.8)],
+  letter: ['Письмо в ржавом баке', [['', 'В ржавом баке — конверт без марки. Адресат: «Воскресителю».'], ['Вы', '«Ты не просил меня петь о тебе. Ты вообще ни о чём не просил. Поэтому я и пою».'], ['Мелоди', 'Я писала их каждую ночь. Это — последнее. Отправлять всё равно некуда.']], () => camSet(13.6, 1.7, 2.2, 15.2, 0.9, 3.8)],
 };
 function d3RoofItem(k) {
   const I = R3_ITEMS[k]; D3.items.add(k); Sound.chime(); const M = D3.mel;
@@ -10812,7 +10817,7 @@ function d3Meet() {
 }
 function d3MeetReply(k, R, upd, shots) {
   D3.reply = k; D3.gift = { love: 'pick', threat: 'fang', ask: 'free' }[k];
-  const A = { love: [['Вы', 'Мелоди любит тебя. Я видел её лицо.'], ['Воскреситель', 'Любит? Ха. Она любит песню, которую я ей подарил. Не меня.'], ['Воскреситель', '…Так я думал. Пока она не пришла сюда и не отдала за меня единственное, что у неё было.']],
+  const A = { love: [['Вы', 'Мелоди любит тебя. Я видел её лицо.'], ['Воскреситель', 'Любит. Только меня — и всегда только меня. Она пела обо мне каждую ночь, о ком бы ни была песня.'], ['Воскреситель', 'В этом вся беда. Вчера она пришла сюда и отдала за меня единственное, что у неё было.']],
     threat: [['Вы', 'Оставь её в покое. Или я найду способ тебя остановить.'], ['Воскреситель', 'Остановить меня? Ты даже не знаешь, с чем стоишь на мосту.'], ['Воскреситель', 'Но я ценю смелость. Из неё получаются хорошие куски. Только останавливать надо не меня.']],
     ask: [['Вы', 'Я хочу понять, кто ты на самом деле.'], ['Воскреситель', 'Кто я? Тот, кого ты боишься вспомнить по утрам.'], ['Воскреситель', 'А если честно — должник. Самый большой должник в этом городе.']] }[k];
   const G = { pick: ['Возьми её медиатор. Пустые помнят её песню: в очереди тебя не тронут, пока ты сам не начнёшь.', 'медиатор Мелоди · очередь в Конторе вас не трогает'], fang: ['Возьми мой клык. Раз уж пришёл драться — бей больнее.', 'клык воскресителя · урон по Счетоводу и взыскателям ×1,5'], free: ['Возьми одну смерть без записи. Последнюю бесплатную, что у меня осталась.', 'смерть без записи · первая гибель не увеличит долг'] }[D3.gift];
@@ -11156,17 +11161,288 @@ function d3Epilogue() {
     ['', lost ? `Не все. ${lost} ${lost % 10 === 1 && lost % 100 !== 11 ? 'окно так и осталось тёмным' : 'окон так и остались тёмными'}: разбитую оболочку душе занять нельзя.` : 'Все до одного. Ни одно окно не осталось тёмным.', 'city'],
   ];
   if (D3.saved >= 2) L.push(['Инспектор', 'Это Лисова. Они встают. Все, кого вы усмирили, — встают и спрашивают, который час. Что вы там сделали?', 'you'], ['Вы', 'Подал жалобу.', 'you']);
-  if (k === 'pay') L.push(['', 'На диване лежит свёрток: чёрный капюшон и оранжевые штаны в клетку. Сверху записка углём: «Первый взнос — сегодня ночью».', 'wide'], ['', 'С соседней крыши кто-то поёт. Вы узнаёте голос. Она не знает, кто теперь за неё платит, — и не узнает.', 'back']);
-  else if (k === 'burn') L.push(['', 'Фонаря больше нет. Воскресителя — тоже. Следующая ваша смерть будет настоящей. Удивительно, как сразу хочется жить аккуратнее.', 'wide'], ['', 'С соседней крыши кто-то поёт про человека в капюшоне. Она помнит песню, но уже не может вспомнить его лица.', 'back']);
-  else L.push(['', 'Фонарь на парапете гаснет сам: тот, кто потерялся, нашёлся. На перилах сидит голубь без кольца.', 'wide'], ['Воскреситель', 'Впервые за одиннадцать тысяч лет я никому не должен. Не привыкай: возвращать тебя я буду и дальше. Бесплатно.', 'back', () => Sound.ghostVoice(3)], ['', 'С соседней крыши кто-то поёт — громко, во весь голос. Вы не идёте туда. Некоторые песни надо слушать издалека.', 'sky']);
-  L.push(['Вы', k === 'pay' ? 'Сто душ за ночь. Что ж. Работа есть работа.' : k === 'burn' ? 'Одна жизнь. Как у всех. Попробуем.' : 'Счёт закрыт.', 'you']);
-  d3Talk(L, (t, dt) => d3RoofAmb(dt), () => { showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 ПРОЙДЕНА', D3_END[k][0], 5200); story.stage = 'd3-cut'; runCut([[0.1, () => subOff()]], (t, dt) => { d3RoofAmb(dt); d3RoofCam('sky', t + 6); }, 5.4, () => { D3.done = true; d3Finish(); }); });
+  if (k === 'pay') L.push(['', 'На диване лежит свёрток: чёрный капюшон и оранжевые штаны в клетку. Сверху записка углём: «Первый взнос — сегодня ночью».', 'wide'], ['', 'С соседней крыши кто-то поёт. Вы узнаёте голос — и слова: песня только о воскресителе. Она не знает, кто теперь за неё платит.', 'back']);
+  else if (k === 'burn') L.push(['', 'Фонаря больше нет. Воскресителя — тоже. Следующая ваша смерть будет настоящей. Удивительно, как сразу хочется жить аккуратнее.', 'wide'], ['', 'Внизу хлопает дверь. По лестнице кто-то бежит вверх — и всхлипывает на бегу.', 'door']);
+  else L.push(['', 'Фонарь на парапете гаснет сам: тот, кто потерялся, нашёлся. На перилах сидит голубь без кольца.', 'wide'], ['Воскреситель', 'Впервые за одиннадцать тысяч лет я никому не должен. Не привыкай: возвращать тебя я буду и дальше. Бесплатно.', 'back', () => Sound.ghostVoice(3)], ['', 'С соседней крыши кто-то поёт — громко, во весь голос, и только о нём. Вы не идёте туда. Некоторые песни надо слушать издалека.', 'sky']);
+  L.push(['Вы', k === 'pay' ? 'Сто душ за ночь. Что ж. Работа есть работа.' : k === 'burn' ? 'Одна жизнь. Как у всех. Попробуем… Стоп. Кто это бежит?' : 'Счёт закрыт.', 'you']);
+  d3Talk(L, (t, dt) => d3RoofAmb(dt), () => { if (k === 'burn') { showCard('ЧАСТЬ VIII', 'Расплата Мелоди', 3000, true); later(1.6, () => d3MelStart()); return; } showCard('ГЛАВА 2 · ЛОКАЦИЯ 3 ПРОЙДЕНА', D3_END[k][0], 5200); story.stage = 'd3-cut'; runCut([[0.1, () => subOff()]], (t, dt) => { d3RoofAmb(dt); d3RoofCam('sky', t + 6); }, 5.4, () => { D3.done = true; d3Finish(); }); });
+}
+/* ===================== Sirius (the resurrector as he was), the back yard and the flat ===================== */
+function addSiriusExtras(n) {
+  const H = n.parts.head.mesh, T = n.parts.torso.mesh, gold = std({ color: 0xf2b81c, roughness: 0.35 }), dk = std({ color: 0x15090a, roughness: 0.5 }), white = std({ color: 0xeeeaf4, roughness: 0.6 });
+  const cap = new THREE.Mesh(GEO.helmet, gold); cap.scale.set(1.14, 1.12, 1.16); cap.position.y = 0.02; cap.castShadow = true; H.add(cap);
+  for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2, c = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.17, 5), gold), r = i % 3 === 0 ? 0.05 : 0.1; c.position.set(Math.sin(a) * r, 0.12 + (i % 3 === 0 ? 0.05 : 0), Math.cos(a) * r); c.rotation.set(Math.cos(a) * 0.55, 0, -Math.sin(a) * 0.55); H.add(c); }
+  for (const s of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.075, 0.045), dk); p.position.set(0.04 * s, 0.018, 0.113); H.add(p); const r = new THREE.Mesh(new THREE.CircleGeometry(0.011, 10), new THREE.MeshBasicMaterial({ color: 0xff2a2a })); r.position.set(0.04 * s, 0.018, 0.114); H.add(r); }
+  const tex = cvTex(128, 256, (g) => { g.fillStyle = '#1c2a78'; g.fillRect(0, 0, 128, 256); const gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(60,110,255,.25)'); gr.addColorStop(1, 'rgba(0,0,0,.4)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 256); for (let i = 0; i < 26; i++) { const x = Math.random() * 128, y = Math.random() * 256, s = 3 + Math.random() * 7; g.fillStyle = '#7ad8ff'; g.beginPath(); g.moveTo(x, y - s); g.lineTo(x + s * 0.3, y - s * 0.3); g.lineTo(x + s, y); g.lineTo(x + s * 0.3, y + s * 0.3); g.lineTo(x, y + s); g.lineTo(x - s * 0.3, y + s * 0.3); g.lineTo(x - s, y); g.lineTo(x - s * 0.3, y - s * 0.3); g.fill(); } });
+  const cape = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.7, 0.025), std({ map: tex, roughness: 0.8 })); cape.position.set(0, -0.13, -0.13); cape.rotation.x = 0.1; T.add(cape);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.018, 6, 16), goldMat); ring.rotation.x = Math.PI / 2; ring.position.set(0, 0.235, 0.01); T.add(ring);
+  for (const s of ['L', 'R']) { const h = n.parts['lArm' + s].hand; if (h) h.material = white; }
+}
+function buildYard3() {
+  Object.assign(LV, { walls: false, ceil: false });
+  const BB = batcher(), C = (c, r = 0.85, m = 0) => std({ color: c, roughness: r, metalness: m }), steel = C(0x55585e, 0.4, 0.6), rust = C(0x7a4226, 0.75, 0.2), brick = C(0x8a4a3a, 0.9), dark = C(0x1c1e24, 0.7);
+  const blk = (m, x, y, z, sx, sy, sz) => { BB.box(m, x, y, z, sx, sy, sz); solid(x, y, z, sx, sy, sz); };
+  floorMesh(std({ map: texRep(TEX.asphalt, 6, 7), color: 0xa09c8a, roughness: 0.95 }), HX * 2, HZ * 2); floorMesh(std({ color: 0x6a8440, roughness: 1 }), 14, 11, 4, 3, 0.012);
+  blk(brick, 0, 6, -HZ + 0.3, HX * 2, 12, 0.6);
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) BB.box(Math.random() < 0.25 ? new THREE.MeshBasicMaterial({ color: 0xffd890 }) : dark, -9.5 + c * 3.8, 5.6 + r * 2.7, -HZ + 0.62, 1.1, 1.5, 0.04);
+  for (let i = 0; i < 16; i++) { const x = -5 + i * 0.66, y = 0.24 * (i + 1); BB.box(rust, x, y, -12.5, 0.62, 0.07, 0.95); BB.box(rust, x, y * 0.5, -12.0, 0.05, y, 0.05); }
+  for (const z of [-12.0, -13.0]) BB.box(steel, 0.3, 2.3, z, 11, 0.05, 0.05, 0, 0, 0.35); BB.box(rust, 6.8, 3.84, -12.5, 2.6, 0.08, 1.2); for (const x of [5.6, 8.0]) BB.box(steel, x, 4.4, -12.0, 0.05, 1.2, 0.05);
+  BB.box(steel, 8.2, 6.5, -13.1, 0.05, 5.5, 0.05); BB.box(steel, 8.6, 6.5, -13.1, 0.05, 5.5, 0.05); for (let y = 4.2; y < 9; y += 0.4) BB.box(steel, 8.4, y, -13.1, 0.4, 0.04, 0.04);
+  for (const x of [-11.8, 11.8]) blk(C(0x5a5a56, 0.9), x, 0.9, 0, 0.4, 1.8, HZ * 2); blk(C(0x5a5a56, 0.9), 0, 0.9, HZ - 0.3, HX * 2, 1.8, 0.4);
+  blk(C(0x2a5a3a, 0.5), 8, 0.6, 6, 2.2, 1.2, 1.1); blk(C(0x2a5a3a, 0.5), 10.4, 0.6, 6, 1.4, 1.2, 1.1); BB.cyl(C(0x5a3a2a), -8, 1.4, 5, 0.25, 0.3, 2.8, 8); BB.geo(C(0x3a6a3a, 0.9), new THREE.SphereGeometry(1.7, 10, 8).translate(-8, 3.6, 5));
+  blk(C(0x6a4a2a, 0.8), -9, 0.4, 9, 2.0, 0.8, 0.6);
+  for (const [x, z, r] of [[-3, -6, 1.2], [2, -2, 0.9], [6, 2, 1.1]]) puddle(x, z, r);
+  BB.flush();
+  const g = new THREE.Group(), soil = std({ color: 0x4e3826, roughness: 1 }); const m1 = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2.0, 0.22, 14), soil); m1.position.y = 0.11; g.add(m1); const m2 = new THREE.Mesh(new THREE.ConeGeometry(0.9, 0.4, 10), soil); m2.position.y = 0.3; g.add(m2); g.position.set(-1.5, 0, -3); addMesh(g); D3.mound = g;
+  const hand = new THREE.Group(), sk = std({ color: 0x0b0b0e, roughness: 0.6 }); const fa = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.8, 8), sk); fa.position.y = 0.4; hand.add(fa); const pm = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.17, 0.05), sk); pm.position.y = 0.88; hand.add(pm); for (let i = 0; i < 4; i++) { const f = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.17, 0.03), sk); f.position.set(-0.054 + i * 0.036, 1.05, 0); f.rotation.z = (i - 1.5) * 0.18; hand.add(f); } hand.position.set(-1.5, -0.9, -3); hand.visible = false; addMesh(hand); D3.hand = hand;
+}
+function buildFlat3() {
+  Object.assign(LV, { walls: false, ceil: false, bounds: [{ x0: -1.4, x1: 1.4, z0: -6, z1: 13 }, { x0: -4.4, x1: 4.4, z0: -14, z1: -6 }] });
+  const BB = batcher(), C = (c, r = 0.85) => std({ color: c, roughness: r }), glow = (c) => new THREE.MeshBasicMaterial({ color: c }), F = D3.F = {};
+  const wood = std({ map: TEX.wood, roughness: 0.5, color: 0xb09070 }), red = C(0x7a1a1c, 0.9), cream = C(0xe8dcc8, 0.9);
+  floorMesh(wood, 10, 28, 0, -0.5); { const c = new THREE.Mesh(new THREE.PlaneGeometry(10, 28).rotateX(Math.PI / 2), cream); c.position.set(0, 3.1, -0.5); addMesh(c); }
+  const wall = (x0, z0, x1, z1, m, h = 3.1) => { const l = Math.hypot(x1 - x0, z1 - z0); BB.box(m, (x0 + x1) / 2, h / 2, (z0 + z1) / 2, Math.abs(x1 - x0) < 0.1 ? 0.2 : l, h, Math.abs(z1 - z0) < 0.1 ? 0.2 : l); solid((x0 + x1) / 2, h / 2, (z0 + z1) / 2, Math.abs(x1 - x0) < 0.1 ? 0.2 : l, h, Math.abs(z1 - z0) < 0.1 ? 0.2 : l); };
+  wall(-1.5, -6, -1.5, 13.6, red); BB.box(cream, -1.4, 2.5, 3.8, 0.04, 1.2, 19.2); wall(1.5, -6, 1.5, 13.6, cream); wall(-1.5, 13.6, 1.5, 13.6, red);
+  wall(-1.5, -6, -0.62, -6, cream); wall(0.62, -6, 1.5, -6, cream); BB.box(cream, 0, 2.7, -6, 1.3, 0.8, 0.2);
+  wall(-4.5, -14, -4.5, -6, C(0xc8bca8)); wall(4.5, -14, 4.5, -6, C(0xc8bca8)); wall(-4.5, -14, 4.5, -14, C(0xc8bca8)); wall(-4.5, -6, -1.5, -6, C(0xc8bca8)); wall(1.5, -6, 4.5, -6, C(0xc8bca8));
+  { const c = new THREE.Mesh(new THREE.PlaneGeometry(9, 8).rotateX(Math.PI / 2), C(0xd8ccb8)); c.position.set(0, 3.1, -10); addMesh(c); }
+  for (const z of [10, 6.5, 2.5]) { BB.box(C(0x2a1a14, 0.6), 1.4, 1.7, z, 0.05, 0.7, 0.55); BB.geo(new THREE.MeshBasicMaterial({ map: cvTex(64, 80, (g) => { g.fillStyle = '#d8d0c0'; g.fillRect(0, 0, 64, 80); g.fillStyle = '#6a5a4a'; g.fillRect(6, 6, 52, 68); g.fillStyle = '#d8a070'; g.beginPath(); g.arc(32, 34, 13, 0, 7); g.fill(); g.fillStyle = '#3a2a1a'; g.fillRect(14, 50, 36, 24); }) }), new THREE.PlaneGeometry(0.45, 0.6).rotateY(-Math.PI / 2).translate(1.37, 1.7, z)); }
+  for (const z of [11.5, 4.5, -2]) { BB.cyl(C(0x3a2a1a, 0.6), -0.9, 0.4, z, 0.25, 0.2, 0.8, 8); }
+  const lampMesh = (x, y, z, c) => { const b = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 8), glow(c)); b.position.set(x, y, z); addMesh(b); return b; }; F.lampC = lampMesh(0, 2.9, 4, 0xffe0a0); lampMesh(0, 2.9, 10, 0xffc080);
+  // the door with the note
+  BB.box(C(0x3a2616, 0.6), -0.58, 1.1, -6, 0.1, 2.3, 0.28); BB.box(C(0x3a2616, 0.6), 0.58, 1.1, -6, 0.1, 2.3, 0.28);
+  { const d = new THREE.Mesh(new THREE.BoxGeometry(1.08, 2.2, 0.07), C(0x6a4a30, 0.5)); d.geometry.translate(-0.54, 0, 0); d.position.set(0.54, 1.1, -5.9); addMesh(d); F.door = d; F.hinge = d.position.clone();
+    const knob = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), goldMat); knob.position.set(-0.95, 0, 0.07); d.add(knob); F.knob = knob;
+    const note = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.6), new THREE.MeshBasicMaterial({ map: cvTex(256, 340, (g) => { g.fillStyle = '#ecdcc0'; g.fillRect(0, 0, 256, 340); g.fillStyle = 'rgba(80,50,30,.12)'; for (let i = 0; i < 40; i++) g.fillRect(Math.random() * 256, Math.random() * 340, 30, 3); g.fillStyle = '#2a1a10'; g.font = 'italic 17px Georgia, serif'; g.textAlign = 'left'; ['Дорогой Сириус,', 'я — Кровавый Джон.', 'Моё слово:', '', 'Мне не нравится, когда', 'меня оклеветают в СМИ,', 'особенно грязные, жадные', 'до денег мошенники.', 'Будь вы настоящим', 'экстрасенсом, а не', 'нечестным маленьким', 'идиотом, вам не нужно', 'было бы открывать дверь,', 'чтобы увидеть, что я', 'сделал с вашей прекрасной', 'женой и дочкой.'].forEach((t, i) => g.fillText(t, 16, 28 + i * 19)); }) })); note.position.set(-0.4, 0.05, 0.045); d.add(note); F.note = note; }
+  const glowP = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 2.2), glow(0xfff0d0)); glowP.position.set(0, 1.1, -6.6); glowP.visible = false; addMesh(glowP); F.glow = glowP;
+  // the flat behind the door
+  BB.cyl(C(0x2a2018, 0.6), 3.4, 0.9, -10.6, 0.03, 0.03, 1.8, 6); { const sh = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.4, 0.35, 12, 1, true), new THREE.MeshBasicMaterial({ color: 0xffd8a0, side: THREE.DoubleSide })); sh.position.set(3.4, 1.8, -10.6); addMesh(sh); }
+  BB.box(C(0x5a4a4a, 0.9), -3.2, 0.35, -13.2, 2.4, 0.7, 0.9); BB.box(C(0x6a5a3a, 0.7), 0, 0.02, -10.4, 5, 0.03, 4);
+  const sm = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), new THREE.MeshBasicMaterial({ map: cvTex(256, 256, (g) => { g.clearRect(0, 0, 256, 256); g.strokeStyle = '#a8121c'; g.fillStyle = '#a8121c'; g.lineCap = 'round'; g.lineWidth = 12; g.beginPath(); g.arc(128, 128, 104, 0, 7); g.stroke(); g.lineWidth = 11; for (const x of [88, 168]) { g.beginPath(); g.moveTo(x, 84); g.lineTo(x, 130); g.stroke(); } g.beginPath(); g.arc(128, 136, 62, 0.25, Math.PI - 0.25); g.stroke(); g.lineWidth = 6; for (const [x, y, l] of [[88, 130, 40], [168, 130, 28], [40, 140, 50], [212, 150, 36], [128, 200, 32], [84, 190, 26], [24, 128, 22]]) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + l); g.stroke(); g.beginPath(); g.arc(x, y + l, 4.5, 0, 7); g.fill(); } }), transparent: true })); sm.position.set(0, 1.9, -13.88); addMesh(sm); F.smile = sm;
+  BB.flush();
+}
+/* ===================== LOCATION 3 · ACT VIII «Расплата Мелоди» and the story of Sirius ===================== */
+const M8 = { m: null, hp: 700, max: 700, wave: 0, state: 'intro', notes: [], ring: null, tex: null };
+function d3Cry(n, dt, k = 7) { if (!n || !n.parts || Math.random() > dt * k) return; n.parts.head.mesh.updateMatrixWorld(true); for (const s of [-1, 1]) { const p = n.parts.head.mesh.localToWorld(_d3b.set(s * 0.045, -0.015, 0.105)); spawnSprite(TEX.soft, p, { color: 0xcfeaff, additive: true, size: 0.035, grow: 0.05, life: 0.9, opacity: 0.9, gravity: 2.2, vel: new V3(0, -0.1, 0.05) }); } }
+function d3Knife(n) { const g = new THREE.Group(), bl = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.24, 0.012), std({ color: 0xd0d4da, roughness: 0.2, metalness: 0.9 })); bl.position.y = -0.34; g.add(bl); const hd = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.1, 0.03), std({ color: 0x1a1a1a, roughness: 0.6 })); hd.position.y = -0.2; g.add(hd); g.position.set(0, 0, 0.04); n.parts.lArmR.mesh.add(g); n.knife = g; }
+function d3Shiver(n, t) { if (!n || !n.root) return; n.root.position.set(n.pos.x + Math.sin(t * 47) * 0.007, n.pos.y, n.pos.z + Math.cos(t * 53) * 0.005); if (n.knife) n.knife.rotation.z = Math.sin(t * 38) * 0.22; }
+function d3Iron(n) {
+  const col = 0x8e959c; for (const k of ['uArmL', 'lArmL', 'uLegL', 'lLegL']) { const P = n.parts[k]; P.mat.map = null; P.mat.color.setHex(col); P.mat.metalness = 0.95; P.mat.roughness = 0.28; P.mat.emissive.setHex(0); P.mat.needsUpdate = true; P.baseColor.setHex(col); }
+  const iron = std({ color: col, roughness: 0.28, metalness: 0.95, envMapIntensity: 1.2 }), H = n.parts.head.mesh, T = n.parts.torso.mesh;
+  const hm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.17, 0.16), iron); hm.position.set(0.062, 0.0, 0.02); H.add(hm); const tp = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.3, 0.03), iron); tp.position.set(0.09, 0.02, 0.118); T.add(tp);
+  for (const [x, y] of [[0.05, 0.1], [0.12, 0.1], [0.05, -0.08], [0.12, -0.08]]) { const r = new THREE.Mesh(new THREE.SphereGeometry(0.01, 6, 5), goldMat); r.position.set(x, y, 0.136); T.add(r); }
+}
+function d3Walk3(n, pts, sp, dt) { if (!pts.length) { n.speed = 0; return true; } const p = pts[0], dx = p[0] - n.pos.x, dy = p[1] - n.pos.y, dz = p[2] - n.pos.z, d = Math.hypot(dx, dy, dz); if (d < 0.08) { pts.shift(); return !pts.length; } const st = Math.min(d, sp * dt); n.pos.x += dx / d * st; n.pos.y += dy / d * st; n.pos.z += dz / d * st; n.yaw = Math.atan2(dx, dz); n.speed = sp; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; return false; }
+function d3Lie(n, x, z, yaw) { n.pos.set(x, 0, z); n.yaw = yaw; n.pose = 'down'; n.poseDur = Infinity; n.poseT = 0; n.poseRate = 1000; n.animate(0.02); n.poseRate = 8; n.root.position.copy(n.pos); n.root.rotation.y = yaw; }
+function d3Stand(n) { n.pose = 'stand'; n.poseDur = 0; n.poseT = 0; n.poseRate = 6; }
+function d3NoteTex() { return M8.tex || (M8.tex = cvTex(64, 64, (g) => { g.clearRect(0, 0, 64, 64); g.fillStyle = '#fff'; g.font = '900 56px Arial'; g.textAlign = 'center'; g.fillText('♪', 32, 50); })); }
+/* ----- kinetic subtitles, like in the video ----- */
+function d3KinBox() { let d = document.getElementById('d3kin'); if (d) return d; d = document.createElement('div'); d.id = 'd3kin'; d.style.cssText = 'position:fixed;left:0;right:0;top:44%;z-index:57;pointer-events:none;text-align:center;font:900 clamp(14px,3.3vw,26px) var(--ui);letter-spacing:.14em;text-transform:uppercase;line-height:1.25'; document.body.appendChild(d); const t = document.createElement('div'); t.id = 'd3tint'; t.style.cssText = 'position:fixed;inset:0;z-index:56;pointer-events:none;display:none;background:radial-gradient(ellipse at center,rgba(120,30,20,.16) 30%,rgba(0,0,0,.72) 100%)'; document.body.appendChild(t); return d; }
+function d3Kin(txt, col, big) { const b = d3KinBox(); b.innerHTML = ''; const s = document.createElement('div'); s.textContent = txt; s.style.cssText = `color:#fff;font-size:${big ? 'clamp(24px,6vw,46px)' : 'inherit'};text-shadow:0 0 3px ${col},0 0 10px ${col},0 0 22px ${col};padding:0 7%;opacity:0;transition:opacity .3s,transform .3s;transform:translateX(${Math.random() < 0.5 ? -8 : 8}px)`; b.appendChild(s); requestAnimationFrame(() => { s.style.opacity = 1; s.style.transform = 'none'; }); }
+function d3KinOff() { const b = document.getElementById('d3kin'); if (b) b.innerHTML = ''; }
+function d3Tint(on) { d3KinBox(); document.getElementById('d3tint').style.display = on ? 'block' : 'none'; }
+/* ----- VIII.1: Melodie comes up to the roof ----- */
+function d3MelStart() {
+  d3Cp('d3g'); d3RoofLook(0, true); d3Map('rooftop3'); d3RoofLook(0); D3.ek = 0; D3.amb = d3RoofAmb; D3.cam = d3RoofCam; D3.lamp = false; FL.on = false; D3.noDebt = true; D3.birdGo = true; d3Bar().style.display = 'none';
+  story.showAvatar = true; story.gun = false; d3Disarm(); d3Put(0, -9, 0, 18); Music.stop(); Music.start('dread'); Sound.droneLoop(0);
+  const m = M8.m = D3.mel = c3Npc('melodie', 0, 20.5, Math.PI); m.protect = false; m.d3Mel = true; m.root.visible = false; d3Knife(m); Object.assign(M8, { state: 'intro', wave: 0, notes: [], ring: null }); let open = 0;
+  const face = () => d3CamFace(m, 0.35, 1.1), two = () => d3CamTwo(player.pos.x, player.pos.z, m.pos.x, m.pos.z, 1, 3.6, 1.55, 1.2);
+  d3Talk([
+    ['', 'Утро. Над городом розовое небо, внизу снова гудят машины. На крыше пусто и тихо — слишком тихо.', () => camSet(5, 2.2, -5, -2, 1.4, -14)],
+    ['', 'Внизу хлопает дверь. По лестнице кто-то бежит и всхлипывает на бегу.', () => camSet(3, 1.9, 12, 0, 1.5, 19)],
+    ['', 'Дверь на крышу распахивается.', () => camSet(2.6, 1.7, 8.5, 0, 1.4, 18.6), () => { open = 1; m.root.visible = true; m.path = [[0, 17.4], [0, -2.4]]; m.pathSp = 4.4; Sound.thud(0.8); }],
+    ['Мелоди', 'Зачем?.. Зачем ты это сделал?!', face],
+    ['Мелоди', 'Мне этого не надо было! Не надо!!', face],
+    ['Вы', 'Мелоди… Он был чудовищем. Он всё это начал.', two],
+    ['Мелоди', 'Он был МОЙ! Единственный, кто слышал, как я пою. Я пела только о нём — каждую ночь, каждую песню!', face],
+    ['Мелоди', 'А ты сжёг его вместе с этой книгой. Сжёг — и смотрел!', face],
+    ['Вы', 'Опусти нож. Пожалуйста.', two],
+    ['Мелоди', 'Не подходи!.. Не подходи, или я…!', face, () => Sound.bigScream()],
+  ], (t, dt) => { d3RoofAmb(dt); if (D3.doorM) D3.doorM.rotation.y = -1.5 * open; if (m.path && m.path.length) walkPath(m, m.path, m.pathSp, dt); else { m.speed = 0; d3FaceTo(m, player.pos.x, player.pos.z); } m.root.position.copy(m.pos); m.root.rotation.y = m.yaw; if (!m.path || !m.path.length) d3Shiver(m, t); d3Cry(m, dt); }, () => d3MelFight());
+}
+function d3MelFight() {
+  const m = M8.m; D3.allow = ['fists']; d3Arm('pipe'); d3Arm('pistol'); d3Arm('shotgun'); story.showAvatar = false; story.gun = true;
+  Object.assign(M8, { max: D3.gift === 'fang' ? 560 : 700, state: 'fight', wave: 0, atk: 1.4, wind: 0, scT: 4, scWarn: 0, fireT: 2, pause: 0.8, notes: [], ring: null }); M8.hp = M8.max;
+  d3Bar('МЕЛОДИ · ВОЛНА 1/3').style.display = 'block'; d3BarSet(1);
+  d3Play('d3-mel', { rsp: [0, 15, 0], spots: [], obj: () => `Мелоди: волна ${M8.wave || 1}/3 · ${['', 'бьёт очень сильно: уходите с линии удара', 'оглушает голосом: прыгайте через волну', 'стреляет нотами: двигайтесь, не стойте'][M8.wave || 1]} · ${Math.max(0, Math.round(M8.hp / M8.max * 100))}%`, tgt: () => [m.pos.x, m.pos.z], upd: d3MelUpd });
+  banner('БОСС', 'Мелоди');
+}
+function d3MelHit(npc, P, h, dir, dmg, w) {
+  const N = M8; if (N.state !== 'fight' || N.pause > 1.2) { sparks(h.point, 4, hitNormal(h), 2); return; }
+  const head = P.def.kind === 'head'; N.hp -= dmg * (head ? 1.4 : 1) * (D3.gift === 'fang' && w.melee ? 1.5 : 1);
+  bloodSpray(h.point, dir, 14, 0.5, 0.6, 2.2, 0.004, 0.01); Sound.splat(dv(h.point)); hitMarker(N.hp <= 0); npc.flinch = 1;
+}
+function d3MelUpd(dt) {
+  const m = M8.m, N = M8; if (!m || !m.root || N.state !== 'fight') return;
+  const P = player, alive = !P.dead && state === 'play', dx = P.pos.x - m.pos.x, dz = P.pos.z - m.pos.z, d = Math.hypot(dx, dz) || 1, k = Math.max(0, N.hp / N.max), w = k > 0.66 ? 1 : k > 0.33 ? 2 : 3, t = performance.now() / 1000;
+  d3BarSet(k); d3Cry(m, dt, 4);
+  if (w !== N.wave) { const first = !N.wave; N.wave = w; N.pause = first ? 0.8 : 1.7; for (const n of N.notes) scene.remove(n.s); N.notes = []; N.atk = 1.2; N.scT = 3.5; N.scWarn = 0; N.fireT = 1.6; d3Bar('МЕЛОДИ · ВОЛНА ' + w + '/3'); showCard('ВОЛНА ' + w + ' / 3', ['', 'Удар', 'Голос', 'Ноты'][w], 2400, true); if (!first) { c2Say(['', '', 'Услышь меня!', 'Это — моя последняя песня!'][w], 'Мелоди'); Sound.bigScream(); shake = Math.max(shake, 0.6); } }
+  if (N.pause > 0) { N.pause -= dt; m.speed = 0; }
+  else if (w < 3) {
+    if (d > 1.7 && !N.wind) { walkNpc(m, P.pos.x, P.pos.z, w === 1 ? 4.0 : 3.3, dt); pushOutAABBs(m.pos, 0.35, 0); clampBounds(m.pos, 0.4); } else m.speed = 0;
+    N.atk -= dt; if (!N.wind && d < 2.4 && N.atk <= 0 && alive) { N.wind = w === 1 ? 0.85 : 0.6; N.atk = w === 1 ? 1.7 : 1.5; m.attackAnim = 1; Sound.whoosh(); }
+    if (N.wind) { N.wind -= dt; if (N.wind <= 0) { N.wind = 0; if (alive && Math.hypot(P.pos.x - m.pos.x, P.pos.z - m.pos.z) < 2.9) { damagePlayer(w === 1 ? 30 : 18); Sound.thud(1); shake = Math.max(shake, 0.7); flashScreen('#fff', 120); P.vel.x += dx / d * 10; P.vel.z += dz / d * 10; } } }
+    if (w === 2) {
+      N.scT -= dt; if (N.scT <= 0 && alive && !N.scWarn) { N.scT = 6; N.scWarn = 1.0; c2Say('А-А-А-А-А-А!', 'Мелоди'); Sound.bigScream(); m.talkT = 1.4; }
+      if (N.scWarn > 0) { N.scWarn -= dt; if (Math.random() < dt * 30) { headPos(m, _d3a); spawnSprite(TEX.soft, _d3a, { color: 0xff7ad8, additive: true, size: 0.9, grow: 2, life: 0.35, opacity: 0.5 }); } if (N.scWarn <= 0) { N.scWarn = 0; const rm = new THREE.Mesh(new THREE.TorusGeometry(1, 0.1, 6, 40).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff7ad8, transparent: true, opacity: 0.9 })); rm.position.set(m.pos.x, 0.25, m.pos.z); scene.add(rm); mapObjs.push(rm); N.ring = { m: rm, r: 1, hit: false, x: m.pos.x, z: m.pos.z }; Sound.zap(0.7); } }
+    }
+  } else {
+    const away = d < 6 ? -1 : d > 10 ? 0.6 : 0, side = Math.sin(t * 0.9) * 1.6, nx = -dz / d, nz = dx / d;
+    if (away || side) { m.pos.x += (dx / d * away * 3.6 + nx * side) * dt; m.pos.z += (dz / d * away * 3.6 + nz * side) * dt; pushOutAABBs(m.pos, 0.35, 0); clampBounds(m.pos, 0.4); m.speed = 2.6; } else m.speed = 0;
+    N.fireT -= dt; if (N.fireT <= 0 && alive) { N.fireT = 1.9; headPos(m, _d3a); const a0 = Math.atan2(dx, dz); for (let i = -1; i <= 1; i++) { const a = a0 + i * 0.24, s = new THREE.Sprite(new THREE.SpriteMaterial({ map: d3NoteTex(), color: pick([0xff7ad8, 0x7affea, 0xffe07a]), transparent: true, depthWrite: false })); s.scale.set(0.8, 0.8, 1); s.position.set(_d3a.x, 1.3, _d3a.z); scene.add(s); mapObjs.push(s); N.notes.push({ s, v: new V3(Math.sin(a) * 9.5, 0, Math.cos(a) * 9.5), life: 5 }); } Sound.chime(); m.talkT = 0.8; m.attackAnim = 0.6; }
+  }
+  m.yaw += angDiff(m.yaw, Math.atan2(dx, dz)) * Math.min(1, dt * 8);
+  if (N.ring) { const R = N.ring; R.r += dt * 9; R.m.scale.set(R.r, 1, R.r); R.m.material.opacity = clamp(1.2 - R.r / 26, 0, 0.9); const pd = Math.hypot(P.pos.x - R.x, P.pos.z - R.z); if (!R.hit && alive && Math.abs(pd - R.r) < 0.7 && P.pos.y < 0.45) { R.hit = true; P.getup = 1.7; damagePlayer(10); shake = Math.max(shake, 0.8); toast('Вас оглушило голосом! Прыгайте через волну'); } if (R.r > 26) { scene.remove(R.m); N.ring = null; } }
+  for (let i = N.notes.length - 1; i >= 0; i--) { const n = N.notes[i]; n.life -= dt; _d3b.set(P.pos.x, P.pos.y + 1.2, P.pos.z).sub(n.s.position); const dd = _d3b.length() || 1; n.v.lerp(_d3b.multiplyScalar(9.5 / dd), Math.min(1, dt * 0.7)); n.s.position.addScaledVector(n.v, dt); n.s.material.rotation += dt * 4; if (alive && dd < 0.8) { damagePlayer(9); Sound.click(1800, 0.3); n.life = 0; } if (n.life <= 0) { scene.remove(n.s); N.notes.splice(i, 1); } }
+  m.root.position.copy(m.pos); m.root.rotation.y = m.yaw; d3Shiver(m, t); if (N.hp <= 0) d3MelDown();
+}
+/* ----- VIII.2: she falls, we fall ----- */
+function d3MelDown() {
+  const N = M8, m = N.m; N.state = 'down'; d3Bar().style.display = 'none'; for (const n of N.notes) scene.remove(n.s); N.notes = []; if (N.ring) { scene.remove(N.ring.m); N.ring = null; }
+  story.showAvatar = true; story.gun = false; let walk = 0, y = 0; m.speed = 0;
+  d3Talk([
+    ['', 'Последний удар. Нож звякает о бетон. Мелоди опускается на колени — и медленно ложится на спину.', () => d3CamTwo(player.pos.x, player.pos.z, m.pos.x, m.pos.z, 1, 3.4, 1.5, 0.7), () => { d3Lie(m, m.pos.x, m.pos.z, m.yaw); if (m.knife) m.knife.visible = false; Sound.thud(0.8); chestOf(m, _d3a); bloodSpray(_d3a, UP, 30, 0.5, 1, 3, 0.004, 0.01); addPool(m.pos.x, m.pos.z, 0.9); }],
+    ['Мелоди', 'Мне… этого… не надо было…', () => d3CamFace(m, 0.35, 1.0)],
+    ['Вы', 'Я не хотел. Я… не хотел этого.', () => d3CamTwo(player.pos.x, player.pos.z, m.pos.x, m.pos.z, -1, 2.6, 1.7, 0.6)],
+    ['', 'Кровь течёт по бетону к самому краю крыши. Она больше не шевелится.', () => camSet(m.pos.x + 0.4, 4.2, m.pos.z + 1.8, m.pos.x, 0, m.pos.z)],
+    ['', 'Нож задел и вас — на последнем замахе. Рубашка быстро темнеет. Вы цепляетесь за перила и идёте к пожарной лестнице.', () => camSet(-6, 2.2, 4, -14, 1.2, -2), () => { walk = 1; }],
+    ['', 'Ступени гудят под ногами. Лестница плывёт. Нога срывается…', () => camSet(-23.4, 2.4, -0.4, -21.2, 0.2, -2), () => { walk = 2; Sound.thud(0.6); }],
+  ], (t, dt) => { d3RoofAmb(dt); if (walk === 1) walkPlayer(-19.6, -2, 1.7, dt); if (walk === 2) { y += dt * 3.2; player.pos.set(-21.2, -Math.min(y, 8), -2); } }, () => { flashScreen('#000', 900); Sound.thud(1); fadeOut(); later(1.0, () => d3Yard()); });
+}
+/* ----- VIII.3: the back yard, the hand from the ground ----- */
+function d3Yard() {
+  d3RoofLook(0, true); d3Map('yard3'); D3.amb = null; D3.noDebt = true; Music.stop(); Music.start('dread'); story.showAvatar = true; story.gun = false; d3Put(-5, -9.6, -1.5, -3);
+  avatar.pose = 'down'; avatar.poseDur = Infinity; avatar.poseT = 0; avatar.poseRate = 1000; avatar.animate(0.02); avatar.poseRate = 8; addPool(-5, -9.6, 1.0); fadeIn(); showCard('ДВОР', 'Земля помнит всё', 3000, true);
+  const R = D3.gg = story.gg = c3Npc('gagarin', -1.5, -3, Math.atan2(-3.5, -6.6)); Object.assign(R, { pose: 'stand', poseDur: Infinity, ggWing: 0.4, ggHalo: 0.7, ggRage: 0, ggSlit: 0.75, ggDim: 0.2 }); d3Iron(R); R.pos.y = -2.4; R.root.position.copy(R.pos); R.root.visible = false;
+  let shk = 0, hT = -1, rT = -1; const low = () => camSet(-5.7, 0.4, -10.5, -1.5, 0.7, -3), rf = () => d3CamFace(R, 0.3, 1.5, 0.05);
+  d3Talk([
+    ['', 'Вы лежите у подножия лестницы. Рёбра горят. Кровь течёт — тёплая, и её много.', low],
+    ['', 'Мир сужается… и вдруг земля в трёх шагах от вас вздрагивает.', () => camSet(-4.2, 0.5, -6.2, -1.5, 0.5, -3), () => { shk = 1; Sound.droneLoop(0.4); }],
+    ['', 'Из рыхлой земли поднимается рука. Чёрная. Пальцы шарят в воздухе — и сжимаются в кулак.', () => camSet(-3.2, 0.9, -5.0, -1.5, 0.7, -3), () => { hT = 0; D3.hand.visible = true; Sound.thud(0.7); }],
+    ['', 'Потом показывается голова. Плечи. Он выползает из земли, как из чужого сна. Левая половина его — из железа.', () => camSet(-3.6, 1.3, -6.4, -1.5, 1.0, -3), () => { rT = 0; R.root.visible = true; Sound.rise(3.4); }],
+    ['Воскреситель', 'Моё бессмертие не ограничивается ничем. Долги я больше не беру. Возрождаю по вашему желанию. Бесплатно.', rf, () => { shk = 0; }],
+    ['Вы', 'Ты — чудовище. Ты всё это начал!', () => d3CamFace(avatar, 0.4, 0.9, 0.1)],
+    ['Воскреситель', 'Нет. Не я. Меня заставляли эти безликие уроды. Теперь я больше не ограничен.', rf],
+    ['Вы', 'Нет, это всё ты, урод!', () => d3CamFace(avatar, 0.4, 0.9, 0.1)],
+    ['Воскреситель', 'Ты не слушаешь. Меня никто никогда не слушал.', rf],
+    ['Вы', 'Ты умрёшь!', () => d3CamFace(avatar, 0.4, 0.9, 0.1)],
+  ], (t, dt) => {
+    R.root.position.copy(R.pos); if (shk) { D3.mound.position.x = -1.5 + Math.sin(t * 60) * 0.03; if (Math.random() < dt * 12) spawnSprite(TEX.smoke, _a.set(-1.5 + rand(-0.8, 0.8), 0.3, -3 + rand(-0.8, 0.8)), { color: 0x4a3a2a, size: 0.25, grow: 1.4, life: 1.0, opacity: 0.5, vel: new V3(0, 0.6, 0) }); }
+    if (hT >= 0) { hT += dt; D3.hand.position.y = lerp(-0.9, 0.05, clamp(hT / 1.6, 0, 1)); D3.hand.rotation.z = Math.sin(hT * 2) * 0.08; if (rT > 0.9) D3.hand.visible = false; }
+    if (rT >= 0) { rT += dt; const e = clamp(rT / 3.6, 0, 1); R.pos.y = -2.4 + e * e * (3 - 2 * e) * 2.4; if (Math.random() < dt * 14) spawnSprite(TEX.smoke, _a.set(-1.5 + rand(-0.6, 0.6), 0.2, -3 + rand(-0.6, 0.6)), { color: 0x4a3a2a, size: 0.3, grow: 1.4, life: 0.9, opacity: 0.5, vel: new V3(0, 0.7, 0) }); }
+  }, () => { D3.hand.visible = false; R.pos.y = 0; d3YardFight(); });
+}
+function d3YardFight() {
+  const R = D3.gg, H = R.parts.head; let bled = 0, regen = -1, run = 0, climb = null; story.gun = true; D3.allow = ['fists', 'shotgun']; const si = WEAPONS.findIndex((w) => w.id === 'shotgun'); if (si >= 0) selectWeapon(si);
+  const sh = () => camSet(-4.6, 1.75, -9.4, -1.6, 1.4, -3), hd = () => d3CamFace(R, 0.4, 1.3, 0.0), body = () => { chestOf(R, _d3a); camSet(_d3a.x + 1.4, 1.5, _d3a.z - 2.2, _d3a.x, _d3a.y + 0.1, _d3a.z); };
+  d3Talk([
+    ['', 'Вы поднимаетесь. Руки сами помнят вес дробовика.', () => camSet(-7.2, 1.6, -8.4, -5, 1.0, -9.4), () => { d3Put(-5, -8.4, R.pos.x, R.pos.z); story.showAvatar = true; story.gun = true; attachHeld(); }],
+    ['', 'Ствол — ему в голову. Он даже не отступает.', sh],
+    ['', 'Выстрел.', hd, () => { const to = headPos(R, new V3()), from = new V3(-4.9, 1.4, -8.2); tracer(from, to); Sound.shot('shotgun', 1); flashScreen('#fff', 180); shake = 1; spawnSprite(TEX.flash, from, { color: 0xffd9a0, size: 0.6, grow: 0.5, life: 0.1, additive: true }); bloodSpray(to, new V3(0.3, 0.2, 0.9).normalize(), 90, 0.7, 2, 7, 0.004, 0.014); bloodMist(to, 0.8); Sound.splat(1); H.mesh.visible = false; R.pose = 'kneel'; R.poseDur = Infinity; R.poseT = 0; bled = 1; }],
+    ['', 'Головы больше нет. Тело опускается на колени и молчит. Кровь бьёт толчками на землю.', body],
+    ['Воскреситель', 'Тебе не надоело?', body, () => { regen = 0; bled = 0; Sound.heal(); flashScreen('#ffe9a0', 500); }],
+    ['', 'На плечах уже новая голова. Он не смеётся. Ему просто скучно.', hd, () => { d3Stand(R); }],
+    ['', 'Вы бежите. Не оглядываясь.', () => camSet(-4, 1.8, -5.4, -8, 1.0, -9.6), () => { run = 1; story.gun = false; climb = [[-5, 0, -10.8], [-5, 0, -12.5], [5.4, 3.84, -12.5], [7.2, 3.84, -12.5]]; }],
+    ['', 'Он не смотрит вам вслед. Он идёт к лестнице — к той самой, с которой вы упали.', () => camSet(-9, 2.4, -6, -4, 1.4, -11.6), () => { }],
+  ], (t, dt) => {
+    R.root.position.copy(R.pos); R.root.rotation.y = R.yaw;
+    if (bled && Math.random() < dt * 25) { chestOf(R, _d3a); _d3a.y += 0.38; bloodSpray(_d3a, UP, 5, 0.3, 1, 3, 0.004, 0.011); }
+    if (regen >= 0) { regen += dt; const k = clamp(regen / 1.8, 0, 1); H.mesh.visible = true; H.mesh.scale.setScalar(Math.max(0.01, k * k * (3 - 2 * k))); if (Math.random() < dt * 20) { headPos(R, _d3a); spawnSprite(TEX.soft, _d3a, { color: 0xffd060, additive: true, size: 0.3, grow: 1, life: 0.35 }); } if (k >= 1) { H.mesh.scale.setScalar(1); regen = -1; } }
+    if (run === 1) { if (walkPlayer(-10.5, -4.6, 6.2, dt)) run = 2; }
+    if (climb && run) { if (t > 0) { if (!d3Walk3(R, climb, 2.1, dt)) { } } }
+  }, () => { H.mesh.visible = true; H.mesh.scale.setScalar(1); fadeOut(); later(1.0, () => d3RoofReturn()); });
+}
+/* ----- VIII.4: he returns to the roof, resurrects her; the bullet ----- */
+function d3RoofReturn() {
+  d3RoofLook(0, true); d3Map('rooftop3'); d3RoofLook(0); D3.amb = d3RoofAmb; D3.cam = d3RoofCam; D3.birdGo = true; D3.noDebt = true; Music.stop(); Music.start('tender'); fadeIn();
+  const R = D3.gg = story.gg = c3Npc('gagarin', -20.6, 0, -2); R.pos.set(-20.6, 0, -2); Object.assign(R, { pose: 'stand', poseDur: Infinity, ggWing: 0.4, ggHalo: 0.7, ggRage: 0, ggSlit: 0.75, ggDim: 0.2 }); d3Iron(R); R.yaw = Math.PI / 2;
+  const m = M8.m = D3.mel = c3Npc('melodie', -2, -3, 0.6); m.protect = false; m.d3Mel = true; m.pos.set(-2, 0, -3); d3Lie(m, -2, -3, 0.6); addPool(-2, -3, 1.1); d3Knife(m); m.knife.visible = false;
+  story.showAvatar = true; story.gun = true; D3.allow = ['fists', 'pistol']; const pi = WEAPONS.findIndex((w) => w.id === 'pistol'); if (pi >= 0) selectWeapon(pi); d3Put(0, 14.4, 0, -3);
+  let walkR = 0, mw = 0, back = 0, me = 0, bullet = null, flick = null, sneak = 0; const rf = () => d3CamFace(R, 0.4, 1.4, 0.05), mf = () => d3CamFace(m, 0.35, 1.0);
+  const two = () => d3CamTwo(R.pos.x, R.pos.z, m.pos.x, m.pos.z, 1, 3.2, 1.5, 1.0);
+  d3Talk([
+    ['', 'Утро на крыше. Ветер. Она лежит у своей сцены из поддонов — маленькая, неподвижная.', () => camSet(2.4, 1.4, 1.6, -2, 0.2, -3)],
+    ['', 'Скрипит пожарная лестница. Кто-то поднимается — медленно, никуда не торопясь.', () => camSet(-14.6, 1.8, 1.6, -19.6, 1.3, -2), () => { walkR = 1; R.path = [[-4.3, -2.6]]; }],
+    ['', 'Он идёт к ней и не смотрит ни на что вокруг. Половина лица — железо, половина — тень.', () => camSet(-9, 1.8, 2.4, R.pos.x, 1.3, R.pos.z)],
+    ['Воскреситель', 'Прости.', rf],
+    ['', 'Он опускается на колени. Ладонь ложится ей на лоб, и между пальцами собирается свет.', () => d3CamTwo(R.pos.x, R.pos.z, m.pos.x, m.pos.z, -1, 2.8, 1.4, 0.5), () => { R.pose = 'kneel'; R.poseDur = Infinity; R.poseT = 0; Sound.heal(); Sound.steam(0.3); flashScreen('#ffe9a0', 700); chestOf(m, _d3a); for (let i = 0; i < 16; i++) spawnSprite(TEX.soft, _d3a.clone().add(new V3(rand(-0.4, 0.4), rand(-0.1, 0.5), rand(-0.4, 0.4))), { color: 0xffe2a0, additive: true, size: rand(0.1, 0.3), grow: 0.6, life: rand(0.8, 1.6), opacity: 0.9, vel: new V3(0, rand(0.4, 1), 0) }); }],
+    ['Мелоди', 'Что… Где я?.. Ты? Это правда ты?!', mf, () => { d3Stand(m); d3Stand(R); me = 1; Sound.chime(); }],
+    ['', 'Она бросается ему на шею и целует. Он даже не вздрагивает — просто отступает на шаг, как от вещи, которая слишком близко.', two, () => { me = 2; m.path = [[R.pos.x - 0.55, R.pos.z]]; m.pathSp = 3; later(1.2, () => { Sound.kiss(); }); later(2.2, () => { back = 1; }); }],
+    ['Мелоди', 'Почему ты… почему ты так на меня смотришь?..', mf],
+    ['', 'Вы подбираетесь со спины. Пистолет в руке тяжёлый, как всё сегодня.', () => { headPos(avatar, _d3a); camSet(_d3a.x + 0.7, _d3a.y + 0.2, _d3a.z + 1.8, R.pos.x, 1.4, R.pos.z); }, () => { sneak = 1; }],
+    ['Вы', 'Отойди от неё!', () => { headPos(avatar, _d3a); camSet(_d3a.x + 0.7, _d3a.y + 0.2, _d3a.z + 1.8, R.pos.x, 1.4, R.pos.z); }],
+    ['', 'Выстрел.', () => camSet(R.pos.x + 1.8, 1.7, R.pos.z + 3, R.pos.x, 1.4, R.pos.z), () => { const from = new V3(player.pos.x, 1.4, player.pos.z - 0.6), to = new V3(R.pos.x, 1.45, R.pos.z + 0.55); tracer(from, to); Sound.shot('pistol', 1); flashScreen('#fff', 120); R.pose = 'stop'; R.poseDur = Infinity; R.poseT = 0; R.poseRate = 30; bullet = { s: new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 5), new THREE.MeshBasicMaterial({ color: 0xffd060 })), p: from, to }; bullet.s.position.copy(from); scene.add(bullet.s); mapObjs.push(bullet.s); }],
+    ['', 'Он не оборачивается. Поднимает руку — и ловит пулю двумя пальцами. Щёлк. Пуля летит в сторону, как скомканная бумажка.', () => camSet(R.pos.x - 1.4, 1.6, R.pos.z + 1.4, R.pos.x, 1.5, R.pos.z + 0.5), () => { Sound.tink(0.9); flick = new V3(rand(-4, 4), 5, rand(2, 6)); }],
+    ['Вы', 'Почему… почему ты такой?', () => { headPos(avatar, _d3a); camSet(_d3a.x + 0.6, _d3a.y + 0.1, _d3a.z - 1.1, _d3a.x, _d3a.y, _d3a.z); }],
+    ['Воскреситель', 'Думаешь, я хотел таким быть?', () => d3CamFace(R, 0.3, 1.3, 0.02)],
+  ], (t, dt) => {
+    d3RoofAmb(dt); if (walkR && R.path && R.path.length) walkPath(R, R.path, 1.7, dt); else R.speed = 0; R.root.position.copy(R.pos); R.root.rotation.y = R.yaw;
+    if (me === 2 && m.path && m.path.length) walkPath(m, m.path, m.pathSp, dt); m.root.position.copy(m.pos); if (me >= 1) { d3Cry(m, dt, 5); if (!(m.path && m.path.length)) { d3FaceTo(m, R.pos.x, R.pos.z); } } else m.root.rotation.y = m.yaw;
+    if (back === 1) { R.pos.x += dt * 0.7; if (R.pos.x > -3.1) back = 2; R.root.position.copy(R.pos); }
+    if (sneak === 1) { if (walkPlayer(0.5, 4.4, 3.6, dt)) sneak = 2; }
+    if (bullet) { const d = bullet.s.position.distanceTo(bullet.to); bullet.s.position.lerp(bullet.to, Math.min(1, dt * 40 / Math.max(0.5, d))); if (flick) { bullet.s.position.addScaledVector(flick, dt); flick.y -= 9 * dt; } }
+  }, () => { if (bullet) scene.remove(bullet.s); fadeOut(); later(0.9, () => d3Flash()); });
+}
+/* ----- VIII.5: the story of Sirius, shot for shot like the video ----- */
+function d3Flash() {
+  d3Map('flat3'); d3Tint(true); d3KinOff(); D3.amb = null; Music.stop(); Music.start('dread'); fadeIn(); story.showAvatar = false; MAPS.flat3.lamp[1] = 14;
+  const F = D3.F, S = D3.sir = c3Npc('sirius', 0, -3.4, Math.PI); S.protect = false; story.gg = null; S.root.visible = true;
+  const mel = c3Npc('melodie', -1.7, -11.9, 1.2); d3Lie(mel, -1.7, -11.9, 1.2); addPool(-1.7, -11.9, 1.3); mel.root.visible = true; addPool(-1.9, -11.6, 0.6);
+  { const bl = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 0.6), std({ color: 0xd8c8d8, roughness: 1 })); bl.position.set(1.4, 0.1, -11.8); addMesh(bl); const tb = new THREE.Mesh(new THREE.SphereGeometry(0.11, 8, 6), std({ color: 0xa8743c, roughness: 1 })); tb.position.set(0.85, 0.11, -11.2); addMesh(tb); addPool(1.4, -11.8, 0.5); }
+  const hand = new THREE.Group(), cuff = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.18), std({ color: 0xeeeaf4, roughness: 0.7 })), palm = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.05, 0.13), std({ color: 0xe6a070, roughness: 0.6 })); palm.position.z = -0.14; hand.add(cuff); hand.add(palm); hand.position.set(0.2, 0.9, -4.2); hand.visible = false; addMesh(hand);
+  let walk = 0, opened = 0, fades = 0; const K = (a, b, k) => a + (b - a) * k, cl = clamp;
+  const face = (dist) => { headPos(S, _d3a); camSet(_d3a.x + 0.02, _d3a.y + 0.03, _d3a.z - dist, _d3a.x, _d3a.y, _d3a.z); };
+  runCut([
+    [0.1, () => { Sound.beat(0.5); }],
+    [0.7, () => d3Kin('Сириус возвращается домой и находит записку на двери', '#ffe040')],
+    [2.8, () => d3KinOff()],
+    [3.3, () => { Sound.click(500, 0.3); }],
+    [4.0, () => d3Kin('— Дорогой Сириус —', '#5aa0ff', true)],
+    [5.3, () => d3Kin('Я не люблю, когда меня оклевещут в СМИ', '#ff3a3a')],
+    [7.3, () => d3KinOff()],
+    [8.0, () => d3Kin('Особенно грязные, жадные до денег мошенники', '#58ffb0')],
+    [10.0, () => d3Kin('Будь вы настоящим экстрасенсом, а не нечестным маленьким идиотом', '#b48aff')],
+    [13.3, () => d3Kin('Вам не нужно было бы открывать дверь, чтобы увидеть, что я сделал', '#ffffff')],
+    [16.0, () => d3Kin('С вашей прекрасной женой и дочкой', '#ff4ad8', true)],
+    [18.0, () => { d3KinOff(); hand.visible = true; Sound.beat(0.6); }],
+    [18.9, () => { opened = 1; Sound.thud(0.6); Sound.rise(3); }],
+    [19.3, () => { hand.visible = false; walk = 1; }],
+    [22.7, () => { $('black').style.transition = 'none'; $('black').classList.add('on'); fades = 1; Sound.thud(1); }],
+    [23.3, () => { $('black').classList.remove('on'); $('black').style.transition = ''; fades = 2; }],
+    [27.3, () => { flashScreen('#fff', 1600); fades = 3; }],
+  ], (t, dt) => {
+    if (D3.F) { F.glow.visible = opened > 0; }
+    if (t < 2.8 || (t >= 8 && t < 18)) { const k = t < 2.8 ? t / 2.8 : (t - 8) / 10; face(t < 2.8 ? K(1.3, 0.8, k) : K(0.9, 0.55, k)); }
+    else if (t < 8) { const k = (t - 3.3) / 4; camSet(0.14, 1.15, K(-4.9, -4.55, cl(k, 0, 1)), 0.14, 1.15, -5.85); }
+    else if (t < 19.3) { const k = cl((t - 18) / 0.9, 0, 1); hand.position.set(K(0.35, -0.38, k), 1.08, K(-4.5, -5.7, k)); camSet(-0.05, 1.22, -4.8, -0.38, 1.1, -5.8); if (t > 18.8) F.knob.rotation.z = Math.min(1.2, (t - 18.8) * 3); }
+    if (opened) { F.door.rotation.y = lerp(F.door.rotation.y, -1.5, Math.min(1, dt * 1.4)); }
+    if (t >= 19.3 && t < 22.7) { S.pos.set(-0.05, 0, K(-4.7, -5.4, cl((t - 19.3) / 3.2, 0, 1))); S.yaw = Math.PI; S.speed = 0.5; S.root.position.copy(S.pos); camSet(0.3, 1.5, K(-2.4, -2.9, cl((t - 19.3) / 3.4, 0, 1)), 0, 1.35, -6.2); }
+    if (t >= 23.3 && t < 24.0) camSet(0.55, 1.55, -6.1, -0.2, 1.5, -5.5);
+    if (t >= 24.0) { const k = cl((t - 24) / 3.3, 0, 1), ty = t > 25.6 ? K(1.9, 0.5, cl((t - 25.6) / 1.4, 0, 1)) : 1.9; camSet(K(0.5, 0.15, k), K(1.6, 1.3, k), K(-8.6, -11.6, k), K(0, -0.5, k), ty, -13.9); }
+    if (t >= 22.7 && t < 23.3) { S.root.visible = true; }
+  }, 28.4, () => { d3KinOff(); d3Tint(false); MAPS.flat3.lamp[1] = 8; $('black').classList.remove('on'); fadeOut(); later(1.2, () => { fadeIn(); d3Embrace(); }); });
+}
+/* ----- VIII.6: the embrace, the end ----- */
+function d3Embrace() {
+  d3RoofLook(0, true); d3Map('rooftop3'); d3RoofLook(0); D3.amb = d3RoofAmb; D3.cam = d3RoofCam; D3.birdGo = true; Music.stop(); Music.start('tender'); D3.sir = null;
+  const R = D3.gg = story.gg = c3Npc('gagarin', -1, -2.6, -Math.PI / 2); Object.assign(R, { pose: 'stand', poseDur: Infinity, ggWing: 0.3, ggHalo: 0.5, ggRage: 0, ggSlit: 0.8, ggDim: 0 }); d3Iron(R); R.pos.set(-1, 0, -2.6); R.yaw = Math.PI / 2;
+  const m = M8.m = D3.mel = c3Npc('melodie', -2.3, -2.6, 0); m.protect = false; m.pos.set(-2.3, 0, -2.6); m.yaw = -Math.PI / 2; m.root.position.copy(m.pos); m.root.rotation.y = m.yaw;
+  story.showAvatar = true; story.gun = true; D3.allow = ['fists', 'pistol']; d3Put(0.8, 4.2, -1.6, -2.6); let drop = null, hug = 0;
+  const mf = () => d3CamFace(m, 0.35, 1.0), sky = (t) => camSet(-10 + t * 0.2, 2.2, 5, 4, 7.4, -42);
+  d3Talk([
+    ['', 'На крыше тихо. Мелоди стоит, закрыв лицо руками. Потом поднимает глаза на него.', () => camSet(2.4, 1.6, 1.2, -1.7, 1.3, -2.6)],
+    ['Мелоди', 'Сириус…', mf],
+    ['', 'Она плачет и обнимает воскресителя. Он стоит, не шевелясь, — но больше не отталкивает.', () => d3CamTwo(R.pos.x, R.pos.z, m.pos.x, m.pos.z, 1, 3.0, 1.4, 1.3), () => { hug = 1; m.path = [[-1.62, -2.6]]; m.pathSp = 1.6; Sound.kiss && 0; }],
+    ['', 'Пистолет выскальзывает из ваших пальцев и падает на бетон.', () => camSet(1.7, 1.2, 4.6, 0.8, 0.3, 4.2), () => { story.gun = false; const g = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.16, 0.22), std({ color: 0x15151a, roughness: 0.4, metalness: 0.7 })); g.position.set(0.9, 1.0, 4.2); scene.add(g); mapObjs.push(g); drop = { g, vy: 0 }; }],
+    ['', 'Над городом поднимается солнце. Настоящее.', sky],
+  ], (t, dt) => { d3RoofAmb(dt); if (hug && m.path && m.path.length) walkPath(m, m.path, m.pathSp, dt); m.root.position.copy(m.pos); if (hug) { m.yaw = 0; m.root.rotation.y = m.yaw; d3Cry(m, dt, 6); } R.root.position.copy(R.pos); if (drop && drop.g.position.y > 0.08) { drop.vy -= 9.8 * dt; drop.g.position.y = Math.max(0.08, drop.g.position.y + drop.vy * dt); drop.g.rotation.x += dt * 4; if (drop.g.position.y <= 0.08) Sound.tink(0.8); } },
+  () => { showCard('КОНЕЦ', 'Сириус', 5200); runCut([[0.1, () => subOff()]], (t, dt) => { d3RoofAmb(dt); sky(t + 8); if (drop) drop.g.position.y = 0.08; }, 6.0, () => { D3.sirius = true; D3.done = true; d3Finish(); }); });
 }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
-  const sec = d3Sec(), E = D3_END[D3.ending || ''], t = D3.trust;
-  const rows = [['Локация 3 · время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Концовка', E[1]], ['Долг (воскрешений)', String(D3.debt)], ['Пустые: усмирено', String(D3.calm)], ['Пустые: разбито вами', String(D3.broken)], ['Выжившие спасены', D3.saved + ' / 3'], ['Доводы против Счетовода', D3.ev.size + ' / 8'], ['Печати', D3.stamps.size + ' / 3'], ['Дар воскресителя', D3.gift === 'pick' ? 'медиатор Мелоди' : D3.gift === 'fang' ? 'клык' : D3.gift === 'free' ? 'смерть без записи' : '—'], ['Мелоди на крыше', t >= 2 ? '♥♥' : t >= 1 ? '♥' : t <= -1 ? '💔' : '—']];
+  const sec = d3Sec(), E = D3.sirius ? ['Сириус', 'история воскресителя'] : D3_END[D3.ending || ''], t = D3.trust;
+  const rows = [['Локация 3 · время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Концовка', E[1]], ['Долг (воскрешений)', String(D3.debt)], ['Мелоди', D3.sirius ? 'расплата пережита, воскрешена' : '—'], ['Пустые: усмирено', String(D3.calm)], ['Пустые: разбито вами', String(D3.broken)], ['Выжившие спасены', D3.saved + ' / 3'], ['Доводы против Счетовода', D3.ev.size + ' / 8'], ['Печати', D3.stamps.size + ' / 3'], ['Дар воскресителя', D3.gift === 'pick' ? 'медиатор Мелоди' : D3.gift === 'fang' ? 'клык' : D3.gift === 'free' ? 'смерть без записи' : '—'], ['Мелоди на крыше', t >= 2 ? '♥♥' : t >= 1 ? '♥' : t <= -1 ? '💔' : '—']];
   addUn('c2a'); addUn('c2b'); addUn('c2c'); if (D3.ending) addUn('d3' + D3.ending); saveCp(null); try { localStorage.removeItem('myasorubka-d3'); } catch (e) {}
   fadeIn(); $('cut').hidden = true; $('cut').classList.remove('on', 'ghost'); $('credits').hidden = true; storyReset(); mode = 'story'; lastCh = 2; Music.stop(); Sound.droneLoop(0);
   document.body.classList.remove('playing'); state = 'over';
@@ -11214,6 +11490,16 @@ function d3Adm() {
     end('pay', 0), end('burn', 1), end('law', 2),
     { l: 'Эпилог: настоящий рассвет', s: 'После «Встречного иска»', f: () => d3AdmGo('d3f', () => { D3.ending = 'law'; d3Epilogue(); }) },
     { l: 'Итоговый экран', s: 'Статистика локации', f: () => d3AdmGo('d3f', () => { D3.ending = 'law'; d3Finish(); }) },
+    { sec: 'Локация 3 · Акт VIII · Расплата Мелоди' },
+    { l: 'Акт VIII: Мелоди приходит на крышу', s: 'Слёзы, нож, дрожащие руки', f: () => d3AdmGo('d3g') },
+    { l: 'Босс Мелоди: волна 1 (удар)', s: 'Очень сильные удары', f: () => { admClose(); D3_TOK++; d3Start('d3g'); d3AdmWhen(() => story.stage === 'd3-cut' && !!M8.m, () => { story.cut = null; d3MelFight(); }); } },
+    { l: 'Босс Мелоди: волна 2 (голос)', s: 'Оглушающая волна, прыгайте', f: () => { admClose(); D3_TOK++; d3Start('d3g'); d3AdmWhen(() => story.stage === 'd3-cut' && !!M8.m, () => { story.cut = null; d3MelFight(); M8.hp = M8.max * 0.6; }); } },
+    { l: 'Босс Мелоди: волна 3 (ноты)', s: 'Стреляет нотами', f: () => { admClose(); D3_TOK++; d3Start('d3g'); d3AdmWhen(() => story.stage === 'd3-cut' && !!M8.m, () => { story.cut = null; d3MelFight(); M8.hp = M8.max * 0.3; }); } },
+    { l: 'Мелоди повержена: падение с лестницы', s: 'Она падает, вы уходите и падаете', f: () => { admClose(); D3_TOK++; d3Start('d3g'); d3AdmWhen(() => story.stage === 'd3-cut' && !!M8.m, () => { story.cut = null; d3MelFight(); M8.pause = 0; M8.hp = 0; }); } },
+    { l: 'Двор: рука из земли', s: 'Воскреситель из земли, половина — железо', f: () => { admClose(); D3_TOK++; d3Start('d3g'); setTimeout(() => { story.cut = null; d3Yard(); }, 600); } },
+    { l: 'Крыша: воскрешение Мелоди и пуля', s: '«Прости», поцелуй, пуля между пальцев', f: () => { admClose(); D3_TOK++; d3Start('d3g'); setTimeout(() => { story.cut = null; d3RoofReturn(); }, 600); } },
+    { l: 'Предыстория Сириуса', s: 'Записка Кровавого Джона, как в видео', f: () => { admClose(); D3_TOK++; d3Start('d3g'); setTimeout(() => { story.cut = null; d3Flash(); }, 600); } },
+    { l: 'Объятия и финал', s: 'Мелоди плачет, пистолет падает, конец', f: () => { admClose(); D3_TOK++; d3Start('d3g'); setTimeout(() => { story.cut = null; d3Embrace(); }, 600); } },
     { sec: 'Локация 3 · во время игры' },
     { l: 'Все 8 доводов', s: 'Открывает «Встречный иск»', f: () => { if (!d3AdmIn()) return; all(); d3Chip(); toast('Доводы: 8/8'); } },
     { l: 'Все 3 печати', s: 'В Конторе', f: () => { if (!d3AdmIn()) return; D3.stamps = new Set(['count', 'seen', 'paid']); D3.ticket = true; d3Chip(); toast('Печати: 3/3'); } },
@@ -11848,7 +12134,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, d3Adm, d3OfficeStart, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, damagePlayer, d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
