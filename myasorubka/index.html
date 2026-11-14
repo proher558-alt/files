@@ -2890,6 +2890,8 @@ class Humanoid {
     if (L.hitler) addHitlerExtras(this);
     if (L.huggy) addHuggyExtras(this);
     if (L.sirius) addSiriusExtras(this);
+    if (L.bottle) addBottleExtras(this);
+    if (L.blockcat) addBlockCatExtras(this);
     if (L.mark) addMarkExtras(this);
     if (L.gagarin) addGagarin(this); else if (!L.plastic && !L.svity) { this.mouthOpen = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.03, 0.01), mouthDarkMat); this.mouthOpen.position.set(0, -0.06, 0.103); this.mouthOpen.scale.y = 0.001; head.add(this.mouthOpen); }
     bodyExtras(this, L);
@@ -13067,10 +13069,30 @@ function updLove(dt) {
   if (LOVE.phase === 'dawn') { LOVE.dawnT += dt; const k = Math.min(1, LOVE.dawnT / 6); MAPS.lovechap.sun = lerp(1.1, 2.4, k); MAPS.lovechap.hemi = lerp(0.9, 1.4, k); sun.intensity = MAPS.lovechap.sun; hemi.intensity = MAPS.lovechap.hemi; if (LOVE.dawnT > 7 && state === 'play') loveFinalStart(); }
 }
 /* ===== the workshop map «Дача» and the original drone-bomber; two original characters for the spawn menu ===== */
-/* original look: a bottle-shaped man (green glass tint, plain label) and a blocky avatar with a red headband */
+/* original looks, built after the references' idea only: a small man standing inside a glass bottle, and a blocky white cat-headed avatar */
 function applyNewLook(L, k) {
-  if (k === 'bottle') { L.female = false; L.shirt = 0xbfe6d2; L.pants = 0x2a2a30; L.sleeves = 'long'; L.hair = 0x2a2a30; L.hairStyle = 'short'; L.cap = false; L.skin = 0xd8c8b0; L.skinTex = null; }
-  else if (k === 'blockhead') { L.female = false; L.skin = 0xf2f2f2; L.skinTex = null; L.shirt = 0x4a7fb0; L.pants = 0xd8d8d8; L.sleeves = 'short'; L.hair = null; L.hairStyle = null; L.cap = true; L.helmet = false; }
+  if (k === 'bottle') { L.female = false; L.shirt = 0x16161a; L.pants = 0x2a2a2e; L.sleeves = 'short'; L.hair = hairMats[0]; L.hairStyle = 'short'; L.cap = false; L.helmet = false; L.bottle = true; L.prop = { height: 1.12, build: 1.0, arms: 0.9, legs: 0.85, head: 1.0 }; }
+  else if (k === 'blockhead') { L.female = false; L.skin = 0xf2f2f2; L.skinTex = null; L.shirt = 0x4a7fb0; L.pants = 0xb8b8b8; L.sleeves = 'short'; L.hair = null; L.hairStyle = null; L.cap = false; L.helmet = false; L.blockcat = true; L.prop = { height: 1.5, build: 1.15, arms: 1.0, legs: 1.0, head: 1.0 }; }
+}
+function addBottleExtras(n) {
+  const P = n.parts, T = P.torso.mesh, add = (par, geo, mat, x, y, z, rx = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.x = rx; par.add(m); return m; };
+  const glass = new THREE.MeshStandardMaterial({ color: 0xcfeee0, transparent: true, opacity: 0.26, roughness: 0.05, metalness: 0.1, depthWrite: false, side: THREE.DoubleSide }), blue = std({ color: 0x1a3a8a, roughness: 0.5 }), steel = std({ color: 0xc8ccd4, roughness: 0.3, metalness: 0.6 });
+  add(T, new THREE.CylinderGeometry(0.3, 0.3, 0.82, 28, 1, true), glass, 0, 0.01, 0); add(T, new THREE.CylinderGeometry(0.3, 0.3, 0.02, 28), glass, 0, -0.4, 0);
+  add(T, new THREE.CylinderGeometry(0.09, 0.3, 0.26, 28, 1, true), glass, 0, 0.55, 0); add(T, new THREE.CylinderGeometry(0.09, 0.09, 0.22, 20, 1, true), glass, 0, 0.79, 0);
+  add(T, new THREE.CylinderGeometry(0.1, 0.1, 0.05, 20), steel, 0, 0.93, 0); add(T, new THREE.CylinderGeometry(0.095, 0.095, 0.08, 20), blue, 0, 0.99, 0);
+  const lab = cvTex(256, 128, (g) => { g.fillStyle = '#f4f2ea'; g.fillRect(0, 0, 256, 128); g.fillStyle = '#1a3a9a'; g.fillRect(0, 0, 256, 38); g.fillStyle = '#fff'; g.font = '900 30px Arial,sans-serif'; g.textAlign = 'center'; g.fillText('ЧЕКУШКА', 128, 30); g.fillStyle = '#d02a2a'; g.font = '900 24px Arial,sans-serif'; g.fillText('МИРОВАЯ', 84, 74); g.strokeStyle = '#d02a2a'; g.lineWidth = 3; g.strokeRect(150, 46, 86, 42); g.font = '900 28px Arial,sans-serif'; g.fillText('№67', 193, 78); g.fillStyle = '#8a8a8a'; for (let y = 94; y < 120; y += 7) g.fillRect(16, y, 224, 2); });
+  const labMesh = add(T, new THREE.CylinderGeometry(0.305, 0.305, 0.3, 28, 1, true, -1.15, 2.3), new THREE.MeshStandardMaterial({ map: lab, roughness: 0.7, side: THREE.DoubleSide }), 0, -0.2, 0); labMesh.renderOrder = 2;
+}
+function addBlockCatExtras(n) {
+  const P = n.parts, H = P.head.mesh, T = P.torso.mesh; H.traverse((o) => { if (o.userData && o.userData.face) o.visible = false; }); if (n.mouthOpen) n.mouthOpen.visible = false;
+  const white = std({ color: 0xf4f4f4, roughness: 0.8 }), red = std({ color: 0xc02a2a, roughness: 0.5 }), gray = std({ color: 0x8a8a92, roughness: 0.8 }), add = (par, geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); par.add(m); return m; };
+  add(H, new THREE.BoxGeometry(0.3, 0.3, 0.3), white, 0, 0.01, 0);
+  add(H, new THREE.BoxGeometry(0.312, 0.07, 0.312), red, 0, 0.115, 0); add(H, new THREE.BoxGeometry(0.318, 0.012, 0.318), std({ color: 0x4a0a0a }), 0, 0.15, 0);
+  for (const s of [-1, 1]) { add(H, new THREE.ConeGeometry(0.075, 0.13, 4), white, s * 0.1, 0.235, 0, 0, Math.PI / 4, 0); add(H, new THREE.ConeGeometry(0.04, 0.08, 4), gray, s * 0.1, 0.225, 0.02, 0, Math.PI / 4, 0); }
+  const face = cvTex(128, 128, (g) => { g.fillStyle = '#111'; g.beginPath(); g.arc(44, 50, 6, 0, 6.283); g.arc(84, 50, 6, 0, 6.283); g.fill(); g.strokeStyle = '#111'; g.lineWidth = 4; g.lineCap = 'round'; g.beginPath(); g.arc(54, 76, 11, 0.1, Math.PI - 0.1); g.stroke(); g.beginPath(); g.arc(75, 76, 11, 0.1, Math.PI - 0.1); g.stroke(); });
+  const fm = add(H, new THREE.PlaneGeometry(0.26, 0.26), new THREE.MeshBasicMaterial({ map: face, transparent: true }), 0, -0.01, 0.1515);
+  const emb = add(T, new THREE.PlaneGeometry(0.075, 0.075), new THREE.MeshBasicMaterial({ color: 0xf4f4f4 }), 0.08, 0.1, 0.113, 0, 0, 0.3); add(T, new THREE.CircleGeometry(0.012, 10), new THREE.MeshBasicMaterial({ color: 0x4a7fb0 }), 0.08, 0.1, 0.114);
+  add(T, new THREE.BoxGeometry(0.4, 0.03, 0.24), std({ color: 0x4a9ad8, roughness: 0.6 }), 0, -0.26, 0);
 }
 MAPS.dacha = { name: 'Дача', desc: 'Дачный участок: дом, сад и забор. Раз в 30 секунд прилетает дрон-сбрасыватель.', story: true, hx: 22, hz: 22, h: 8, spawn: [0, 16, 0], fog: 0xbcd6e8, fogD: 0.012, bg: 0x9fc4e0, sun: 1.5, hemi: 0.9, lamp: [0xffe6b0, 18, 30], lamps: [[-6, 4, -6], [6, 4, -6], [-6, 4, 6], [6, 4, 6]], red: [[0, 5, 0], 0xff9a5a, 1], build: buildDacha, npcs: { human: 4, zombie: 0, soldier: 0 }, props: [], pills: [] };
 const DACHA = { on: false, next: 30, drone: null, bomb: null, ring: null, walls: [], wrap: 0 };
