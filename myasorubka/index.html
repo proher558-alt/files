@@ -13008,16 +13008,24 @@ async function loveAsk(text) {
   } catch (e) { if (LOVE.on) loveSay('Свити', 'Прости, я немного задумалась. Скажи ещё раз?', 5); }
 }
 function loveSend() { const d = document.getElementById('loveSay'), i = d && d.querySelector('#loveIn'); const v = i ? i.value.trim() : ''; if (!v || !LOVE.on) return; i.value = ''; d.style.display = 'none'; i.blur(); loveAsk(v); }
+/* the «СКАЗАТЬ» button is always there in the chapter, once the model is reachable */
+function loveSayBtn() {
+  let b = document.getElementById('lvSay'); if (b) return b;
+  b = document.createElement('button'); b.id = 'lvSay'; b.className = 'btn primary'; b.textContent = '💬 СКАЗАТЬ'; b.style.cssText = 'position:fixed;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(30% + env(safe-area-inset-bottom,0px));z-index:49;display:none;font:900 15px var(--ui);padding:10px 14px;pointer-events:auto;box-shadow:0 0 18px rgba(255,90,180,.6)';
+  ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => b.addEventListener(e, (ev) => ev.stopPropagation()));
+  b.onclick = () => { const d = loveSayUi(); const open = d.style.display !== 'flex'; d.style.display = open ? 'flex' : 'none'; if (open) d.querySelector('#loveIn').focus(); };
+  document.body.appendChild(b); return b;
+}
 async function loveProbe() {
   let S = null; try { if (window.claude && claude.use) S = await claude.use('sample'); } catch (e) { S = null; }
-  LOVE.canSay = !!S; const b = document.getElementById('lvSay'); if (b) b.style.display = S ? '' : 'none';
+  LOVE.canSay = !!S; loveSayBtn().dataset.ok = S ? '1' : ''; return !!S;
 }
+async function loveProbeLoop() { for (let i = 0; i < 10 && LOVE.on; i++) { if (await loveProbe()) return; await new Promise((r) => setTimeout(r, 1200)); } }
 function loveBtns() {
   let d = document.getElementById('loveBtns'); if (d) return d;
   d = document.createElement('div'); d.id = 'loveBtns'; d.style.cssText = 'position:fixed;left:50%;bottom:calc(16% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:49;display:none;gap:10px;pointer-events:auto';
-  d.innerHTML = '<button class="btn primary" id="lvSay" style="font:900 15px var(--ui);padding:10px 16px;display:none">💬 СКАЗАТЬ</button><button class="btn primary" id="lvHug" style="font:900 15px var(--ui);padding:10px 16px">🤗 ОБНЯТЬ</button><button class="btn primary" id="lvKiss" style="font:900 15px var(--ui);padding:10px 16px">💋 ПОЦЕЛОВАТЬ</button>';
+  d.innerHTML = '<button class="btn primary" id="lvHug" style="font:900 15px var(--ui);padding:10px 16px">🤗 ОБНЯТЬ</button><button class="btn primary" id="lvKiss" style="font:900 15px var(--ui);padding:10px 16px">💋 ПОЦЕЛОВАТЬ</button>';
   document.body.appendChild(d); d.querySelectorAll('button').forEach((b) => ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => b.addEventListener(e, (ev) => ev.stopPropagation())));
-  d.querySelector('#lvSay').onclick = () => { const b = loveSayUi(); b.style.display = b.style.display === 'flex' ? 'none' : 'flex'; if (b.style.display === 'flex') b.querySelector('#loveIn').focus(); };
   d.querySelector('#lvHug').onclick = () => loveAct('hug'); d.querySelector('#lvKiss').onclick = () => loveAct('kiss'); return d;
 }
 /* hug or kiss: Svity walks in, the pose plays, hearts burst, a line is said */
@@ -13037,11 +13045,11 @@ function loveStart() {
   { const fi = WEAPONS.findIndex((w) => w.id === 'fists'); if (fi >= 0) selectWeapon(fi); W.switchT = 0; W.fireHeld = false; }
   const sv = mkNpc('svity-street', 1.8, 2.6, Math.PI, 'human'); sv.scripted = true; sv.protect = true; sv.protMsg = 'Свити не стреляет'; sv.pose = 'stand'; sv.poseDur = Infinity; LOVE.sv = sv;
   const spots = [[-7, -7], [7, -7], [-8, 5], [8, 6], [0, -10], [3, 9], [-16, -4], [16, 3], [-12, 14], [12, -15]]; spots.forEach(([x, z], i) => loveHeart(x, z, i));
-  loveBtns(); loveProbe(); Music.stop(); Music.start('tender'); resume();
+  loveBtns(); loveSayBtn(); loveProbeLoop(); Music.stop(); Music.start('tender'); resume();
   showCard('ГЛАВА 1 · СЕКРЕТНАЯ', 'Чистая любовь'); loveSay('Свити', 'Привет… Собери все сердца, пока не взошло солнце.');
 }
 function loveTalk() {
-  LOVE.phase = 'talk'; const sv = LOVE.sv, pp = player.pos.clone();
+  LOVE.phase = 'talk'; loveSayBtn().style.display = 'none'; const sv = LOVE.sv, pp = player.pos.clone();
   if (sv && sv.state === 'alive') { sv.pos.set(pp.x + 1.2, 0, pp.z - 1.2); sv.root.position.copy(sv.pos); sv.yaw = Math.PI; }
   const steps = LOVE_TALK.map(([at, who, text]) => [at, () => sub(who === 'Вы' ? IDEA.name : 'Свити', text)]); steps.push([15.2, () => subOff()]);
   story.showAvatar = true; IDEA.cut = true; loveBtns().style.display = 'none';
@@ -13056,7 +13064,7 @@ function loveFinalStart() {
   resume(); showCard('ГЛАВА 1 · КОНЕЦ', 'Озеро на рассвете'); loveSay('Свити', 'Пойдём, покажу тебе место, где я ждала тебя.');
 }
 function loveEndCut() {
-  LOVE.phase = 'end'; loveBtns().style.display = 'none'; const sv = LOVE.sv; if (sv && sv.state === 'alive') { sv.pos.set(player.pos.x - 1, 0, player.pos.z - 0.6); sv.root.position.copy(sv.pos); }
+  LOVE.phase = 'end'; loveBtns().style.display = 'none'; loveSayBtn().style.display = 'none'; const sv = LOVE.sv; if (sv && sv.state === 'alive') { sv.pos.set(player.pos.x - 1, 0, player.pos.z - 0.6); sv.root.position.copy(sv.pos); }
   const steps = [[0.5, () => sub('Свити', 'Смотри. Солнце пришло.')], [4.0, () => sub(IDEA.name, 'Теперь я тоже знаю, где тебя искать.')], [8.0, () => sub('Свити', 'Тогда больше не теряемся.')], [12.0, () => subOff()]];
   story.showAvatar = true; IDEA.cut = true;
   runCut(steps, (t) => { const c = player.pos, a = t * 0.12, r = 4.2; camera.position.set(c.x + Math.sin(a) * r, 1.8, c.z + Math.cos(a) * r); camera.lookAt(c.x, 1.4, c.z - 2); }, 14, () => { IDEA.cut = false; story.showAvatar = false; subOff(); loveFinish(); });
@@ -13082,6 +13090,7 @@ function updLove(dt) {
     const near = d < 2.6 && !LOVE.approach; const bt = loveBtns(); bt.style.display = near && play && LOVE.actCd <= 0 ? 'flex' : 'none';
     if (near && LOVE.actCd <= 0) { /* buttons are shown */ }
   }
+  { const sb = loveSayBtn(); sb.style.display = LOVE.canSay && play && LOVE.phase !== 'end' ? '' : 'none'; }
   if (LOVE.phase === 'walk' && play) for (const h of LOVE.hearts) if (!h.got && Math.hypot(player.pos.x - h.x, player.pos.z - h.z) < 1.5) {
     h.got = true; scene.remove(h.g); LOVE.got++; Sound.chime(); flashScreen('#ffd0ea', 300); toast(`💖 ${LOVE.got} из ${LOVE.hearts.length}`);
     if (LOVE.got < LOVE.hearts.length) loveSay('Свити', LOVE_LINES[Math.min(LOVE.got - 1, LOVE_LINES.length - 1)]); else { subOff(); loveTalk(); break; } }
