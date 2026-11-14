@@ -12959,58 +12959,109 @@ function ideaWorldApply(P, t, who, me, tg, at, why) {
   }
   return null;
 }
-/* ===== the secret chapter «Чистая любовь»: a playable garden after the cut ===== */
-MAPS.lovechap = { name: 'Чистая любовь', desc: '', story: true, hx: 16, hz: 16, h: 7, spawn: [0, 11, 0], fog: 0xffd6ea, fogD: 0.018, bg: 0x2a1830, sun: 1.1, hemi: 0.9, lamp: [0xffc0e0, 26, 30], lamps: [[-6, 4, -6], [6, 4, -6], [-6, 4, 6], [6, 4, 6]], red: [[0, 5, 0], 0xff5ab4, 2], build: buildLoveChap, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] };
-const LOVE = { on: false, t: 0, sv: null, hearts: [], got: 0, phase: 'walk', dawnT: 0, cutT: 0 };
-const LOVE_LINES = ['Ещё одно сердечко… Оно светится.', 'Ты собираешь их, как в детстве.', 'Осталось совсем немного.', 'Вот это ещё одно, смотри.', 'Почти все. Ещё пару шагов.', 'Последнее. Ты справился.'];
+/* ===== the secret chapter «Чистая любовь»: a playable garden, hugs and kisses, a big final place by the lake ===== */
+MAPS.lovechap = { name: 'Чистая любовь', desc: '', story: true, hx: 24, hz: 24, h: 7, spawn: [0, 11, 0], fog: 0xffd6ea, fogD: 0.014, bg: 0x2a1830, sun: 1.1, hemi: 0.9, lamp: [0xffc0e0, 26, 36], lamps: [[-6, 4, -6], [6, 4, -6], [-6, 4, 6], [6, 4, 6]], red: [[0, 5, 0], 0xff5ab4, 2], build: buildLoveChap, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] };
+MAPS.lovefinal = { name: 'Озеро на рассвете', desc: '', story: true, hx: 36, hz: 36, h: 9, spawn: [0, -26, 0], fog: 0xffe2f0, fogD: 0.008, bg: 0xffc8e0, sun: 2.2, hemi: 1.3, lamp: [0xffe0f0, 14, 40], lamps: [[-8, 4, -8], [8, 4, -8], [-8, 4, 8], [8, 4, 8]], red: [[0, 5, 0], 0xff9ad0, 1], build: buildLoveFinal, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] };
+const LOVE = { on: false, t: 0, sv: null, hearts: [], got: 0, phase: 'walk', dawnT: 0, kisses: 0, hugs: 0, sayTok: 0, kissT: 22, approach: null, actCd: 0, actT: 0 };
+const LOVE_LINES = ['Ещё одно сердечко… Оно светится.', 'Ты собираешь их, как в детстве.', 'Осталось совсем немного.', 'Вот это ещё одно, смотри.', 'Почти все. Ещё пару шагов.', 'Смотри, как оно блестит.', 'Ещё немного, и ты увидишь, что дальше.', 'Пятое… Ты очень старательный.', 'Ещё одно. Почти конец.', 'Последнее. Ты справился.'];
 const LOVE_TALK = [[0.4, 'Свити', 'Ты собрал все сердца…'], [3.6, 'Вы', 'Я шёл к тебе через весь этот город.'], [7.2, 'Свити', 'Я боялась, что ты так и не придёшь.'], [10.8, 'Вы', 'Ни одного выстрела. Ни одной идеи. Только мы.'], [14.4, 'Свити', 'Тогда останемся здесь. Пока не взойдёт солнце.']];
+const LOVE_HUG = ['Обнимаю тебя крепко…', 'Вот так. Не отпускай.', 'Тепло…', 'Я рядом, я здесь.'];
+const LOVE_KISS = ['Ты… правда меня любишь?', 'Я тоже. Всегда была.', 'Не уходи, пожалуйста.', 'Ещё немного так постоим.'];
 function buildLoveChap() {
   floorMesh(std({ color: 0xffc4de, roughness: 0.6, emissive: 0x2a0a20 }), HX * 2, HZ * 2);
   const box = (col, x, y, z, sx, sy, sz, solidB) => { const m = new THREE.Mesh(IM_G.box, std({ color: col, roughness: 0.7 })); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = m.receiveShadow = true; addMesh(m); if (solidB) solid(x, y, z, sx, sy, sz); return m; };
   for (const [x, z] of [[-3, -3], [3, -3], [-3, 3], [3, 3]]) box(0xfff0f6, x, 1.6, z, 0.35, 3.2, 0.35, true);
   box(0xffd6e8, 0, 3.4, 0, 7.4, 0.3, 7.4); const roof = new THREE.Mesh(IM_G.cone, std({ color: 0xff7ab4, roughness: 0.5 })); roof.position.set(0, 4.6, 0); roof.scale.set(7, 2.2, 7); addMesh(roof);
-  for (const [x, z, r] of [[-6, 0, 0], [6, 0, 0], [0, -6, 1], [0, 6, 1]]) box(0xf4e0b0, x, 0.45, z, r ? 2.6 : 0.9, 0.9, r ? 0.9 : 2.6, true);
-  for (const [x, z] of [[-12, -12], [12, -12], [-12, 12], [12, 12], [-13, 0], [13, 0]]) { box(0x7a4a2a, x, 1.6, z, 0.45, 3.2, 0.45, true); const c = new THREE.Mesh(IM_G.sph, std({ color: pick([0xff8ac0, 0xff5aa0, 0xffb0d8]), roughness: 0.8 })); c.position.set(x, 3.9, z); c.scale.set(3.2, 2.8, 3.2); addMesh(c); }
-  for (let i = 0; i < 14; i++) { const a = i / 14 * 6.283, m = new THREE.Mesh(IM_G.sph, imMat(pick([0xff7aa8, 0xffffff, 0xffd0e0]), true)); m.position.set(Math.cos(a) * 14, 0.3, Math.sin(a) * 14); m.scale.setScalar(0.5); addMesh(m); }
+  for (const [x, z, r] of [[-6, 0, 0], [6, 0, 0], [0, -6, 1], [0, 6, 1], [-14, -9, 0], [14, 8, 1]]) box(0xf4e0b0, x, 0.45, z, r ? 2.6 : 0.9, 0.9, r ? 0.9 : 2.6, true);
+  for (const [x, z] of [[-12, -12], [12, -12], [-12, 12], [12, 12], [-13, 0], [13, 0], [-20, -18], [20, -4], [-21, 14], [19, 19]]) { box(0x7a4a2a, x, 1.6, z, 0.45, 3.2, 0.45, true); const c = new THREE.Mesh(IM_G.sph, std({ color: pick([0xff8ac0, 0xff5aa0, 0xffb0d8]), roughness: 0.8 })); c.position.set(x, 3.9, z); c.scale.set(3.2, 2.8, 3.2); addMesh(c); }
+  for (let i = 0; i < 18; i++) { const a = i / 18 * 6.283, m = new THREE.Mesh(IM_G.sph, imMat(pick([0xff7aa8, 0xffffff, 0xffd0e0]), true)); m.position.set(Math.cos(a) * 21, 0.3, Math.sin(a) * 21); m.scale.setScalar(0.5); addMesh(m); }
+}
+function buildLoveFinal() {
+  floorMesh(std({ color: 0xbfe8a8, roughness: 0.9 }), HX * 2, HZ * 2);
+  const box = (col, x, y, z, sx, sy, sz, solidB) => { const m = new THREE.Mesh(IM_G.box, std({ color: col, roughness: 0.7 })); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = m.receiveShadow = true; addMesh(m); if (solidB) solid(x, y, z, sx, sy, sz); return m; };
+  const lake = new THREE.Mesh(new THREE.CylinderGeometry(9, 9, 0.1, 40), std({ color: 0x4aa8e8, roughness: 0.1, metalness: 0.3, emissive: 0x0a2a4a })); lake.position.set(0, 0.04, -4); addMesh(lake);
+  for (let i = 0; i < 9; i++) box(0xa87a4a, 0, 0.35, 9 + i * 1.0, 1.6, 0.7, 1.0, true);
+  for (const [x, z] of [[-20, -20], [20, -20], [-20, 20], [20, 20]]) box(0xfff0f6, x, 1.6, z, 0.4, 3.2, 0.4, true);
+  box(0xffd6e8, 0, 3.6, -22, 7, 0.3, 7); const roof = new THREE.Mesh(IM_G.cone, std({ color: 0xff7ab4, roughness: 0.5 })); roof.position.set(0, 4.8, -22); roof.scale.set(7, 2.2, 7); addMesh(roof);
+  for (let i = 0; i < 22; i++) { const a = i / 22 * 6.283, r = 28 + (i % 3) * 3, x = Math.cos(a) * r, z = Math.sin(a) * r; box(0x7a4a2a, x, 1.6, z, 0.5, 3.2, 0.5, true); const c = new THREE.Mesh(IM_G.sph, std({ color: pick([0xff8ac0, 0xffb0d8, 0xfff0a0, 0xffffff]), roughness: 0.8 })); c.position.set(x, 3.9, z); c.scale.set(3.4, 3, 3.4); addMesh(c); }
+  for (let i = 0; i < 24; i++) { const m = new THREE.Mesh(IM_G.sph, imMat(pick([0xffffff, 0xffe27a, 0xffb0d8]), true)); m.position.set(rand(-22, 22), rand(0.4, 6), rand(-22, 22)); m.scale.setScalar(0.22); addMesh(m); }
 }
 function loveHeart(x, z, ph) { const { g } = imBuild(IM.heart()); g.scale.setScalar(1.1); g.position.set(x, 1.1, z); scene.add(g); mapObjs.push(g); LOVE.hearts.push({ g, x, z, ph, got: false }); }
-/* subtitles in free play must hide by themselves, otherwise the dark panel stays on screen */
 function loveSay(who, text) { sub(who, text); const tok = (LOVE.sayTok = (LOVE.sayTok || 0) + 1); later(3.2, () => { if (LOVE.sayTok === tok) subOff(); }); }
+function loveBtns() {
+  let d = document.getElementById('loveBtns'); if (d) return d;
+  d = document.createElement('div'); d.id = 'loveBtns'; d.style.cssText = 'position:fixed;left:50%;bottom:calc(16% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:49;display:none;gap:10px;pointer-events:auto';
+  d.innerHTML = '<button class="btn primary" id="lvHug" style="font:900 15px var(--ui);padding:10px 16px">🤗 ОБНЯТЬ</button><button class="btn primary" id="lvKiss" style="font:900 15px var(--ui);padding:10px 16px">💋 ПОЦЕЛОВАТЬ</button>';
+  document.body.appendChild(d); d.querySelectorAll('button').forEach((b) => ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => b.addEventListener(e, (ev) => ev.stopPropagation())));
+  d.querySelector('#lvHug').onclick = () => loveAct('hug'); d.querySelector('#lvKiss').onclick = () => loveAct('kiss'); return d;
+}
+/* hug or kiss: Svity walks in, the pose plays, hearts burst, a line is said */
+function loveAct(kind, auto) {
+  const sv = LOVE.sv; if (!sv || sv.state !== 'alive' || LOVE.actCd > 0 || state !== 'play') return;
+  LOVE.actCd = 3.5; if (kind === 'kiss') LOVE.kisses++; else LOVE.hugs++;
+  sv.pose = kind === 'kiss' ? 'hug' : 'hug'; sv.poseDur = 2.4; sv.poseT = 0; sv.speed = 0;
+  const c = player.pos; for (let i = 0; i < (kind === 'kiss' ? 14 : 8); i++) ideaDrop(c.x + rand(-1.2, 1.2), c.z + rand(-1.2, 1.2), '❤', 0, '', kind === 'kiss' ? 1.1 : 0.8);
+  flashScreen(kind === 'kiss' ? 'rgba(255,120,200,.35)' : 'rgba(255,210,230,.25)', 500); Sound.chime(); if (kind === 'kiss') Sound.heal();
+  const L = kind === 'kiss' ? LOVE_KISS : LOVE_HUG; loveSay('Свити', L[Math.floor(Math.random() * L.length)]);
+  if (auto) LOVE.kissT = rand(24, 34);
+}
 function loveStart() {
-  Object.assign(LOVE, { on: true, t: 0, got: 0, phase: 'walk', dawnT: 0, cutT: 0, hearts: [] });
+  Object.assign(LOVE, { on: true, t: 0, got: 0, phase: 'walk', dawnT: 0, kisses: 0, hugs: 0, hearts: [], kissT: 22, approach: null, actCd: 0 });
   IDEA.on = false; IDEA.cut = false; IDEA.lotFreeze = false; IDEA.asking = false; mode = 'love'; { const u = document.getElementById('ideaUi'); if (u) u.style.display = 'none'; const q = document.getElementById('ideaAsk'); if (q) q.style.display = 'none'; } ideaCard('');
   story.gun = false; W.fireHeld = false; loadMap('lovechap'); respawnPlayer(); story.showAvatar = false;
-  const sv = mkNpc('svity-street', 1.8, 2.6, Math.PI, 'human'); sv.scripted = true; sv.protect = true; sv.protMsg = 'Свити не стреляет'; sv.pose = 'stand'; sv.poseDur = Infinity; LOVE.sv = sv;
-  const spots = [[-7, -7], [7, -7], [-8, 5], [8, 6], [0, -10], [3, 9]]; spots.forEach(([x, z], i) => loveHeart(x, z, i));
   { const fi = WEAPONS.findIndex((w) => w.id === 'fists'); if (fi >= 0) selectWeapon(fi); W.switchT = 0; W.fireHeld = false; }
-  Music.stop(); Music.start('tender'); resume();
+  const sv = mkNpc('svity-street', 1.8, 2.6, Math.PI, 'human'); sv.scripted = true; sv.protect = true; sv.protMsg = 'Свити не стреляет'; sv.pose = 'stand'; sv.poseDur = Infinity; LOVE.sv = sv;
+  const spots = [[-7, -7], [7, -7], [-8, 5], [8, 6], [0, -10], [3, 9], [-16, -4], [16, 3], [-12, 14], [12, -15]]; spots.forEach(([x, z], i) => loveHeart(x, z, i));
+  loveBtns(); Music.stop(); Music.start('tender'); resume();
   showCard('ГЛАВА 1 · СЕКРЕТНАЯ', 'Чистая любовь'); loveSay('Свити', 'Привет… Собери все сердца, пока не взошло солнце.');
 }
 function loveTalk() {
   LOVE.phase = 'talk'; const sv = LOVE.sv, pp = player.pos.clone();
   if (sv && sv.state === 'alive') { sv.pos.set(pp.x + 1.2, 0, pp.z - 1.2); sv.root.position.copy(sv.pos); sv.yaw = Math.PI; }
   const steps = LOVE_TALK.map(([at, who, text]) => [at, () => sub(who === 'Вы' ? IDEA.name : 'Свити', text)]); steps.push([15.2, () => subOff()]);
-  story.showAvatar = true; IDEA.cut = true;
+  story.showAvatar = true; IDEA.cut = true; loveBtns().style.display = 'none';
   runCut(steps, (t) => { const c = player.pos, a = t * 0.2, r = 3.4; camera.position.set(c.x + Math.sin(a) * r, 1.5, c.z + Math.cos(a) * r); camera.lookAt(c.x, 1.3, c.z); }, 16, () => {
     IDEA.cut = false; story.showAvatar = false; subOff(); LOVE.phase = 'dawn'; LOVE.dawnT = 0; resume(); showCard('УТРО', 'солнце встаёт над садом', 3200);
   });
 }
+/* the last place: a big lake, a pier. Walk to the end of the pier with Svity */
+function loveFinalStart() {
+  LOVE.phase = 'bridge'; loveBtns().style.display = 'none'; loadMap('lovefinal'); respawnPlayer(); story.showAvatar = false;
+  const sv = mkNpc('svity-street', 1.6, -24, 0, 'human'); sv.scripted = true; sv.protect = true; sv.pose = 'stand'; sv.poseDur = Infinity; LOVE.sv = sv;
+  resume(); showCard('ГЛАВА 1 · КОНЕЦ', 'Озеро на рассвете'); loveSay('Свити', 'Пойдём, покажу тебе место, где я ждала тебя.');
+}
+function loveEndCut() {
+  LOVE.phase = 'end'; loveBtns().style.display = 'none'; const sv = LOVE.sv; if (sv && sv.state === 'alive') { sv.pos.set(player.pos.x - 1, 0, player.pos.z - 0.6); sv.root.position.copy(sv.pos); }
+  const steps = [[0.5, () => sub('Свити', 'Смотри. Солнце пришло.')], [4.0, () => sub(IDEA.name, 'Теперь я тоже знаю, где тебя искать.')], [8.0, () => sub('Свити', 'Тогда больше не теряемся.')], [12.0, () => subOff()]];
+  story.showAvatar = true; IDEA.cut = true;
+  runCut(steps, (t) => { const c = player.pos, a = t * 0.12, r = 4.2; camera.position.set(c.x + Math.sin(a) * r, 1.8, c.z + Math.cos(a) * r); camera.lookAt(c.x, 1.4, c.z - 2); }, 14, () => { IDEA.cut = false; story.showAvatar = false; subOff(); loveFinish(); });
+}
 function loveFinish() {
-  LOVE.on = false; const sec = Math.round(LOVE.t);
-  document.body.classList.remove('playing'); state = 'over'; if (VEH.in) vehExit(true);
+  LOVE.on = false; const sec = Math.round(LOVE.t), tot = LOVE.hearts.length;
+  document.body.classList.remove('playing'); state = 'over'; if (VEH.in) vehExit(true); { const b = document.getElementById('loveBtns'); if (b) b.style.display = 'none'; }
   document.querySelector('#over .eyebrow').textContent = 'Секретная глава'; $('overTitle').textContent = '💖 Конец главы · Чистая любовь';
-  $('overStats').innerHTML = [['Сердца', `${LOVE.got} из ${LOVE.hearts.length}`], ['Выстрелов', '0'], ['Время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с']].map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join('');
+  $('overStats').innerHTML = [['Сердца', `${LOVE.got} из ${tot}`], ['Объятия', LOVE.hugs], ['Поцелуи', LOVE.kisses], ['Выстрелов', '0'], ['Время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с']].map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join('');
   $('againBtn').innerHTML = 'Ещё раз<small>с начала главы</small>'; $('over').hidden = false; $('hud').hidden = true; $('touch').hidden = true; Sound.chime();
 }
 function updLove(dt) {
-  if (!LOVE.on || mode !== 'love') return; LOVE.t += dt;
+  if (!LOVE.on || mode !== 'love') return; LOVE.t += dt; LOVE.actCd = Math.max(0, LOVE.actCd - dt);
   for (const h of LOVE.hearts) if (!h.got) { h.g.rotation.y += dt * 2; h.g.position.y = 1.1 + Math.sin(LOVE.t * 3 + h.ph) * 0.12; }
-  const sv = LOVE.sv;
-  if (sv && sv.state === 'alive' && LOVE.phase === 'walk' && state === 'play') { const dx = player.pos.x - sv.pos.x, dz = player.pos.z - sv.pos.z, d = Math.hypot(dx, dz); if (d > 2.4) walkNpc(sv, player.pos.x, player.pos.z, 3.4, dt); else { sv.speed = 0; sv.yaw = Math.atan2(dx, dz); } pushOutAABBs(sv.pos, 0.3, 0); sv.pos.y = 0; sv.root.position.copy(sv.pos); sv.root.rotation.y = sv.yaw; }
-  if (LOVE.phase === 'walk' && state === 'play' && !player.dead) for (const h of LOVE.hearts) if (!h.got && Math.hypot(player.pos.x - h.x, player.pos.z - h.z) < 1.5) {
+  const sv = LOVE.sv, play = state === 'play' && !player.dead;
+  if (sv && sv.state === 'alive' && (LOVE.phase === 'walk' || LOVE.phase === 'bridge') && play) {
+    const dx = player.pos.x - sv.pos.x, dz = player.pos.z - sv.pos.z, d = Math.hypot(dx, dz);
+    if (LOVE.approach) { if (d > 1.5) { walkNpc(sv, player.pos.x, player.pos.z, 3.6, dt); } else { sv.speed = 0; LOVE.approach = null; loveAct('kiss', true); } }
+    else if (d > 2.4) walkNpc(sv, player.pos.x, player.pos.z, 3.4, dt); else { sv.speed = 0; sv.yaw = Math.atan2(dx, dz); }
+    if (sv.pose === 'hug' && (sv.poseT || 0) > 0) { /* pose plays itself */ }
+    pushOutAABBs(sv.pos, 0.3, 0); sv.pos.y = 0; sv.root.position.copy(sv.pos); sv.root.rotation.y = sv.yaw;
+    if (LOVE.phase === 'walk' && !LOVE.approach) { LOVE.kissT -= dt; if (LOVE.kissT <= 0) { LOVE.approach = true; LOVE.kissT = rand(24, 34); } }
+    const near = d < 2.6 && !LOVE.approach; const bt = loveBtns(); bt.style.display = near && play && LOVE.actCd <= 0 ? 'flex' : 'none';
+    if (near && LOVE.actCd <= 0) { /* buttons are shown */ }
+  }
+  if (LOVE.phase === 'walk' && play) for (const h of LOVE.hearts) if (!h.got && Math.hypot(player.pos.x - h.x, player.pos.z - h.z) < 1.5) {
     h.got = true; scene.remove(h.g); LOVE.got++; Sound.chime(); flashScreen('#ffd0ea', 300); toast(`💖 ${LOVE.got} из ${LOVE.hearts.length}`);
     if (LOVE.got < LOVE.hearts.length) loveSay('Свити', LOVE_LINES[Math.min(LOVE.got - 1, LOVE_LINES.length - 1)]); else { subOff(); loveTalk(); break; } }
-  if (LOVE.phase === 'dawn') { LOVE.dawnT += dt; const k = Math.min(1, LOVE.dawnT / 6); MAPS.lovechap.sun = lerp(1.1, 2.4, k); MAPS.lovechap.hemi = lerp(0.9, 1.4, k); sun.intensity = MAPS.lovechap.sun; hemi.intensity = MAPS.lovechap.hemi; if (LOVE.dawnT > 7 && state === 'play') loveFinish(); }
+  if (LOVE.phase === 'bridge' && play && Math.hypot(player.pos.x, player.pos.z - 17.5) < 2.2) loveEndCut();
+  if (LOVE.phase === 'dawn') { LOVE.dawnT += dt; const k = Math.min(1, LOVE.dawnT / 6); MAPS.lovechap.sun = lerp(1.1, 2.4, k); MAPS.lovechap.hemi = lerp(0.9, 1.4, k); sun.intensity = MAPS.lovechap.sun; hemi.intensity = MAPS.lovechap.hemi; if (LOVE.dawnT > 7 && state === 'play') loveFinalStart(); }
 }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
