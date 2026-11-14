@@ -12901,7 +12901,7 @@ function ideaParseWorld(t) {
   const who = () => ideaFindWho(t);
   if (/коч\W{0,3}брат/.test(t)) return { k: 'location', kind: 'sauna' };
   if (/(танц\S*\W{0,3}пантер|пантер\S*\W{0,3}танц)/.test(t)) return { k: 'location', kind: 'cottage' };
-  if (/(^|[^а-я])голода([^а-я]|$)/.test(t)) return { k: 'location', kind: 'school' };
+  if (/(^|[^а-я])голда([^а-я]|$)/.test(t)) return { k: 'location', kind: 'school' };
   if (/свадьб|поженит|женить|венчан|замуж|бракосочет/.test(t)) return { k: 'wedding', who: who() };
   if (/стату[яюи]|памятник|скульптур/.test(t)) return { k: 'statue', who: who(), t };
   if (/карт|арен|зон[ауы]|площадк|мир(?!о)/.test(t) && /уменьш|сузи|суж|сжат|сжим|меньш|маленьк|сократ|урез|теснее/.test(t)) return { k: 'zone' };
