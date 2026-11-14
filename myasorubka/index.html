@@ -12988,53 +12988,6 @@ function buildLoveFinal() {
 }
 function loveHeart(x, z, ph) { const { g } = imBuild(IM.heart()); g.scale.setScalar(1.1); g.position.set(x, 1.1, z); scene.add(g); mapObjs.push(g); LOVE.hearts.push({ g, x, z, ph, got: false }); }
 function loveSay(who, text, secs = 3.2) { sub(who, text); story.typ = null; $('cutText').textContent = text; const tok = (LOVE.sayTok = (LOVE.sayTok || 0) + 1); later(secs, () => { if (LOVE.sayTok === tok) subOff(); }); }
-/* «Сказать»: a real model answers as Svity, in love. No canned replies: if the viewer cannot reach the model, the button stays hidden */
-const LOVE_SYS = 'Ты — Свити, девушка главного героя. Ты очень любишь его, говоришь тепло, нежно и коротко (1–3 предложения), по-русски. Никакого насилия, оружия и стрельбы. Отвечай только как Свити, без пояснений и без кавычек.';
-function loveSayUi() {
-  let d = document.getElementById('loveSay'); if (d) return d;
-  d = document.createElement('div'); d.id = 'loveSay'; d.style.cssText = 'position:fixed;left:50%;bottom:calc(30% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:49;display:none;width:min(480px,86vw);gap:6px;pointer-events:auto;font-family:var(--ui)';
-  d.innerHTML = '<div id="loveKeyRow" style="display:none;width:100%;gap:6px"><input id="loveKeyIn" type="password" placeholder="Ваш ключ ИИ (хранится только в этом браузере)" style="flex:1;min-width:0;font:600 12px var(--ui);padding:7px 9px;border-radius:9px;border:2px solid #888;background:#0e0812;color:#fff"><button class="btn" id="loveKeySave" style="padding:6px 10px;margin:0">OK</button></div><input id="loveIn" maxlength="200" placeholder="Скажи Свити что-нибудь…" style="flex:1;min-width:0;font:700 14px var(--ui);padding:9px 10px;border-radius:9px;border:2px solid #ff5ab4;background:#0e0812;color:#fff"><button class="btn primary" id="loveSend" style="padding:6px 14px;margin:0">➤</button>';
-  document.body.appendChild(d); d.querySelectorAll('input,button').forEach((el) => ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => el.addEventListener(e, (ev) => ev.stopPropagation())));
-  const inp = d.querySelector('#loveIn'); inp.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') loveSend(); }); inp.addEventListener('keyup', (e) => e.stopPropagation());
-  d.querySelector('#loveSend').onclick = loveSend;
-  d.querySelector('#loveKeySave').onclick = () => { const k = d.querySelector('#loveKeyIn').value.trim(); if (!k) return; loveKeySave(k); d.querySelector('#loveKeyIn').value = ''; LOVE.canSay = true; d.querySelector('#loveKeyRow').style.display = 'none'; toast('Ключ сохранён в этом браузере'); };
-  d.querySelectorAll('#loveKeyIn,#loveIn').forEach((el) => el.addEventListener('keydown', (e) => e.stopPropagation()));
-  return d;
-}
-/* the model endpoint is public; the key is the player's own and lives only in their browser */
-const LOVE_API = { url: 'https://router.nodul.ru/api/v1/chat/completions', model: 'global-1/google/gemma-3-4b-it' };
-function loveKey() { try { return localStorage.getItem('myasorubka-ai-key') || ''; } catch (e) { return ''; } }
-function loveKeySave(k) { try { if (k) localStorage.setItem('myasorubka-ai-key', k); else localStorage.removeItem('myasorubka-ai-key'); } catch (e) {} }
-async function loveAsk(text) {
-  let S = null; try { if (window.claude && claude.use) S = await claude.use('sample'); } catch (e) { S = null; }
-  const key = S ? '' : loveKey();
-  if (!S && !key) { loveSay('Свити', 'Чтобы я могла ответить, вставьте свой ключ ИИ в окне «СКАЗАТЬ».', 5); return; }
-  loveSay('Свити', 'Думаю, что ответить…', 30);
-  try {
-    let t = '';
-    if (S) { const r = await S([{ role: 'user', content: LOVE_SYS + '\n\nГерой говорит тебе: «' + text + '». Ответь ему.' }], { modelTier: 'quick' }); t = String((r && r.text) || ''); }
-    else {
-      const res = await fetch(LOVE_API.url, { method: 'POST', headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' }, body: JSON.stringify({ model: LOVE_API.model, max_tokens: 150, messages: [{ role: 'system', content: LOVE_SYS }, { role: 'user', content: text }] }) });
-      if (!res.ok) throw new Error('http ' + res.status);
-      const j = await res.json(); t = String((j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '');
-    }
-    t = t.trim().slice(0, 240); if (LOVE.on) loveSay('Свити', t || '…', 9);
-  } catch (e) { if (LOVE.on) loveSay('Свити', 'Прости, я немного задумалась. Скажи ещё раз?', 5); }
-}
-function loveSend() { const d = document.getElementById('loveSay'), i = d && d.querySelector('#loveIn'); const v = i ? i.value.trim() : ''; if (!v || !LOVE.on) return; i.value = ''; d.style.display = 'none'; i.blur(); loveAsk(v); }
-/* the «СКАЗАТЬ» button is always there in the chapter, once the model is reachable */
-function loveSayBtn() {
-  let b = document.getElementById('lvSay'); if (b) return b;
-  b = document.createElement('button'); b.id = 'lvSay'; b.className = 'btn primary'; b.textContent = '💬 СКАЗАТЬ'; b.style.cssText = 'position:fixed;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(30% + env(safe-area-inset-bottom,0px));z-index:49;display:none;font:900 15px var(--ui);padding:10px 14px;pointer-events:auto;box-shadow:0 0 18px rgba(255,90,180,.6)';
-  ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => b.addEventListener(e, (ev) => ev.stopPropagation()));
-  b.onclick = () => { const d = loveSayUi(); const open = d.style.display !== 'flex'; d.style.display = open ? 'flex' : 'none'; if (open) { const kr = d.querySelector('#loveKeyRow'); kr.style.display = (!LOVE.sampleOk && !loveKey()) ? 'flex' : 'none'; d.querySelector('#loveIn').focus(); } };
-  document.body.appendChild(b); return b;
-}
-async function loveProbe() {
-  let S = null; try { if (window.claude && claude.use) S = await claude.use('sample'); } catch (e) { S = null; }
-  LOVE.sampleOk = !!S; const ok = !!S || !!loveKey(); LOVE.canSay = ok; loveSayBtn().dataset.ok = ok ? '1' : ''; return ok;
-}
-async function loveProbeLoop() { for (let i = 0; i < 10 && LOVE.on; i++) { if (await loveProbe()) return; await new Promise((r) => setTimeout(r, 1200)); } }
 function loveBtns() {
   let d = document.getElementById('loveBtns'); if (d) return d;
   d = document.createElement('div'); d.id = 'loveBtns'; d.style.cssText = 'position:fixed;left:50%;bottom:calc(16% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:49;display:none;gap:10px;pointer-events:auto';
@@ -13059,11 +13012,11 @@ function loveStart() {
   { const fi = WEAPONS.findIndex((w) => w.id === 'fists'); if (fi >= 0) selectWeapon(fi); W.switchT = 0; W.fireHeld = false; }
   const sv = mkNpc('svity-street', 1.8, 2.6, Math.PI, 'human'); sv.scripted = true; sv.protect = true; sv.protMsg = 'Свити не стреляет'; sv.pose = 'stand'; sv.poseDur = Infinity; LOVE.sv = sv;
   const spots = [[-7, -7], [7, -7], [-8, 5], [8, 6], [0, -10], [3, 9], [-16, -4], [16, 3], [-12, 14], [12, -15]]; spots.forEach(([x, z], i) => loveHeart(x, z, i));
-  loveBtns(); loveSayBtn(); loveProbeLoop(); Music.stop(); Music.start('tender'); resume();
+  loveBtns(); Music.stop(); Music.start('tender'); resume();
   showCard('ГЛАВА 1 · СЕКРЕТНАЯ', 'Чистая любовь'); loveSay('Свити', 'Привет… Собери все сердца, пока не взошло солнце.');
 }
 function loveTalk() {
-  LOVE.phase = 'talk'; loveSayBtn().style.display = 'none'; const sv = LOVE.sv, pp = player.pos.clone();
+  LOVE.phase = 'talk'; const sv = LOVE.sv, pp = player.pos.clone();
   if (sv && sv.state === 'alive') { sv.pos.set(pp.x + 1.2, 0, pp.z - 1.2); sv.root.position.copy(sv.pos); sv.yaw = Math.PI; }
   const steps = LOVE_TALK.map(([at, who, text]) => [at, () => sub(who === 'Вы' ? IDEA.name : 'Свити', text)]); steps.push([15.2, () => subOff()]);
   story.showAvatar = true; IDEA.cut = true; loveBtns().style.display = 'none';
@@ -13078,7 +13031,7 @@ function loveFinalStart() {
   resume(); showCard('ГЛАВА 1 · КОНЕЦ', 'Озеро на рассвете'); loveSay('Свити', 'Пойдём, покажу тебе место, где я ждала тебя.');
 }
 function loveEndCut() {
-  LOVE.phase = 'end'; loveBtns().style.display = 'none'; loveSayBtn().style.display = 'none'; const sv = LOVE.sv; if (sv && sv.state === 'alive') { sv.pos.set(player.pos.x - 1, 0, player.pos.z - 0.6); sv.root.position.copy(sv.pos); }
+  LOVE.phase = 'end'; loveBtns().style.display = 'none'; const sv = LOVE.sv; if (sv && sv.state === 'alive') { sv.pos.set(player.pos.x - 1, 0, player.pos.z - 0.6); sv.root.position.copy(sv.pos); }
   const steps = [[0.5, () => sub('Свити', 'Смотри. Солнце пришло.')], [4.0, () => sub(IDEA.name, 'Теперь я тоже знаю, где тебя искать.')], [8.0, () => sub('Свити', 'Тогда больше не теряемся.')], [12.0, () => subOff()]];
   story.showAvatar = true; IDEA.cut = true;
   runCut(steps, (t) => { const c = player.pos, a = t * 0.12, r = 4.2; camera.position.set(c.x + Math.sin(a) * r, 1.8, c.z + Math.cos(a) * r); camera.lookAt(c.x, 1.4, c.z - 2); }, 14, () => { IDEA.cut = false; story.showAvatar = false; subOff(); loveFinish(); });
@@ -13104,7 +13057,6 @@ function updLove(dt) {
     const near = d < 2.6 && !LOVE.approach; const bt = loveBtns(); bt.style.display = near && play && LOVE.actCd <= 0 ? 'flex' : 'none';
     if (near && LOVE.actCd <= 0) { /* buttons are shown */ }
   }
-  { const sb = loveSayBtn(); sb.style.display = LOVE.canSay && play && LOVE.phase !== 'end' ? '' : 'none'; }
   if (LOVE.phase === 'walk' && play) for (const h of LOVE.hearts) if (!h.got && Math.hypot(player.pos.x - h.x, player.pos.z - h.z) < 1.5) {
     h.got = true; scene.remove(h.g); LOVE.got++; Sound.chime(); flashScreen('#ffd0ea', 300); toast(`💖 ${LOVE.got} из ${LOVE.hearts.length}`);
     if (LOVE.got < LOVE.hearts.length) loveSay('Свити', LOVE_LINES[Math.min(LOVE.got - 1, LOVE_LINES.length - 1)]); else { subOff(); loveTalk(); break; } }
@@ -13812,7 +13764,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, loveAsk, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
