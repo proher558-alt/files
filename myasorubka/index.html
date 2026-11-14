@@ -12974,6 +12974,8 @@ function buildLoveChap() {
   for (let i = 0; i < 14; i++) { const a = i / 14 * 6.283, m = new THREE.Mesh(IM_G.sph, imMat(pick([0xff7aa8, 0xffffff, 0xffd0e0]), true)); m.position.set(Math.cos(a) * 14, 0.3, Math.sin(a) * 14); m.scale.setScalar(0.5); addMesh(m); }
 }
 function loveHeart(x, z, ph) { const { g } = imBuild(IM.heart()); g.scale.setScalar(1.1); g.position.set(x, 1.1, z); scene.add(g); mapObjs.push(g); LOVE.hearts.push({ g, x, z, ph, got: false }); }
+/* subtitles in free play must hide by themselves, otherwise the dark panel stays on screen */
+function loveSay(who, text) { sub(who, text); const tok = (LOVE.sayTok = (LOVE.sayTok || 0) + 1); later(3.2, () => { if (LOVE.sayTok === tok) subOff(); }); }
 function loveStart() {
   Object.assign(LOVE, { on: true, t: 0, got: 0, phase: 'walk', dawnT: 0, cutT: 0, hearts: [] });
   IDEA.on = false; IDEA.cut = false; IDEA.lotFreeze = false; IDEA.asking = false; mode = 'love'; { const u = document.getElementById('ideaUi'); if (u) u.style.display = 'none'; const q = document.getElementById('ideaAsk'); if (q) q.style.display = 'none'; } ideaCard('');
@@ -12982,7 +12984,7 @@ function loveStart() {
   const spots = [[-7, -7], [7, -7], [-8, 5], [8, 6], [0, -10], [3, 9]]; spots.forEach(([x, z], i) => loveHeart(x, z, i));
   { const fi = WEAPONS.findIndex((w) => w.id === 'fists'); if (fi >= 0) selectWeapon(fi); W.switchT = 0; W.fireHeld = false; }
   Music.stop(); Music.start('tender'); resume();
-  showCard('ГЛАВА 1 · СЕКРЕТНАЯ', 'Чистая любовь'); sub('Свити', 'Привет… Собери все сердца, пока не взошло солнце.');
+  showCard('ГЛАВА 1 · СЕКРЕТНАЯ', 'Чистая любовь'); loveSay('Свити', 'Привет… Собери все сердца, пока не взошло солнце.');
 }
 function loveTalk() {
   LOVE.phase = 'talk'; const sv = LOVE.sv, pp = player.pos.clone();
@@ -13007,7 +13009,7 @@ function updLove(dt) {
   if (sv && sv.state === 'alive' && LOVE.phase === 'walk' && state === 'play') { const dx = player.pos.x - sv.pos.x, dz = player.pos.z - sv.pos.z, d = Math.hypot(dx, dz); if (d > 2.4) walkNpc(sv, player.pos.x, player.pos.z, 3.4, dt); else { sv.speed = 0; sv.yaw = Math.atan2(dx, dz); } pushOutAABBs(sv.pos, 0.3, 0); sv.pos.y = 0; sv.root.position.copy(sv.pos); sv.root.rotation.y = sv.yaw; }
   if (LOVE.phase === 'walk' && state === 'play' && !player.dead) for (const h of LOVE.hearts) if (!h.got && Math.hypot(player.pos.x - h.x, player.pos.z - h.z) < 1.5) {
     h.got = true; scene.remove(h.g); LOVE.got++; Sound.chime(); flashScreen('#ffd0ea', 300); toast(`💖 ${LOVE.got} из ${LOVE.hearts.length}`);
-    if (LOVE.got < LOVE.hearts.length) sub('Свити', LOVE_LINES[Math.min(LOVE.got - 1, LOVE_LINES.length - 1)]); else { subOff(); loveTalk(); break; } }
+    if (LOVE.got < LOVE.hearts.length) loveSay('Свити', LOVE_LINES[Math.min(LOVE.got - 1, LOVE_LINES.length - 1)]); else { subOff(); loveTalk(); break; } }
   if (LOVE.phase === 'dawn') { LOVE.dawnT += dt; const k = Math.min(1, LOVE.dawnT / 6); MAPS.lovechap.sun = lerp(1.1, 2.4, k); MAPS.lovechap.hemi = lerp(0.9, 1.4, k); sun.intensity = MAPS.lovechap.sun; hemi.intensity = MAPS.lovechap.hemi; if (LOVE.dawnT > 7 && state === 'play') loveFinish(); }
 }
 /* ----- the final screen of location 3 ----- */
