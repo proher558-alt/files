@@ -3738,7 +3738,7 @@ const crateMat = std({ map: TEX.wood, roughness: 0.75 });
 const barrelMat = std({ map: TEX.barrel, roughness: 0.45, metalness: 0.5, envMapIntensity: 0.5 });
 const crateGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8), barrelGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.9, 22);
 function spawnProp(kind, x, z, y = null) {
-  if (props.length >= 30) removeProp(props[0]);
+  if (props.length >= (mode === 'ideas' ? 44 : 30)) removeProp(props[0]);
   const isB = kind === 'barrel', sc = clamp(propCfgScale(kind), 0.3, settings.ultra ? 9 : 3);
   const m = new THREE.Mesh(isB ? barrelGeo : crateGeo, isB ? barrelMat : crateMat); m.scale.setScalar(sc); m.castShadow = true; m.receiveShadow = true; scene.add(m);
   const b = new CANNON.Body({ mass: (isB ? 30 : 25) * Math.min(8, sc * sc * sc), material: mProp, position: new CANNON.Vec3(x, y ?? (isB ? 0.46 : 0.41) * sc, z), collisionFilterGroup: G_PROP, collisionFilterMask: G_STATIC | G_BODY | G_GIB | G_PROP, angularDamping: 0.2 });
@@ -3760,7 +3760,7 @@ function later(t, fn) { timers.push({ t, fn }); }
 /* ===================== targets ===================== */
 let targetsCache = [];
 function getTargets() {
-  if (targetsDirty) { targetsCache = envMeshes.slice(); for (const p of props) targetsCache.push(p.m); for (const g of gibs) targetsCache.push(g.m); for (const n of npcs) for (const P of n.partList) if (!P.gone) targetsCache.push(P.mesh); targetsDirty = false; }
+  if (targetsDirty) { targetsCache = envMeshes.slice(); for (const p of props) { if (p.parts) for (const q of p.parts) targetsCache.push(q); else targetsCache.push(p.m); } for (const g of gibs) targetsCache.push(g.m); for (const n of npcs) for (const P of n.partList) if (!P.gone) targetsCache.push(P.mesh); targetsDirty = false; }
   return targetsCache;
 }
 const raycaster = new THREE.Raycaster();
@@ -11998,8 +11998,8 @@ const IDEA_WORDS = [
   ['кошк', 'emoji', '🐈'], ['собак', 'emoji', '🐕'], ['коров', 'emoji', '🐄'], ['свин', 'emoji', '🐖'], ['куриц', 'emoji', '🐔'], ['рыб', 'emoji', '🐟'], ['акул', 'emoji', '🦈'], ['лягуш', 'emoji', '🐸'], ['утк', 'emoji', '🦆'], ['лебед', 'emoji', '🦢'],
   ['пингвин', 'emoji', '🐧'], ['медвед', 'emoji', '🐻'], ['тигр', 'emoji', '🐯'], ['слон', 'emoji', '🐘'], ['жираф', 'emoji', '🦒'], ['обезьян', 'emoji', '🐒'], ['зме', 'emoji', '🐍'], ['паук', 'emoji', '🕷'], ['пчел', 'emoji', '🐝'], ['кролик', 'emoji', '🐇'],
   ['хомяк', 'emoji', '🐹'], ['лошад', 'emoji', '🐎'], ['овц', 'emoji', '🐑'], ['кит', 'emoji', '🐋'], ['осьминог', 'emoji', '🐙'], ['крокодил', 'emoji', '🐊'], ['динозавр', 'emoji', '🦖'], ['единорог', 'emoji', '🦄'], ['ежик', 'emoji', '🦔'], ['сова', 'emoji', '🦉'],
-  ['арбуз', 'emoji', '🍉'], ['яблок', 'emoji', '🍎'], ['кирпич', 'emoji', '🧱'], ['камн', 'emoji', '🪨'], ['камен', 'emoji', '🪨'], ['утюг', 'emoji', '🧺'], ['холодильник', 'emoji', '🧊'], ['телевизор', 'emoji', '📺'], ['диван', 'emoji', '🛋'], ['стул', 'emoji', '🪑'],
-  ['унитаз', 'emoji', '🚽'], ['ванн', 'emoji', '🛁'], ['пианино', 'emoji', '🎹'], ['роял', 'emoji', '🎹'], ['сейф', 'emoji', '🔒'], ['наковальн', 'emoji', '⚒'], ['гир', 'emoji', '🏋'], ['ботин', 'emoji', '👞'], ['тапк', 'emoji', '🩴'], ['тапок', 'emoji', '🩴'],
+  ['арбуз', 'emoji', '🍉'], ['яблок', 'emoji', '🍎'], ['кирпич', 'emoji', '🧱'], ['камн', 'emoji', '🪨'], ['камен', 'emoji', '🪨'], ['утюг', 'emoji', '🧺'], ['холодильник', 'emoji', '🗄'], ['телевизор', 'emoji', '📺'], ['диван', 'emoji', '🛋'], ['стул', 'emoji', '🪑'],
+  ['унитаз', 'emoji', '🚽'], ['ванн', 'emoji', '🛁'], ['пианино', 'emoji', '🎹'], ['туалет', 'emoji', '🚽'], ['толчок', 'emoji', '🚽'], ['сортир', 'emoji', '🚽'], ['кресл', 'emoji', '🛋'], ['телек', 'emoji', '📺'], ['ноутбук', 'emoji', '💻'], ['смартфон', 'emoji', '📱'], ['айфон', 'emoji', '📱'], ['гантел', 'emoji', '🏋'], ['чайник', 'emoji', '🍲'], ['мишк', 'soft', '🧸'], ['мишек', 'soft', '🧸'], ['мартыш', 'emoji', '🐒'], ['льв', 'emoji', '🐯'], ['роял', 'emoji', '🎹'], ['сейф', 'emoji', '🔒'], ['наковальн', 'emoji', '⚒'], ['гир', 'emoji', '🏋'], ['ботин', 'emoji', '👞'], ['тапк', 'emoji', '🩴'], ['тапок', 'emoji', '🩴'],
   ['кастрюл', 'emoji', '🍲'], ['сковород', 'emoji', '🍳'], ['ведр', 'emoji', '🪣'], ['шарик', 'soft', '🎈'], ['мяч', 'soft', '⚽'], ['подуш', 'soft', '🛏'], ['игруш', 'soft', '🧸'], ['книг', 'emoji', '📚'], ['компьютер', 'emoji', '💻'], ['телефон', 'emoji', '📱'],
   ['град', 'emoji', '🧊'], ['колокол', 'emoji', '🔔'], ['барабан', 'music', ''], ['гитар', 'music', ''],
   // food heals
@@ -12032,9 +12032,9 @@ const IDEA_WORDS = [
   ['кошек', 'emoji', '🐈'], ['уток', 'emoji', '🦆'], ['овец', 'emoji', '🐑'], ['ведер', 'emoji', '🪣'], ['филин', 'emoji', '🦉'], ['банановая', 'slip'], ['все маленьк', 'shrinkall'], ['все крошеч', 'shrinkall'], ['все велик', 'growall'], ['все огромн', 'growall'], ['клон', 'clone'], ['двойник', 'clone'], ['копию', 'clone'], ['армия', 'army'], ['армию', 'army'], ['полици', 'army'], ['охранник', 'army'],
 ];
 /* ===================== SERVERS · «ВЫЖИВИ СВОИ ИДЕИ»: a battle royale where every 10 seconds what you write comes true ===================== */
-const IDEA = { on: false, bots: [], feed: [], pending: '', name: 'Игрок', roundT: 20, drops: [], fx: [], mines: [], cut: false, round: 0, sent: 0, ok: 0, t0: 0, form: '', look: null, scale: 1, spd: 1, armor: 1, dmgMul: 1, evade: 0, lives: 0, ghost: 0, shield: 0, spdT: 0, lava: 0, acid: 0, grav: 0, night: 0, dance: 0, tornado: 0, car: 0, allow: ['fists', 'pistol'], over: false, kills0: 0 };
+const IDEA = { on: false, bots: [], feed: [], pending: '', name: 'Игрок', roundT: 20, drops: [], fx: [], mines: [], cut: false, locs: [], statues: [], guests: 0, zone: null, rocket: null, riding: false, chute: false, canopy: null, round: 0, sent: 0, ok: 0, t0: 0, form: '', look: null, scale: 1, spd: 1, armor: 1, dmgMul: 1, evade: 0, lives: 0, ghost: 0, shield: 0, spdT: 0, lava: 0, acid: 0, grav: 0, night: 0, dance: 0, tornado: 0, car: 0, allow: ['fists', 'pistol'], over: false, kills0: 0 };
 const IDEA_NAMES = ['КиллерКот', 'Вася_228', 'ПельменьБог', 'Нагибатор3000', 'ТихийУжас', 'Лёха', 'Mr_Zombie', 'Кексик', 'БабкаСТапком', 'Шаурмен', 'ДедИнсайд', 'КотБаюн', 'Ржавый', 'Пончик', 'Тень', 'Сосиска', 'ГромГромыч', 'Пуля', 'Снежок', 'Бублик', 'ЖелезныйДрын', 'Креветка', 'Таракан', 'ЗлойГусь', 'Бульдозер', 'Кактус', 'Варенье', 'Пиксель', 'ХомякУбийца', 'Чебурек', 'Дрон', 'Лягушонок', 'КапитанКрюк', 'Гаечка', 'Мармелад', 'Фантом', 'Капуста', 'Йогурт', 'Свинтус', 'Огурчик', 'Чупакабра', 'Валера', 'Маргарита', 'Ниндзя', 'Пират', 'Холодец', 'Шпрот', 'Зефир', 'Буран', 'Ватрушка'];
-const IDEA_BOT = ['дождь из гранат', 'призвать 3 зомби', 'превратиться в великана', 'стать маленьким', 'пол это лава', 'невесомость', 'торнадо', 'метеорит на {n}', 'молния в {n}', 'дай мне автомат', 'дай мне дробовик', 'аптечка', 'превратиться в хаги ваги', 'стать воскресителем', 'превратиться в свити', 'стать невидимым', 'землетрясение', 'кислотный дождь', 'ночь', 'машина сбивает {n}', 'взорвать {n}', 'призвать 2 солдат', 'дождь из бочек', 'бессмертие', 'огонь вокруг {n}', 'хочу пиццу', 'все танцуют', 'огромный ботинок', 'превратиться в зомби', 'быстрые ноги', 'убить {n}', 'дождь из ящиков', 'гигантский утюг', 'призвать хаги ваги', 'стать призраком', 'дай мне огнемёт', 'бензопила мне', 'падающий холодильник на {n}', 'дождь из кошек', 'дождь из арбузов', 'хочу шаурму', 'заморозить всех', 'туман', 'цунами', 'чёрная дыра', 'ядовитый газ на {n}', 'вирус', 'салют', 'дискотека', 'замедлить время', 'батут', 'телепорт к {n}', 'построить крепость', 'мины', 'банановая кожура', 'деньги', 'все маленькие', 'клоны', 'армия', 'превратиться в дракона', 'стать роботом', 'превратиться в ниндзя', 'стать сириусом', 'превратиться в динозавра', 'стать котом', 'адская жара', 'солнце', 'радуга', 'дождь из унитазов', 'падающее пианино на {n}', 'пицца', 'вулкан', 'извержение', 'дождь из акул'];
+const IDEA_BOT = ['дождь из гранат', 'призвать 3 зомби', 'превратиться в великана', 'стать маленьким', 'пол это лава', 'невесомость', 'торнадо', 'метеорит на {n}', 'молния в {n}', 'дай мне автомат', 'дай мне дробовик', 'аптечка', 'превратиться в хаги ваги', 'стать воскресителем', 'превратиться в свити', 'стать невидимым', 'землетрясение', 'кислотный дождь', 'ночь', 'машина сбивает {n}', 'взорвать {n}', 'призвать 2 солдат', 'дождь из бочек', 'бессмертие', 'огонь вокруг {n}', 'хочу пиццу', 'все танцуют', 'огромный ботинок', 'превратиться в зомби', 'быстрые ноги', 'убить {n}', 'дождь из ящиков', 'гигантский утюг', 'призвать хаги ваги', 'стать призраком', 'дай мне огнемёт', 'бензопила мне', 'падающий холодильник на {n}', 'дождь из кошек', 'дождь из арбузов', 'хочу шаурму', 'заморозить всех', 'туман', 'цунами', 'чёрная дыра', 'ядовитый газ на {n}', 'вирус', 'салют', 'дискотека', 'замедлить время', 'батут', 'телепорт к {n}', 'построить крепость', 'мины', 'банановая кожура', 'деньги', 'все маленькие', 'клоны', 'армия', 'превратиться в дракона', 'стать роботом', 'превратиться в ниндзя', 'стать сириусом', 'превратиться в динозавра', 'стать котом', 'дождь из туалетов', 'свадьба {n} и {m}', 'свадьба на пляже', 'статуя {n}', 'уменьшить карту', 'ракета', 'призвать воскресителя', 'призвать мелоди', 'призвать свити', 'призвать продюсера', 'построить замок', 'фонтан', 'пирамида', 'церковь', 'дождь из слонов', 'дождь из холодильников', 'адская жара', 'солнце', 'радуга', 'дождь из унитазов', 'падающее пианино на {n}', 'пицца', 'вулкан', 'извержение', 'дождь из акул', 'дождь из унитазов'];
 const IDEA_OUT = ['съеден зомби', 'упал с края арены', 'взорвался на своей же гранате', 'превратился в табуретку', 'поскользнулся на банановой кожуре', 'его забрал НЛО', 'сгорел в лаве', 'вышел покушать', 'раздавлен огромным ботинком', 'укушен хаги ваги', 'исчез в портале', 'его идея обернулась против него'];
 const IDEA_HINTS = ['дождь из гранат', 'превратиться в великана', 'стать невидимым', 'призвать 3 зомби', 'дай мне автомат', 'пол это лава', 'молния в КиллерКот', 'превратиться в машину', 'превратиться в хаги ваги', 'стать воскресителем', 'торнадо', 'метеорит на Вася_228', 'аптечка', 'бессмертие', 'все танцуют', 'огромный арбуз', 'дождь из кошек', 'заморозить всех', 'чёрная дыра', 'цунами', 'превратиться в дракона', 'стать ниндзя', 'дискотека', 'замедлить время', 'построить крепость', 'мины', 'батут', 'ядовитый газ', 'салют', 'хочу пиццу', 'вирус', 'все маленькие'];
 const IDEA_EMB = 12;
@@ -12067,18 +12067,22 @@ function ideaEmbody(b, x, z) {
 }
 function ideaRelook(b, look) { b.look = look; if (!b.n || b.n.state !== 'alive') return; const n = b.n, x = n.pos.x, z = n.pos.z, k = n.hp / n.maxHp; n.dispose(); ideaEmbody(b, x, z); b.n.hp = b.n.maxHp * k; }
 function ideaKillBot(b, why) { if (!b.alive) return; b.alive = false; if (b.n && b.n.state !== 'dead') { if (b.n.state === 'alive') b.n.die('zombie'); else b.n.die('zombie'); } ideaFeed(`☠ ${b.name} выбыл${why ? ': ' + why : ''}`, '#ff8a8a'); }
-function ideaHurtBot(b, d, why, dir) { if (!b.alive) return; if (!b.n) { if (Math.random() < d / 100) ideaKillBot(b, why); return; } if (b.shield > 0 || b.ghost > 0) return; const n = b.n; n.hp -= d; n.flinch = 1; chestOf(n, _a); bloodSpray(_a, dir || UP, 12, 0.6, 1, 3, 0.004, 0.01); if (n.hp <= 0) { if (b.lives > 0) { b.lives--; n.hp = n.maxHp; flashScreen('#ffe9a0', 200); ideaFeed(`✨ ${b.name} воскрес`, '#ffd060'); return; } n.vel.set(rand(-2, 2), 2, rand(-2, 2)); ideaKillBot(b, why); } }
+function ideaHurtBot(b, d, why, dir) { if (!b.alive || b.boarded) return; if (!b.n) { if (Math.random() < d / 100) ideaKillBot(b, why); return; } if (b.shield > 0 || b.ghost > 0) return; const n = b.n; n.hp -= d; n.flinch = 1; chestOf(n, _a); bloodSpray(_a, dir || UP, 12, 0.6, 1, 3, 0.004, 0.01); if (n.hp <= 0) { if (b.lives > 0) { b.lives--; n.hp = n.maxHp; flashScreen('#ffe9a0', 200); ideaFeed(`✨ ${b.name} воскрес`, '#ffd060'); return; } n.vel.set(rand(-2, 2), 2, rand(-2, 2)); ideaKillBot(b, why); } }
 function ideaBotsUpd(dt) {
-  const emb = IDEA.bots.filter((b) => b.alive && b.n);
-  for (const b of IDEA.bots) { if (!b.alive || !b.n) continue; if (b.n.state === 'dead') { b.alive = false; ideaFeed(`☠ ${b.name} выбыл`, '#ff8a8a'); if (b.n.killedBy === 'shot' && b.lastHit !== 'bot') IDEA.kills = (IDEA.kills || 0) + 1; } }
+  const emb = IDEA.bots.filter((b) => b.alive && b.n && !b.boarded);
+  for (const b of IDEA.bots) { if (!b.alive || !b.n) continue; if (b.boarded) continue; if (b.n.state === 'dead') { b.alive = false; ideaFeed(`☠ ${b.name} выбыл`, '#ff8a8a'); if (b.n.killedBy === 'shot' && b.lastHit !== 'bot') IDEA.kills = (IDEA.kills || 0) + 1; } }
   if (emb.length < IDEA_EMB) { const pool = IDEA.bots.filter((b) => b.alive && !b.n); if (pool.length && Math.random() < dt * 1.5) ideaEmbody(pick(pool)); }
   for (const b of emb) {
     const n = b.n; if (n.state !== 'alive') continue; b.shield = Math.max(0, (b.shield || 0) - dt); b.ghost = Math.max(0, (b.ghost || 0) - dt); if (b.ghostVis !== (b.ghost > 0)) { b.ghostVis = b.ghost > 0; n.root.visible = !b.ghostVis; }
     if (IDEA.lotFreeze || IDEA.asking) { n.speed = 0; n.root.position.copy(n.pos); continue; }
+    if (b.chute > 0) { b.chute = Math.max(0, b.chute - 5.5 * dt); n.pos.y = b.chute; n.speed = 0; n.root.position.copy(n.pos); if (b.chute <= 0 && b.canopy) { n.root.remove(b.canopy); b.canopy = null; } continue; }
+    if (IDEA.zone && (Math.abs(n.pos.x) > IDEA.zone.half - 1.2 || Math.abs(n.pos.z) > IDEA.zone.half - 1.2)) { walkNpc(n, n.pos.x * 0.6, n.pos.z * 0.6, 3.8, dt); pushOutAABBs(n.pos, 0.3, 0); n.pos.y = 0; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; continue; }
+    if (IDEA.rocket && IDEA.rocket.state === 'count' && b.rk) { const R = IDEA.rocket; if (Math.hypot(R.x - n.pos.x, R.z - n.pos.z) > 1.6) walkNpc(n, R.x, R.z, 3.8, dt); else n.speed = 0; pushOutAABBs(n.pos, 0.3, 0); clampBounds(n.pos, 0.6); n.pos.y = 0; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; continue; }
+    if (b.dancing && !(b.stun > 0)) { b.dancing = false; n.pose = 'stand'; n.poseDur = 0; }
     if (b.stun > 0) { b.stun -= dt; n.speed = 0; if (b.ice) { b.ice.position.set(n.pos.x, b.ice.position.y, n.pos.z); if (b.stun <= 0) { scene.remove(b.ice); b.ice = null; Sound.click(1500, 0.1 * dv(n.pos)); } } n.root.position.copy(n.pos); continue; }
     if (IDEA.dance > 0) { if (n.pose !== 'dance') { n.pose = 'dance'; n.poseDur = Infinity; } n.speed = 0; n.root.position.copy(n.pos); continue; } else if (n.pose === 'dance') { n.pose = 'stand'; n.poseDur = 0; }
     if (IDEA.lava > 0 && Math.random() < dt * 0.6) n.hp -= 0; // they hop, see below
-    b.tT -= dt; if (b.tT <= 0 || !b.tgt || (b.tgt !== 'player' && (!b.tgt.alive || !b.tgt.n))) { b.tT = rand(1.2, 2.4); let best = null, bd = 1e9; const cands = emb.filter((o) => o !== b && o.alive && o.n && !(o.ghost > 0)); if (!player.dead && !(IDEA.ghost > 0) && !IDEA.over) cands.push('player'); for (const o of cands) { const p = o === 'player' ? player.pos : o.n.pos, d = Math.hypot(p.x - n.pos.x, p.z - n.pos.z) + rand(0, 6) + (o === 'player' ? 3 : 0); if (d < bd) { bd = d; best = o; } } b.tgt = best; }
+    b.tT -= dt; if (b.tT <= 0 || !b.tgt || (b.tgt !== 'player' && (!b.tgt.alive || !b.tgt.n))) { b.tT = rand(1.2, 2.4); let best = null, bd = 1e9; const cands = emb.filter((o) => o !== b && o.alive && o.n && !(o.ghost > 0)); if (!player.dead && !(IDEA.ghost > 0) && !IDEA.over && !IDEA.riding) cands.push('player'); for (const o of cands) { const p = o === 'player' ? player.pos : o.n.pos, d = Math.hypot(p.x - n.pos.x, p.z - n.pos.z) + rand(0, 6) + (o === 'player' ? 3 : 0); if (d < bd) { bd = d; best = o; } } b.tgt = best; }
     const T = b.tgt, tp = T === 'player' ? player.pos : T && T.n ? T.n.pos : null; if (!tp) { n.speed = 0; continue; }
     const dx = tp.x - n.pos.x, dz = tp.z - n.pos.z, d = Math.hypot(dx, dz) || 1, flee = n.hp < n.maxHp * 0.25 && Math.random() < 0.9, sp = 2.6 * (b.spd || 1) * (IDEA.lava > 0 ? 1.4 : 1);
     if (flee) { walkNpc(n, n.pos.x - dx / d * 4, n.pos.z - dz / d * 4, sp * 1.2, dt); }
@@ -12138,6 +12142,7 @@ function ideaParse(t) {
   const FORMS = [[/зомби|мертвец|пуст/, 'zombie'], [/гигант|великан|больш|огромн/, 'giant'], [/маленьк|муравь|крошеч|малыш|мыш/, 'small'], [/воскрес/, 'gg'], [/свити/, 'svity'], [/хаги|хагги|huggy/, 'huggy'], [/солдат|спецназ|воен/, 'soldier'], [/невидим|призрак|привидени/, 'ghost'], [/мелоди/, 'melodie'], [/машин|танк|авто|грузовик|фур/, 'car']];
   const wb = (st) => { let i = t.indexOf(st); while (i >= 0) { if (i === 0 || !/[а-яa-z]/.test(t[i - 1])) return true; i = t.indexOf(st, i + 1); } return false; };
   if (/превра|стать|стал|становл|я теперь|сделай меня|обернуть/.test(t)) { for (const [re, f] of FORMS) if (re.test(t)) return { k: 'form', f }; for (const st in IDEA_FX) if (wb(st)) return { k: 'formx', f: st }; }
+  { const PW = ideaParseWorld(t); if (PW) return PW; }
   if (/невидим|призрак/.test(t)) return { k: 'form', f: 'ghost' };
   if (/танц/.test(t)) return { k: 'dance' };
   if (/убить|убей|взорв|уничтож|казнить|прибить|сжечь|сожги/.test(t) && !/дожд/.test(t)) return { k: 'kill', all: /всех|(^|\s)все(\s|$)/.test(t), fire: /сжечь|сожги/.test(t) };
@@ -12170,6 +12175,7 @@ function ideaParse(t) {
 function ideaApply(text, who) {
   const P = ideaParse(text), t = text.toLowerCase().replace(/ё/g, 'е'), me = who || 'player', tg = ideaTarget(t, who), at = ideaPosOf(tg || me), why = `идея ${ideaWho(who)}`;
   IDEA.ckind = P.k; IDEA.focus = at.clone(); IDEA.focusS = 1;
+  { const r = ideaWorldApply(P, t, who, me, tg, at, why); if (r) return r; }
   { const r = ideaNewApply(P, t, who, me, tg, at, why); if (r) return r; }
   switch (P.k) {
     case 'form': { const o = tg && tg !== me && /его|ее|сделай/.test(t) ? tg : me; ideaForm(o, P.f); IDEA.focus = ideaPosOf(o); IDEA.focusS = o === 'player' ? IDEA.scale : o.scale || 1; const nm = { zombie: 'зомби', giant: 'великана', small: 'малыша', gg: 'воскресителя', svity: 'Свити', huggy: 'Хаги Ваги', soldier: 'солдата', ghost: 'призрака', melodie: 'Мелоди', car: 'машину' }[P.f]; return `${o === 'player' ? IDEA.name : o.name} превращается в ${nm}`; }
@@ -12218,7 +12224,7 @@ function ideaUiFeed() { const f = document.getElementById('ideaFeed'); if (!f) r
 function ideasMenu() {
   const d = c2Ui(); d.style.borderColor = '#ff5ab4'; let nick = 'Игрок'; try { nick = localStorage.getItem('myasorubka-nick') || 'Игрок'; } catch (e) {}
   d.innerHTML = '<small style="letter-spacing:.18em;color:#ff9ad0">СЕРВЕРЫ</small>'
-    + '<div style="text-align:left;border:1px solid #ff5ab4;border-radius:10px;padding:9px 11px;margin:8px 0;background:rgba(255,90,180,.08)"><b style="font-size:17px;color:#ff9ad0">☠ ВЫЖИВИ СВОИ ИДЕИ</b><br><small>🟢 онлайн 51/51 · пинг ' + (18 + randi(30)) + ' мс · королевская битва</small><div style="font-size:12px;margin-top:6px;line-height:1.4">Каждые <b>20 секунд</b> — эпичная лотерея «🎰 Кому повезёт?»: из всех живых выбирается <b>один</b> игрок, и сбывается только его идея. Если повезло вам — появляется окно ввода и 14 секунд на идею. Идея показывается своей катсценой. Она может появиться, произойти или превратить игрока в кого-то (более 350 слов: дожди из животных и еды, мороз, цунами, чёрная дыра, дискотека, мины, драконы, ниндзя…). 50 ботов тоже пишут свои идеи. <b>Шанс</b> выпасть вам — 1 из числа живых: чем меньше выживших, тем он выше. Цель — остаться последним.</div>'
+    + '<div style="text-align:left;border:1px solid #ff5ab4;border-radius:10px;padding:9px 11px;margin:8px 0;background:rgba(255,90,180,.08)"><b style="font-size:17px;color:#ff9ad0">☠ ВЫЖИВИ СВОИ ИДЕИ</b><br><small>🟢 онлайн 51/51 · пинг ' + (18 + randi(30)) + ' мс · королевская битва</small><div style="font-size:12px;margin-top:6px;line-height:1.4">Каждые <b>20 секунд</b> — эпичная лотерея «🎰 Кому повезёт?»: из всех живых выбирается <b>один</b> игрок, и сбывается только его идея. Если повезло вам — появляется окно ввода и 14 секунд на идею. Идея показывается своей катсценой. Она может появиться, произойти или превратить игрока в кого-то (более 400 слов: дожди из зверей, унитазов и еды, мороз, цунами, чёрная дыра, дискотека, мины, драконы, ниндзя; <b>свадьбы</b> на разных локациях, <b>статуи</b>, замок и пирамида, <b>сужение арены</b>, <b>ракета</b>, призыв героев игры. Построенное остаётся навсегда). 50 ботов тоже пишут свои идеи. <b>Шанс</b> выпасть вам — 1 из числа живых: чем меньше выживших, тем он выше. Цель — остаться последним.</div>'
     + '<div style="display:flex;gap:6px;align-items:center;margin-top:8px"><small>Ваш ник:</small><input id="ideaNick" maxlength="14" value="' + nick.replace(/"/g, '') + '" style="flex:1;font:600 13px var(--ui);padding:5px 8px;border-radius:7px;border:1px solid #888;background:#140c16;color:#fff"></div></div>'
     + '<button class="btn primary" data-k="go" style="width:100%">Подключиться</button><button class="btn" data-k="x" style="width:100%;margin-top:4px">Назад</button>';
   d.style.display = 'block'; d.querySelector('#ideaNick').addEventListener('keydown', (e) => e.stopPropagation());
@@ -12228,7 +12234,7 @@ function ideasMenu() {
 function ideasStart() {
   Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'ideas'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true; $('resumeBtn').hidden = true; startGame.fromWaves = true;
   loadMap('ideas'); clearAll(); respawnPlayer(); invReset(); W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0;
-  Object.assign(IDEA, { on: true, bots: [], feed: [], pending: '', roundT: 20, round: 0, sent: 0, ok: 0, t0: performance.now(), asking: false, askT: 0, lotFreeze: false, winner: null, drops: [], fx: [], mines: [], cut: false, skipAll: false, wave: null, hole: null, gas: null, fog: 0, chill: 0, snow: 0, heat: 0, disco: 0, sunT: 0, slowT: 0, jumpT: 0, walls: 0, formName: '', spdBase: 1, form: '', look: null, scale: 1, spd: 1, armor: 1, dmgMul: 1, evade: 0, lives: 0, ghost: 0, shield: 0, spdT: 0, lava: 0, acid: 0, grav: 0, night: 0, dance: 0, tornado: 0, car: 0, allow: ['fists', 'pistol'], over: false, kills: 0 });
+  Object.assign(IDEA, { on: true, bots: [], feed: [], pending: '', roundT: 20, round: 0, sent: 0, ok: 0, t0: performance.now(), asking: false, askT: 0, lotFreeze: false, winner: null, drops: [], fx: [], mines: [], cut: false, skipAll: false, wave: null, hole: null, gas: null, fog: 0, chill: 0, snow: 0, heat: 0, disco: 0, sunT: 0, slowT: 0, jumpT: 0, walls: 0, formName: '', spdBase: 1, locs: [], statues: [], guests: 0, chars: 0, zone: null, rocket: null, riding: false, chute: false, canopy: null, jump: false, form: '', look: null, scale: 1, spd: 1, armor: 1, dmgMul: 1, evade: 0, lives: 0, ghost: 0, shield: 0, spdT: 0, lava: 0, acid: 0, grav: 0, night: 0, dance: 0, tornado: 0, car: 0, allow: ['fists', 'pistol'], over: false, kills: 0 });
   worldTs = 1; scene.fog.density = MAPS.ideas.fogD; { const q = document.getElementById('ideaAsk'); if (q) q.style.display = 'none'; } { const o = document.getElementById('ideaLot'); if (o) o.style.display = 'none'; } if (typeof ideaCard === 'function') ideaCard('');
   player.eye = 1.62; makeAvatar(); selectWeapon(WEAPONS.findIndex((w) => w.id === 'pistol'));
   const names = IDEA_NAMES.slice().sort(() => Math.random() - 0.5); for (let i = 0; i < 50; i++) IDEA.bots.push({ name: names[i], alive: true, n: null, i, scale: 1, spd: 1, dmg: 1, hpK: 1, look: null });
@@ -12236,7 +12242,7 @@ function ideasStart() {
   ideaUi().style.display = 'block'; ideaUiInput(); ideaFeed(`Вы на сервере «Выживи свои идеи» как ${IDEA.name}. Удачи!`, '#ff9ad0');
   resume(); banner('ВЫЖИВИ СВОИ ИДЕИ', '51 игрок · первая лотерея через 20 с: повезёт одному'); Music.stop(); Music.start(true);
 }
-function ideasStop() { IDEA.on = false; IDEA.cut = false; IDEA.asking = false; { const q = document.getElementById('ideaAsk'); if (q) q.style.display = 'none'; } worldTs = 1; scene.fog.density = MAPS[mapId] ? MAPS[mapId].fogD : scene.fog.density; if (IDEA.discoOn) { IDEA.discoOn = false; lamps.forEach((l) => l.color.setHex(MAPS.ideas.lamp[0])); } { const o = document.getElementById('ideaLot'); if (o) o.style.display = 'none'; } const d = document.getElementById('ideaUi'); if (d) d.style.display = 'none'; MAPS.ideas.sun = 1.0; MAPS.ideas.hemi = 0.8; LV.grav = 1; world.gravity.set(0, -9.82, 0); player.eye = 1.62; }
+function ideasStop() { IDEA.on = false; IDEA.riding = false; IDEA.chute = false; if (IDEA.canopy) { scene.remove(IDEA.canopy); IDEA.canopy = null; } { const j = document.getElementById('ideaJump'); if (j) j.style.display = 'none'; } IDEA.cut = false; IDEA.asking = false; { const q = document.getElementById('ideaAsk'); if (q) q.style.display = 'none'; } worldTs = 1; scene.fog.density = MAPS[mapId] ? MAPS[mapId].fogD : scene.fog.density; if (IDEA.discoOn) { IDEA.discoOn = false; lamps.forEach((l) => l.color.setHex(MAPS.ideas.lamp[0])); } { const o = document.getElementById('ideaLot'); if (o) o.style.display = 'none'; } const d = document.getElementById('ideaUi'); if (d) d.style.display = 'none'; MAPS.ideas.sun = 1.0; MAPS.ideas.hemi = 0.8; LV.grav = 1; world.gravity.set(0, -9.82, 0); player.eye = 1.62; }
 function ideasOver(win) {
   if (IDEA.over) return; IDEA.over = true; const place = win ? 1 : IDEA.bots.filter((b) => b.alive).length + 1, sec = Math.round((performance.now() - IDEA.t0) / 1000);
   document.body.classList.remove('playing'); state = 'over'; story.cut = null; IDEA.cut = false; IDEA.asking = false; IDEA.lotFreeze = false; story.fov = 0; Sound.droneLoop(0); { const q = document.getElementById('ideaAsk'); if (q) q.style.display = 'none'; } ideaCard(''); worldTs = 1; subOff(); { const o = document.getElementById('ideaLot'); if (o) o.style.display = 'none'; } if (VEH.in) vehExit(true); ideaUi().style.display = 'none';
@@ -12246,7 +12252,7 @@ function ideasOver(win) {
 }
 function updIdeas(dt) {
   if (!IDEA.on) return; if (mode !== 'ideas') { ideasStop(); return; }
-  const ui = ideaUi(); ui.style.display = state === 'play' && !IDEA.over ? 'block' : (IDEA.cut && state === 'story' && !IDEA.lotFreeze ? ui.style.display : 'none');
+  const ui = ideaUi(); ui.style.display = state === 'play' && !IDEA.over ? 'block' : 'none';
   const inCut = state === 'story' && IDEA.cut; if ((state !== 'play' && !inCut) || IDEA.over) return;
   ideaBotsUpd(dt); ideaWorldUpd(dt);
   for (const b of IDEA.bots) if (b.ice && (!b.alive || !b.n || b.n.state !== 'alive')) { scene.remove(b.ice); b.ice = null; }
@@ -12268,13 +12274,13 @@ function updIdeas(dt) {
   if (IDEA.car <= 0 && IDEA.carC) { const C = IDEA.carC; IDEA.carC = null; if (VEH.in === C) { C.vx = C.vz = 0; vehExit(true); } vehRemove(C); flashScreen('#ff9ad8', 300); IDEA.form = ''; toast('Вы снова человек'); }
   for (const C of VEH.list.slice()) if (C.ai && C.ai.kind === 'ram') { C.ai.life -= dt; if (C.ai.life <= 0) vehRemove(C); }
   // the top line, the end
-  IDEA.uiT = (IDEA.uiT || 0) - dt; if (IDEA.uiT <= 0) { IDEA.uiT = 0.25; const a = ideaAlive(); $('ideaTop').innerHTML = `☠ Живых: <b style="color:#ff9ad0">${a}</b>/51 · 🍀 шанс выпасть вам: <b style="color:#8fff9a">${ideaChance()}%</b> · 🎰 лотерея через ${Math.ceil(IDEA.roundT)} с` + (IDEA.ghost > 0 ? ' · 👻' : '') + (IDEA.jumpT > 0 ? ' · 🦘' : '') + (IDEA.chill > 0 ? ' · ❄' : '') + (IDEA.fog > 0 ? ' · 🌫' : '') + (IDEA.slowT > 0 ? ' · ⏳' : '') + (IDEA.shield > 0 ? ' · 🛡' : '') + (IDEA.lava > 0 ? ' · 🔥 ЛАВА' : ''); ideaUiFeed(); }
+  IDEA.uiT = (IDEA.uiT || 0) - dt; if (IDEA.uiT <= 0) { IDEA.uiT = 0.25; const a = ideaAlive(); $('ideaTop').innerHTML = `☠ Живых: <b style="color:#ff9ad0">${a}</b>/51 · 🍀 шанс выпасть вам: <b style="color:#8fff9a">${ideaChance()}%</b> · 🎰 лотерея через ${Math.ceil(IDEA.roundT)} с` + (IDEA.ghost > 0 ? ' · 👻' : '') + (IDEA.jumpT > 0 ? ' · 🦘' : '') + (IDEA.chill > 0 ? ' · ❄' : '') + (IDEA.fog > 0 ? ' · 🌫' : '') + (IDEA.slowT > 0 ? ' · ⏳' : '') + (IDEA.zone ? ` · 📏 арена ${Math.round(IDEA.zone.half * 2)} м` : '') + (IDEA.rocket && IDEA.rocket.state === 'count' ? ` · 🚀 ${Math.max(0, Math.ceil(IDEA.rocket.t))} с` : '') + (IDEA.shield > 0 ? ' · 🛡' : '') + (IDEA.lava > 0 ? ' · 🔥 ЛАВА' : ''); ideaUiFeed(); }
   if (!player.dead && IDEA.bots.every((b) => !b.alive)) ideasOver(true);
 }
 
 document.getElementById('srvBtn').onclick = () => { Sound.init(); ideasMenu(); };
 /* ----- the lottery cut «Кому повезло?» and one cut per idea that worked ----- */
-function ideaHurtPlayer(d) { if (player.dead || IDEA.over || VEH.in) return; if (state === 'story') { state = 'play'; damagePlayer(d); state = 'story'; } else damagePlayer(d); }
+function ideaHurtPlayer(d) { if (player.dead || IDEA.over || VEH.in || IDEA.riding) return; if (state === 'story') { state = 'play'; damagePlayer(d); state = 'story'; } else damagePlayer(d); }
 function ideaLotUi() {
   let d = document.getElementById('ideaLot'); if (d) return d;
   d = document.createElement('div'); d.id = 'ideaLot'; d.style.cssText = 'position:fixed;inset:0;z-index:46;display:none;pointer-events:none;font-family:var(--ui);text-align:center';
@@ -12291,7 +12297,7 @@ function ideaLottery(Wn) {
   const name = isP ? IDEA.name : Wn.name, N = Math.max(1, ideaAlive()), chance = Math.round(100 / N), sc = isP ? IDEA.scale : (Wn.scale || 1);
   const names = IDEA.bots.filter((b) => b.alive).map((b) => b.name); if (!player.dead) names.push(IDEA.name);
   const wpos = () => (isP ? player.pos : (Wn.n ? Wn.n.pos : _a.set(0, 0, 0)));
-  let text = ''; if (!isP) { const pool = IDEA.bots.filter((o) => o.alive && o !== Wn), tn = !player.dead && Math.random() < 0.25 ? IDEA.name : pool.length ? pick(pool).name : IDEA.name; text = pick(IDEA_BOT).replace('{n}', tn); }
+  let text = ''; if (!isP) { const pool = IDEA.bots.filter((o) => o.alive && o !== Wn), tn = !player.dead && Math.random() < 0.25 ? IDEA.name : pool.length ? pick(pool).name : IDEA.name; text = pick(IDEA_BOT).replace('{n}', tn).replace('{m}', pool.length ? pick(pool).name : IDEA.name); }
   IDEA.cut = true; IDEA.lotFreeze = true; IDEA.winner = Wn; story.showAvatar = !VEH.in;
   const ov = ideaLotUi(), T = document.getElementById('ilTitle'), NM = document.getElementById('ilName'), SB = document.getElementById('ilSub');
   T.textContent = '🎰 КОМУ ПОВЕЗЁТ?'; NM.className = ''; NM.textContent = '— — —'; SB.textContent = `шанс у каждого ${chance}% · живых ${N}`; ov.style.display = 'block'; ideaUiShow(false);
@@ -12354,17 +12360,17 @@ function ideaAskSubmit(v) {
 function ideaCamKind(k) {
   if (/^(form|formx|give|heal|shield|speed|bounce|food|swap|money)$/.test(k)) return 'close';
   if (/^(meteor|bombs|rain|emoji|soft|bolt|fireworks)$/.test(k)) return 'sky';
-  if (/^(spawn|fire|ram|kill|thing|wall|poison|clone|army|virus|mines|hole)$/.test(k)) return 'orbit';
+  if (/^(spawn|fire|ram|kill|thing|wall|poison|clone|army|virus|mines|hole|wedding|statue|location|char|rocket)$/.test(k)) return 'orbit';
   return 'aerial';
 }
 function ideaCam(kind, F, t, a0, sz = 1) {
   const lim = (v, h) => clamp(v, -h + 1.2, h - 1.2);
   if (kind === 'close') { const a = a0 + t * 0.45, r = lerp(3.6, 2.5, Math.min(1, t / 2)) * Math.max(0.8, sz); camera.position.set(lim(F.x + Math.sin(a) * r, HX), 1.45 * Math.max(0.6, sz), lim(F.z + Math.cos(a) * r, HZ)); camera.lookAt(F.x, 1.0 * Math.max(0.5, sz), F.z); }
   else if (kind === 'sky') { const k = Math.min(1, t / 2.3); camera.position.set(lim(F.x + Math.sin(a0) * 11, HX), 1.6 + k * 3, lim(F.z + Math.cos(a0) * 11, HZ)); camera.lookAt(F.x, lerp(7, 0.5, k), F.z); }
-  else if (kind === 'orbit') { const a = a0 + t * 0.4; camera.position.set(lim(F.x + Math.sin(a) * 7.5, HX), 3.8, lim(F.z + Math.cos(a) * 7.5, HZ)); camera.lookAt(F.x, 0.9, F.z); }
+  else if (kind === 'orbit') { const a = a0 + t * 0.4, k = Math.max(1, sz); camera.position.set(lim(F.x + Math.sin(a) * 7.5 * k, HX), 3.8 * k, lim(F.z + Math.cos(a) * 7.5 * k, HZ)); camera.lookAt(F.x, 0.9 * k, F.z); }
   else { const a = a0 + t * 0.2, R = Math.min(HX, HZ) * 0.78; camera.position.set(Math.sin(a) * R, 16, Math.cos(a) * R); camera.lookAt(F.x * 0.4, 0, F.z * 0.4); }
 }
-const IDEA_KIND_T = { form: '✨ ПРЕВРАЩЕНИЕ', formx: '✨ ПРЕВРАЩЕНИЕ', give: '🔫 ОРУЖИЕ', heal: '❤ ЛЕЧЕНИЕ', shield: '🛡 ЩИТ', speed: '⚡ СКОРОСТЬ', meteor: '☄ МЕТЕОРИТ', bombs: '💣 БОМБЫ', rain: '📦 ДОЖДЬ', emoji: '🌧 ДОЖДЬ', soft: '🎈 ДОЖДЬ', bolt: '⚡ МОЛНИЯ', fireworks: '🎆 САЛЮТ', kill: '💀 РАСПРАВА', spawn: '👥 ПРИЗЫВ', fire: '🔥 ОГОНЬ', ram: '🚗 ТАРАН', freeze: '❄ МОРОЗ', fog: '🌫 ТУМАН', healall: '🌈 ИСЦЕЛЕНИЕ', sun: '☀ СОЛНЦЕ', heat: '🥵 ЖАРА', lava: '🌋 ЛАВА', acid: '🧪 КИСЛОТА', grav: '🪐 НЕВЕСОМОСТЬ', night: '🌑 НОЧЬ', quake: '🌍 ЗЕМЛЕТРЯСЕНИЕ', tornado: '🌪 ТОРНАДО', flood: '🌊 ЦУНАМИ', hole: '🕳 ЧЁРНАЯ ДЫРА', poison: '☣ ЯД', virus: '🧟 ВИРУС', music: '🎵 ДИСКОТЕКА', dance: '💃 ТАНЦЫ', slowmo: '⏳ ЗАМЕДЛЕНИЕ', bounce: '🦘 ПРЫЖКИ', swap: '🌀 ТЕЛЕПОРТ', wall: '🧱 КРЕПОСТЬ', mines: '💥 МИНЫ', slip: '🍌 СКОЛЬЗКО', money: '💰 БОГАТСТВО', shrinkall: '🐜 ВСЕ МАЛЕНЬКИЕ', growall: '🗿 ВСЕ ВЕЛИКАНЫ', clone: '👯 КЛОНЫ', army: '🪖 АРМИЯ', food: '🍕 ЕДА', thing: '📦 ПОСЫЛКА' };
+const IDEA_KIND_T = { wedding: '💍 СВАДЬБА', statue: '🗿 СТАТУЯ', location: '🏰 ЛОКАЦИЯ', char: '👤 ПЕРСОНАЖ', rocket: '🚀 РАКЕТА', zone: '📏 СУЖЕНИЕ АРЕНЫ', form: '✨ ПРЕВРАЩЕНИЕ', formx: '✨ ПРЕВРАЩЕНИЕ', give: '🔫 ОРУЖИЕ', heal: '❤ ЛЕЧЕНИЕ', shield: '🛡 ЩИТ', speed: '⚡ СКОРОСТЬ', meteor: '☄ МЕТЕОРИТ', bombs: '💣 БОМБЫ', rain: '📦 ДОЖДЬ', emoji: '🌧 ДОЖДЬ', soft: '🎈 ДОЖДЬ', bolt: '⚡ МОЛНИЯ', fireworks: '🎆 САЛЮТ', kill: '💀 РАСПРАВА', spawn: '👥 ПРИЗЫВ', fire: '🔥 ОГОНЬ', ram: '🚗 ТАРАН', freeze: '❄ МОРОЗ', fog: '🌫 ТУМАН', healall: '🌈 ИСЦЕЛЕНИЕ', sun: '☀ СОЛНЦЕ', heat: '🥵 ЖАРА', lava: '🌋 ЛАВА', acid: '🧪 КИСЛОТА', grav: '🪐 НЕВЕСОМОСТЬ', night: '🌑 НОЧЬ', quake: '🌍 ЗЕМЛЕТРЯСЕНИЕ', tornado: '🌪 ТОРНАДО', flood: '🌊 ЦУНАМИ', hole: '🕳 ЧЁРНАЯ ДЫРА', poison: '☣ ЯД', virus: '🧟 ВИРУС', music: '🎵 ДИСКОТЕКА', dance: '💃 ТАНЦЫ', slowmo: '⏳ ЗАМЕДЛЕНИЕ', bounce: '🦘 ПРЫЖКИ', swap: '🌀 ТЕЛЕПОРТ', wall: '🧱 КРЕПОСТЬ', mines: '💥 МИНЫ', slip: '🍌 СКОЛЬЗКО', money: '💰 БОГАТСТВО', shrinkall: '🐜 ВСЕ МАЛЕНЬКИЕ', growall: '🗿 ВСЕ ВЕЛИКАНЫ', clone: '👯 КЛОНЫ', army: '🪖 АРМИЯ', food: '🍕 ЕДА', thing: '📦 ПОСЫЛКА' };
 function ideaPlayAll(list, i) {
   if (IDEA.over || i >= list.length) { ideaCutEnd(); return; }
   const e = list[i];
@@ -12384,19 +12390,6 @@ function ideaPlayAll(list, i) {
 function ideaCard(top, txt) { let c = document.getElementById('ideaCard'); if (!c) { c = document.createElement('div'); c.id = 'ideaCard'; c.style.cssText = 'position:fixed;left:50%;top:calc(6px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:47;pointer-events:none;text-align:center;font-family:var(--ui);white-space:nowrap;transition:opacity .3s'; document.body.appendChild(c); } if (!top) { c.style.opacity = 0; return; } c.innerHTML = `<div style="font:800 11px var(--ui);letter-spacing:.14em;color:#ff9ad0">${top.replace(/</g, '&lt;')}</div><div style="font:700 15px var(--ui);color:#fff;text-shadow:0 0 8px #ff3aa0">${txt.replace(/</g, '&lt;')}</div>`; c.style.opacity = 1; }
 function ideaCutEnd() { ideaCard(''); IDEA.cut = false; IDEA.skipAll = false; story.showAvatar = false; subOff(); $('chapter').classList.remove('on'); const ov = document.getElementById('ideaLot'); if (ov) ov.style.display = 'none'; if (!IDEA.over && mode === 'ideas') resume(); }
 /* ----- props and effects for the new words ----- */
-const IDEA_EMO = {};
-function ideaEmoTex(e) { if (!IDEA_EMO[e]) { const c = makeCanvas(128, 128), g = c.getContext('2d'); g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '100px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.fillText(e, 64, 70); IDEA_EMO[e] = toTex(c); } return IDEA_EMO[e]; }
-function ideaDrop(x, z, emo, dmg, why, size = 1.5, heal = 0) {
-  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: ideaEmoTex(emo), transparent: true, depthWrite: false })); s.scale.setScalar(size); s.position.set(x, rand(12, 17), z); scene.add(s); mapObjs.push(s);
-  IDEA.drops.push({ s, vy: -4, dmg, why, heal, life: 4, land: false, sz: size });
-}
-function ideaDropsUpd(dt) {
-  for (let i = IDEA.drops.length - 1; i >= 0; i--) {
-    const d = IDEA.drops[i], s = d.s;
-    if (!d.land) { d.vy -= 18 * dt; s.position.y += d.vy * dt; if (s.position.y <= d.sz * 0.5) { s.position.y = d.sz * 0.5; d.land = true; d.vy = 0; const x = s.position.x, z = s.position.z; if (d.dmg) ideaBonk(x, z, 1.1 * d.sz, d.dmg, d.why); else Sound.click(500, 0.12 * dv(s.position)); if (d.heal) { for (const b of IDEA.bots) if (b.alive && b.n && b.n.state === 'alive' && Math.hypot(b.n.pos.x - x, b.n.pos.z - z) < 1.6) b.n.hp = Math.min(b.n.maxHp, b.n.hp + d.heal); if (!player.dead && Math.hypot(player.pos.x - x, player.pos.z - z) < 1.6) player.hp = Math.min(200, player.hp + d.heal); } spawnSprite(TEX.smoke, _a.set(x, 0.3, z), { color: 0xb0a8a0, size: 1, grow: 1.5, life: 0.6, opacity: 0.5 }); } }
-    else { d.life -= dt; s.position.y = d.sz * 0.5 + Math.abs(Math.sin(d.life * 6)) * 0.08 * d.life; s.material.opacity = Math.min(1, d.life); if (d.life <= 0) { scene.remove(s); s.material.dispose(); IDEA.drops.splice(i, 1); } }
-  }
-}
 function ideaRing(x, z, r, col, life = 1) { const m = new THREE.Mesh(new THREE.RingGeometry(r * 0.7, r, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.8, depthWrite: false, blending: THREE.AdditiveBlending })); m.position.set(x, 0.06, z); scene.add(m); mapObjs.push(m); IDEA.fx.push({ m, life, l0: life, grow: 1 }); return m; }
 function ideaFxUpd(dt) { for (let i = IDEA.fx.length - 1; i >= 0; i--) { const f = IDEA.fx[i]; f.life -= dt; if (f.grow) f.m.scale.multiplyScalar(1 + dt * f.grow); f.m.material.opacity = clamp(f.life / f.l0, 0, 1) * 0.8; if (f.life <= 0) { scene.remove(f.m); f.m.geometry.dispose(); f.m.material.dispose(); IDEA.fx.splice(i, 1); } } }
 function ideaFormX(o, F) {
@@ -12409,7 +12402,7 @@ function ideaFormX(o, F) {
   b.scale = F.scale || 1; b.spd = F.spd || 1; b.dmg = F.dmg || 1; b.hpK = F.armor ? 1 / F.armor : 1; if (F.lives) b.lives = F.lives; if (F.gun) b.gun = F.gun;
   const look = F.bot || F.look; if (b.n) { if (look) ideaRelook(b, look); else { b.n.root.scale.setScalar(b.scale); b.n.hp = b.n.maxHp = 100 * b.hpK; } }
 }
-function ideaOthers(me) { return IDEA.bots.filter((b) => b.alive && b.n && b.n.state === 'alive' && b !== me); }
+function ideaOthers(me) { return IDEA.bots.filter((b) => b.alive && b.n && b.n.state === 'alive' && !b.boarded && b !== me); }
 function ideaIce(b, t) { const n = b.n; if (!n) return; b.stun = Math.max(b.stun || 0, t); if (!b.ice) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.95 * b.scale, 2.0 * b.scale, 0.95 * b.scale), new THREE.MeshStandardMaterial({ color: 0xbfe8ff, transparent: true, opacity: 0.45, roughness: 0.05, metalness: 0.1, emissive: 0x3a6a8a })); m.position.copy(n.pos).setY(1.0 * b.scale); scene.add(m); mapObjs.push(m); b.ice = m; } }
 function ideaNewApply(P, t, who, me, tg, at, why) {
   const nm = ideaWho(who), F = (o) => { IDEA.focus = ideaPosOf(o); IDEA.focusS = o === 'player' ? IDEA.scale : o.scale || 1; }, spot = (r) => [clamp(at.x + rand(-r, r), -HX + 3, HX - 3), clamp(at.z + rand(-r, r), -HZ + 3, HZ - 3)];
@@ -12444,7 +12437,7 @@ function ideaNewApply(P, t, who, me, tg, at, why) {
   return null;
 }
 function ideaWorldUpd(dt) {
-  ideaDropsUpd(dt); ideaFxUpd(dt);
+  ideaFxUpd(dt); ideaPropsUpd(dt); ideaZoneUpd(dt); ideaRocketUpd(dt); ideaLocsUpd(dt); ideaChuteUpd(dt);
   for (const k of ['fog', 'chill', 'snow', 'heat', 'disco', 'sunT']) if (IDEA[k] > 0) IDEA[k] = Math.max(0, IDEA[k] - dt);
   if (IDEA.slowT > 0) { IDEA.slowT -= dt; worldTs = IDEA.slowT > 0 ? 0.35 : 1; }
   if (IDEA.jumpT > 0) IDEA.jumpT -= dt;
@@ -12464,6 +12457,416 @@ function ideaWorldUpd(dt) {
     G.hitT = (G.hitT || 0) - dt; if (G.hitT <= 0) { G.hitT = 0.5; for (const b of ideaOthers(G.who)) if (Math.hypot(b.n.pos.x - G.p.x, b.n.pos.z - G.p.z) < 5) ideaHurtBot(b, 3, 'отравлен газом'); if (G.who !== 'player' && Math.hypot(player.pos.x - G.p.x, player.pos.z - G.p.z) < 5) ideaHurtPlayer(3); }
     if (G.t <= 0) IDEA.gas = null; }
   for (let i = IDEA.mines.length - 1; i >= 0; i--) { const M = IDEA.mines[i]; M.arm -= dt; M.m.material.emissiveIntensity = 0.3 + (Math.sin(performance.now() / 120) > 0 ? 1.5 : 0); if (M.arm > 0) continue; let hit = !player.dead && Math.hypot(player.pos.x - M.x, player.pos.z - M.z) < 0.9; if (!hit) for (const b of ideaOthers(null)) if (Math.hypot(b.n.pos.x - M.x, b.n.pos.z - M.z) < 0.9) { hit = true; break; } if (hit) { scene.remove(M.m); IDEA.mines.splice(i, 1); ideaBoom(M.x, M.z, 0.9, `мина (${M.why})`, null); } }
+}
+/* ===== real 3D objects for the idea words (toilets, animals, food…) ===== */
+const IM_G = { box: new THREE.BoxGeometry(1, 1, 1), sph: new THREE.SphereGeometry(0.5, 14, 10), cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 14), cone: new THREE.ConeGeometry(0.5, 1, 14), oct: new THREE.OctahedronGeometry(0.5), tor: new THREE.TorusGeometry(0.4, 0.16, 8, 16), ring: new THREE.TorusGeometry(0.45, 0.035, 8, 40) };
+const IM_M = {};
+function imMat(c, e) { const k = c + (e ? 'e' : ''); return IM_M[k] || (IM_M[k] = e ? new THREE.MeshBasicMaterial({ color: c }) : std({ color: c, roughness: 0.72 })); }
+function imBuild(parts, stone) {
+  const g = new THREE.Group(), L = [];
+  for (const p of parts) { let k = p[0], e = false; if (k[0] === 'e') { e = true; k = k.slice(1); } const m = new THREE.Mesh(IM_G[k], stone || imMat(p[1], e)); m.position.set(p[2], p[3], p[4]); m.scale.set(p[5], p[6], p[7]); if (p[8] || p[9] || p[10]) m.rotation.set(p[8] || 0, p[9] || 0, p[10] || 0); g.add(m); L.push(m); }
+  return { g, L };
+}
+const PI2 = Math.PI / 2;
+function imQuad(o) {
+  const c = o.c, c2 = o.c2 ?? c, L = o.L, H = o.H, W = o.W, lg = o.leg, hd = o.hd, nk = o.neck || 0, P = [], by = lg + H / 2, hy = lg + H * 0.8 + nk, hz = L / 2 + hd * 0.2;
+  P.push([o.wool ? 'sph' : 'box', c, 0, by, 0, W, H, L]);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) P.push(['box', c2, sx * W * 0.32, lg / 2, sz * L * 0.32, W * 0.22, lg, W * 0.22]);
+  if (nk) P.push(['box', c, 0, lg + H * 0.7 + nk / 2, L / 2 - hd * 0.1, W * 0.35, nk + H * 0.2, W * 0.35]);
+  P.push(['box', c, 0, hy, hz, hd, hd, hd * 1.1]);
+  P.push(['box', o.sn ?? c2, 0, hy - hd * 0.18, hz + hd * 0.62 + (o.snL || 0) / 2, hd * 0.55, hd * 0.4, hd * 0.35 + (o.snL || 0)]);
+  for (const sx of [-1, 1]) P.push(['sph', 0x101010, sx * hd * 0.27, hy + hd * 0.14, hz + hd * 0.56, hd * 0.15, hd * 0.15, hd * 0.1]);
+  const ear = o.ear || 'p';
+  for (const sx of [-1, 1]) {
+    if (ear === 'p') P.push(['cone', c, sx * hd * 0.32, hy + hd * 0.7, hz - hd * 0.1, hd * 0.3, hd * 0.4, hd * 0.3]);
+    else if (ear === 'r') P.push(['sph', c2, sx * hd * 0.5, hy + hd * 0.5, hz - hd * 0.1, hd * 0.4, hd * 0.4, hd * 0.12]);
+    else if (ear === 'l') P.push(['box', c, sx * hd * 0.25, hy + hd * 1.0, hz - hd * 0.1, hd * 0.18, hd * 0.9, hd * 0.12]);
+    else if (ear === 'd') P.push(['box', c2, sx * hd * 0.55, hy, hz - hd * 0.1, hd * 0.14, hd * 0.5, hd * 0.3]);
+    else if (ear === 'bg') P.push(['sph', c2, sx * hd * 0.55, hy + hd * 0.1, hz - hd * 0.1, hd * 0.5, hd * 0.2, hd * 0.2]);
+  }
+  const tl = o.tail || 't';
+  if (tl === 't') P.push(['box', c2, 0, by + H * 0.3, -L / 2 - L * 0.12, W * 0.1, W * 0.1, L * 0.3]);
+  else if (tl === 'f') P.push(['cyl', c, 0, by + H * 0.6, -L / 2 - L * 0.05, W * 0.3, L * 0.7, W * 0.3, -0.5, 0, 0]);
+  else if (tl === 'k') P.push(['sph', c2, 0, by + H * 0.3, -L / 2 - 0.05, W * 0.25, W * 0.25, W * 0.25]);
+  else if (tl === 'l') P.push(['cone', c, 0, by - H * 0.1, -L / 2 - L * 0.3, W * 0.5, L * 0.8, W * 0.5, PI2, 0, 0]);
+  else if (tl === 'r') P.push(['box', 0xff5ab4, 0, by + H * 0.2, -L / 2 - L * 0.1, W * 0.2, W * 0.2, L * 0.5]);
+  if (o.trunk) P.push(['cyl', c, 0, hy - hd * 0.7, hz + hd * 0.75, hd * 0.28, hd * 1.7, hd * 0.28]);
+  if (o.horn) P.push(['cone', 0xffe070, 0, hy + hd * 0.9, hz + hd * 0.2, hd * 0.2, hd * 0.9, hd * 0.2]);
+  if (o.mane) P.push(['box', o.mane, 0, hy + hd * 0.2, hz - hd * 0.9, hd * 0.2, hd * 1.1 + nk, hd * 0.8]);
+  if (o.stripes) for (let i = 0; i < 4; i++) P.push(['box', 0x181818, 0, by, -L / 2 + L * (i + 0.5) / 4, W * 1.02, H * 1.02, L * 0.06]);
+  if (o.spots) for (let i = 0; i < 5; i++) { const sx = i % 2 ? 1 : -1; P.push(['box', o.spots, sx * W * 0.5, by + (i % 3 - 1) * H * 0.18, -L * 0.3 + i * L * 0.15, W * 0.04, H * 0.3, L * 0.16]); }
+  if (o.spikes) for (let i = 0; i < 7; i++) P.push(['cone', 0x3a2a1a, Math.cos(i) * W * 0.3, by + H * 0.55, Math.sin(i * 2) * L * 0.3, W * 0.12, H * 0.5, W * 0.12]);
+  return P;
+}
+function imBird(o) {
+  const c = o.c, S = o.s, nk = o.neck || 0, P = [], hy = S * 0.95 + nk, hz = S * 0.32;
+  P.push(['sph', c, 0, S * 0.55, 0, S * 0.7, S * 0.75, S * 0.95]);
+  if (nk) P.push(['cyl', c, 0, S * 0.9 + nk / 2, S * 0.3, S * 0.18, nk, S * 0.18]);
+  P.push(['sph', o.hc ?? c, 0, hy, hz, S * 0.38, S * 0.38, S * 0.38]);
+  P.push(['cone', o.b ?? 0xff9a20, 0, hy - S * 0.02, hz + S * 0.28, S * 0.14, S * 0.3, S * 0.14, PI2, 0, 0]);
+  for (const sx of [-1, 1]) { P.push(['sph', o.eye ?? 0x101010, sx * S * 0.13, hy + S * 0.06, hz + S * 0.12, S * 0.08, S * 0.08, S * 0.08]); P.push(['box', o.wc ?? c, sx * S * 0.38, S * 0.6, 0, S * 0.08, S * 0.45, S * 0.6]); P.push(['box', 0xff9a20, sx * S * 0.15, S * 0.12, 0, S * 0.06, S * 0.25, S * 0.06]); }
+  if (o.belly) P.push(['sph', o.belly, 0, S * 0.5, S * 0.12, S * 0.55, S * 0.6, S * 0.7]);
+  if (o.comb) P.push(['box', 0xe02020, 0, hy + S * 0.22, hz, S * 0.06, S * 0.15, S * 0.2]);
+  P.push(['cone', c, 0, S * 0.55, -S * 0.55, S * 0.3, S * 0.45, S * 0.3, -PI2, 0, 0]);
+  return P;
+}
+function imFish(o) {
+  const c = o.c, L = o.L, H = o.H, P = [];
+  P.push(['sph', c, 0, H * 0.6, 0, H * 0.7, H, L]); P.push(['cone', o.fin ?? c, 0, H * 0.6, -L * 0.6, H * 0.15, L * 0.35, H * 0.8, -PI2, 0, 0]);
+  P.push(['sph', 0x101010, H * 0.3, H * 0.75, L * 0.3, H * 0.12, H * 0.12, H * 0.12]); P.push(['sph', 0x101010, -H * 0.3, H * 0.75, L * 0.3, H * 0.12, H * 0.12, H * 0.12]);
+  if (o.dorsal) P.push(['cone', o.fin ?? c, 0, H * 1.2, -L * 0.05, H * 0.15, H * 0.8, L * 0.25]);
+  if (o.belly) P.push(['sph', o.belly, 0, H * 0.42, L * 0.05, H * 0.6, H * 0.5, L * 0.9]);
+  return P;
+}
+const IM = {
+  cat: () => imQuad({ c: 0xe08a30, c2: 0xf0e0c0, L: 0.6, H: 0.25, W: 0.22, leg: 0.16, hd: 0.2, ear: 'p', tail: 'f' }),
+  dog: () => imQuad({ c: 0xa0703a, c2: 0xd8b080, L: 0.8, H: 0.3, W: 0.25, leg: 0.25, hd: 0.24, ear: 'd', tail: 't' }),
+  cow: () => imQuad({ c: 0xf4f4f0, c2: 0xf0b0a0, L: 1.7, H: 0.85, W: 0.75, leg: 0.65, hd: 0.5, ear: 'bg', tail: 't', spots: 0x181818 }),
+  pig: () => imQuad({ c: 0xf0a0b0, c2: 0xe88a9a, L: 1.1, H: 0.55, W: 0.5, leg: 0.25, hd: 0.38, ear: 'p', tail: 'k', sn: 0xe07a8a }),
+  tiger: () => imQuad({ c: 0xe8821e, c2: 0xf0e0c0, L: 1.5, H: 0.6, W: 0.5, leg: 0.5, hd: 0.45, ear: 'r', tail: 't', stripes: 1 }),
+  bear: () => imQuad({ c: 0x6a4224, c2: 0xc8a070, L: 1.4, H: 0.8, W: 0.7, leg: 0.5, hd: 0.5, ear: 'r', tail: 'k' }),
+  elephant: () => imQuad({ c: 0x8a8a96, c2: 0x7a7a86, L: 2.4, H: 1.4, W: 1.2, leg: 1.0, hd: 0.9, ear: 'r', trunk: 1, tail: 't' }),
+  giraffe: () => imQuad({ c: 0xe8b040, c2: 0xc08a28, L: 1.5, H: 0.8, W: 0.55, leg: 1.3, hd: 0.4, neck: 1.5, ear: 'p', tail: 't', spots: 0x8a5018 }),
+  horse: () => imQuad({ c: 0x8a5a2a, c2: 0x6a3a18, L: 1.7, H: 0.7, W: 0.5, leg: 0.95, hd: 0.4, neck: 0.4, ear: 'p', tail: 't', mane: 0x2a1608 }),
+  unicorn: () => imQuad({ c: 0xffffff, c2: 0xf0e8ff, L: 1.7, H: 0.7, W: 0.5, leg: 0.95, hd: 0.4, neck: 0.4, ear: 'p', tail: 'r', horn: 1, mane: 0xff7ad8 }),
+  sheep: () => imQuad({ c: 0xf4f4ee, c2: 0x2a2a2a, L: 1.0, H: 0.7, W: 0.7, leg: 0.4, hd: 0.3, ear: 'bg', tail: 'k', wool: 1, sn: 0x2a2a2a }),
+  rabbit: () => imQuad({ c: 0xf0f0f0, c2: 0xffc8d8, L: 0.45, H: 0.28, W: 0.25, leg: 0.12, hd: 0.2, ear: 'l', tail: 'k' }),
+  hamster: () => imQuad({ c: 0xd8a860, c2: 0xf4e0b8, L: 0.3, H: 0.2, W: 0.2, leg: 0.06, hd: 0.14, ear: 'r', tail: 't' }),
+  croc: () => imQuad({ c: 0x3a8a3a, c2: 0x2a6a2a, L: 2.2, H: 0.4, W: 0.6, leg: 0.2, hd: 0.4, ear: 'n', tail: 'l', sn: 0x3a8a3a, snL: 0.6 }),
+  dino: () => imQuad({ c: 0x48a848, c2: 0x388838, L: 3.0, H: 1.1, W: 0.9, leg: 1.0, hd: 0.7, neck: 0.5, ear: 'n', tail: 'l', spikes: 1 }),
+  monkey: () => imQuad({ c: 0x7a4a28, c2: 0xe8b888, L: 0.6, H: 0.4, W: 0.3, leg: 0.3, hd: 0.25, ear: 'r', tail: 't' }),
+  hedgehog: () => imQuad({ c: 0x6a5038, c2: 0xe8c8a0, L: 0.5, H: 0.3, W: 0.35, leg: 0.06, hd: 0.2, ear: 'r', tail: 'n', wool: 1, spikes: 1 }),
+  chicken: () => imBird({ c: 0xf4f4f0, s: 0.5, comb: 1 }), duck: () => imBird({ c: 0xf0d030, s: 0.5, b: 0xe07a20 }), swan: () => imBird({ c: 0xffffff, s: 0.9, neck: 0.55, b: 0xff8a20 }),
+  penguin: () => imBird({ c: 0x1a1a22, s: 0.9, belly: 0xf4f4f4, b: 0xffa020 }), owl: () => imBird({ c: 0x8a6a42, s: 0.6, belly: 0xd8c098, eye: 0xffd020 }),
+  fish: () => imFish({ c: 0xff8a3a, L: 0.7, H: 0.35 }), shark: () => imFish({ c: 0x7a8a9a, L: 2.6, H: 0.9, dorsal: 1, belly: 0xe8eef2 }), whale: () => imFish({ c: 0x3a6aa8, L: 4.0, H: 1.6, belly: 0xc8d8e8 }),
+  octopus: () => { const P = [['sph', 0xa83aa8, 0, 0.6, 0, 0.6, 0.65, 0.6], ['sph', 0x101010, 0.12, 0.65, 0.27, 0.1, 0.1, 0.08], ['sph', 0x101010, -0.12, 0.65, 0.27, 0.1, 0.1, 0.08]]; for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283; P.push(['cyl', 0xa83aa8, Math.cos(a) * 0.35, 0.2, Math.sin(a) * 0.35, 0.1, 0.45, 0.1, Math.sin(a) * 0.5, 0, -Math.cos(a) * 0.5]); } return P; },
+  frog: () => [['sph', 0x3aa83a, 0, 0.18, 0, 0.4, 0.3, 0.45], ['sph', 0xf0f0f0, 0.1, 0.36, 0.14, 0.12, 0.12, 0.12], ['sph', 0xf0f0f0, -0.1, 0.36, 0.14, 0.12, 0.12, 0.12], ['sph', 0x101010, 0.1, 0.37, 0.18, 0.06, 0.06, 0.06], ['sph', 0x101010, -0.1, 0.37, 0.18, 0.06, 0.06, 0.06], ['box', 0x2a8a2a, 0.22, 0.06, -0.12, 0.1, 0.1, 0.3], ['box', 0x2a8a2a, -0.22, 0.06, -0.12, 0.1, 0.1, 0.3]],
+  snake: () => { const P = []; for (let i = 0; i < 10; i++) { const a = i * 0.9, r = 0.35 - i * 0.02; P.push(['sph', i % 2 ? 0x4aa84a : 0x2a7a2a, Math.cos(a) * r, 0.1 + i * 0.015, Math.sin(a) * r, 0.2 - i * 0.008, 0.2 - i * 0.008, 0.2 - i * 0.008]); } P.push(['sph', 0x3a9a3a, 0.35, 0.18, 0, 0.26, 0.2, 0.3]); P.push(['sph', 0xe02020, 0.46, 0.18, 0.04, 0.05, 0.04, 0.05]); return P; },
+  spider: () => { const P = [['sph', 0x181820, 0, 0.3, 0, 0.35, 0.3, 0.45], ['sph', 0x181820, 0, 0.32, 0.3, 0.22, 0.2, 0.2], ['sph', 0xff2020, 0.06, 0.36, 0.4, 0.05, 0.05, 0.05], ['sph', 0xff2020, -0.06, 0.36, 0.4, 0.05, 0.05, 0.05]]; for (let i = 0; i < 4; i++) for (const s of [-1, 1]) P.push(['box', 0x181820, s * 0.35, 0.22, -0.2 + i * 0.16, 0.5, 0.05, 0.05, 0, 0, s * 0.5]); return P; },
+  bee: () => [['sph', 0xf0c820, 0, 0.3, 0, 0.3, 0.3, 0.5], ['sph', 0x181818, 0, 0.3, -0.08, 0.31, 0.31, 0.12], ['sph', 0x181818, 0, 0.3, 0.1, 0.31, 0.31, 0.12], ['sph', 0x181818, 0, 0.32, 0.28, 0.2, 0.2, 0.2], ['box', 0xcfe8ff, 0.16, 0.5, 0, 0.3, 0.02, 0.2, 0, 0, 0.4], ['box', 0xcfe8ff, -0.16, 0.5, 0, 0.3, 0.02, 0.2, 0, 0, -0.4], ['cone', 0x181818, 0, 0.3, -0.34, 0.06, 0.14, 0.06, -PI2, 0, 0]],
+  toilet: () => [['cyl', 0xf4f4f4, 0, 0.22, 0.05, 0.42, 0.44, 0.5], ['cyl', 0xdcdcdc, 0, 0.46, 0.07, 0.34, 0.04, 0.4], ['box', 0xf4f4f4, 0, 0.72, -0.22, 0.4, 0.62, 0.2], ['box', 0xcccccc, 0, 1.05, -0.22, 0.44, 0.08, 0.24]],
+  bath: () => [['box', 0xf4f4f4, 0, 0.4, 0, 0.8, 0.55, 1.7], ['box', 0x9ad0e8, 0, 0.66, 0, 0.62, 0.06, 1.5], ['cyl', 0xc8c8c8, 0.3, 0.05, 0.7, 0.12, 0.1, 0.12], ['cyl', 0xc8c8c8, -0.3, 0.05, 0.7, 0.12, 0.1, 0.12], ['cyl', 0xc8c8c8, 0.3, 0.05, -0.7, 0.12, 0.1, 0.12], ['cyl', 0xc8c8c8, -0.3, 0.05, -0.7, 0.12, 0.1, 0.12]],
+  fridge: () => [['box', 0xe8ecf0, 0, 0.9, 0, 0.7, 1.8, 0.7], ['box', 0x9aa4ac, 0, 1.22, 0.355, 0.68, 0.02, 0.02], ['box', 0xb8c0c8, 0.28, 1.5, 0.37, 0.04, 0.4, 0.04], ['box', 0xb8c0c8, 0.28, 0.7, 0.37, 0.04, 0.3, 0.04]],
+  tv: () => [['box', 0x1a1a1e, 0, 0.5, 0, 1.1, 0.7, 0.12], ['ebox', 0x5aa8ff, 0, 0.5, 0.07, 1.0, 0.6, 0.02], ['box', 0x1a1a1e, 0, 0.08, 0, 0.5, 0.16, 0.22]],
+  sofa: () => [['box', 0x8a2a3a, 0, 0.25, 0, 1.8, 0.4, 0.8], ['box', 0x7a2232, 0, 0.6, -0.32, 1.8, 0.5, 0.18], ['box', 0x7a2232, 0.8, 0.45, 0, 0.2, 0.35, 0.8], ['box', 0x7a2232, -0.8, 0.45, 0, 0.2, 0.35, 0.8]],
+  chair: () => [['box', 0x8a5a2a, 0, 0.45, 0, 0.5, 0.06, 0.5], ['box', 0x8a5a2a, 0, 0.8, -0.22, 0.5, 0.7, 0.06], ['box', 0x6a4220, 0.2, 0.22, 0.2, 0.06, 0.44, 0.06], ['box', 0x6a4220, -0.2, 0.22, 0.2, 0.06, 0.44, 0.06], ['box', 0x6a4220, 0.2, 0.22, -0.2, 0.06, 0.44, 0.06], ['box', 0x6a4220, -0.2, 0.22, -0.2, 0.06, 0.44, 0.06]],
+  piano: () => [['box', 0x111114, 0, 0.7, 0, 1.5, 1.0, 0.6], ['box', 0xf4f4f4, 0, 0.78, 0.33, 1.4, 0.05, 0.1], ['box', 0x111114, 0.65, 0.2, 0.2, 0.08, 0.4, 0.08], ['box', 0x111114, -0.65, 0.2, 0.2, 0.08, 0.4, 0.08], ['box', 0x111114, 0, 0.2, -0.2, 0.08, 0.4, 0.08]],
+  safe: () => [['box', 0x4a5058, 0, 0.45, 0, 0.8, 0.9, 0.7], ['cyl', 0xd0b050, 0, 0.5, 0.36, 0.26, 0.05, 0.26, PI2, 0, 0], ['box', 0x2a2e34, 0.28, 0.5, 0.37, 0.05, 0.25, 0.03]],
+  anvil: () => [['box', 0x2a2a30, 0, 0.15, 0, 0.5, 0.3, 0.3], ['box', 0x34343c, 0, 0.38, 0, 0.9, 0.18, 0.35], ['cone', 0x34343c, 0.6, 0.38, 0, 0.2, 0.3, 0.2, 0, 0, -PI2]],
+  weight: () => [['sph', 0x2a2a30, 0, 0.3, 0, 0.6, 0.6, 0.6], ['tor', 0x2a2a30, 0, 0.66, 0, 0.6, 0.6, 0.5]],
+  shoe: () => [['box', 0x3a2a1a, 0, 0.12, 0, 0.3, 0.24, 0.8], ['box', 0x3a2a1a, 0, 0.28, -0.2, 0.28, 0.3, 0.3], ['box', 0x1a1208, 0, 0.02, 0, 0.32, 0.04, 0.82]],
+  slipper: () => [['box', 0xf0b0c0, 0, 0.05, 0, 0.3, 0.1, 0.8], ['box', 0xe08aa0, 0, 0.12, 0.15, 0.3, 0.14, 0.3]],
+  pot: () => [['cyl', 0x8a8a92, 0, 0.25, 0, 0.5, 0.5, 0.5], ['cyl', 0x5a5a62, 0, 0.52, 0, 0.55, 0.04, 0.55], ['box', 0x3a2a1a, 0.34, 0.4, 0, 0.25, 0.05, 0.08]],
+  pan: () => [['cyl', 0x2a2a2e, 0, 0.04, 0, 0.55, 0.08, 0.55], ['box', 0x5a3a1a, 0.55, 0.06, 0, 0.5, 0.05, 0.08]],
+  bucket: () => [['cyl', 0x8aa0b0, 0, 0.2, 0, 0.4, 0.4, 0.4], ['cyl', 0x3a5a8a, 0, 0.4, 0, 0.32, 0.02, 0.32]],
+  balloon: () => [['sph', 0xe02a3a, 0, 1.1, 0, 0.7, 0.85, 0.7], ['cone', 0xe02a3a, 0, 0.62, 0, 0.1, 0.12, 0.1, Math.PI, 0, 0], ['cyl', 0xdddddd, 0, 0.3, 0, 0.01, 0.6, 0.01]],
+  ball: () => [['sph', 0xf4f4f4, 0, 0.25, 0, 0.5, 0.5, 0.5], ['box', 0x181818, 0, 0.25, 0.24, 0.2, 0.2, 0.04], ['box', 0x181818, 0.24, 0.3, 0, 0.04, 0.2, 0.2], ['box', 0x181818, 0, 0.49, 0, 0.2, 0.04, 0.2]],
+  pillow: () => [['box', 0xf0a0c0, 0, 0.12, 0, 0.8, 0.24, 0.55], ['box', 0xe08aa8, 0, 0.13, 0, 0.82, 0.04, 0.57]],
+  teddy: () => [['sph', 0x9a6a3a, 0, 0.3, 0, 0.4, 0.45, 0.35], ['sph', 0x9a6a3a, 0, 0.62, 0, 0.3, 0.3, 0.3], ['sph', 0x9a6a3a, 0.12, 0.78, 0, 0.12, 0.12, 0.08], ['sph', 0x9a6a3a, -0.12, 0.78, 0, 0.12, 0.12, 0.08], ['sph', 0x9a6a3a, 0.24, 0.36, 0, 0.14, 0.3, 0.14], ['sph', 0x9a6a3a, -0.24, 0.36, 0, 0.14, 0.3, 0.14], ['sph', 0x9a6a3a, 0.1, 0.08, 0.1, 0.16, 0.18, 0.2], ['sph', 0x9a6a3a, -0.1, 0.08, 0.1, 0.16, 0.18, 0.2], ['sph', 0x2a1a0a, 0, 0.6, 0.14, 0.07, 0.06, 0.05]],
+  books: () => [['box', 0xc83a3a, 0, 0.06, 0, 0.5, 0.12, 0.38], ['box', 0x3a6ac8, 0, 0.18, 0, 0.46, 0.12, 0.36, 0, 0.15, 0], ['box', 0x3ac86a, 0, 0.3, 0, 0.5, 0.12, 0.38, 0, -0.1, 0]],
+  laptop: () => [['box', 0x8a8a92, 0, 0.02, 0, 0.7, 0.04, 0.5], ['box', 0x8a8a92, 0, 0.28, -0.25, 0.7, 0.5, 0.03, -0.2, 0, 0], ['ebox', 0x5aa8ff, 0, 0.28, -0.235, 0.62, 0.42, 0.01, -0.2, 0, 0]],
+  phone: () => [['box', 0x1a1a1e, 0, 0.02, 0, 0.3, 0.04, 0.6], ['ebox', 0x8ac8ff, 0, 0.045, 0, 0.26, 0.01, 0.5]],
+  bell: () => [['cone', 0xe0b030, 0, 0.3, 0, 0.55, 0.6, 0.55], ['sph', 0x806010, 0, 0.02, 0, 0.12, 0.12, 0.12], ['cyl', 0xe0b030, 0, 0.62, 0, 0.1, 0.08, 0.1]],
+  melon: () => [['sph', 0x2a8a3a, 0, 0.3, 0, 0.7, 0.6, 0.6], ['sph', 0x1a5a26, 0, 0.3, 0, 0.62, 0.62, 0.2], ['sph', 0x1a5a26, 0, 0.3, 0, 0.2, 0.62, 0.62]],
+  apple: () => [['sph', 0xd02a2a, 0, 0.17, 0, 0.34, 0.32, 0.34], ['cyl', 0x5a3a1a, 0, 0.35, 0, 0.02, 0.1, 0.02], ['sph', 0x3a9a3a, 0.06, 0.37, 0, 0.1, 0.04, 0.06]],
+  brick: () => [['box', 0xa8402a, 0, 0.1, 0, 0.5, 0.2, 0.25]],
+  rock: () => [['sph', 0x7a7a82, 0, 0.3, 0, 0.7, 0.55, 0.6], ['sph', 0x6a6a72, 0.2, 0.2, 0.1, 0.4, 0.35, 0.4]],
+  ice: () => [['box', 0xbfe8ff, 0, 0.25, 0, 0.5, 0.5, 0.5], ['box', 0xe8f8ff, 0.1, 0.5, 0.1, 0.25, 0.04, 0.25]],
+  banana: () => [['box', 0xf0d020, 0, 0.12, 0, 0.12, 0.12, 0.4], ['box', 0xf0d020, 0, 0.14, 0.25, 0.12, 0.12, 0.2, -0.5, 0, 0], ['box', 0xf0d020, 0, 0.14, -0.25, 0.12, 0.12, 0.2, 0.5, 0, 0], ['box', 0x4a3a10, 0, 0.18, 0.38, 0.06, 0.06, 0.08]],
+  heart: () => [['sph', 0xff3a7a, -0.17, 0.4, 0, 0.4, 0.4, 0.2], ['sph', 0xff3a7a, 0.17, 0.4, 0, 0.4, 0.4, 0.2], ['box', 0xff3a7a, 0, 0.22, 0, 0.38, 0.38, 0.2, 0, 0, Math.PI / 4]],
+  coin: () => [['cyl', 0xf0c030, 0, 0.03, 0, 0.45, 0.06, 0.45], ['cyl', 0xd0a020, 0, 0.065, 0, 0.3, 0.02, 0.3]],
+  gem: () => [['oct', 0x4ad8ff, 0, 0.25, 0, 0.5, 0.6, 0.5]],
+  cash: () => [['box', 0x5ab85a, 0, 0.02, 0, 0.6, 0.04, 0.3], ['box', 0x4aa84a, 0.02, 0.06, 0.01, 0.6, 0.04, 0.3, 0, 0.1, 0], ['box', 0x5ab85a, -0.02, 0.1, 0, 0.6, 0.04, 0.3, 0, -0.1, 0]],
+  pizza: () => [['cyl', 0xf0c070, 0, 0.03, 0, 0.6, 0.06, 0.6], ['cyl', 0xd03a2a, 0, 0.065, 0, 0.5, 0.02, 0.5], ['cyl', 0xf0e060, 0, 0.08, 0, 0.36, 0.02, 0.36], ['cyl', 0xa02020, 0.12, 0.1, 0.05, 0.1, 0.02, 0.1], ['cyl', 0xa02020, -0.1, 0.1, -0.08, 0.1, 0.02, 0.1]],
+  burger: () => [['cyl', 0xd8a050, 0, 0.06, 0, 0.5, 0.1, 0.5], ['cyl', 0x5a2a10, 0, 0.14, 0, 0.5, 0.1, 0.5], ['cyl', 0x4ab04a, 0, 0.2, 0, 0.55, 0.03, 0.55], ['cyl', 0xf0c030, 0, 0.23, 0, 0.5, 0.03, 0.5], ['sph', 0xd8a050, 0, 0.3, 0, 0.5, 0.22, 0.5]],
+  cake: () => [['cyl', 0xf4d0e0, 0, 0.12, 0, 0.6, 0.24, 0.6], ['cyl', 0xd06090, 0, 0.3, 0, 0.45, 0.14, 0.45], ['cyl', 0xf0f0f0, 0, 0.42, 0, 0.03, 0.1, 0.03], ['sph', 0xe03030, 0, 0.5, 0, 0.1, 0.1, 0.1]],
+  icecream: () => [['cone', 0xd8a050, 0, 0.2, 0, 0.25, 0.4, 0.25, Math.PI, 0, 0], ['sph', 0xf8c0d8, 0, 0.5, 0, 0.3, 0.3, 0.3]],
+  donut: () => [['tor', 0xe090b0, 0, 0.1, 0, 0.6, 0.6, 0.6, PI2, 0, 0]],
+  choco: () => [['box', 0x4a2a18, 0, 0.04, 0, 0.5, 0.08, 0.25], ['box', 0x5a3a28, 0, 0.09, 0, 0.46, 0.02, 0.21]],
+  candy: () => [['sph', 0xff4a8a, 0, 0.12, 0, 0.22, 0.22, 0.22], ['cone', 0xff4a8a, 0.17, 0.12, 0, 0.14, 0.14, 0.14, 0, 0, -PI2], ['cone', 0xff4a8a, -0.17, 0.12, 0, 0.14, 0.14, 0.14, 0, 0, PI2]],
+  shawarma: () => [['cyl', 0xe8c890, 0, 0.25, 0, 0.28, 0.5, 0.28], ['cyl', 0xd0d0d8, 0, 0.05, 0, 0.3, 0.1, 0.3], ['sph', 0x4ab04a, 0, 0.52, 0, 0.2, 0.08, 0.2]],
+  dumpling: () => [['sph', 0xf8f0e0, 0, 0.1, 0, 0.4, 0.2, 0.28]],
+  pancake: () => [['cyl', 0xd8a860, 0, 0.03, 0, 0.6, 0.06, 0.6], ['cyl', 0xd8a860, 0, 0.09, 0, 0.58, 0.06, 0.58], ['box', 0xf0d030, 0, 0.14, 0, 0.14, 0.04, 0.14]],
+  potato: () => [['sph', 0xc8a060, 0, 0.15, 0, 0.4, 0.28, 0.3]],
+  carrot: () => [['cone', 0xf08a20, 0, 0.08, 0, 0.14, 0.45, 0.14, PI2, 0, 0], ['box', 0x3aa03a, 0, 0.1, -0.28, 0.1, 0.06, 0.12]],
+  bread: () => [['box', 0xd0a060, 0, 0.12, 0, 0.5, 0.24, 0.28], ['sph', 0xd0a060, 0, 0.24, 0, 0.5, 0.1, 0.28]],
+  cheese: () => [['box', 0xf0d030, 0, 0.1, 0, 0.4, 0.2, 0.3], ['sph', 0xd0b020, 0.12, 0.12, 0.16, 0.08, 0.08, 0.02]],
+  sausage: () => [['cyl', 0xc06a3a, 0, 0.08, 0, 0.14, 0.45, 0.14, 0, 0, PI2], ['box', 0xe8c040, 0, 0.17, 0, 0.45, 0.03, 0.03]],
+  cup: () => [['cyl', 0xf4f4f4, 0, 0.1, 0, 0.2, 0.2, 0.2], ['cyl', 0x5a3a1a, 0, 0.2, 0, 0.17, 0.01, 0.17], ['tor', 0xf4f4f4, 0.12, 0.1, 0, 0.14, 0.14, 0.08]],
+  juice: () => [['box', 0xf0a020, 0, 0.15, 0, 0.2, 0.3, 0.14], ['box', 0x3a9a3a, 0, 0.32, 0, 0.08, 0.04, 0.08]],
+  milk: () => [['box', 0xf4f4f4, 0, 0.15, 0, 0.2, 0.3, 0.14], ['box', 0x3a6ac8, 0, 0.25, 0, 0.202, 0.1, 0.142]],
+  cucumber: () => [['cyl', 0x3a9a3a, 0, 0.07, 0, 0.12, 0.4, 0.12, 0, 0, PI2]],
+  tomato: () => [['sph', 0xe03a2a, 0, 0.12, 0, 0.28, 0.24, 0.28], ['sph', 0x3a9a3a, 0, 0.25, 0, 0.12, 0.03, 0.12]],
+  meal: () => [['box', 0xe8e0c8, 0, 0.06, 0, 0.6, 0.12, 0.45], ['cyl', 0xd0803a, -0.12, 0.14, 0, 0.22, 0.06, 0.22], ['sph', 0xe8f0e0, 0.14, 0.14, 0, 0.18, 0.1, 0.18]],
+  cookie: () => [['cyl', 0xc8903a, 0, 0.03, 0, 0.3, 0.06, 0.3], ['sph', 0x4a2a10, 0.05, 0.07, 0.03, 0.05, 0.03, 0.05], ['sph', 0x4a2a10, -0.06, 0.07, -0.02, 0.05, 0.03, 0.05]],
+};
+const IM_EMO = { '🐈': 'cat', '🐕': 'dog', '🐄': 'cow', '🐖': 'pig', '🐔': 'chicken', '🐟': 'fish', '🦈': 'shark', '🐸': 'frog', '🦆': 'duck', '🦢': 'swan', '🐧': 'penguin', '🐻': 'bear', '🐯': 'tiger', '🐘': 'elephant', '🦒': 'giraffe', '🐒': 'monkey', '🐍': 'snake', '🕷': 'spider', '🐝': 'bee', '🐇': 'rabbit', '🐹': 'hamster', '🐎': 'horse', '🐑': 'sheep', '🐋': 'whale', '🐙': 'octopus', '🐊': 'croc', '🦖': 'dino', '🦄': 'unicorn', '🦔': 'hedgehog', '🦉': 'owl', '🍉': 'melon', '🍎': 'apple', '🧱': 'brick', '🪨': 'rock', '🧺': 'weight', '🧊': 'ice', '🗄': 'fridge', '📺': 'tv', '🛋': 'sofa', '🪑': 'chair', '🚽': 'toilet', '🛁': 'bath', '🎹': 'piano', '🔒': 'safe', '⚒': 'anvil', '🏋': 'weight', '👞': 'shoe', '🩴': 'slipper', '🍲': 'pot', '🍳': 'pan', '🪣': 'bucket', '🎈': 'balloon', '⚽': 'ball', '🛏': 'pillow', '🧸': 'teddy', '📚': 'books', '💻': 'laptop', '📱': 'phone', '🔔': 'bell', '🍌': 'banana', '❤': 'heart', '💖': 'heart', '🌈': 'heart', '💰': 'coin', '🪙': 'coin', '💎': 'gem', '💵': 'cash', '🍕': 'pizza', '🍔': 'burger', '🎂': 'cake', '🍦': 'icecream', '🍩': 'donut', '🍫': 'choco', '🍬': 'candy', '🌯': 'shawarma', '🥟': 'dumpling', '🥞': 'pancake', '🥔': 'potato', '🥕': 'carrot', '🍞': 'bread', '🧀': 'cheese', '🌭': 'sausage', '☕': 'cup', '🧃': 'juice', '🥛': 'milk', '🥒': 'cucumber', '🍅': 'tomato', '🍱': 'meal', '🍪': 'cookie' };
+const IM_OPT = { balloon: { m: 0.6, ld: 0.9 }, pillow: { m: 2 }, ball: { m: 3 }, teddy: { m: 2 }, banana: { sc: 1.5 }, coin: { sc: 1.7 }, cash: { sc: 1.5 }, gem: { sc: 1.3 }, cookie: { sc: 1.6 }, candy: { sc: 1.6 }, dumpling: { sc: 1.5 }, tomato: { sc: 1.5 }, cucumber: { sc: 1.4 }, cup: { sc: 1.4 }, apple: { sc: 1.4 }, juice: { sc: 1.5 }, milk: { sc: 1.5 }, hamster: { sc: 1.3 }, phone: { sc: 1.4 }, heart: { sc: 1.1 }, bee: { sc: 1.4 }, spider: { sc: 1.2 } };
+const IM_SOFT = new Set(['balloon', 'ball', 'pillow', 'teddy', 'banana', 'heart', 'coin', 'cash', 'gem', 'pizza', 'burger', 'cake', 'icecream', 'donut', 'choco', 'candy', 'shawarma', 'dumpling', 'pancake', 'potato', 'carrot', 'bread', 'cheese', 'sausage', 'cup', 'juice', 'milk', 'cucumber', 'tomato', 'meal', 'cookie', 'apple', 'cat', 'rabbit', 'hamster', 'frog', 'bee', 'duck', 'chicken', 'fish', 'hedgehog', 'snake', 'spider']);
+const IM_FOOD = new Set(['pizza', 'burger', 'cake', 'icecream', 'donut', 'choco', 'candy', 'shawarma', 'dumpling', 'pancake', 'potato', 'carrot', 'bread', 'cheese', 'sausage', 'cup', 'juice', 'milk', 'cucumber', 'tomato', 'meal', 'cookie', 'apple', 'melon']);
+function imFallback(emo) { return [['box', 0xc89a5a, 0, 0.4, 0, 0.8, 0.8, 0.8], ['box', 0xa87a3a, 0, 0.4, 0, 0.82, 0.1, 0.82]]; }
+/* a real physical prop built from the model of `key`; stays on the arena (the oldest ones go when there are too many) */
+function ideaSpawnObj(key, x, z, y, sc = 1, o = {}) {
+  const parts = IM[key] ? IM[key]() : imFallback(), { g, L } = imBuild(parts, o.stone), op = IM_OPT[key] || {}; g.scale.setScalar(sc * (o.noOpt ? 1 : (op.sc || 1)));
+  const bb = new THREE.Box3().setFromObject(g), sz = bb.getSize(new V3()), ct = bb.getCenter(new V3()), m = new THREE.Group(); g.position.copy(ct).multiplyScalar(-1); m.add(g); scene.add(m);
+  const hx = Math.max(0.12, sz.x / 2), hy = Math.max(0.12, sz.y / 2), hz = Math.max(0.12, sz.z / 2), vol = sz.x * sz.y * sz.z;
+  while (props.length >= 44) removeProp(props[0]);
+  const b = new CANNON.Body({ mass: op.m ?? clamp(vol * 140, 3, 500), material: mProp, position: new CANNON.Vec3(x, y ?? hy, z), collisionFilterGroup: G_PROP, collisionFilterMask: G_STATIC | G_BODY | G_GIB | G_PROP, angularDamping: 0.25, linearDamping: op.ld || 0.01 });
+  b.addShape(new CANNON.Box(new CANNON.Vec3(hx, hy, hz))); b.quaternion.setFromEuler(rand(-0.25, 0.25), rand(0, 6.28), rand(-0.25, 0.25)); world.addBody(b);
+  const pr = { kind: 'idea', m, body: b, r: Math.max(hx, hz), hp: 999, dead: false, parts: L, ideaObj: key, hy };
+  const ud = { kind: 'prop', prop: pr, body: b }; for (const q of L) q.userData = ud; m.userData = ud; props.push(pr); targetsDirty = true; return pr;
+}
+/* the old emoji "drop" became a real object: damage on landing and food that heals */
+function ideaDrop(x, z, emo, dmg, why, size = 1.5, heal = 0) {
+  const key = IM_EMO[emo]; const pr = ideaSpawnObj(key || 'crate', x, z, rand(10, 15), 1); pr.ideaHurt = { dmg: IM_SOFT.has(key) ? 0 : dmg, why, heal: heal || (IM_FOOD.has(key) && heal ? heal : 0), done: false }; if (IM_FOOD.has(key)) pr.food = 15; return pr;
+}
+function ideaPropsUpd(dt) {
+  for (let i = props.length - 1; i >= 0; i--) {
+    const p = props[i]; if (p.kind !== 'idea') continue; const h = p.ideaHurt, bp = p.body.position;
+    if (h && !h.done && bp.y < p.hy + 0.9 && p.body.velocity.y > -1.5) { h.done = true; if (h.dmg) ideaBonk(bp.x, bp.z, 1.2 + p.r, h.dmg, h.why); else Sound.click(500, 0.12 * dv(_a.set(bp.x, 0, bp.z))); }
+    if (p.food && p.body.position.y < 1.2) { p.food -= 0; for (const b of IDEA.bots) if (b.alive && b.n && b.n.state === 'alive' && !b.boarded && b.n.hp < b.n.maxHp && Math.hypot(b.n.pos.x - bp.x, b.n.pos.z - bp.z) < 1.0) { b.n.hp = Math.min(b.n.maxHp, b.n.hp + p.food); removeProp(p); Sound.heal(); break; } if (props[i] === p && !player.dead && state === 'play' && player.hp < 100 && Math.hypot(player.pos.x - bp.x, player.pos.z - bp.z) < 1.1) { player.hp = Math.min(100, player.hp + p.food); removeProp(p); Sound.heal(); toast('🍽 +' + p.food + ' HP'); } }
+  }
+}
+/* ===== characters of the game, statues, free spots ===== */
+const IDEA_CHARS = [['воскрес', 'gagarin', 'Воскреситель'], ['мелоди', 'melodie', 'Мелоди'], ['свити', 'svity-street', 'Свити'], ['продюсер', 'producer', 'Продюсер'], ['сириус', 'sirius', 'Сириус'], ['счетовод', 'ledger', 'Счетовод'], ['взыскател', 'collector', 'Взыскатель'], ['хаги', 'huggy', 'Хаги Ваги'], ['хагги', 'huggy', 'Хаги Ваги']];
+const IDEA_STAT_MODEL = { 'кот': 'cat', 'кошк': 'cat', 'собак': 'dog', 'медвед': 'bear', 'тигр': 'tiger', 'акул': 'shark', 'динозавр': 'dino', 'пингвин': 'penguin', 'дракон': 'dino', 'паук': 'spider' };
+function ideaFreeSpot(r) {
+  for (let k = 0; k < 50; k++) {
+    const x = rand(-24, 24), z = rand(-24, 24); let ok = Math.hypot(x, z) > 5;
+    for (const o of obstacles) { if (!ok) break; if (o.max.y < 0.3) continue; const cx = clamp(x, o.min.x, o.max.x), cz = clamp(z, o.min.z, o.max.z); if (Math.hypot(x - cx, z - cz) < r) ok = false; }
+    for (const l of IDEA.locs) if (Math.hypot(l.cx - x, l.cz - z) < 8 + r) ok = false;
+    for (const s of IDEA.statues) if (Math.hypot(s.x - x, s.z - z) < r + 2.5) ok = false;
+    if (ok) return { x, z };
+  } return null;
+}
+function ideaLabel(text, x, y, z, w = 3.2) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: toTex(textCanvas([{ t: text, s: 40 }], 512, 96, 'rgba(10,6,16,.72)', '#ffd860')), transparent: true, depthWrite: false })); sp.scale.set(w, w * 96 / 512, 1); sp.position.set(x, y, z); addMesh(sp); return sp; }
+function ideaSolid(x, y, z, sx, sy, sz, own) { const bd = addBody(x, y, z, sx / 2, sy / 2, sz / 2), ob = { min: new V3(x - sx / 2, y - sy / 2, z - sz / 2), max: new V3(x + sx / 2, y + sy / 2, z + sz / 2) }; obstacles.push(ob); own.bodies.push(bd); own.obs.push(ob); }
+function ideaDispose(own) { for (const b of own.bodies) { world.removeBody(b); const i = mapBodies.indexOf(b); if (i >= 0) mapBodies.splice(i, 1); } for (const o of own.obs) { const i = obstacles.indexOf(o); if (i >= 0) obstacles.splice(i, 1); } for (const m of own.meshes || []) { scene.remove(m); const i = mapObjs.indexOf(m); if (i >= 0) mapObjs.splice(i, 1); } if (own.npc) { own.npc.dispose(); const i = npcs.indexOf(own.npc); if (i >= 0) npcs.splice(i, 1); targetsDirty = true; } }
+let _stone = null;
+function ideaStoneMat() { return _stone || (_stone = std({ color: 0xa8a49c, roughness: 0.9, metalness: 0.02 })); }
+/* a statue: anything with a model, a game character or a player; permanent, on a pedestal with a plaque */
+function ideaStatue(spec) {
+  const spot = ideaFreeSpot(2.6); if (!spot) return null; const st = { x: spot.x, z: spot.z, bodies: [], obs: [], meshes: [], npc: null };
+  while (IDEA.statues.length >= 8) ideaDispose(IDEA.statues.shift());
+  const ped = new THREE.Mesh(IM_G.box, imMat(0x6a6a74)); ped.position.set(st.x, 0.35, st.z); ped.scale.set(2.2, 0.7, 2.2); addMesh(ped); st.meshes.push(ped); ideaSolid(st.x, 0.35, st.z, 2.2, 0.7, 2.2, st);
+  const stone = ideaStoneMat(); let h = 3;
+  if (spec.model) { const { g } = imBuild((IM[spec.model] || IM.dino)(), stone), bb = new THREE.Box3().setFromObject(g), k = clamp(3.0 / Math.max(0.2, bb.max.y - bb.min.y), 1.2, 4.5); g.scale.setScalar(k); const b2 = new THREE.Box3().setFromObject(g); g.position.set(st.x, 0.7 - b2.min.y, st.z); g.rotation.y = Math.atan2(-st.x, -st.z); addMesh(g); st.meshes.push(g); h = b2.max.y - b2.min.y; ideaSolid(st.x, 0.7 + h / 2, st.z, Math.min(1.6, (b2.max.x - b2.min.x) * 0.6), h, Math.min(1.6, (b2.max.z - b2.min.z) * 0.6), st); }
+  else { const n = mkNpc(spec.look || undefined, st.x, st.z, Math.atan2(-st.x, -st.z), 'human'); n.scripted = true; n.protect = true; n.protMsg = 'Это каменная статуя'; n.pos.y = 0.7; n.root.scale.setScalar(2.2); for (let i = 0; i < 3; i++) n.update(0.016); n.root.traverse((o) => { if (o.isMesh) o.material = stone; }); n.update = function () { this.root.position.copy(this.pos); }; n.root.position.copy(n.pos); st.npc = n; h = 3.8; ideaSolid(st.x, 0.7 + h / 2, st.z, 0.9, h, 0.9, st); }
+  const sgn = st.z < 0 ? 1 : -1, pl = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 0.42), new THREE.MeshBasicMaterial({ map: toTex(textCanvas([{ t: spec.name || 'Статуя', s: 46 }], 512, 128, '#c9a24a', '#2a1a08')) })); pl.position.set(st.x, 0.36, st.z + sgn * 1.11); pl.rotation.y = sgn > 0 ? 0 : Math.PI; addMesh(pl); st.meshes.push(pl);
+  st.h = h; IDEA.statues.push(st); flashScreen('rgba(255,224,140,.3)', 400); Sound.thud(0.9); for (let i = 0; i < 14; i++) spawnSprite(TEX.smoke, _a.set(st.x + rand(-1.2, 1.2), rand(0.1, 0.8), st.z + rand(-1.2, 1.2)), { color: 0xb0a898, size: 1.4, grow: 1.4, life: 1.4, opacity: 0.5 });
+  IDEA.focus = new V3(st.x, 1.5, st.z); IDEA.focusS = 2.2; return st;
+}
+/* the people/characters named in an idea, in order of appearance: bots, the player, game characters */
+function ideaFindWho(t) {
+  const out = [], norm = (s) => s.toLowerCase().replace(/ё/g, 'е'), wb = (st, from = 0) => { let i = t.indexOf(st, from); while (i >= 0) { if (i === 0 || !/[а-яa-z0-9_]/.test(t[i - 1])) return i; i = t.indexOf(st, i + 1); } return -1; };
+  for (const b of IDEA.bots) { if (!b.alive) continue; const i = wb(norm(b.name)); if (i >= 0) out.push({ i, len: b.name.length, w: { t: 'bot', b } }); }
+  { const nm = norm(IDEA.name), i = nm ? wb(nm) : -1; if (i >= 0) out.push({ i, len: nm.length, w: { t: 'player' } }); }
+  { const m = t.match(/(^|[^а-я])(я|меня|мной|мне|себя)([^а-я]|$)/); if (m) out.push({ i: m.index + m[1].length, len: m[2].length, w: { t: 'me' } }); }
+  for (const [st, look, nm] of IDEA_CHARS) { const i = wb(st); if (i >= 0) out.push({ i, len: st.length, w: { t: 'char', look, nm, st } }); }
+  out.sort((a, b) => a.i - b.i); const res = []; let end = -1; for (const o of out) { if (o.i < end) continue; end = o.i + o.len; res.push(o.w); }
+  return res;
+}
+/* ===== permanent locations (weddings, castle, pyramid…), zone shrinking, the rocket ===== */
+const IDEA_SLOTS = [{ cx: -24, cz: 8, fx: 1, fz: 0 }, { cx: 24, cz: -8, fx: -1, fz: 0 }, { cx: 8, cz: 25, fx: 0, fz: -1 }, { cx: -8, cz: -25, fx: 0, fz: 1 }, { cx: 25, cz: 10, fx: -1, fz: 0 }, { cx: -25, cz: -10, fx: 1, fz: 0 }, { cx: -10, cz: 25, fx: 0, fz: -1 }, { cx: 10, cz: -25, fx: 0, fz: 1 }];
+const IDEA_VENUE_NAME = { garden: 'в саду', church: 'в церкви', beach: 'на пляже', gothic: 'на готическом кладбище', space: 'в космосе', castle: 'замок', pyramid: 'пирамида', fountain: 'фонтан', pad: 'космодром' };
+function ideaLocFree(loc) { ideaDispose({ bodies: loc.bodies, obs: loc.obs, meshes: [loc.group, loc.label] }); const i = IDEA.locs.indexOf(loc); if (i >= 0) IDEA.locs.splice(i, 1); }
+function ideaSlotAlloc() {
+  const used = new Set(IDEA.locs.map((l) => l.slot)); for (let i = 0; i < IDEA_SLOTS.length; i++) if (!used.has(i)) return { ...IDEA_SLOTS[i], i };
+  const old = IDEA.locs.find((l) => l.kind !== 'pad') || IDEA.locs[0], i = old.slot; ideaLocFree(old); return { ...IDEA_SLOTS[i], i };
+}
+function ideaLocCtx(slot, loc) {
+  const { cx, cz, fx, fz } = slot, rx = fz, rz = -fx, swap = Math.abs(fx) > 0.5, grp = new THREE.Group(); addMesh(grp); loc.group = grp;
+  const W = (a, b) => [cx + rx * a + fx * b, cz + rz * a + fz * b];
+  const mk = (geo, col, a, b, y, sx, sy, sz, o = {}) => { const [x, z] = W(a, b), m = new THREE.Mesh(IM_G[geo], imMat(col, o.e)), dx = swap ? sz : sx, dz = swap ? sx : sz; m.position.set(x, y, z); m.scale.set(dx, sy, dz); if (o.ry) m.rotation.y = o.ry; grp.add(m); if (o.solid) ideaSolid(x, y, z, dx, sy, dz, loc); return m; };
+  const rd = (geo, col, a, b, y, sx, sy, sz, o = {}) => { const [x, z] = W(a, b), m = new THREE.Mesh(IM_G[geo], imMat(col, o.e)); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.rotation.set(o.rx || 0, o.ry || 0, 0); grp.add(m); return m; };
+  const hit = (a, b, y, sx, sy, sz) => { const [x, z] = W(a, b); ideaSolid(x, y, z, swap ? sz : sx, sy, swap ? sx : sz, loc); };
+  return { W, mk, rd, hit, swap };
+}
+const IFL = [0xff7aa8, 0xffd0e0, 0xffffff, 0xff4a7a];
+function locGarden(c, loc) {
+  const { mk, rd } = c; rd('cyl', 0x4a8a3a, 0, 0, 0.03, 9.4, 0.06, 9.4); mk('box', 0xb82a3a, 0, -0.6, 0.07, 1.3, 0.02, 6.6);
+  for (const s of [-1, 1]) { mk('box', 0xf4f4f4, s * 1.4, 2.6, 1.3, 0.25, 2.6, 0.25, { solid: true }); for (let i = 0; i < 4; i++) rd('sph', IFL[(i + (s > 0 ? 1 : 0)) % 4], s * 1.4, 2.6, 0.5 + i * 0.6, 0.38, 0.38, 0.38); }
+  mk('box', 0xf4f4f4, 0, 2.6, 2.75, 3.1, 0.25, 0.3); for (let i = 0; i < 6; i++) rd('sph', IFL[i % 4], -1.3 + i * 0.52, 2.6, 2.85, 0.4, 0.4, 0.4);
+  for (let i = 0; i < 4; i++) for (const s of [-1, 1]) { mk('box', 0xf4f4f4, s * 2.3, -3.6 + i * 1.1, 0.45, 0.6, 0.06, 0.5); mk('box', 0xf4f4f4, s * 2.3, -3.82 + i * 1.1, 0.8, 0.6, 0.7, 0.05); }
+  mk('box', 0xf4f4f4, 3.4, 2.4, 0.4, 1.1, 0.8, 1.1, { solid: true }); rd('cyl', 0xf4d0e0, 3.4, 2.4, 1.0, 0.7, 0.4, 0.7); rd('cyl', 0xd06090, 3.4, 2.4, 1.35, 0.5, 0.3, 0.5); rd('sph', 0xe03030, 3.4, 2.4, 1.6, 0.14, 0.14, 0.14);
+  for (const [a, b] of [[-3.9, -3.9], [3.9, -3.9], [-3.9, 3.9]]) { rd('cyl', 0x8a5a3a, a, b, 0.2, 0.5, 0.4, 0.5); rd('sph', IFL[(a + b > 0 ? 1 : 3)], a, b, 0.6, 0.55, 0.45, 0.55); }
+  loc.altarB = 1.2; loc.labelY = 4.2;
+}
+function locChurch(c, loc) {
+  const { mk, rd, hit } = c; mk('box', 0xcfc8b8, 0, 0, 0.04, 7, 0.08, 8.4);
+  mk('box', 0xe8e2d4, 0, 4.0, 2.2, 7, 4.4, 0.5, { solid: true }); for (const s of [-1, 1]) { mk('box', 0xe8e2d4, s * 3.4, 0, 2.2, 0.5, 4.4, 8, { solid: true }); mk('box', 0xe8e2d4, s * 3.4, -4.1, 2.2, 0.5, 4.4, 0.5, { solid: true }); }
+  mk('box', 0x8a3a2a, 0, 0, 4.5, 7.4, 0.4, 8.8); mk('box', 0x8a3a2a, 0, 0, 4.95, 5.4, 0.6, 6.8); mk('box', 0x8a3a2a, 0, 0, 5.5, 3.4, 0.5, 4.8);
+  mk('box', 0xe8e2d4, 0, 3.4, 6.2, 1.8, 3.4, 1.8); rd('cone', 0x8a3a2a, 0, 3.4, 8.8, 2.1, 2.0, 2.1); mk('box', 0xe0b030, 0, 3.4, 10.3, 0.12, 1.0, 0.12); mk('box', 0xe0b030, 0, 3.4, 10.5, 0.6, 0.12, 0.12);
+  [[-1.9, 0x5a8aff], [0, 0xff5a8a], [1.9, 0xffd060]].forEach(([a, col]) => mk('box', col, a, 3.74, 2.6, 0.9, 1.9, 0.04, { e: true }));
+  mk('box', 0xb82a3a, 0, -0.4, 0.09, 1.2, 0.02, 6.2); for (let i = 0; i < 3; i++) for (const s of [-1, 1]) { mk('box', 0x6a4a2a, s * 1.9, -3 + i * 1.3, 0.28, 1.7, 0.32, 0.5); mk('box', 0x6a4a2a, s * 1.9, -3.25 + i * 1.3, 0.7, 1.7, 0.6, 0.08); }
+  mk('box', 0xf4f4f4, 0, 2.7, 0.5, 1.8, 1.0, 0.7, { solid: true }); for (const s of [-1, 1]) { rd('cyl', 0xfff0c0, s * 0.7, 2.7, 1.2, 0.09, 0.3, 0.09); rd('sph', 0xffd060, s * 0.7, 2.7, 1.42, 0.12, 0.16, 0.12, { e: true }); }
+  loc.altarB = 1.2; loc.labelY = 6.2;
+}
+function locBeach(c, loc) {
+  const { mk, rd } = c; rd('cyl', 0x2a8ad0, 0, 0, 0.015, 11.6, 0.03, 11.6); rd('cyl', 0xe6cf8e, 0, 0, 0.04, 8.8, 0.08, 8.8);
+  for (const [a, b, h] of [[-3.4, -3, 3.2], [3.6, -2.4, 2.8], [3.2, 3.2, 3.0]]) { rd('cyl', 0x8a5a2a, a, b, h / 2, 0.35, h, 0.35); for (let i = 0; i < 6; i++) { const an = i / 6 * 6.283; rd('sph', 0x2a8a3a, a + Math.cos(an) * 0.9, b + Math.sin(an) * 0.9, h + 0.1, 1.8, 0.14, 0.55, { ry: -an }); } }
+  for (const s of [-1, 1]) { mk('box', 0x9a7a4a, s * 1.35, 2.6, 1.3, 0.22, 2.6, 0.22, { solid: true }); for (let i = 0; i < 3; i++) rd('sph', IFL[(i + 1) % 4], s * 1.35, 2.6, 0.7 + i * 0.7, 0.36, 0.36, 0.36); }
+  mk('box', 0x9a7a4a, 0, 2.6, 2.7, 3.0, 0.22, 0.22); mk('box', 0xffffff, 0, 2.6, 2.4, 2.6, 0.7, 0.04); for (let i = 0; i < 5; i++) rd('sph', IFL[i % 4], -1.2 + i * 0.6, 2.6, 2.75, 0.36, 0.36, 0.36);
+  mk('box', 0xe8d8a8, 0, -0.5, 0.07, 1.2, 0.02, 5.4); for (let i = 0; i < 3; i++) for (const s of [-1, 1]) mk('box', 0x9a7a4a, s * 1.9, -3 + i * 1.3, 0.3, 1.2, 0.3, 0.4);
+  rd('cyl', 0x8a5a3a, -3.4, 1.4, 1.0, 0.07, 2.0, 0.07); rd('cone', 0xe03a3a, -3.4, 1.4, 2.1, 2.0, 0.6, 2.0); rd('sph', 0xffd060, -2.2, -3.6, 0.9, 0.3, 0.3, 0.3, { e: true }); mk('box', 0xd8c080, 2.6, -3.4, 0.4, 1.1, 0.8, 1.1, { solid: true });
+  loc.altarB = 1.2; loc.labelY = 4.4;
+}
+function locGothic(c, loc) {
+  const { mk, rd } = c; rd('cyl', 0x2a2630, 0, 0, 0.04, 9.4, 0.08, 9.4);
+  for (const s of [-1, 1]) { mk('box', 0x18141c, s * 1.4, 2.6, 1.7, 0.4, 3.4, 0.4, { solid: true }); rd('cone', 0x18141c, s * 1.4, 2.6, 3.8, 0.6, 1.2, 0.6); rd('sph', 0xb01030, s * 1.4, 2.6, 0.5, 0.35, 0.3, 0.35); }
+  mk('box', 0x18141c, 0, 2.6, 3.5, 3.2, 0.3, 0.4); for (let i = 0; i < 4; i++) rd('sph', 0xb080ff, -1.0 + i * 0.66, 2.6, 3.2 - (i % 2) * 0.2, 0.2, 0.26, 0.2, { e: true });
+  mk('box', 0x4a2a1a, 0, 2.7, 0.4, 0.9, 0.8, 2.0, { solid: true }); rd('sph', 0xb01030, 0, 2.7, 0.9, 0.3, 0.12, 0.3);
+  for (let i = 0; i < 6; i++) { const a = (i % 2 ? 1 : -1) * (2.4 + (i >> 1) * 0.5), b = -2.6 + (i >> 1) * 1.7; mk('box', 0x6a6a74, a, b, 0.6, 0.7, 1.2, 0.2, { solid: true }); rd('sph', 0x6a6a74, a, b, 1.2, 0.7, 0.3, 0.2); }
+  for (const [a, b] of [[-3.6, 1.6], [3.8, -2.4]]) { rd('cyl', 0x2a1a10, a, b, 1.6, 0.3, 3.2, 0.3); rd('cyl', 0x2a1a10, a + 0.5, b, 2.7, 0.12, 1.4, 0.12); rd('cyl', 0x2a1a10, a - 0.5, b, 2.4, 0.12, 1.2, 0.12); }
+  for (let i = 0; i < 5; i++) rd('sph', 0x7ad88a, rand(-3.5, 3.5), rand(-3.5, 3.5), 0.15, 0.7, 0.2, 0.7, { e: true });
+  loc.altarB = 0.2; loc.labelY = 4.6;
+}
+function locSpace(c, loc) {
+  const { mk, rd } = c; rd('cyl', 0x120a2a, 0, 0, 0.05, 9.4, 0.1, 9.4); rd('ring', 0xff3aa0, 0, 0, 0.12, 19, 19, 6, { rx: PI2, e: true });
+  rd('ring', 0x5ad8ff, 0, 3, 2.5, 6.6, 6.6, 6.6, { ry: c.swap ? PI2 : 0, e: true }); mk('box', 0x30e0ff, 0, -0.5, 0.12, 1.2, 0.04, 6, { e: true });
+  for (let i = 0; i < 3; i++) for (const s of [-1, 1]) mk('box', 0x30e0ff, s * 2.4, -3 + i * 1.6, 0.3, 1.5, 0.3, 0.5, { e: true });
+  for (let i = 0; i < 18; i++) rd('sph', pick([0xffffff, 0xffd060, 0x9ad8ff, 0xff9ad8]), rand(-7, 7), rand(-7, 7), rand(1.5, 7), 0.12, 0.12, 0.12, { e: true });
+  rd('sph', 0xff8a3a, -6, 6, 5.5, 2.4, 2.4, 2.4); rd('ring', 0xffd8a0, -6, 6, 5.5, 7, 7, 7, { rx: 1.2, e: true }); rd('sph', 0x8a5aff, 6, -3, 4, 1.2, 1.2, 1.2);
+  for (let i = 0; i < 6; i++) rd('sph', 0xff5ab4, rand(-3, 3), rand(-2, 4), rand(2.5, 4.5), 0.3, 0.3, 0.3, { e: true });
+  loc.altarB = 1.2; loc.labelY = 5.2;
+}
+function locCastle(c, loc) {
+  const { mk, rd, hit } = c; rd('cyl', 0x6a8a4a, 0, 0, 0.03, 12.6, 0.06, 12.6);
+  mk('box', 0x8a8a96, -2.4, -3.5, 1.6, 2.4, 3.2, 0.7, { solid: true }); mk('box', 0x8a8a96, 2.4, -3.5, 1.6, 2.4, 3.2, 0.7, { solid: true }); mk('box', 0x7a7a86, 0, -3.5, 3.1, 2.4, 1.2, 0.7);
+  mk('box', 0x8a8a96, 0, 3.5, 1.6, 7.4, 3.2, 0.7, { solid: true }); for (const s of [-1, 1]) mk('box', 0x8a8a96, s * 3.5, 0, 1.6, 0.7, 3.2, 7, { solid: true });
+  for (const [a, b] of [[-3.5, -3.5], [3.5, -3.5], [-3.5, 3.5], [3.5, 3.5]]) { rd('cyl', 0x7a7a86, a, b, 2.6, 1.7, 5.2, 1.7); rd('cone', 0xc83a3a, a, b, 6.0, 2.0, 1.8, 2.0); hit(a, b, 2.6, 1.5, 5.2, 1.5); }
+  for (let i = 0; i < 6; i++) for (const s of [0, 3.5]) mk('box', 0x8a8a96, -3 + i * 1.2, s - 3.5 * (s ? 0 : 1), 3.4, 0.5, 0.4, 0.5);
+  mk('box', 0x8a8a96, 0, 0, 1.0, 1.4, 2.0, 1.4, { solid: true }); mk('box', 0xc83a3a, 0, 0, 2.2, 0.1, 0.8, 0.5);
+  loc.altarB = 0; loc.labelY = 7.4;
+}
+function locPyramid(c, loc) { const { mk, rd } = c; for (let i = 0; i < 5; i++) mk('box', i % 2 ? 0xc8a850 : 0xd8b868, 0, 0, 0.5 + i, 9 - i * 1.7, 1, 9 - i * 1.7, { solid: true }); rd('oct', 0xffd060, 0, 0, 5.9, 0.9, 1.1, 0.9, { e: true }); loc.altarB = -4.4; loc.labelY = 7.6; }
+function locFountain(c, loc) { const { mk, rd } = c; rd('cyl', 0x9a9aa6, 0, 0, 0.3, 4.6, 0.6, 4.6); c.hit(0, 0, 0.3, 4.4, 0.6, 4.4); rd('cyl', 0x3a8aff, 0, 0, 0.55, 4.1, 0.1, 4.1, { e: true }); rd('cyl', 0x9a9aa6, 0, 0, 1.4, 0.7, 1.7, 0.7); rd('cyl', 0x9a9aa6, 0, 0, 2.3, 2.0, 0.2, 2.0); rd('sph', 0x9a9aa6, 0, 0, 2.7, 0.7, 0.7, 0.7); for (const [a, b] of [[-3.4, -3.4], [3.4, -3.4], [-3.4, 3.4], [3.4, 3.4]]) { mk('box', 0x8a6a4a, a, b, 0.25, 1.2, 0.5, 0.5); rd('sph', IFL[0], a, b, 0.7, 0.5, 0.4, 0.5); } loc.altarB = 3; loc.labelY = 4.4; }
+function locPad(c, loc) { const { mk, rd } = c; rd('cyl', 0x2a2a30, 0, 0, 0.05, 8, 0.1, 8); rd('ring', 0xffd020, 0, 0, 0.12, 15.5, 15.5, 6, { rx: PI2, e: true }); mk('box', 0xc83a2a, 3.4, -1.4, 3, 0.3, 6, 0.3, { solid: true }); mk('box', 0xc83a2a, 3.4, 1.4, 3, 0.3, 6, 0.3, { solid: true }); for (let i = 0; i < 4; i++) mk('box', 0xc83a2a, 3.4, 0, 1 + i * 1.4, 0.2, 0.2, 2.8); mk('box', 0x8a8a92, 2.2, 0, 4.6, 2.4, 0.2, 0.5); loc.altarB = 0; loc.labelY = 9.4; }
+const IDEA_VENUE = { garden: locGarden, church: locChurch, beach: locBeach, gothic: locGothic, space: locSpace, castle: locCastle, pyramid: locPyramid, fountain: locFountain, pad: locPad };
+function ideaLocBuild(kind, title) {
+  const slot = ideaSlotAlloc(), loc = { kind, cx: slot.cx, cz: slot.cz, fx: slot.fx, fz: slot.fz, slot: slot.i, bodies: [], obs: [], group: null, label: null }, c = ideaLocCtx(slot, loc);
+  IDEA_VENUE[kind](c, loc); loc.W = c.W; loc.altar = c.W(0, loc.altarB || 0); IDEA.locs.push(loc);
+  if (title) loc.label = ideaLabel(title, slot.cx, loc.labelY || 4, slot.cz, 4.4);
+  for (let i = 0; i < 18; i++) spawnSprite(TEX.soft, _a.set(slot.cx + rand(-4, 4), rand(0.2, 3), slot.cz + rand(-4, 4)), { color: pick([0xffd060, 0xff5ab4, 0xffffff]), additive: true, size: 0.4, grow: 1, life: 1.2, vel: new V3(0, rand(1, 3), 0) });
+  IDEA.focus = new V3(slot.cx, 1.5, slot.cz); IDEA.focusS = 2.2; return loc;
+}
+/* ===== wedding ===== */
+function ideaVenueOf(t) {
+  if (/церкв|церков|храм|венчан|собор/.test(t)) return 'church'; if (/пляж|море|океан|остров|пальм|тропик/.test(t)) return 'beach';
+  if (/готик|кладбищ|зомби|вампир|ужас|страш|мертв|могил|ночн/.test(t)) return 'gothic'; if (/космос|космич|звезд|ракет|нло|неон|кибер|планет/.test(t)) return 'space'; return 'garden';
+}
+function ideaPlaceWho(w, x, z, yaw, venue) {
+  if (w.t === 'player') { if (player.dead) return null; player.pos.set(x, 0, z); player.vel.set(0, 0, 0); player.hp = Math.min(130, player.hp + 30); return IDEA.name; }
+  if (w.t === 'bot') { const b = w.b; if (!b.alive) return null; if (!b.n) ideaEmbody(b, x, z); const n = b.n; if (!n || n.state !== 'alive') return null; n.pos.set(x, 0, z); n.yaw = yaw; n.root.position.copy(n.pos); n.root.rotation.y = yaw; b.stun = 16; b.dancing = true; n.pose = 'dance'; n.poseDur = Infinity; n.hp = Math.min(n.maxHp, n.hp + 30); return b.name; }
+  const n = w.look === 'huggy' ? spawnHuggy(x, z) : mkNpc(w.look, x, z, yaw, 'human'); if (!n) return null; n.scripted = true; n.speed = 0; n.yaw = yaw; n.root.rotation.y = yaw; n.pose = 'dance'; n.poseDur = Infinity; return w.nm;
+}
+function ideaWedding(P, t, who, me) {
+  const resolve = (w) => (w.t === 'me' ? (me === 'player' ? { t: 'player' } : { t: 'bot', b: me }) : w), same = (a, b) => a.t === b.t && a.b === b.b && a.nm === b.nm;
+  let L = (P.who || []).map(resolve).filter((w, i, a) => a.findIndex((o) => same(o, w)) === i).slice(0, 2);
+  if (!L.length) L = [resolve({ t: 'me' })];
+  if (L.length < 2) { const pool = IDEA.bots.filter((b) => b.alive && !b.boarded && !(L[0].t === 'bot' && L[0].b === b)); const opt = []; if (L[0].t !== 'player' && !player.dead) opt.push({ t: 'player' }); if (pool.length) opt.push({ t: 'bot', b: pick(pool) }); L.push(pick(opt.length ? opt : [{ t: 'char', look: 'melodie', nm: 'Мелоди' }])); }
+  const venue = ideaVenueOf(t), nm = (w) => (w.t === 'player' ? IDEA.name : w.t === 'bot' ? w.b.name : w.nm), title = `💍 ${nm(L[0])} ♥ ${nm(L[1])}`, loc = ideaLocBuild(venue, title), [ax, az] = loc.altar, [bx, bz] = loc.W(0.8, (loc.altarB || 0) - 1.4), yaw = Math.atan2(loc.fx, loc.fz);
+  const [x1, z1] = loc.W(-0.55, (loc.altarB || 0) - 1.4), [x2, z2] = loc.W(0.55, (loc.altarB || 0) - 1.4);
+  ideaPlaceWho(L[0], x1, z1, yaw); ideaPlaceWho(L[1], x2, z2, yaw);
+  const gl = { garden: 'fan', church: 'office', beach: 'fan', gothic: 'hollow', space: 'tech' }[venue]; let gi = 0;
+  for (const [a, b] of [[-2.4, -3.2], [2.4, -3.2], [-2.4, -1.6], [2.4, -1.6]]) { if (IDEA.guests >= 24) break; const [gx, gz] = loc.W(a, b), g = mkNpc(gl, gx, gz, yaw + Math.PI, 'human'); g.scripted = true; g.speed = 0; g.pose = 'tada'; g.poseDur = Infinity; IDEA.guests++; gi++; }
+  for (let i = 0; i < 40; i++) spawnSprite(TEX.soft, _a.set(ax + rand(-2, 2), rand(1, 3), az + rand(-2, 2)), { color: pick([0xff5ab4, 0xff3a7a, 0xffd0e0, 0xffd060]), additive: true, size: rand(0.25, 0.5), grow: 0.2, life: 2.2, vel: new V3(rand(-1, 1), rand(0.8, 2.4), rand(-1, 1)) });
+  Sound.chime(); IDEA.focus = new V3(ax, 1.4, az); IDEA.focusS = 1.4; return `${title}: свадьба ${IDEA_VENUE_NAME[venue]} (навсегда)`;
+}
+/* ===== the shrinking arena ===== */
+function ideaZoneShrink() {
+  if (!IDEA.zone) { const g = new THREE.Group(), mat = new THREE.MeshBasicMaterial({ color: 0xff2a3a, transparent: true, opacity: 0.2, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }); for (let i = 0; i < 4; i++) { const m = new THREE.Mesh(IM_G.box, mat); g.add(m); } addMesh(g); IDEA.zone = { half: HX - 0.6, to: HX - 0.6, g }; }
+  const Z = IDEA.zone; Z.to = Math.max(11, Z.half * 0.72); Sound.boom(); Sound.whoosh(); IDEA.focus = new V3(0, 1, 0); IDEA.focusS = 1; return `арена сужается: ${Math.round(Z.half * 2)} м → ${Math.round(Z.to * 2)} м`;
+}
+function ideaZoneUpd(dt) {
+  const Z = IDEA.zone; if (!Z) return; if (Z.half > Z.to) Z.half = Math.max(Z.to, Z.half - 1.4 * dt); const h = Z.half, H = 10, T = 0.3;
+  [[0, -h, 2 * h + T, T], [0, h, 2 * h + T, T], [-h, 0, T, 2 * h + T], [h, 0, T, 2 * h + T]].forEach(([x, z, sx, sz], i) => { const m = Z.g.children[i]; m.position.set(x, H / 2, z); m.scale.set(sx, H, sz); });
+  Z.g.children[0].material.opacity = 0.16 + Math.sin(performance.now() / 260) * 0.05; Z.t = (Z.t || 0) - dt;
+  if (Z.t <= 0) { Z.t = 0.5; if (!player.dead && !VEH.in && (Math.abs(player.pos.x) > h || Math.abs(player.pos.z) > h)) ideaHurtPlayer(3); for (const b of IDEA.bots) if (b.alive && b.n && b.n.state === 'alive' && !b.boarded && (Math.abs(b.n.pos.x) > h || Math.abs(b.n.pos.z) > h)) ideaHurtBot(b, 3, 'остался за границей зоны'); }
+}
+/* ===== the rocket: stand in the circle, it flies away with everyone inside, jump with a parachute ===== */
+function ideaRocketMake() {
+  const g = new THREE.Group(), P = [['cyl', 0xf4f4f4, 0, 3.2, 0, 1.8, 6.4, 1.8], ['cone', 0xe03a3a, 0, 7.4, 0, 1.8, 2.4, 1.8], ['cyl', 0xe03a3a, 0, 1.2, 0, 1.84, 0.5, 1.84], ['cyl', 0x2a2a30, 0, 0.1, 0, 1.4, 0.4, 1.4], ['ebox', 0x5ad8ff, 0, 4.6, 0.92, 0.7, 0.7, 0.12], ['ebox', 0x5ad8ff, 0, 4.6, -0.92, 0.7, 0.7, 0.12]];
+  for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) P.push(['box', 0xe03a3a, a * 1.1, 0.9, b * 1.1, a ? 0.9 : 0.14, 1.8, b ? 0.9 : 0.14]);
+  const { g: gg, L } = imBuild(P); g.add(gg); return g;
+}
+function ideaRocket() {
+  if (IDEA.rocket) return 'ракета уже стоит на космодроме';
+  let pad = IDEA.locs.find((l) => l.kind === 'pad'); if (!pad) pad = ideaLocBuild('pad', '🚀 КОСМОДРОМ');
+  const [x, z] = pad.W(0, 0), m = ideaRocketMake(); m.position.set(x, 0, z); scene.add(m); mapObjs.push(m);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(2.6, 3.3, 40).rotateX(-PI2), new THREE.MeshBasicMaterial({ color: 0x5aff8a, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending })); ring.position.set(x, 0.12, z); addMesh(ring); const lab = ideaLabel('🚀 ВСЕ НА БОРТ! встаньте в круг', x, 10.2, z, 5.2);
+  IDEA.rocket = { x, z, y: 0, vy: 0, m, state: 'count', t: 18, pr: false, ring, lab, pax: [], lt: 0 };
+  for (const b of IDEA.bots) if (b.alive && b.n && Math.random() < 0.5) b.rk = true;
+  Sound.whoosh(); toast('🚀 Ракета стартует через 18 с: встаньте в круг'); IDEA.focus = new V3(x, 3, z); IDEA.focusS = 2.4; return 'на космодроме стоит ракета: встаньте в круг до старта';
+}
+function ideaJumpBtn() {
+  let b = document.getElementById('ideaJump'); if (b) return b;
+  b = document.createElement('button'); b.id = 'ideaJump'; b.className = 'btn primary'; b.textContent = '🪂 ПРЫГНУТЬ'; b.style.cssText = 'position:fixed;left:50%;bottom:calc(14% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:49;display:none;font:900 18px var(--ui);padding:12px 26px;pointer-events:auto;box-shadow:0 0 24px rgba(255,200,80,.7)';
+  ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => b.addEventListener(e, (ev) => ev.stopPropagation())); b.onclick = () => { IDEA.jump = true; }; document.body.appendChild(b); return b;
+}
+function ideaRocketLaunch() {
+  const R = IDEA.rocket; R.state = 'fly'; scene.remove(R.lab); if (R.ring) R.ring.visible = false;
+  const near = (x, z) => Math.hypot(x - R.x, z - R.z) < 3.3; R.pr = !player.dead && !VEH.in && near(player.pos.x, player.pos.z);
+  for (const b of IDEA.bots) if (b.alive && b.n && b.n.state === 'alive' && !b.boarded && near(b.n.pos.x, b.n.pos.z)) { b.boarded = true; b.n.root.visible = false; b.n.pos.set(R.x, 400, R.z); b.n.root.position.copy(b.n.pos); b.jumpAt = rand(3, 11); R.pax.push(b); }
+  Sound.boom(); Sound.whoosh(); shake = 1; flashScreen('#ffe9b0', 500); ideaFeed(`🚀 Ракета взлетает${R.pr ? ' с вами на борту' : ''}${R.pax.length ? ': ' + R.pax.length + ' пассажиров' : ''}`, '#ffd860');
+  if (R.pr) ideaRocketRide(R);
+}
+function ideaRocketRide(R) {
+  IDEA.cut = true; IDEA.riding = true; IDEA.jump = false; const bt = ideaJumpBtn(); bt.style.display = 'none'; story.showAvatar = false; let last = 0; Sound.droneLoop(0.8);
+  runCut([[1.6, () => { bt.style.display = 'block'; toast('🪂 Нажмите «Прыгнуть», когда захотите'); }]], (t, d) => {
+    ang_ride += d * 0.35; player.pos.set(R.x, R.y + 2, R.z); shake = Math.max(shake, 0.18);
+    camera.position.set(R.x + Math.sin(ang_ride) * 10, Math.max(1.4, R.y - 2 + Math.sin(t) * 0.4), R.z + Math.cos(ang_ride) * 10); camera.lookAt(R.x, R.y + 3.2, R.z);
+    if (t - last > 0.2) { last = t; ideaCard('🚀 ПОЛЁТ', `высота ${Math.round(R.y)} м`); }
+    if (IDEA.jump) { story.cut.t = story.cut.dur; }
+  }, 16, () => {
+    bt.style.display = 'none'; Sound.droneLoop(0); ideaCard(''); IDEA.riding = false; IDEA.jump = false; const y = clamp(R.y, 18, 70), x = rand(-16, 16), z = rand(-16, 16);
+    player.pos.set(x, y, z); player.vel.set(0, 0, 0); player.onGround = false; IDEA.chute = true; ideaFeed('🪂 Вы выпрыгнули из ракеты!', '#8fff9a'); flashScreen('#cfe8ff', 500); Sound.whoosh(); ideaCutEnd();
+  });
+}
+let ang_ride = 0;
+function ideaChuteUpd(dt) {
+  if (!IDEA.chute) return; if (player.dead || (player.onGround && player.pos.y < 1.3)) { IDEA.chute = false; if (IDEA.canopy) { scene.remove(IDEA.canopy); IDEA.canopy = null; } return; }
+  { if (player.vel.y < -6) player.vel.y = -6; if (!IDEA.canopy) { const c = new THREE.Mesh(new THREE.SphereGeometry(1.4, 14, 8, 0, 6.283, 0, 1.5), new THREE.MeshBasicMaterial({ color: pick([0xff3a5a, 0xffd060, 0x5ad8ff]), side: THREE.DoubleSide })); scene.add(c); IDEA.canopy = c; Sound.whoosh(); } IDEA.canopy.position.set(player.pos.x, player.pos.y + 2.8, player.pos.z); }
+}
+function ideaRocketUpd(dt) {
+  const R = IDEA.rocket; if (!R) return;
+  if (R.state === 'count') {
+    if (state === 'play' && !IDEA.asking) { R.t -= dt; R.lt -= dt; R.ring.material.opacity = 0.5 + Math.sin(performance.now() / 150) * 0.3; if (R.lt <= 0) { R.lt = 1; const sp = R.lab.material; sp.map = toTex(textCanvas([{ t: `🚀 СТАРТ ЧЕРЕЗ ${Math.max(0, Math.ceil(R.t))} с · встаньте в круг`, s: 38 }], 512, 96, 'rgba(10,6,16,.72)', '#ffd860')); sp.needsUpdate = true; if (R.t < 4) Sound.click(900 + (4 - R.t) * 200, 0.25); } if (R.t <= 0) ideaRocketLaunch(); }
+    return;
+  }
+  R.fly = (R.fly || 0) + dt; R.vy += 4.6 * dt; R.y += R.vy * dt; R.x += dt * 0.6; R.m.position.set(R.x, R.y, R.z); R.m.rotation.z = Math.min(0.15, R.y * 0.0005);
+  for (let i = 0; i < 3; i++) { spawnSprite(TEX.soft, _a.set(R.x + rand(-0.3, 0.3), R.y - 0.4, R.z + rand(-0.3, 0.3)), { color: pick([0xffb040, 0xff6a20, 0xfff0a0]), additive: true, size: rand(1.0, 2.2), grow: 0.8, life: 0.4, vel: new V3(rand(-0.5, 0.5), -rand(5, 9), rand(-0.5, 0.5)) }); } if (Math.random() < dt * 25) spawnSprite(TEX.smoke, _a.set(R.x, R.y - 1.2, R.z), { color: 0xd8d8e0, size: 2.2, grow: 2.5, life: 2.2, opacity: 0.5 });
+  for (const b of R.pax) { if (!b.boarded) continue; b.jumpAt -= dt; if (b.jumpAt <= 0 && b.alive && b.n) { b.boarded = false; const n = b.n; n.pos.set(rand(-18, 18), 45, rand(-18, 18)); n.root.position.copy(n.pos); n.root.visible = true; b.chute = 45; b.stun = 0; if (!b.canopy) { const c = new THREE.Mesh(new THREE.SphereGeometry(1.3, 12, 8, 0, 6.283, 0, 1.5), new THREE.MeshBasicMaterial({ color: pick([0xff3a5a, 0xffd060, 0x5ad8ff, 0x8fff9a]), side: THREE.DoubleSide })); c.position.y = 2.6; n.root.add(c); b.canopy = c; } ideaFeed(`🪂 ${b.name} прыгает с ракеты`, '#cfe8ff'); } }
+  if (R.fly > 19) { for (const b of R.pax) if (b.boarded && b.alive && b.n) { b.boarded = false; b.n.pos.set(rand(-18, 18), 40, rand(-18, 18)); b.n.root.visible = true; b.chute = 40; } scene.remove(R.m); const i = mapObjs.indexOf(R.m); if (i >= 0) mapObjs.splice(i, 1); IDEA.rocket = null; }
+}
+function ideaLocsUpd(dt) { for (const l of IDEA.locs) if (l.kind === 'fountain' && Math.random() < dt * 22) spawnSprite(TEX.soft, _a.set(l.cx + rand(-0.2, 0.2), 3.0, l.cz + rand(-0.2, 0.2)), { color: 0x9ad0ff, additive: true, size: 0.22, grow: 0, life: 1.0, vel: new V3(rand(-1.2, 1.2), rand(1, 2.4), rand(-1.2, 1.2)) }); }
+/* ===== parse + apply for the new world words ===== */
+function ideaParseWorld(t) {
+  const who = () => ideaFindWho(t);
+  if (/свадьб|поженит|женить|венчан|замуж|бракосочет/.test(t)) return { k: 'wedding', who: who() };
+  if (/стату[яюи]|памятник|скульптур/.test(t)) return { k: 'statue', who: who(), t };
+  if (/карт|арен|зон[ауы]|площадк|мир(?!о)/.test(t) && /уменьш|сузи|суж|сжат|сжим|меньш|маленьк|сократ|урез|теснее/.test(t)) return { k: 'zone' };
+  if (/ракет|космолет|шаттл|звездолет/.test(t)) return { k: 'rocket' };
+  const LOC = [[/церкв|церков|храм/, 'church'], [/пляж|тропическ/, 'beach'], [/кладбищ|готическ/, 'gothic'], [/пирамид/, 'pyramid'], [/фонтан/, 'fountain'], [/замок|дворец|кремль|цитадел/, 'castle'], [/локаци|космодром/, 'any']];
+  for (const [re, k] of LOC) if (re.test(t)) return { k: 'location', kind: k };
+  const w = who().filter((x) => x.t === 'char'); if (w.length && !/превра|стать|стал|становл|я теперь|сделай меня/.test(t)) return { k: 'char', who: w, n: clamp(parseInt((t.match(/\d+/) || ['1'])[0], 10) || 1, 1, 3) };
+  return null;
+}
+function ideaWorldApply(P, t, who, me, tg, at, why) {
+  switch (P.k) {
+    case 'wedding': return ideaWedding(P, t, who, me);
+    case 'location': { const kind = P.kind === 'any' ? pick(['garden', 'church', 'beach', 'gothic', 'space', 'castle', 'pyramid', 'fountain']) : P.kind, loc = ideaLocBuild(kind, ({ garden: '🌸 САД', church: '⛪ ЦЕРКОВЬ', beach: '🏝 ПЛЯЖ', gothic: '🦇 КЛАДБИЩЕ', space: '🌌 КОСМОС', castle: '🏰 ЗАМОК', pyramid: '🔺 ПИРАМИДА', fountain: '⛲ ФОНТАН' })[kind]); return `на арене навсегда появляется: ${({ garden: 'сад', church: 'церковь', beach: 'пляж', gothic: 'кладбище', space: 'космическая площадка', castle: 'замок', pyramid: 'пирамида', fountain: 'фонтан' })[kind]}`; }
+    case 'statue': {
+      const T = P.t, w = (P.who || [])[0]; let spec = null;
+      if (w && w.t === 'char') spec = { look: w.look, name: w.nm }; else if (w && (w.t === 'player' || (w.t === 'me' && me === 'player'))) spec = { look: IDEA.look || undefined, name: IDEA.name }; else if (w && w.t === 'bot') spec = { look: w.b.look || undefined, name: w.b.name }; else if (w && w.t === 'me') spec = { look: me.look || undefined, name: me.name };
+      if (!spec) { let best = null; for (const [st, k, a] of IDEA_WORDS) if ((k === 'emoji' || k === 'soft' || k === 'food') && T.includes(st) && (!best || st.length > best[0].length) && IM_EMO[a]) best = [st, IM_EMO[a]]; for (const st in IDEA_STAT_MODEL) if (T.includes(st) && (!best || st.length > best[0].length)) best = [st, IDEA_STAT_MODEL[st]]; if (best) spec = { model: best[1], name: best[0][0].toUpperCase() + best[0].slice(1) }; }
+      if (!spec) spec = { model: pick(['elephant', 'dino', 'unicorn', 'cat', 'giraffe']), name: 'Статуя' };
+      const s = ideaStatue(spec); return s ? `на арене навсегда встаёт статуя «${spec.name}»` : 'для статуи не нашлось места'; }
+    case 'zone': return ideaZoneShrink();
+    case 'rocket': return ideaRocket();
+    case 'char': { let n = 0; for (const w of P.who) for (let i = 0; i < P.n; i++) { if (IDEA.chars >= 14) break; const x = clamp(at.x + rand(-4, 4), -HX + 3, HX - 3), z = clamp(at.z + rand(-4, 4), -HZ + 3, HZ - 3), c = w.look === 'huggy' ? spawnHuggy(x, z) : mkNpc(w.look, x, z, rand(0, 6.28), 'human'); if (c) { IDEA.chars++; n++; spawnSprite(TEX.soft, _a.set(x, 1, z), { color: 0xffd060, additive: true, size: 2.6, grow: 1, life: 0.6 }); } } IDEA.focus = at.clone(); return n ? `на арене появляется: ${P.who.map((w) => w.nm).join(', ')} (навсегда)` : 'арена переполнена'; }
+  }
+  return null;
 }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
@@ -13166,7 +13569,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
