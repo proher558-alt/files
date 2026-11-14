@@ -385,6 +385,7 @@ body.touch #wAmmo{font-size:26px}
     <button class="btn" id="contStory" hidden style="width:100%;margin-bottom:10px">Продолжить главу 1<small id="contWhere"></small></button>
     <button class="btn primary" id="playStory" style="width:100%;margin-bottom:10px">Сюжет · Глава 1<small>«Преступница Свити». Награда за её устранение — 50 000 $</small></button>
     <button class="btn primary" id="playCh2" style="width:100%;margin-bottom:10px">Сюжет · Глава 2<small>«Расплата». Вы — воскреситель. Вы очнулись в клетке…</small></button>
+    <button class="btn primary" id="srvBtn" style="width:100%;margin-bottom:10px">Серверы ☠<small>«Выживи свои идеи» · королевская битва, 50 ботов</small></button>
     <button class="btn" id="wsBtn" style="width:100%;margin-bottom:10px">Мастерская модов<small>Свой предмет и авторские моды</small></button>
     <button class="btn" id="exclBtn" style="width:100%;margin-bottom:10px">Эксклюзив<small>Награды за концовки сюжета: костюмы Свити</small></button>
     <button class="btn" id="admBtn" style="width:100%;margin-bottom:10px">Админ-панель<small>Служебный доступ по коду</small></button>
@@ -1155,6 +1156,7 @@ const MAPS = {
   street3: { name: 'Набережная', desc: '', story: true, hx: 26, hz: 62, h: 40, backdrop: 'eclipse', spawn: [0, 40, 0], fog: 0x100e1a, fogD: 0.013, bg: 0x100e1a, sun: 0.1, hemi: 0.6, lamp: [0xffd8a0, 30, 20], lamps: [[0, 6, 31], [-10, 5, 10], [9, 5, -6], [0, 5, -24]], red: [[0, 2.2, 30], 0x3a6aff, 5], build: buildStreet3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   office3: { name: 'Контора Счетовода', desc: '', story: true, hx: 26, hz: 40, h: 6, spawn: [0, 37, 0], fog: 0x0c100c, fogD: 0.016, bg: 0x060806, sun: 0.1, hemi: 0.62, lamp: [0xd8f0c0, 34, 24], lamps: [[0, 5.4, 26], [0, 5.4, 6], [-20, 5.2, 0], [20, 5.2, 0]], red: [[0, 4.6, -30], 0x60ff80, 4], build: buildOffice3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   ledger3: { name: 'Кабинет Счетовода', desc: '', story: true, hx: 18, hz: 22, h: 16, spawn: [0, 18, 0], fog: 0x08060a, fogD: 0.012, bg: 0x040305, sun: 0.1, hemi: 0.6, lamp: [0xffe0a8, 44, 30], lamps: [[-9, 9, -6], [9, 9, -6], [-9, 9, 10], [9, 9, 10]], red: [[0, 6, -18], 0xff3020, 5], build: buildLedger3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
+  ideas: { name: 'Арена идей', desc: '', story: true, hx: 30, hz: 30, h: 8, spawn: [0, 24, 0], fog: 0x140a1c, fogD: 0.012, bg: 0x0a0610, sun: 1.0, hemi: 0.8, lamp: [0xffc0f0, 30, 30], lamps: [[-12, 6, -12], [12, 6, -12], [-12, 6, 12], [12, 6, 12]], red: [[0, 5, 0], 0xff3aa0, 6], build: buildIdeas, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
   race: { name: 'Гоночная трасса', desc: 'Трасса с трибунами, отбойниками и тремя соперниками. Гонка на 3 круга, гараж — кнопка 🚗. Машины ломаются по частям: капот, двери, стёкла, фары, бампер, колёса.', hx: 125, hz: 125, h: 40, backdrop: 'grey', spawn: [-80, -80, 0], fog: 0xb8c4cc, fogD: 0.004, bg: 0xb8c4cc, sun: 1.7, hemi: 1.1, lamp: [0xffffff, 0, 10], lamps: [[0, 5, 0], [40, 5, 40], [-40, 5, -40], [40, 5, -40]], red: [[0, 3, 0], 0xff2412, 0], build: buildRace, npcs: { human: 3, zombie: 0, soldier: 0 }, props: [], pills: [] },
   traffic: { name: 'Трафик', desc: 'Шоссе длиной 1,6 км: четыре полосы, встречка, седаны, пикапы, грузовики и фуры. Садитесь за руль, обгоняйте или устройте аварию. Гараж — кнопка 🚗.', hx: 30, hz: 800, h: 40, backdrop: 'dusk', spawn: [-12, -760, Math.PI], fog: 0x7a5060, fogD: 0.006, bg: 0x6a4a58, sun: 1.1, hemi: 0.85, lamp: [0xffd8a0, 0, 10], lamps: [[0, 6, -760], [0, 6, -700], [0, 6, -640], [0, 6, -580]], red: [[0, 3, 0], 0xff2412, 0], build: buildTraffic, npcs: { human: 5, zombie: 0, soldier: 0 }, props: [], pills: [] },
   yard3: { name: 'Двор', desc: '', story: true, hx: 12, hz: 14, h: 40, backdrop: 'dawn', spawn: [-5, -9, 0], fog: 0xe8b898, fogD: 0.009, bg: 0xe8b898, sun: 1.2, hemi: 0.95, lamp: [0xffd8b0, 30, 18], lamps: [[-5, 4, -8], [5, 4, -8], [-5, 4, 6], [5, 4, 6]], red: [[0, 4, 0], 0xff6a40, 0], build: buildYard3, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] },
@@ -3704,7 +3706,7 @@ function spawnChunks(kind, c, vel, dir, power, npc) {
 }
 function zombieTarget(z) {
   let best = null, bd = 30;
-  if (state !== 'menu' && !player.dead) { bd = Math.hypot(player.pos.x - z.pos.x, player.pos.z - z.pos.z) * 0.85; best = 'player'; }
+  if (state !== 'menu' && !player.dead && !(mode === 'ideas' && (IDEA.form === 'zombie' || IDEA.ghost > 0))) { bd = Math.hypot(player.pos.x - z.pos.x, player.pos.z - z.pos.z) * 0.85; best = 'player'; }
   for (const n of npcs) if (n.type === 'human' && n.alive) { const d = n.pos.distanceTo(z.pos); if (d < bd) { bd = d; best = n; } }
   return best;
 }
@@ -3768,15 +3770,16 @@ const player = { pos: new V3(0, 0, 15), vel: new V3(), yaw: 0, pitch: 0, onGroun
 let shake = 0, hurtFlash = 0;
 function damagePlayer(d) {
   if (state !== 'play' || player.dead || settings.god) return;
-  player.hp -= d; player.lastHurt = 0; hurtFlash = Math.min(1, hurtFlash + 0.6); shake = Math.max(shake, 0.3); Sound.hurt(); screenBlood(0.35);
+  if (mode === 'ideas') { if (IDEA.shield > 0) return; d *= IDEA.armor * (IDEA.form === 'small' && Math.random() < 0.3 ? 0 : 1); } player.hp -= d; player.lastHurt = 0; hurtFlash = Math.min(1, hurtFlash + 0.6); shake = Math.max(shake, 0.3); Sound.hurt(); screenBlood(0.35);
   if (avatar && avatar.state === 'alive' && d > 6 && Math.random() < 0.45) { const P = avatar.parts[pick(['torso', 'torso', 'uArmL', 'uArmR', 'uLegL', 'uLegR'])]; if (P && !P.gone) { const q = randomSurface(P, new V3()); tearCloth(avatar, P, q, q.clone().normalize(), rand(0.05, 0.09), 0.8); bloody(P, 0.08); } }
   if (avatar && avatar.state === 'alive' && view3()) { const P = avatar.parts[pick(['torso', 'torso', 'uArmL', 'uArmR', 'pelvis', 'uLegL', 'uLegR'])]; if (!P.gone) { const wp = P.mesh.getWorldPosition(new V3()); bloodSpray(wp, randUnit(new V3()), 16, 0.6, 1, 3, 0.005, 0.012); addWoundLocal(P, randomSurface(P, _a), _b.copy(_a).normalize(), rand(0.05, 0.08)); bloody(P, 0.12); } }
+  if (player.hp <= 0 && mode === 'ideas' && IDEA.lives > 0) { IDEA.lives--; player.hp = 100; flashScreen('#ffe9a0', 700); Sound.ghostVoice(1.2); toast('Воскреситель не умирает: одна жизнь потрачена'); }
   if (player.hp <= 0 && mode === 'story' && story.asGG) { player.hp = 100; flashScreen('#000', 700); Sound.ghostVoice(1.2); toast('Воскреситель не умирает — регенерация'); }
   if (player.hp <= 0) { player.hp = 0; player.dead = true; player.deathT = 0; player.fall = 0; releaseGrab(false); Sound.ring(3); Sound.muffle(800);
     if (avatar && avatar.living) { if (avatar.state === 'alive') { avatar.vel.copy(player.vel); avatar.root.position.copy(player.pos); avatar.root.rotation.y = player.yaw + Math.PI; } avatar.die('player'); }
     player.rag = false; ragCam.init = false;
     const fell = player.lastFall > 0;
-    if (mode === 'waves') later(1.6, gameOver); else { banner(fell ? 'РАЗБИЛСЯ' : 'ВЫ ПОГИБЛИ', 'возрождение через ' + (fell ? 5 : 3) + ' с'); player.respawnT = fell ? 5 : 3; }
+    if (mode === 'waves') later(1.6, gameOver); else if (mode === 'ideas') { banner('ВЫ ВЫБЫЛИ', 'место ' + (IDEA.bots.filter((b) => b.alive).length + 1) + ' из 51'); later(0.9, () => ideasOver(false)); } else { banner(fell ? 'РАЗБИЛСЯ' : 'ВЫ ПОГИБЛИ', 'возрождение через ' + (fell ? 5 : 3) + ' с'); player.respawnT = fell ? 5 : 3; }
   }
 }
 function respawnPlayer() {
@@ -3794,7 +3797,7 @@ const ragCam = { init: false, pos: new V3(), q: new THREE.Quaternion(), orb: 0 }
 const view3 = () => settings.view === 'tps' && !story.zoom;
 function makeAvatar() {
   if (avatar) { avatar.controlled = false; avatar.isPlayer = false; if (avatar.state !== 'dead') avatar.dispose(); else { if (!npcs.includes(avatar)) npcs.push(avatar); enforceCorpseLimit(); } }
-  avatar = new Humanoid('player', player.pos.x, player.pos.z, player.yaw + Math.PI, mode === 'story' && story.asGG ? 'gagarin' : mode !== 'story' && skinOk(settings.skin) && settings.skin !== 'default' ? settings.skin : undefined);
+  avatar = new Humanoid('player', player.pos.x, player.pos.z, player.yaw + Math.PI, mode === 'ideas' && IDEA.look ? IDEA.look : mode === 'story' && story.asGG ? 'gagarin' : mode !== 'story' && skinOk(settings.skin) && settings.skin !== 'default' ? settings.skin : undefined);
   avatar.isPlayer = true; avatar.controlled = true; avatar.pos.y = player.pos.y; avatar.root.position.copy(player.pos);
   attachHeld();
 }
@@ -3943,7 +3946,7 @@ function updatePlayer(dt) {
   if (!inputOn) { mx = 0; mz = 0; }
   const ml = Math.hypot(mx, mz); if (ml > 1) { mx /= ml; mz /= ml; }
   const sprint = touch.moveId !== null && ml > 0.92;
-  const sp = (sprint ? 7.2 : 4.6) * (madness.on ? 1.15 : 1) * (player.broken && player.broken.leg ? 0.5 : 1) * (ADR.t > 0 ? 1.3 : 1);
+  const sp = (sprint ? 7.2 : 4.6) * (madness.on ? 1.15 : 1) * (mode === 'ideas' ? IDEA.spd : 1) * (player.broken && player.broken.leg ? 0.5 : 1) * (ADR.t > 0 ? 1.3 : 1);
   const fwx = -Math.sin(player.yaw), fwz = -Math.cos(player.yaw), rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw);
   const wx = (fwx * -mz + rx * mx) * sp, wz = (fwz * -mz + rz * mx) * sp;
   const acc = player.onGround ? 12 : 2.5;
@@ -4344,6 +4347,7 @@ function playerFoot(dt) {
   _a.set(player.pos.x + cx * sd * 0.1, player.pos.y, player.pos.z + cz * sd * 0.1); _c.set(-Math.sin(player.yaw), 0, -Math.cos(player.yaw)); addBloodDecal(_a, UP, _c, 0.07 * k, 0.15 * k);
 }
 function hitPart(npc, P, h, dir, dmg, w) {
+  if (mode === 'ideas') dmg *= IDEA.dmgMul;
   if (WW.boss && npc === WW.boss && (WW.shield || !WW.provoked)) { WW.provoked = true; sparks(h.point, 8, hitNormal(h), 4); if (!WW.shT2 || performance.now() - WW.shT2 > 2500) { WW.shT2 = performance.now(); toast('Босс неуязвим: сначала перебейте охрану'); } return; }
   if (npc.d3Mel) { d3MelHit(npc, P, h, dir, dmg, w); return; }
   // Melodie dodges every bullet: she sidesteps across the shot and takes no damage
@@ -4721,7 +4725,7 @@ function closeSpawn() { $('spawn').hidden = true; resume(); }
 $('playSandbox').onclick = () => { lockFromClick = true; tryLandscape(); startGame('sandbox'); };
 $('playWaves').onclick = () => { lockFromClick = true; tryLandscape(); startGame('waves'); };
 $('resumeBtn').onclick = () => { Sound.init(); lockFromClick = true; resume(); };
-$('againBtn').onclick = () => (mode === 'story' ? (lastCh === 2 ? startCh2() : startStory()) : startGame('waves'));
+$('againBtn').onclick = () => (mode === 'ideas' ? ideasStart() : mode === 'story' ? (lastCh === 2 ? startCh2() : startStory()) : startGame('waves'));
 const CH2_CODE = '3398';
 function ch2Open() { try { return localStorage.getItem('myasorubka-ch2') === '1'; } catch (e) { return false; } }
 function ch2Label() { const sm2 = $('playCh2').querySelector('small'); if (sm2) sm2.textContent = ch2Open() ? '«Расплата». Вы — воскреситель. Вы очнулись в клетке…' : '🔒 Закрыто. Введите код доступа'; }
@@ -11789,7 +11793,8 @@ function vehBoom(C) {
 }
 /* ----- collisions: walls, other cars, people, props ----- */
 function vehWall(x, z, r) {
-  const T = VEH.track, R = VEH.road;
+  const T = VEH.track, R = VEH.road, AR = VEH.arena;
+  if (AR) { const h = AR.half - r; if (x > h) return [-1, 0, x - h]; if (x < -h) return [1, 0, -h - x]; if (z > h) return [0, -1, z - h]; if (z < -h) return [0, 1, -h - z]; return null; }
   if (R) { const lim = R.half - r; if (x > lim) return [-1, 0, x - lim]; if (x < -lim) return [1, 0, -lim - x]; if (z > R.end - r) return [0, -1, z - R.end + r]; if (z < -R.end + r) return [0, 1, -R.end + r - z]; return null; }
   if (T) { let best = 1e9, bi = 0; for (let i = 0; i < T.N; i++) { const p = T.p[i], d = (p.x - x) ** 2 + (p.z - z) ** 2; if (d < best) { best = d; bi = i; } } const p = T.p[bi], d = Math.sqrt(best), lim = T.wall - r; if (d > lim) return [(p.x - x) / d, (p.z - z) / d, d - lim]; return null; }
   return null;
@@ -11874,7 +11879,8 @@ function vehSpawnMine(id, atSpawn, here) {
 }
 /* ----- AI drivers ----- */
 function vehAI(C, dt) {
-  const A = C.ai, I = C.in; if (A.stop || C.burnt || C.hp < 30) { I.th = 0; I.br = 0; I.st = 0; I.hb = 1; return; }
+  const A = C.ai, I = C.in; if (A.kind === 'ram' && !C.burnt) { const tp = ideaPosOf(A.tgt); I.st = clamp(-angDiff(C.yaw, Math.atan2(tp.x - C.x, tp.z - C.z)) * 2.5, -1, 1); I.th = 1; I.br = 0; I.hb = 0; return; }
+  if (A.stop || C.burnt || C.hp < 30) { I.th = 0; I.br = 0; I.st = 0; I.hb = 1; return; }
   if (A.kind === 'lane') {
     const dir = A.dir, yaw0 = dir > 0 ? 0 : Math.PI, e = A.x - C.x, yT = yaw0 + clamp(e * 0.12, -0.35, 0.35) * dir;
     I.st = clamp(-angDiff(C.yaw, yT) * 3, -1, 1); let want = A.sp;
@@ -11920,7 +11926,7 @@ function vehTouch(act, down) {
   return false;
 }
 function vehAct() { if (VEH.in) { vehExit(false); return true; } const C = vehNearest(); if (C && mode !== 'story') { vehEnter(C); return true; } return false; }
-function vehClear() { for (const d of VEH.debris) scene.remove(d.o); Object.assign(VEH, { list: [], in: null, debris: [], track: null, road: null, race: null, started: false, mine: null }); story.ride = null; story.rideCam = null; vehHud(false); vehAudioSet(0, 0, 0); const b = document.getElementById('vehBtn'); if (b) b.style.display = 'none'; }
+function vehClear() { for (const d of VEH.debris) scene.remove(d.o); Object.assign(VEH, { list: [], in: null, debris: [], track: null, road: null, arena: null, race: null, started: false, mine: null }); story.ride = null; story.rideCam = null; vehHud(false); vehAudioSet(0, 0, 0); const b = document.getElementById('vehBtn'); if (b) b.style.display = 'none'; }
 function updVeh(dt) {
   if (!VEH.list.length && !VEH.debris.length && !VEH.road && !VEH.track) return;
   const vmap = !!(VEH.road || VEH.track);
@@ -11978,6 +11984,248 @@ function buildTraffic() {
   for (let z = -HZ + 80; z < HZ; z += 260) addSign([{ t: 'ТРАССА М-13', s: 90 }, { t: `${Math.round((z + HZ) / 10)} км`, s: 70 }], 4, 1.6, -12.5, 3.5, z, Math.PI / 2, 'rgba(255,255,255,0.95)');
   for (let i = 0; i < 6; i++) makeCar(pick(['sedan', 'pickup', 'sport']), rand(-6.5, -2), -HZ + 30 + i * 9, rand(-0.3, 0.3), { col: pick(TRAFFIC_COLS) });
 }
+/* ===================== SERVERS · «ВЫЖИВИ СВОИ ИДЕИ»: a battle royale where every 10 seconds what you write comes true ===================== */
+const IDEA = { on: false, bots: [], feed: [], pending: '', name: 'Игрок', roundT: 10, round: 0, sent: 0, ok: 0, t0: 0, form: '', look: null, scale: 1, spd: 1, armor: 1, dmgMul: 1, evade: 0, lives: 0, ghost: 0, shield: 0, spdT: 0, lava: 0, acid: 0, grav: 0, night: 0, dance: 0, tornado: 0, car: 0, allow: ['fists', 'pistol'], over: false, kills0: 0 };
+const IDEA_NAMES = ['КиллерКот', 'Вася_228', 'ПельменьБог', 'Нагибатор3000', 'ТихийУжас', 'Лёха', 'Mr_Zombie', 'Кексик', 'БабкаСТапком', 'Шаурмен', 'ДедИнсайд', 'КотБаюн', 'Ржавый', 'Пончик', 'Тень', 'Сосиска', 'ГромГромыч', 'Пуля', 'Снежок', 'Бублик', 'ЖелезныйДрын', 'Креветка', 'Таракан', 'ЗлойГусь', 'Бульдозер', 'Кактус', 'Варенье', 'Пиксель', 'ХомякУбийца', 'Чебурек', 'Дрон', 'Лягушонок', 'КапитанКрюк', 'Гаечка', 'Мармелад', 'Фантом', 'Капуста', 'Йогурт', 'Свинтус', 'Огурчик', 'Чупакабра', 'Валера', 'Маргарита', 'Ниндзя', 'Пират', 'Холодец', 'Шпрот', 'Зефир', 'Буран', 'Ватрушка'];
+const IDEA_BOT = ['дождь из гранат', 'призвать 3 зомби', 'превратиться в великана', 'стать маленьким', 'пол это лава', 'невесомость', 'торнадо', 'метеорит на {n}', 'молния в {n}', 'дай мне автомат', 'дай мне дробовик', 'аптечка', 'превратиться в хаги ваги', 'стать воскресителем', 'превратиться в свити', 'стать невидимым', 'землетрясение', 'кислотный дождь', 'ночь', 'машина сбивает {n}', 'взорвать {n}', 'призвать 2 солдат', 'дождь из бочек', 'бессмертие', 'огонь вокруг {n}', 'хочу пиццу', 'все танцуют', 'огромный ботинок', 'превратиться в зомби', 'быстрые ноги', 'убить {n}', 'дождь из ящиков', 'гигантский утюг', 'призвать хаги ваги', 'стать призраком', 'дай мне огнемёт', 'бензопила мне', 'падающий холодильник на {n}'];
+const IDEA_OUT = ['съеден зомби', 'упал с края арены', 'взорвался на своей же гранате', 'превратился в табуретку', 'поскользнулся на банановой кожуре', 'его забрал НЛО', 'сгорел в лаве', 'вышел покушать', 'раздавлен огромным ботинком', 'укушен хаги ваги', 'исчез в портале', 'его идея обернулась против него'];
+const IDEA_HINTS = ['дождь из гранат', 'превратиться в великана', 'стать невидимым', 'призвать 3 зомби', 'дай мне автомат', 'пол это лава', 'молния в КиллерКот', 'превратиться в машину', 'превратиться в хаги ваги', 'стать воскресителем', 'торнадо', 'метеорит на Вася_228', 'аптечка', 'бессмертие', 'все танцуют', 'огромный арбуз'];
+const IDEA_EMB = 12;
+function ideaChance() { const a = IDEA.bots.filter((b) => b.alive).length + (player.dead ? 0 : 1); return clamp(Math.round(160 / Math.sqrt(Math.max(1, a))), 10, 95); }
+function ideaAlive() { return IDEA.bots.filter((b) => b.alive).length + (player.dead || IDEA.over ? 0 : 1); }
+/* ----- the arena ----- */
+function buildIdeas() {
+  Object.assign(LV, { walls: false, ceil: false }); VEH.arena = { half: HX - 1 };
+  const BB = batcher(), C = (c, r = 0.7, m = 0) => std({ color: c, roughness: r, metalness: m });
+  floorMesh(std({ map: cvTex(128, 128, (g) => { g.fillStyle = '#16121e'; g.fillRect(0, 0, 128, 128); g.strokeStyle = '#ff3aa0'; g.lineWidth = 2; g.strokeRect(1, 1, 126, 126); g.strokeStyle = 'rgba(90,220,255,.35)'; g.lineWidth = 1; g.strokeRect(32, 32, 64, 64); }), roughness: 0.5, metalness: 0.3, emissive: 0x1a0a1e }), HX * 2, HZ * 2).material.map.repeat.set(15, 15);
+  const blk = (m, x, y, z, sx, sy, sz) => { BB.box(m, x, y, z, sx, sy, sz); solid(x, y, z, sx, sy, sz); };
+  for (const [x, z, sx, sz] of [[0, -HZ + 0.4, HX * 2, 0.8], [0, HZ - 0.4, HX * 2, 0.8], [-HX + 0.4, 0, 0.8, HZ * 2], [HX - 0.4, 0, 0.8, HZ * 2]]) blk(C(0x2a2236), x, 1.2, z, sx, 2.4, sz);
+  const neon = new THREE.MeshBasicMaterial({ color: 0xff3aa0 }), cyan = new THREE.MeshBasicMaterial({ color: 0x5ad8ff });
+  for (const [x, z, sx, sz] of [[0, -HZ + 0.85, HX * 2, 0.06], [0, HZ - 0.85, HX * 2, 0.06], [-HX + 0.85, 0, 0.06, HZ * 2], [HX - 0.85, 0, 0.06, HZ * 2]]) BB.box(neon, x, 2.2, z, sx, 0.08, sz);
+  // cover: low blocks (stand on them when the floor is lava), tall walls, crates
+  const cover = [[-12, -12], [12, -12], [-12, 12], [12, 12], [0, -18], [0, 18], [-18, 0], [18, 0], [-6, -4], [6, 4], [-22, -20], [22, 20], [20, -22], [-20, 22]];
+  for (const [x, z] of cover) { blk(C(0x3a3048, 0.6, 0.2), x, 0.45, z, 3, 0.9, 3); BB.box(cyan, x, 0.92, z, 3.02, 0.03, 3.02); }
+  for (const [x, z, r] of [[-8, 10, 0], [8, -10, 0], [14, 4, 1], [-14, -4, 1], [0, 8, 1], [0, -8, 1]]) { const sx = r ? 0.6 : 5, sz = r ? 5 : 0.6; blk(C(0x4a3a5a, 0.6), x, 1.4, z, sx, 2.8, sz); BB.box(neon, x, 2.82, z, sx + 0.02, 0.04, sz + 0.02); }
+  blk(C(0x221a2a, 0.4, 0.5), 0, 2.5, 0, 2.2, 5, 2.2);
+  for (const s of [0, 1, 2, 3]) { const a = s * Math.PI / 2, m = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.2), new THREE.MeshBasicMaterial({ map: toTex(textCanvas([{ t: 'ВЫЖИВИ', s: 70 }, { t: 'СВОИ ИДЕИ', s: 60 }], 512, 300, '#120a18', '#ff5ab4')) })); m.position.set(Math.sin(a) * 1.12, 3.8, Math.cos(a) * 1.12); m.rotation.y = a; addMesh(m); }
+  BB.flush();
+  const lava = new THREE.Mesh(new THREE.PlaneGeometry(HX * 2, HZ * 2).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff5a10, transparent: true, opacity: 0.0, depthWrite: false })); lava.position.y = 0.03; lava.visible = false; addMesh(lava); IDEA.lavaM = lava;
+}
+/* ----- bots ----- */
+function ideaTag(n, name) { const t = new THREE.Sprite(new THREE.SpriteMaterial({ map: toTex(textCanvas([{ t: name, s: 44 }], 320, 64, 'rgba(0,0,0,0.45)', '#fff')), depthTest: false, transparent: true })); t.scale.set(1.0, 0.2, 1); t.position.y = 2.15; t.renderOrder = 5; n.root.add(t); n.tag = t; }
+function ideaEmbody(b, x, z) {
+  if (x === undefined) { const a = rand(0, 6.28), r = rand(10, HX - 4); x = Math.cos(a) * r; z = Math.sin(a) * r; }
+  const n = mkNpc(b.look || undefined, x, z, rand(0, 6.28), 'human'); n.scripted = true; n.pos.set(x, 0, z); n.root.position.copy(n.pos); n.ideaBot = b; b.n = n; ideaTag(n, b.name);
+  if (b.scale !== 1) { n.root.scale.setScalar(b.scale); } n.hp = n.maxHp = 100 * (b.hpK || 1); b.cd = rand(0.5, 1.5); b.tT = 0; spawnSprite(TEX.soft, _a.set(x, 1, z), { color: 0xff5ab4, additive: true, size: 2.4, grow: 1, life: 0.5 });
+}
+function ideaRelook(b, look) { b.look = look; if (!b.n || b.n.state !== 'alive') return; const n = b.n, x = n.pos.x, z = n.pos.z, k = n.hp / n.maxHp; n.dispose(); ideaEmbody(b, x, z); b.n.hp = b.n.maxHp * k; }
+function ideaKillBot(b, why) { if (!b.alive) return; b.alive = false; if (b.n && b.n.state !== 'dead') { if (b.n.state === 'alive') b.n.die('zombie'); else b.n.die('zombie'); } ideaFeed(`☠ ${b.name} выбыл${why ? ': ' + why : ''}`, '#ff8a8a'); }
+function ideaHurtBot(b, d, why, dir) { if (!b.alive) return; if (!b.n) { if (Math.random() < d / 100) ideaKillBot(b, why); return; } if (b.shield > 0 || b.ghost > 0) return; const n = b.n; n.hp -= d; n.flinch = 1; chestOf(n, _a); bloodSpray(_a, dir || UP, 12, 0.6, 1, 3, 0.004, 0.01); if (n.hp <= 0) { if (b.lives > 0) { b.lives--; n.hp = n.maxHp; flashScreen('#ffe9a0', 200); ideaFeed(`✨ ${b.name} воскрес`, '#ffd060'); return; } n.vel.set(rand(-2, 2), 2, rand(-2, 2)); ideaKillBot(b, why); } }
+function ideaBotsUpd(dt) {
+  const emb = IDEA.bots.filter((b) => b.alive && b.n);
+  for (const b of IDEA.bots) { if (!b.alive || !b.n) continue; if (b.n.state === 'dead') { b.alive = false; ideaFeed(`☠ ${b.name} выбыл`, '#ff8a8a'); if (b.n.killedBy === 'shot' && b.lastHit !== 'bot') IDEA.kills = (IDEA.kills || 0) + 1; } }
+  if (emb.length < IDEA_EMB) { const pool = IDEA.bots.filter((b) => b.alive && !b.n); if (pool.length && Math.random() < dt * 1.5) ideaEmbody(pick(pool)); }
+  for (const b of emb) {
+    const n = b.n; if (n.state !== 'alive') continue; b.shield = Math.max(0, (b.shield || 0) - dt); b.ghost = Math.max(0, (b.ghost || 0) - dt); if (b.ghostVis !== (b.ghost > 0)) { b.ghostVis = b.ghost > 0; n.root.visible = !b.ghostVis; }
+    if (IDEA.dance > 0) { if (n.pose !== 'dance') { n.pose = 'dance'; n.poseDur = Infinity; } n.speed = 0; n.root.position.copy(n.pos); continue; } else if (n.pose === 'dance') { n.pose = 'stand'; n.poseDur = 0; }
+    if (IDEA.lava > 0 && Math.random() < dt * 0.6) n.hp -= 0; // they hop, see below
+    b.tT -= dt; if (b.tT <= 0 || !b.tgt || (b.tgt !== 'player' && (!b.tgt.alive || !b.tgt.n))) { b.tT = rand(1.2, 2.4); let best = null, bd = 1e9; const cands = emb.filter((o) => o !== b && o.alive && o.n && !(o.ghost > 0)); if (!player.dead && !(IDEA.ghost > 0) && !IDEA.over) cands.push('player'); for (const o of cands) { const p = o === 'player' ? player.pos : o.n.pos, d = Math.hypot(p.x - n.pos.x, p.z - n.pos.z) + rand(0, 6) + (o === 'player' ? 3 : 0); if (d < bd) { bd = d; best = o; } } b.tgt = best; }
+    const T = b.tgt, tp = T === 'player' ? player.pos : T && T.n ? T.n.pos : null; if (!tp) { n.speed = 0; continue; }
+    const dx = tp.x - n.pos.x, dz = tp.z - n.pos.z, d = Math.hypot(dx, dz) || 1, flee = n.hp < n.maxHp * 0.25 && Math.random() < 0.9, sp = 2.6 * (b.spd || 1) * (IDEA.lava > 0 ? 1.4 : 1);
+    if (flee) { walkNpc(n, n.pos.x - dx / d * 4, n.pos.z - dz / d * 4, sp * 1.2, dt); }
+    else if (b.gun && d > 3 && d < 16) { n.speed = 0; n.yaw = Math.atan2(dx, dz); }
+    else if (d > 1.25) walkNpc(n, tp.x, tp.z, sp, dt); else { n.speed = 0; n.yaw = Math.atan2(dx, dz); }
+    pushOutAABBs(n.pos, 0.3, 0); clampBounds(n.pos, 0.6);
+    if (IDEA.lava > 0) { n.pos.y = Math.abs(Math.sin(performance.now() / 160 + b.i)) * 0.35; if (Math.random() < dt * 2) ideaHurtBot(b, 6, 'сгорел в лаве'); } else n.pos.y = 0;
+    n.root.position.copy(n.pos); n.root.rotation.y = n.yaw;
+    b.cd -= dt; if (b.cd > 0 || flee) continue;
+    if (b.gun && d < 16 && d > 2.5) { b.cd = rand(0.9, 1.5); const from = _a.set(n.pos.x + Math.sin(n.yaw) * 0.4, 1.4 * b.scale, n.pos.z + Math.cos(n.yaw) * 0.4).clone(); const to = T === 'player' ? eye.position.clone() : chestOf(T.n, new V3()); tracer(from, to); Sound.shot(b.gun === 'shotgun' ? 'shotgun' : 'pistol', 0.5 * dv(from)); if (Math.random() < 0.38) { if (T === 'player') { if (Math.random() > IDEA.evade) damagePlayer(b.gun === 'shotgun' ? 16 : 10); } else { T.lastHit = 'bot'; ideaHurtBot(T, b.gun === 'shotgun' ? 22 : 14, `застрелен ${b.name}`, new V3(dx, 0, dz).normalize()); } } }
+    else if (d < 1.45) { b.cd = rand(0.9, 1.3); n.pose = 'punchwind'; n.poseDur = 0.18; n.poseT = 0; later(0.15, () => { if (n.state === 'alive') { n.pose = 'punch'; n.poseDur = 0.22; n.poseT = 0; } }); const dmg = rand(6, 10) * (b.dmg || 1); later(0.2, () => { if (n.state !== 'alive') return; const p2 = T === 'player' ? player.pos : T.n && T.n.pos; if (!p2 || Math.hypot(p2.x - n.pos.x, p2.z - n.pos.z) > 1.9) return; Sound.thud(0.5 * dv(n.pos)); if (T === 'player') damagePlayer(dmg); else { T.lastHit = 'bot'; ideaHurtBot(T, dmg * 1.4, `избит ${b.name}`, new V3(dx, 0, dz).normalize()); } }); }
+  }
+}
+/* ----- ideas: reading the text and making it real ----- */
+function ideaWho(who) { return who ? who.name : IDEA.name; }
+function ideaPosOf(o) { if (o === 'player') return player.pos.clone(); if (o && o.n && o.n.state === 'alive') return o.n.pos.clone(); return new V3(rand(-HX + 4, HX - 4), 0, rand(-HZ + 4, HZ - 4)); }
+function ideaTarget(t, who) {
+  if (/меня|себя|(^|\s)мне(\s|$)/.test(t) && !/дай|выдай|получ/.test(t)) return who || 'player';
+  if (IDEA.name && t.includes(IDEA.name.toLowerCase()) && who) return 'player';
+  for (const b of IDEA.bots) if (b.alive && b !== who && t.includes(b.name.toLowerCase())) return b;
+  return null;
+}
+function ideaRandomTargets(k, who) { const all = IDEA.bots.filter((b) => b.alive && b !== who && b.n); if (!player.dead && who) all.push('player'); const out = []; while (out.length < k && all.length) out.push(all.splice(randi(all.length), 1)[0]); return out; }
+function ideaHit(o, d, why, src) { if (o === 'player') { if (!(IDEA.shield > 0)) damagePlayer(d); return; } ideaHurtBot(o, d, why, src); }
+function ideaMark(x, z, r, t, fn) { const m = new THREE.Mesh(new THREE.RingGeometry(r * 0.85, r, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff2020, transparent: true, opacity: 0.8, depthWrite: false })); m.position.set(x, 0.05, z); scene.add(m); mapObjs.push(m); later(t, () => { scene.remove(m); fn(); }); }
+function ideaBoom(x, z, power, why, who) { explode(_a.set(x, 0.5, z), power); const R = 5 * power; for (const b of IDEA.bots) { if (!b.alive || !b.n || b === who) continue; const d = Math.hypot(b.n.pos.x - x, b.n.pos.z - z); if (d < R) { ideaHurtBot(b, (1 - d / R) * 130, why); if (b.n && b.n.state === 'alive' && d < R * 0.6) { b.n.vel.set((b.n.pos.x - x) / (d || 1) * 7, 6, (b.n.pos.z - z) / (d || 1) * 7); } } } }
+function ideaForm(o, form) {
+  const W2 = (id) => WEAPONS.findIndex((w) => w.id === id);
+  if (o === 'player') {
+    Object.assign(IDEA, { form, look: null, scale: 1, spd: 1, armor: 1, dmgMul: 1, evade: 0 }); player.eye = 1.62;
+    if (form === 'giant') { IDEA.scale = 1.7; IDEA.armor = 0.5; IDEA.spd = 0.85; player.hp = Math.min(200, player.hp + 100); }
+    else if (form === 'small') { IDEA.scale = 0.5; IDEA.spd = 1.35; IDEA.evade = 0.6; }
+    else if (form === 'zombie') IDEA.look = 'hollow';
+    else if (form === 'gg') { IDEA.look = 'gagarin'; IDEA.lives = 1; IDEA.dmgMul = 1.5; }
+    else if (form === 'svity') { IDEA.look = 'svity-street'; IDEA.spd = 1.45; }
+    else if (form === 'huggy') { IDEA.look = 'huggy'; IDEA.dmgMul = 3; IDEA.scale = 1.25; }
+    else if (form === 'soldier') { IDEA.look = 'guard'; ideaGive('rifle'); }
+    else if (form === 'melodie') { IDEA.look = 'melodie'; IDEA.evade = 0.85; }
+    else if (form === 'ghost') { IDEA.ghost = 15; }
+    else if (form === 'car') { ideaCar(); }
+    player.eye = 1.62 * IDEA.scale; makeAvatar(); if (avatar) avatar.root.scale.setScalar(IDEA.scale); flashScreen('#ff9ad8', 400); Sound.whoosh(); return;
+  }
+  const b = o; if (!b.alive) return;
+  b.scale = 1; b.spd = 1; b.dmg = 1; b.hpK = 1;
+  const look = { zombie: 'hollow', gg: 'tech', svity: 'svity-street', huggy: 'huggy', soldier: 'guard', melodie: 'fan' }[form];
+  if (form === 'giant') { b.scale = 1.7; b.hpK = 2; b.dmg = 1.8; b.spd = 0.85; }
+  if (form === 'small') { b.scale = 0.55; b.spd = 1.4; }
+  if (form === 'zombie') b.dmg = 1.6; if (form === 'gg') b.lives = 1; if (form === 'huggy') { b.dmg = 2.5; b.scale = 1.25; } if (form === 'soldier') b.gun = 'rifle'; if (form === 'svity') b.spd = 1.5; if (form === 'ghost') b.ghost = 12;
+  if (form === 'car' && b.n) { ideaRam(b.n.pos.clone(), ideaRandomTargets(1, b)[0], b); return; }
+  if (b.n) { if (look) ideaRelook(b, look); else if (b.n) { b.n.root.scale.setScalar(b.scale); b.n.hp = b.n.maxHp = 100 * b.hpK; } }
+}
+function ideaGive(id) { const i = WEAPONS.findIndex((w) => w.id === id); if (i < 0) return; if (!IDEA.allow.includes(id)) IDEA.allow.push(id); W.ammo[i] = WEAPONS[i].mag || 0; selectWeapon(i); W.switchT = 0.2; }
+function ideaCar() { const C = makeCar(pick(['sport', 'sedan', 'pickup']), player.pos.x, player.pos.z, player.yaw + Math.PI); vehEnter(C); IDEA.car = 20; IDEA.carC = C; }
+function ideaRam(from, tgt, who) { const tp = ideaPosOf(tgt || 'player'), a = rand(0, 6.28), sx = clamp(tp.x + Math.cos(a) * 22, -HX + 4, HX - 4), sz = clamp(tp.z + Math.sin(a) * 22, -HZ + 4, HZ - 4); const C = makeCar(pick(['truck', 'sedan', 'pickup', 'sport']), sx, sz, Math.atan2(tp.x - sx, tp.z - sz), { col: pick([0xc81818, 0x1a1a1e, 0xe8e8e0]), ai: { kind: 'ram', tgt: tgt || 'player', life: 7 } }); C.vx = Math.sin(C.yaw) * 14; C.vz = Math.cos(C.yaw) * 14; Sound.thud(0.4); }
+function ideaParse(t) {
+  t = t.toLowerCase().replace(/ё/g, 'е'); const num = clamp(parseInt((t.match(/\d+/) || ['3'])[0], 10) || 3, 1, 6);
+  const FORMS = [[/зомби|мертвец|пуст/, 'zombie'], [/гигант|великан|больш|огромн/, 'giant'], [/маленьк|муравь|крошеч|малыш|мыш/, 'small'], [/воскрес/, 'gg'], [/свити/, 'svity'], [/хаги|хагги|huggy/, 'huggy'], [/солдат|спецназ|воен/, 'soldier'], [/невидим|призрак|привидени/, 'ghost'], [/мелоди/, 'melodie'], [/машин|танк|авто|грузовик|фур/, 'car']];
+  if (/превра|стать|стал|становл|я теперь|сделай меня|обернуть/.test(t)) { for (const [re, f] of FORMS) if (re.test(t)) return { k: 'form', f }; }
+  if (/невидим|призрак/.test(t)) return { k: 'form', f: 'ghost' };
+  if (/танц/.test(t)) return { k: 'dance' };
+  if (/убить|убей|взорв|уничтож|казнить|прибить|сжечь|сожги/.test(t) && !/дожд/.test(t)) return { k: 'kill', all: /всех|(^|\s)все(\s|$)/.test(t), fire: /сжечь|сожги/.test(t) };
+  const give = /дай|дать|выдай|получ|хочу|(^|\s)мне(\s|$)/.test(t) && !/дожд|град|с неба/.test(t);
+  const WP = [[/автомат|калаш|винтовк/, 'rifle'], [/дробовик|ружь/, 'shotgun'], [/пистолет/, 'pistol'], [/огнем[её]т/, 'flame'], [/бензопил/, 'saw'], [/арбалет/, 'bow'], [/мачете|меч|нож/, 'machete'], [/гранат/, 'grenade']];
+  if (give) for (const [re, id] of WP) if (re.test(t)) return { k: 'give', id };
+  if (/аптечк|вылеч|здоров|(^|\s)хп(\s|$)|жизн/.test(t)) return { k: 'heal' };
+  if (/бессмерт|щит|брон|неуязв/.test(t)) return { k: 'shield' };
+  if (/скорост|быстр|ноги|бег/.test(t)) return { k: 'speed' };
+  if (/лава/.test(t)) return { k: 'lava' };
+  if (/кислот/.test(t)) return { k: 'acid' };
+  if (/невесом|гравитац|(^|\s)луна|космос/.test(t)) return { k: 'grav' };
+  if (/ночь|темн|тьма/.test(t)) return { k: 'night' };
+  if (/землетряс|тряск|трясет/.test(t)) return { k: 'quake' };
+  if (/торнадо|ураган|ветер|смерч/.test(t)) return { k: 'tornado' };
+  if (/метеор|астероид|комет/.test(t)) return { k: 'meteor' };
+  if (/молни|(^|\s)гром|гроз/.test(t)) return { k: 'bolt' };
+  if (/огон|пожар|пламя/.test(t)) return { k: 'fire' };
+  if (/машин|грузовик|фур|автобус|сбива/.test(t)) return { k: 'ram' };
+  if (/зомби/.test(t)) return { k: 'spawn', what: 'zombie', n: num };
+  if (/хаги|хагги/.test(t)) return { k: 'spawn', what: 'huggy', n: Math.min(num, 3) };
+  if (/солдат|спецназ|охран/.test(t)) return { k: 'spawn', what: 'soldier', n: Math.min(num, 3) };
+  if (/манекен/.test(t)) return { k: 'spawn', what: 'dummy', n: num };
+  if (/боч[ке]/.test(t)) return { k: 'rain', what: 'barrel', n: num + 3 };
+  if (/ящик/.test(t)) return { k: 'rain', what: 'crate', n: num + 3 };
+  if (/гранат|бомб|взрыв|ракет/.test(t)) return { k: 'bombs', n: num + 2 };
+  return { k: 'thing' };
+}
+function ideaApply(text, who) {
+  const P = ideaParse(text), t = text.toLowerCase().replace(/ё/g, 'е'), me = who || 'player', tg = ideaTarget(t, who), at = ideaPosOf(tg || me), why = `идея ${ideaWho(who)}`;
+  switch (P.k) {
+    case 'form': { const o = tg && tg !== me && /его|ее|сделай/.test(t) ? tg : me; ideaForm(o, P.f); const nm = { zombie: 'зомби', giant: 'великана', small: 'малыша', gg: 'воскресителя', svity: 'Свити', huggy: 'Хаги Ваги', soldier: 'солдата', ghost: 'призрака', melodie: 'Мелоди', car: 'машину' }[P.f]; return `${o === 'player' ? IDEA.name : o.name} превращается в ${nm}`; }
+    case 'dance': IDEA.dance = 6; Sound.chime(); return 'все боты пускаются в пляс';
+    case 'kill': { const list = P.all ? ideaRandomTargets(randi(3) + 2, who) : [tg || ideaRandomTargets(1, who)[0]]; for (const o of list) { if (!o) continue; const p = ideaPosOf(o); if (P.fire) molotovBurst(p.clone().setY(0.1)); else ideaBoom(p.x, p.z, 0.9, why, who); if (o !== 'player' && !o.n) ideaKillBot(o, why); } return list.length ? `${list.map((o) => o === 'player' ? IDEA.name : o.name).join(', ')} под ударом` : 'некого'; }
+    case 'give': if (me === 'player') ideaGive(P.id); else me.gun = P.id === 'shotgun' ? 'shotgun' : 'pistol'; Sound.click(700, 0.4); return `${ideaWho(who)} получает ${WEAPONS.find((w) => w.id === P.id).name.toLowerCase()}`;
+    case 'heal': if (me === 'player') { player.hp = Math.max(player.hp, 100); } else if (me.n) me.n.hp = me.n.maxHp; Sound.heal(); return `${ideaWho(who)} полностью здоров`;
+    case 'shield': if (me === 'player') IDEA.shield = 12; else me.shield = 12; Sound.heal(); return `${ideaWho(who)} неуязвим 12 секунд`;
+    case 'speed': if (me === 'player') { IDEA.spdT = 20; } else me.spd = 1.7; return `${ideaWho(who)} бегает в два раза быстрее`;
+    case 'lava': IDEA.lava = 7; Sound.boom(); return 'ПОЛ — ЭТО ЛАВА! Запрыгивайте на блоки';
+    case 'acid': IDEA.acid = 6; return 'кислотный дождь на всю арену';
+    case 'grav': IDEA.grav = 10; return 'невесомость на 10 секунд';
+    case 'night': IDEA.night = 15; return 'на арене наступает ночь';
+    case 'quake': shake = 1; Sound.boom(); for (const b of IDEA.bots) if (b.alive && b.n && b.n.state === 'alive') { b.n.setPose('down', 1.6); ideaHurtBot(b, 8, 'землетрясение'); } if (!player.dead) damagePlayer(8); return 'землетрясение валит всех с ног';
+    case 'tornado': IDEA.tornado = 5; IDEA.tornP = at.clone(); Sound.whoosh(); return 'на арену налетает торнадо';
+    case 'meteor': ideaMark(at.x, at.z, 4, 2.2, () => ideaBoom(at.x, at.z, 2, `метеорит (${why})`, who)); for (let i = 0; i < 14; i++) later(i * 0.15, () => spawnSprite(TEX.soft, _a.set(at.x + (14 - i) * 1.4, i < 14 ? (14 - i) * 2.5 : 0.5, at.z), { color: 0xff7a20, additive: true, size: 2, grow: 0.5, life: 0.3 })); return `метеорит летит в ${tg === 'player' ? IDEA.name : tg ? tg.name : 'толпу'}`;
+    case 'bolt': { const list = tg ? [tg] : ideaRandomTargets(3, who); for (const o of list) { const p = ideaPosOf(o); tracer(new V3(p.x, 40, p.z), p.clone().setY(0.2)); flashScreen('#fff', 200); Sound.zap(1); Sound.boom(); ideaHit(o, 45, `молния (${why})`); } return `молния бьёт в ${list.map((o) => o === 'player' ? IDEA.name : o.name).join(', ')}`; }
+    case 'fire': for (let i = 0; i < 3; i++) molotovBurst(at.clone().add(new V3(rand(-2, 2), 0.1, rand(-2, 2)))); return `огонь вокруг ${tg === 'player' ? IDEA.name : tg ? tg.name : 'арены'}`;
+    case 'ram': ideaRam(at, tg, who); return `машина несётся на ${tg === 'player' ? IDEA.name : tg ? tg.name : 'толпу'}`;
+    case 'spawn': for (let i = 0; i < P.n; i++) { const x = clamp(at.x + rand(-5, 5), -HX + 3, HX - 3), z = clamp(at.z + rand(-5, 5), -HZ + 3, HZ - 3); if (P.what === 'huggy') spawnHuggy(x, z); else spawnNPC(P.what, x, z, undefined, P.what === 'soldier' ? 'guard' : undefined); } return `появляются: ${P.what === 'zombie' ? 'зомби' : P.what === 'huggy' ? 'Хаги Ваги' : P.what === 'soldier' ? 'солдаты' : 'манекены'} ×${P.n}`;
+    case 'rain': for (let i = 0; i < P.n; i++) { const x = clamp(at.x + rand(-6, 6), -HX + 3, HX - 3), z = clamp(at.z + rand(-6, 6), -HZ + 3, HZ - 3); later(i * 0.15, () => { spawnProp(P.what, x, z, rand(8, 14)); later(1.2, () => ideaBonk(x, z, 1.1, 22, why)); }); } return `с неба падают ${P.what === 'barrel' ? 'бочки' : 'ящики'}`;
+    case 'bombs': for (let i = 0; i < P.n; i++) { const x = clamp(at.x + rand(-8, 8), -HX + 3, HX - 3), z = clamp(at.z + rand(-8, 8), -HZ + 3, HZ - 3); ideaMark(x, z, 2.4, 1.4 + i * 0.25, () => ideaBoom(x, z, 1.0, `граната (${why})`, who)); } return 'дождь из гранат';
+    default: { const label = text.slice(0, 26); const x = clamp(at.x + rand(-3, 3), -HX + 3, HX - 3), z = clamp(at.z + rand(-3, 3), -HZ + 3, HZ - 3); const pr = spawnProp('crate', x, z, 12); if (pr) { pr.m.material = std({ map: toTex(textCanvas([{ t: '«' + label + '»', s: 34 }], 512, 512, '#c89a5a', '#2a1808')), roughness: 0.8 }); pr.m.scale.setScalar(1.6); } later(1.2, () => ideaBonk(x, z, 1.5, 30, why)); return `с неба падает «${label}»`; }
+  }
+}
+function ideaBonk(x, z, r, d, why) { Sound.thud(0.7 * dv(_a.set(x, 0, z))); for (const b of IDEA.bots) if (b.alive && b.n && Math.hypot(b.n.pos.x - x, b.n.pos.z - z) < r) ideaHurtBot(b, d, why); if (!player.dead && Math.hypot(player.pos.x - x, player.pos.z - z) < r) damagePlayer(d); }
+/* ----- rounds ----- */
+function ideaFeed(txt, col = '#f2ead8') { IDEA.feed.push({ txt, col, t: performance.now() }); if (IDEA.feed.length > 7) IDEA.feed.shift(); ideaUiFeed(); }
+function ideaRound() {
+  IDEA.round++; const ch = ideaChance(); Sound.click(1200, 0.25);
+  if (IDEA.pending && !player.dead) { const t = IDEA.pending; IDEA.pending = ''; IDEA.sent++; if (Math.random() * 100 < ch) { IDEA.ok++; const r = ideaApply(t, null); ideaFeed(`✔ Вы: «${t}» → ${r}`, '#8fff9a'); banner('ИДЕЯ СРАБОТАЛА!', r); Sound.chime(); } else { ideaFeed(`✖ Вы: «${t}» — не повезло (шанс ${ch}%)`, '#ff9a9a'); toast('Идея не сработала'); } ideaUiInput(); }
+  const alive = IDEA.bots.filter((b) => b.alive), k = Math.min(alive.length, 2 + randi(4));
+  for (let i = 0; i < k; i++) { const b = Math.random() < 0.65 ? (alive.filter((x) => x.n)[randi(Math.max(1, alive.filter((x) => x.n).length))] || pick(alive)) : pick(alive); if (!b || !b.alive) continue; const pool = alive.filter((o) => o !== b), tn = !player.dead && Math.random() < 0.25 ? IDEA.name : pool.length ? pick(pool).name : IDEA.name; const txt = pick(IDEA_BOT).replace('{n}', tn); if (Math.random() * 100 < ch) { const r = ideaApply(txt, b); ideaFeed(`💬 ${b.name}: «${txt}» → ${r}`, '#ffe8a0'); } else ideaFeed(`💬 ${b.name}: «${txt}» ✖`, '#a8a0b0'); }
+  const abs = IDEA.bots.filter((b) => b.alive && !b.n), kk = Math.min(abs.length, randi(3) + (abs.length > 25 ? 1 : 0)); for (let i = 0; i < kk; i++) ideaKillBot(pick(abs.filter((b) => b.alive)), pick(IDEA_OUT));
+}
+/* ----- UI ----- */
+function ideaUi() {
+  let d = document.getElementById('ideaUi'); if (d) return d;
+  d = document.createElement('div'); d.id = 'ideaUi'; d.style.cssText = 'position:fixed;inset:0;z-index:38;pointer-events:none;display:none;font-family:var(--ui)';
+  d.innerHTML = '<div id="ideaTop" style="position:absolute;left:50%;top:calc(6px + env(safe-area-inset-top,0px));transform:translateX(-50%);font:800 12px var(--ui);letter-spacing:.08em;color:#fff;text-shadow:0 0 4px #000;white-space:nowrap"></div>'
+    + '<div style="position:absolute;left:50%;top:calc(26px + env(safe-area-inset-top,0px));transform:translateX(-50%);width:min(440px,58vw);display:flex;gap:4px;pointer-events:auto"><input id="ideaIn" maxlength="60" placeholder="Напишите идею… (сработает в следующем раунде)" style="flex:1;min-width:0;font:600 13px var(--ui);padding:7px 9px;border-radius:8px;border:2px solid #ff5ab4;background:rgba(14,8,18,.85);color:#fff"><button id="ideaGo" class="btn" style="padding:4px 10px;margin:0">➤</button><button id="ideaHint" class="btn" style="padding:4px 10px;margin:0">💡</button></div>'
+    + '<div id="ideaPend" style="position:absolute;left:50%;top:calc(62px + env(safe-area-inset-top,0px));transform:translateX(-50%);font:700 11px var(--ui);color:#ffd0ea;text-shadow:0 0 4px #000;white-space:nowrap"></div>'
+    + '<div id="ideaHints" style="position:absolute;left:50%;top:calc(62px + env(safe-area-inset-top,0px));transform:translateX(-50%);width:min(440px,58vw);display:none;flex-wrap:wrap;gap:4px;pointer-events:auto"></div>'
+    + '<div id="ideaFeed" style="position:absolute;left:calc(8px + env(safe-area-inset-left,0px));top:calc(84px + env(safe-area-inset-top,0px));width:min(330px,42vw);font:700 10.5px var(--ui);line-height:1.35;text-shadow:0 0 3px #000,0 0 3px #000"></div>';
+  document.body.appendChild(d);
+  const inp = d.querySelector('#ideaIn'), send = () => { const v = inp.value.trim(); if (!v) return; IDEA.pending = v; inp.value = ''; inp.blur(); Sound.click(900, 0.3); ideaUiInput(); toast('Идея принята: сработает в следующем раунде'); };
+  ['touchstart', 'pointerdown', 'click'].forEach((e) => d.querySelectorAll('input,button,#ideaHints').forEach((el) => el.addEventListener(e, (ev) => ev.stopPropagation())));
+  d.querySelector('#ideaGo').onclick = send; inp.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') send(); });
+  const hb = d.querySelector('#ideaHints'); hb.innerHTML = IDEA_HINTS.map((h) => `<button class="btn" style="padding:3px 7px;margin:0;font-size:11px">${h}</button>`).join(''); hb.querySelectorAll('button').forEach((b) => b.onclick = () => { inp.value = b.textContent; hb.style.display = 'none'; send(); });
+  d.querySelector('#ideaHint').onclick = () => { hb.style.display = hb.style.display === 'flex' ? 'none' : 'flex'; };
+  return d;
+}
+function ideaUiInput() { const p = document.getElementById('ideaPend'); if (p) p.textContent = IDEA.pending ? `Ваша идея: «${IDEA.pending}»` : ''; }
+function ideaUiFeed() { const f = document.getElementById('ideaFeed'); if (!f) return; const now = performance.now(); f.innerHTML = IDEA.feed.map((m) => `<div style="color:${m.col};opacity:${clamp(1 - (now - m.t - 12000) / 3000, 0, 1)}">${m.txt.replace(/</g, '&lt;')}</div>`).join(''); }
+/* ----- start, frame, end ----- */
+function ideasMenu() {
+  const d = c2Ui(); d.style.borderColor = '#ff5ab4'; let nick = 'Игрок'; try { nick = localStorage.getItem('myasorubka-nick') || 'Игрок'; } catch (e) {}
+  d.innerHTML = '<small style="letter-spacing:.18em;color:#ff9ad0">СЕРВЕРЫ</small>'
+    + '<div style="text-align:left;border:1px solid #ff5ab4;border-radius:10px;padding:9px 11px;margin:8px 0;background:rgba(255,90,180,.08)"><b style="font-size:17px;color:#ff9ad0">☠ ВЫЖИВИ СВОИ ИДЕИ</b><br><small>🟢 онлайн 51/51 · пинг ' + (18 + randi(30)) + ' мс · королевская битва</small><div style="font-size:12px;margin-top:6px;line-height:1.4">Каждые <b>10 секунд</b> всё, что вы написали, может случиться: появиться, произойти или превратить вас в кого-то. 50 ботов тоже пишут свои идеи. <b>Шанс</b> зависит от того, сколько игроков ещё живо: чем меньше выживших, тем чаще идеи срабатывают. Цель — остаться последним.</div>'
+    + '<div style="display:flex;gap:6px;align-items:center;margin-top:8px"><small>Ваш ник:</small><input id="ideaNick" maxlength="14" value="' + nick.replace(/"/g, '') + '" style="flex:1;font:600 13px var(--ui);padding:5px 8px;border-radius:7px;border:1px solid #888;background:#140c16;color:#fff"></div></div>'
+    + '<button class="btn primary" data-k="go" style="width:100%">Подключиться</button><button class="btn" data-k="x" style="width:100%;margin-top:4px">Назад</button>';
+  d.style.display = 'block'; d.querySelector('#ideaNick').addEventListener('keydown', (e) => e.stopPropagation());
+  d.querySelector('[data-k="go"]').onclick = () => { let nk = (d.querySelector('#ideaNick').value || '').trim().slice(0, 14) || 'Игрок'; IDEA.name = nk; try { localStorage.setItem('myasorubka-nick', nk); } catch (e) {} d.innerHTML = '<b>Подключение к серверу…</b><br><small>поиск 50 игроков</small>'; setTimeout(() => { d.style.display = 'none'; ideasStart(); }, 1200); };
+  d.querySelector('[data-k="x"]').onclick = () => { d.style.display = 'none'; };
+}
+function ideasStart() {
+  Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'ideas'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true; $('resumeBtn').hidden = true; startGame.fromWaves = true;
+  loadMap('ideas'); clearAll(); respawnPlayer(); invReset(); W.ammo = WEAPONS.map((w) => w.mag || 0); W.reloadT = 0;
+  Object.assign(IDEA, { on: true, bots: [], feed: [], pending: '', roundT: 10, round: 0, sent: 0, ok: 0, t0: performance.now(), form: '', look: null, scale: 1, spd: 1, armor: 1, dmgMul: 1, evade: 0, lives: 0, ghost: 0, shield: 0, spdT: 0, lava: 0, acid: 0, grav: 0, night: 0, dance: 0, tornado: 0, car: 0, allow: ['fists', 'pistol'], over: false, kills: 0 });
+  player.eye = 1.62; makeAvatar(); selectWeapon(WEAPONS.findIndex((w) => w.id === 'pistol'));
+  const names = IDEA_NAMES.slice().sort(() => Math.random() - 0.5); for (let i = 0; i < 50; i++) IDEA.bots.push({ name: names[i], alive: true, n: null, i, scale: 1, spd: 1, dmg: 1, hpK: 1, look: null });
+  for (let i = 0; i < IDEA_EMB; i++) ideaEmbody(IDEA.bots[i]);
+  ideaUi().style.display = 'block'; ideaUiInput(); ideaFeed(`Вы на сервере «Выживи свои идеи» как ${IDEA.name}. Удачи!`, '#ff9ad0');
+  resume(); banner('ВЫЖИВИ СВОИ ИДЕИ', '51 игрок · первый раунд через 10 с'); Music.stop(); Music.start(true);
+}
+function ideasStop() { IDEA.on = false; const d = document.getElementById('ideaUi'); if (d) d.style.display = 'none'; MAPS.ideas.sun = 1.0; MAPS.ideas.hemi = 0.8; LV.grav = 1; world.gravity.set(0, -9.82, 0); player.eye = 1.62; }
+function ideasOver(win) {
+  if (IDEA.over) return; IDEA.over = true; const place = win ? 1 : IDEA.bots.filter((b) => b.alive).length + 1, sec = Math.round((performance.now() - IDEA.t0) / 1000);
+  document.body.classList.remove('playing'); state = 'over'; if (VEH.in) vehExit(true); ideaUi().style.display = 'none';
+  document.querySelector('#over .eyebrow').textContent = 'Сервер · Выживи свои идеи'; $('overTitle').textContent = win ? '🏆 ПОСЛЕДНИЙ ВЫЖИВШИЙ!' : `Вы выбыли · ${place} место`;
+  $('overStats').innerHTML = [['Место', `${place} из 51`], ['Время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Раундов', IDEA.round], ['Идей отправлено', IDEA.sent], ['Идей сработало', IDEA.ok], ['Убито', stats.kills], ['Облик', { '': 'обычный', giant: 'великан', small: 'малыш', zombie: 'зомби', gg: 'воскреситель', svity: 'Свити', huggy: 'Хаги Ваги', soldier: 'солдат', melodie: 'Мелоди', ghost: 'призрак', car: 'машина' }[IDEA.form] || 'обычный']].map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join('');
+  $('againBtn').innerHTML = 'Ещё раз<small>новый матч на сервере</small>'; $('over').hidden = false; $('hud').hidden = true; $('touch').hidden = true; if (win) { Sound.chime(); Sound.heal(); }
+}
+function updIdeas(dt) {
+  if (!IDEA.on) return; if (mode !== 'ideas') { ideasStop(); return; }
+  const ui = ideaUi(); ui.style.display = state === 'play' && !IDEA.over ? 'block' : 'none';
+  if (state !== 'play' || IDEA.over) return;
+  ideaBotsUpd(dt);
+  if (!IDEA.allow.includes(curW().id) && !VEH.in) { const i = WEAPONS.findIndex((w) => w.id === IDEA.allow[IDEA.allow.length - 1]); if (i >= 0) selectWeapon(i); }
+  IDEA.roundT -= dt; if (IDEA.roundT <= 0) { IDEA.roundT = 10; ideaRound(); }
+  for (const k of ['ghost', 'shield', 'spdT', 'lava', 'acid', 'grav', 'night', 'dance', 'tornado', 'car']) if (IDEA[k] > 0) IDEA[k] = Math.max(0, IDEA[k] - dt);
+  const spdBase = { giant: 0.85, small: 1.35, svity: 1.45 }[IDEA.form] || 1; IDEA.spd = spdBase * (IDEA.spdT > 0 ? 1.7 : 1);
+  if (avatar && avatar.state === 'alive') { avatar.root.scale.setScalar(IDEA.scale); avatar.root.visible = !(IDEA.ghost > 0) || Math.sin(performance.now() / 80) > 0.6; }
+  // world events
+  IDEA.lavaM.visible = IDEA.lava > 0; if (IDEA.lava > 0) { IDEA.lavaM.material.opacity = 0.55 + Math.sin(performance.now() / 150) * 0.15; if (!player.dead && player.pos.y < 0.15 && !VEH.in) { IDEA.lavaHit = (IDEA.lavaHit || 0) - dt; if (IDEA.lavaHit <= 0) { IDEA.lavaHit = 0.35; damagePlayer(5); } } }
+  if (IDEA.acid > 0) { if (Math.random() < dt * 30) spawnSprite(TEX.soft, _a.set(player.pos.x + rand(-12, 12), 9, player.pos.z + rand(-12, 12)), { color: 0x9aff40, additive: true, size: 0.15, grow: 0, life: 1.2, vel: new V3(0, -9, 0) }); IDEA.acidT = (IDEA.acidT || 0) - dt; if (IDEA.acidT <= 0) { IDEA.acidT = 1; if (!player.dead && !VEH.in) damagePlayer(4); for (const b of IDEA.bots) if (b.alive && b.n && Math.random() < 0.5) ideaHurtBot(b, 5, 'кислотный дождь'); } }
+  const g = IDEA.grav > 0 ? 0.25 : 1; if (LV.grav !== g) { LV.grav = g; world.gravity.set(0, -9.82 * g, 0); }
+  const M = MAPS.ideas, nt = IDEA.night > 0; M.sun = nt ? 0.05 : 1.0; M.hemi = nt ? 0.12 : 0.8; M.lamp[1] = nt ? 4 : 30;
+  if (IDEA.tornado > 0) { const p = IDEA.tornP; p.x += Math.sin(performance.now() / 700) * dt * 4; p.z += Math.cos(performance.now() / 900) * dt * 4; for (let i = 0; i < 6; i++) { const a = performance.now() / 120 + i, r = 0.5 + i * 0.5; spawnSprite(TEX.smoke, _a.set(p.x + Math.cos(a) * r, i * 1.2, p.z + Math.sin(a) * r), { color: 0x9a9aa8, size: 1.2, grow: 1, life: 0.4, opacity: 0.4 }); }
+    for (const b of IDEA.bots) if (b.alive && b.n && b.n.state === 'alive' && Math.hypot(b.n.pos.x - p.x, b.n.pos.z - p.z) < 6) { b.n.vel.set(rand(-6, 6), 9, rand(-6, 6)); b.n.goLimp(); ideaHurtBot(b, 25, 'унесён торнадо'); }
+    if (!player.dead && Math.hypot(player.pos.x - p.x, player.pos.z - p.z) < 6 && !VEH.in) { player.vel.set((player.pos.x - p.x) * 3, 7, (player.pos.z - p.z) * 3); player.onGround = false; IDEA.tornHit = (IDEA.tornHit || 0) - dt; if (IDEA.tornHit <= 0) { IDEA.tornHit = 0.8; damagePlayer(8); } } }
+  if (IDEA.car <= 0 && IDEA.carC) { const C = IDEA.carC; IDEA.carC = null; if (VEH.in === C) { C.vx = C.vz = 0; vehExit(true); } vehRemove(C); flashScreen('#ff9ad8', 300); IDEA.form = ''; toast('Вы снова человек'); }
+  for (const C of VEH.list.slice()) if (C.ai && C.ai.kind === 'ram') { C.ai.life -= dt; if (C.ai.life <= 0) vehRemove(C); }
+  // the top line, the end
+  IDEA.uiT = (IDEA.uiT || 0) - dt; if (IDEA.uiT <= 0) { IDEA.uiT = 0.25; const a = ideaAlive(); $('ideaTop').innerHTML = `☠ Живых: <b style="color:#ff9ad0">${a}</b>/51 · 💡 шанс идеи: <b style="color:#8fff9a">${ideaChance()}%</b> · ⏱ раунд через ${Math.ceil(IDEA.roundT)} с` + (IDEA.ghost > 0 ? ' · 👻' : '') + (IDEA.shield > 0 ? ' · 🛡' : '') + (IDEA.lava > 0 ? ' · 🔥 ЛАВА' : ''); ideaUiFeed(); }
+  if (!player.dead && IDEA.bots.every((b) => !b.alive)) ideasOver(true);
+}
+
+document.getElementById('srvBtn').onclick = () => { Sound.init(); ideasMenu(); };
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
@@ -12656,7 +12904,7 @@ function frame(now) {
   lamps.forEach((l, i) => { l.intensity = MP.lamp[1] * (i === 2 ? flick : 1) * lk * (ELV.riding ? 0 : 1); }); cabinLight.intensity = mapId === 'tower' ? 7 * lk : 0;
   Sound.windLoop(state === 'play' || state === 'spawn' ? LV.wind + windExtra + fallFx.k * 1.3 : 0);
   redLight.intensity *= lk; hemi.intensity = MP.hemi * lk; sun.intensity = MP.sun * lk; updateBackdrop(rdt, now, lk);
-  updatePills(now); Music.update(); updateMadness(rdt, now);
+  updatePills(now); Music.update(); updIdeas(rdt); updateMadness(rdt, now);
   if (darkFx > 0 || darkWas) { if (!(madness.amt > 0 || madness.wasOn)) { scene.fog.color.setHex(MP.fog); scene.background.setHex(MP.bg); } scene.fog.color.multiplyScalar(1 - darkFx); scene.background.multiplyScalar(1 - darkFx); scene.fog.density = MP.fogD * (1 + darkFx * 1.5); darkWas = darkFx > 0; }
   Sound.sawLoop(state === 'play' && !player.dead && W.fireHeld && curW().id === 'saw');
   updateViewmodel(rdt);
@@ -12679,7 +12927,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideasStart, ideaRound, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
