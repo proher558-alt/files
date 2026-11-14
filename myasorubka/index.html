@@ -12993,18 +12993,32 @@ const LOVE_SYS = 'Ты — Свити, девушка главного геро�
 function loveSayUi() {
   let d = document.getElementById('loveSay'); if (d) return d;
   d = document.createElement('div'); d.id = 'loveSay'; d.style.cssText = 'position:fixed;left:50%;bottom:calc(30% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:49;display:none;width:min(480px,86vw);gap:6px;pointer-events:auto;font-family:var(--ui)';
-  d.innerHTML = '<input id="loveIn" maxlength="200" placeholder="Скажи Свити что-нибудь…" style="flex:1;min-width:0;font:700 14px var(--ui);padding:9px 10px;border-radius:9px;border:2px solid #ff5ab4;background:#0e0812;color:#fff"><button class="btn primary" id="loveSend" style="padding:6px 14px;margin:0">➤</button>';
+  d.innerHTML = '<div id="loveKeyRow" style="display:none;width:100%;gap:6px"><input id="loveKeyIn" type="password" placeholder="Ваш ключ ИИ (хранится только в этом браузере)" style="flex:1;min-width:0;font:600 12px var(--ui);padding:7px 9px;border-radius:9px;border:2px solid #888;background:#0e0812;color:#fff"><button class="btn" id="loveKeySave" style="padding:6px 10px;margin:0">OK</button></div><input id="loveIn" maxlength="200" placeholder="Скажи Свити что-нибудь…" style="flex:1;min-width:0;font:700 14px var(--ui);padding:9px 10px;border-radius:9px;border:2px solid #ff5ab4;background:#0e0812;color:#fff"><button class="btn primary" id="loveSend" style="padding:6px 14px;margin:0">➤</button>';
   document.body.appendChild(d); d.querySelectorAll('input,button').forEach((el) => ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => el.addEventListener(e, (ev) => ev.stopPropagation())));
   const inp = d.querySelector('#loveIn'); inp.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') loveSend(); }); inp.addEventListener('keyup', (e) => e.stopPropagation());
-  d.querySelector('#loveSend').onclick = loveSend; return d;
+  d.querySelector('#loveSend').onclick = loveSend;
+  d.querySelector('#loveKeySave').onclick = () => { const k = d.querySelector('#loveKeyIn').value.trim(); if (!k) return; loveKeySave(k); d.querySelector('#loveKeyIn').value = ''; LOVE.canSay = true; d.querySelector('#loveKeyRow').style.display = 'none'; toast('Ключ сохранён в этом браузере'); };
+  d.querySelectorAll('#loveKeyIn,#loveIn').forEach((el) => el.addEventListener('keydown', (e) => e.stopPropagation()));
+  return d;
 }
+/* the model endpoint is public; the key is the player's own and lives only in their browser */
+const LOVE_API = { url: 'https://router.nodul.ru/api/v1/chat/completions', model: 'global-1/google/gemma-3-4b-it' };
+function loveKey() { try { return localStorage.getItem('myasorubka-ai-key') || ''; } catch (e) { return ''; } }
+function loveKeySave(k) { try { if (k) localStorage.setItem('myasorubka-ai-key', k); else localStorage.removeItem('myasorubka-ai-key'); } catch (e) {} }
 async function loveAsk(text) {
   let S = null; try { if (window.claude && claude.use) S = await claude.use('sample'); } catch (e) { S = null; }
-  if (!S) { loveSay('Свити', 'Я тебя слышу, но сейчас не могу ответить…', 4); return; }
+  const key = S ? '' : loveKey();
+  if (!S && !key) { loveSay('Свити', 'Чтобы я могла ответить, вставьте свой ключ ИИ в окне «СКАЗАТЬ».', 5); return; }
   loveSay('Свити', 'Думаю, что ответить…', 30);
   try {
-    const r = await S([{ role: 'user', content: LOVE_SYS + '\n\nГерой говорит тебе: «' + text + '». Ответь ему.' }], { modelTier: 'quick' });
-    const t = String((r && r.text) || '').trim().slice(0, 240); if (LOVE.on) loveSay('Свити', t || '…', 9);
+    let t = '';
+    if (S) { const r = await S([{ role: 'user', content: LOVE_SYS + '\n\nГерой говорит тебе: «' + text + '». Ответь ему.' }], { modelTier: 'quick' }); t = String((r && r.text) || ''); }
+    else {
+      const res = await fetch(LOVE_API.url, { method: 'POST', headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' }, body: JSON.stringify({ model: LOVE_API.model, max_tokens: 150, messages: [{ role: 'system', content: LOVE_SYS }, { role: 'user', content: text }] }) });
+      if (!res.ok) throw new Error('http ' + res.status);
+      const j = await res.json(); t = String((j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '');
+    }
+    t = t.trim().slice(0, 240); if (LOVE.on) loveSay('Свити', t || '…', 9);
   } catch (e) { if (LOVE.on) loveSay('Свити', 'Прости, я немного задумалась. Скажи ещё раз?', 5); }
 }
 function loveSend() { const d = document.getElementById('loveSay'), i = d && d.querySelector('#loveIn'); const v = i ? i.value.trim() : ''; if (!v || !LOVE.on) return; i.value = ''; d.style.display = 'none'; i.blur(); loveAsk(v); }
@@ -13013,12 +13027,12 @@ function loveSayBtn() {
   let b = document.getElementById('lvSay'); if (b) return b;
   b = document.createElement('button'); b.id = 'lvSay'; b.className = 'btn primary'; b.textContent = '💬 СКАЗАТЬ'; b.style.cssText = 'position:fixed;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(30% + env(safe-area-inset-bottom,0px));z-index:49;display:none;font:900 15px var(--ui);padding:10px 14px;pointer-events:auto;box-shadow:0 0 18px rgba(255,90,180,.6)';
   ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => b.addEventListener(e, (ev) => ev.stopPropagation()));
-  b.onclick = () => { const d = loveSayUi(); const open = d.style.display !== 'flex'; d.style.display = open ? 'flex' : 'none'; if (open) d.querySelector('#loveIn').focus(); };
+  b.onclick = () => { const d = loveSayUi(); const open = d.style.display !== 'flex'; d.style.display = open ? 'flex' : 'none'; if (open) { const kr = d.querySelector('#loveKeyRow'); kr.style.display = (!LOVE.sampleOk && !loveKey()) ? 'flex' : 'none'; d.querySelector('#loveIn').focus(); } };
   document.body.appendChild(b); return b;
 }
 async function loveProbe() {
   let S = null; try { if (window.claude && claude.use) S = await claude.use('sample'); } catch (e) { S = null; }
-  LOVE.canSay = !!S; loveSayBtn().dataset.ok = S ? '1' : ''; return !!S;
+  LOVE.sampleOk = !!S; const ok = !!S || !!loveKey(); LOVE.canSay = ok; loveSayBtn().dataset.ok = ok ? '1' : ''; return ok;
 }
 async function loveProbeLoop() { for (let i = 0; i < 10 && LOVE.on; i++) { if (await loveProbe()) return; await new Promise((r) => setTimeout(r, 1200)); } }
 function loveBtns() {
