@@ -13077,6 +13077,7 @@ function applyNewLook(L, k) {
 function addBottleExtras(n) {
   const P = n.parts, T = P.torso.mesh, add = (par, geo, mat, x, y, z, rx = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.x = rx; par.add(m); return m; };
   const glass = new THREE.MeshStandardMaterial({ color: 0xcfeee0, transparent: true, opacity: 0.26, roughness: 0.05, metalness: 0.1, depthWrite: false, side: THREE.DoubleSide }), blue = std({ color: 0x1a3a8a, roughness: 0.5 }), steel = std({ color: 0xc8ccd4, roughness: 0.3, metalness: 0.6 });
+  { const H = P.head.mesh; H.traverse((o) => { if (o.userData && o.userData.face) o.visible = false; }); const face = cvTex(128, 128, (g) => { g.fillStyle = '#e8b896'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#2a1a12'; g.fillRect(0, 0, 128, 34); g.fillStyle = '#fff'; g.beginPath(); g.ellipse(40, 66, 11, 8, 0, 0, 6.283); g.ellipse(88, 66, 11, 8, 0, 0, 6.283); g.fill(); g.fillStyle = '#4a3a2a'; g.beginPath(); g.arc(40, 66, 5, 0, 6.283); g.arc(88, 66, 5, 0, 6.283); g.fill(); g.strokeStyle = '#2a1a12'; g.lineWidth = 5; g.beginPath(); g.moveTo(26, 50); g.lineTo(54, 54); g.moveTo(74, 54); g.lineTo(102, 50); g.stroke(); g.strokeStyle = '#a05a4a'; g.lineWidth = 5; g.beginPath(); g.moveTo(48, 104); g.lineTo(80, 104); g.stroke(); }); const m = new THREE.Mesh(new THREE.PlaneGeometry(0.19, 0.19), new THREE.MeshBasicMaterial({ map: face })); m.position.set(0, 0, 0.1); H.add(m); }
   add(T, new THREE.CylinderGeometry(0.3, 0.3, 0.82, 28, 1, true), glass, 0, 0.01, 0); add(T, new THREE.CylinderGeometry(0.3, 0.3, 0.02, 28), glass, 0, -0.4, 0);
   add(T, new THREE.CylinderGeometry(0.09, 0.3, 0.26, 28, 1, true), glass, 0, 0.55, 0); add(T, new THREE.CylinderGeometry(0.09, 0.09, 0.22, 20, 1, true), glass, 0, 0.79, 0);
   add(T, new THREE.CylinderGeometry(0.1, 0.1, 0.05, 20), steel, 0, 0.93, 0); add(T, new THREE.CylinderGeometry(0.095, 0.095, 0.08, 20), blue, 0, 0.99, 0);
@@ -13093,62 +13094,117 @@ function addBlockCatExtras(n) {
   const fm = add(H, new THREE.PlaneGeometry(0.26, 0.26), new THREE.MeshBasicMaterial({ map: face, transparent: true }), 0, -0.01, 0.1515);
   const emb = add(T, new THREE.PlaneGeometry(0.075, 0.075), new THREE.MeshBasicMaterial({ color: 0xf4f4f4 }), 0.08, 0.1, 0.113, 0, 0, 0.3); add(T, new THREE.CircleGeometry(0.012, 10), new THREE.MeshBasicMaterial({ color: 0x4a7fb0 }), 0.08, 0.1, 0.114);
   add(T, new THREE.BoxGeometry(0.4, 0.03, 0.24), std({ color: 0x4a9ad8, roughness: 0.6 }), 0, -0.26, 0);
+  /* blocky overlays: square torso, arms and legs like a blocky avatar */
+  const blk = (name, col, k) => { const Pt = P[name]; if (!Pt || !Pt.def || !Pt.def.box) return; const bx = Pt.def.box; add(Pt.mesh, new THREE.BoxGeometry(bx[0] * k, bx[1] * k, bx[2] * k), std({ color: col, roughness: 0.8 }), 0, 0, 0); };
+  blk('torso', 0x4a7fb0, 1.05); blk('pelvis', 0xb8b8b8, 1.06); for (const s of ['L', 'R']) { blk('uArm' + s, 0xf4f4f4, 1.2); blk('lArm' + s, 0xf4f4f4, 1.2); blk('uLeg' + s, 0xb8b8b8, 1.12); blk('lLeg' + s, 0xf4f4f4, 1.12); }
 }
-MAPS.dacha = { name: 'Дача', desc: 'Дачный участок: дом, сад и забор. Раз в 30 секунд прилетает дрон-сбрасыватель.', story: true, hx: 22, hz: 22, h: 8, spawn: [0, 16, 0], fog: 0xbcd6e8, fogD: 0.012, bg: 0x9fc4e0, sun: 1.5, hemi: 0.9, lamp: [0xffe6b0, 18, 30], lamps: [[-6, 4, -6], [6, 4, -6], [-6, 4, 6], [6, 4, 6]], red: [[0, 5, 0], 0xff9a5a, 1], build: buildDacha, npcs: { human: 4, zombie: 0, soldier: 0 }, props: [], pills: [] };
-const DACHA = { on: false, next: 30, drone: null, bomb: null, ring: null, walls: [], wrap: 0 };
-function dachaWall(x, z, sx, sy, sz, col) { const rec = { bodies: [], obs: [], meshes: [] }; const m = new THREE.Mesh(IM_G.box, std({ color: col, roughness: 0.8 })); m.position.set(x, sy / 2, z); m.scale.set(sx, sy, sz); m.castShadow = m.receiveShadow = true; addMesh(m); rec.meshes.push(m); ideaSolid(x, sy / 2, z, sx, sy, sz, rec); rec.pos = new V3(x, 0, z); DACHA.walls.push(rec); return rec; }
+MAPS.dacha = { name: 'Дача', desc: 'Большая дача: дом с комнатами, баня, теплица, гараж с машиной, сад, пруд и подвал. Волны дронов с сиреной.', story: true, hx: 40, hz: 40, h: 14, spawn: [0, 30, 0], fog: 0xbcd6e8, fogD: 0.007, bg: 0x9fc4e0, sun: 1.6, hemi: 0.95, lamp: [0xffe6b0, 22, 45], lamps: [[-14, 6, -14], [14, 6, -14], [-14, 6, 14], [14, 6, 14]], red: [[0, 8, 0], 0xff9a5a, 1], build: buildDacha, npcs: { human: 6, zombie: 0, soldier: 0 }, props: [], pills: [] };
+const DACHA = { on: false, next: 30, wave: 0, siren: 0, sirT: 0, drones: [], bombs: [], rings: [], walls: [], hatch: null, shel: null, hudT: 0, fireT: 0, mangal: null, lost: 0 };
+/* breakable building pieces: each remembers where it stands so a blast can remove it */
+function dBox(x, z, sx, sy, sz, col, o = {}) {
+  const rec = { bodies: [], obs: [], meshes: [], r: o.r || 4.4 }, y0 = o.y0 || 0, m = new THREE.Mesh(IM_G.box, o.e ? imMat(col, true) : std({ color: col, roughness: 0.8 })); m.position.set(x, y0 + sy / 2, z); m.scale.set(sx, sy, sz); m.castShadow = m.receiveShadow = !o.e; addMesh(m); rec.meshes.push(m);
+  if (o.solid !== false) ideaSolid(x, y0 + sy / 2, z, sx, sy, sz, rec); rec.pos = new V3(x, 0, z); DACHA.walls.push(rec); return rec;
+}
+function dDeco(key, x, z, rot = 0, sc = 1, solid = true, r = 3) {
+  const { g } = imBuild((IM[key] || IM.crate)()); g.scale.setScalar(sc); g.rotation.y = rot; g.position.set(x, 0, z); addMesh(g); const rec = { bodies: [], obs: [], meshes: [g], r, pos: new V3(x, 0, z) };
+  if (solid) { const bb = new THREE.Box3().setFromObject(g), c = bb.getCenter(new V3()), sz = bb.getSize(new V3()); if (sz.y > 0.4) ideaSolid(c.x, c.y, c.z, sz.x, sz.y, sz.z, rec); } DACHA.walls.push(rec); return rec;
+}
+function dStatic(geo, col, x, y, z, sx, sy, sz, o = {}) { const m = new THREE.Mesh(IM_G[geo], imMat(col, o.e)); m.position.set(x, y, z); m.scale.set(sx, sy, sz); if (o.ry) m.rotation.y = o.ry; addMesh(m); return m; }
 function buildDacha() {
-  DACHA.drone = null; DACHA.bomb = null; DACHA.ring = null; DACHA.walls = []; DACHA.next = 30;
+  Object.assign(DACHA, { drones: [], bombs: [], rings: [], walls: [], next: 30, wave: 0, siren: 0, hatch: null, shel: null, mangal: null, lost: 0 }); VEH.arena = { half: HX - 1 };
   floorMesh(std({ color: 0x5a9a3a, roughness: 0.95 }), HX * 2, HZ * 2);
-  for (const [x, z, sx, sz] of [[0, -HZ + 0.6, HX * 2, 0.3], [0, HZ - 0.6, HX * 2, 0.3], [-HX + 0.6, 0, 0.3, HZ * 2], [HX - 0.6, 0, 0.3, HZ * 2]]) { const m = new THREE.Mesh(IM_G.box, std({ color: 0x9a7a52, roughness: 0.9 })); m.position.set(x, 0.7, z); m.scale.set(sx, 1.4, sz); addMesh(m); }
-  const H = { x: 0, z: -6, w: 10, d: 7, t: 0.4, c: 0xe8dcc0 };
-  dachaWall(H.x, H.z - H.d / 2, H.w, 3, H.t, H.c); dachaWall(H.x, H.z + H.d / 2, H.w, 3, H.t, H.c);
-  dachaWall(H.x - H.w / 2, H.z, H.t, 3, H.d, H.c); dachaWall(H.x + H.w / 2, H.z, H.t, 3, H.d, H.c);
-  dachaWall(H.x, H.z, H.t, 3, H.d * 0.6, H.c);
-  const roof = new THREE.Mesh(IM_G.box, std({ color: 0x8a3a2a, roughness: 0.7 })); roof.position.set(H.x, 3.3, H.z); roof.scale.set(H.w + 1, 0.4, H.d + 1); addMesh(roof);
-  const ch = new THREE.Mesh(IM_G.cone, std({ color: 0x7a2a1a, roughness: 0.7 })); ch.position.set(H.x, 4.2, H.z); ch.scale.set(H.w * 0.7, 1.8, H.d * 0.7); addMesh(ch);
-  for (const [x, z] of [[-6, 6], [7, 8], [-14, -12], [12, -14]]) { const tr = new THREE.Mesh(IM_G.cyl, std({ color: 0x6a4a2a, roughness: 0.9 })); tr.position.set(x, 1.2, z); tr.scale.set(0.5, 2.4, 0.5); addMesh(tr); const cr = new THREE.Mesh(IM_G.sph, std({ color: 0x3a8a3a, roughness: 0.9 })); cr.position.set(x, 3.4, z); cr.scale.set(2.8, 2.4, 2.8); addMesh(cr); }
-  for (let i = 0; i < 4; i++) { const bed = new THREE.Mesh(IM_G.box, std({ color: 0x4a2a14, roughness: 1 })); bed.position.set(-8 + i * 2.2, 0.08, 9); bed.scale.set(1.6, 0.16, 0.9); addMesh(bed); }
-  const bench = dachaWall(12, 2, 2.2, 0.8, 0.6, 0x8a5a2a); bench.dbench = true;
+  // dirt path from the gate to the house, flower strips
+  for (let i = 0; i < 13; i++) dStatic('box', 0xb8a884, 0, 0.02, 38 - i * 2.1, 2.2, 0.04, 1.8); for (let i = 0; i < 14; i++) for (const s of [-1, 1]) dStatic('sph', pick([0xff7aa8, 0xffd060, 0xffffff, 0xc080ff]), s * 1.9, 0.18, 38 - i * 1.95, 0.35, 0.35, 0.35);
+  // fence with a gate gap on the south side
+  for (let i = -19; i <= 19; i++) { const x = i * 2; if (Math.abs(x) < 3) continue; dBox(x, HZ - 0.8, 2, 1.4, 0.2, 0x9a7a52, { r: 2.5 }); dBox(x, -HZ + 0.8, 2, 1.4, 0.2, 0x9a7a52, { r: 2.5 }); dBox(-HX + 0.8, x, 0.2, 1.4, 2, 0x9a7a52, { r: 2.5 }); dBox(HX - 0.8, x, 0.2, 1.4, 2, 0x9a7a52, { r: 2.5 }); }
+  // the house: two rooms, a doorway between them, a front door, windows, a porch, a roof
+  const WL = 0xe8dcc0, HZc = -14;
+  dBox(0, HZc - 4.5, 14, 3.2, 0.4, WL); dBox(-7, HZc, 0.4, 3.2, 9, WL); dBox(7, HZc, 0.4, 3.2, 9, WL);
+  dBox(-4.2, HZc + 4.5, 5.6, 3.2, 0.4, WL); dBox(4.2, HZc + 4.5, 5.6, 3.2, 0.4, WL); dBox(0, HZc + 4.5, 2.8, 0.8, 0.4, WL, { y0: 2.4, solid: false });
+  dBox(-0.5, HZc - 3.0, 0.3, 3.2, 3.0, 0xd8cca8); dBox(-0.5, HZc + 3.0, 0.3, 3.2, 3.0, 0xd8cca8);
+  for (const s of [-1, 1]) { dBox(s * 3.0, HZc + 4.72, 2.6, 1.6, 0.06, 0x7ad0ff, { e: true, y0: 0.9, solid: false, r: 2.5 }); dBox(s * 7.22, HZc, 0.06, 1.6, 2.6, 0x7ad0ff, { e: true, y0: 0.9, solid: false, r: 2.5 }); }
+  dBox(0, HZc - 4.72, 3.2, 1.6, 0.06, 0x7ad0ff, { e: true, y0: 0.9, solid: false, r: 2.5 });
+  dBox(0, HZc, 15, 0.4, 10, 0x8a3a2a, { y0: 3.2, solid: false, r: 7 }); dBox(0, HZc, 10, 0.4, 7, 0x7a2a1a, { y0: 3.6, solid: false, r: 6 }); dBox(0, HZc, 5, 0.4, 3.6, 0x6a2214, { y0: 4.0, solid: false, r: 5 });
+  dBox(0, HZc + 7, 9, 0.2, 3.6, 0xb08a5a, { y0: 0.0, solid: false, r: 3.5 }); for (const s of [-1, 1]) dBox(s * 4.2, HZc + 8.4, 0.3, 3.2, 0.3, 0xe8dcc0, { r: 2.5 }); dBox(0, HZc + 8.4, 9, 0.3, 0.3, 0xe8dcc0, { y0: 3.1, solid: false, r: 4 });
+  dBox(0, HZc, 13.6, 0.12, 8.6, 0xb08a5a, { solid: false, r: 6 }); dBox(-3.5, HZc, 6.2, 0.14, 7.8, 0x8a2a3a, { solid: false, r: 3 });
+  // inside: living room (sofa, TV, table), bedroom (bed), kitchen corner (fridge, stove, pot), bathroom (toilet, bath)
+  dDeco('sofa', -4.4, HZc - 2.4, 0, 1.1, true, 2.5); dDeco('tv', -4.4, HZc - 3.9, 0, 1.1, true, 2); dDeco('chair', -2.0, HZc + 0.4, 2.4, 1.0, true, 2); dBox(-3.6, HZc + 1.6, 1.6, 0.8, 0.9, 0x8a5a2a, { r: 2.2 });
+  dDeco('pillow', 4.2, HZc - 3.4, 0, 1.4, false, 2); dBox(4.2, HZc - 2.2, 2.0, 0.5, 2.8, 0x4a5a8a, { r: 2.5 }); dDeco('fridge', 6.2, HZc - 4.0, 0, 1.0, true, 2.5); dBox(2.0, HZc - 4.2, 1.8, 0.9, 0.7, 0x4a4a52, { r: 2.2 }); dDeco('pot', 2.0, HZc - 4.1, 0, 1.0, false, 2);
+  dDeco('toilet', 6.2, HZc + 1.2, 3.14, 1.0, true, 2); dDeco('bath', 4.4, HZc + 3.6, 1.57, 1.0, true, 2.5);
+  // the yard: orchard, garden beds, well, pond, swing, grill with fire, doghouse, hay, mailbox
+  for (let i = 0; i < 12; i++) { const x = -34 + (i % 4) * 4, z = 6 + Math.floor(i / 4) * 5; dBox(x, z, 0.5, 2.4, 0.5, 0x6a4a2a, { r: 2.2 }); const c = new THREE.Mesh(IM_G.sph, std({ color: 0x3a8a3a, roughness: 0.9 })); c.position.set(x, 3.6, z); c.scale.set(3, 2.6, 3); addMesh(c); for (let k = 0; k < 4; k++) dStatic('sph', 0xe03a2a, x + rand(-1, 1), 3.4 + rand(-0.4, 0.5), z + rand(-1, 1), 0.28, 0.28, 0.28); }
+  for (let r = 0; r < 4; r++) for (let i = 0; i < 6; i++) { dStatic('box', 0x4a2a14, 12 + i * 2.2, 0.08, 6 + r * 2.2, 1.6, 0.16, 1.6); dStatic('sph', pick([0x3a9a3a, 0x4aaa4a, 0xe03a3a]), 12 + i * 2.2, 0.4, 6 + r * 2.2, 0.8, 0.7, 0.8); }
+  dStatic('cyl', 0x8a8a92, 8, 0.6, 20, 1.6, 1.2, 1.6); dStatic('cyl', 0x2a5a8a, 8, 1.1, 20, 1.2, 0.05, 1.2); dBox(7.2, 20, 0.2, 2.4, 0.2, 0x6a4a2a, { r: 2 }); dBox(8.8, 20, 0.2, 2.4, 0.2, 0x6a4a2a, { r: 2 }); dBox(8, 20, 2.2, 0.15, 1.4, 0x8a3a2a, { y0: 2.4, solid: false, r: 2 });
+  dStatic('cyl', 0x4a9ad0, -6, 0.03, 26, 10, 0.05, 8); for (let i = 0; i < 10; i++) { const a = i / 10 * 6.283; dStatic('sph', 0x8a8a92, -6 + Math.cos(a) * 5.2, 0.25, 26 + Math.sin(a) * 4.2, 0.7, 0.5, 0.7); }
+  dBox(-22, 14, 0.2, 3, 0.2, 0x6a4a2a, { r: 2 }); dBox(-18, 14, 0.2, 3, 0.2, 0x6a4a2a, { r: 2 }); dBox(-20, 14, 4.4, 0.15, 0.2, 0x6a4a2a, { y0: 3, solid: false, r: 2.5 }); dBox(-20, 14, 0.8, 0.1, 0.35, 0xc83a3a, { y0: 0.7, solid: false, r: 2 });
+  dBox(14, -2, 1.8, 0.8, 0.8, 0x2a2a30, { r: 2.2 }); DACHA.mangal = new V3(14, 1.0, -2); dStatic('sph', 0xff5a20, 14, 0.85, -2, 1.2, 0.3, 0.5, { e: true });
+  dDeco('dog', 20, -3, 0.5, 1.0, false, 2); dBox(22, -3, 1.6, 1.0, 1.4, 0x8a5a2a, { r: 2.2 }); for (const [x, z] of [[-30, 28], [-26, 30], [30, 30]]) dStatic('sph', 0xe0c860, x, 0.9, z, 2.2, 1.8, 2.2);
+  for (const [x, z] of [[12, 26], [14, 28], [10, 29], [-12, 24]]) dDeco('chicken', x, z, rand(0, 6), 1.1, false, 2);
+  dBox(3, 36, 0.12, 1.2, 0.12, 0x6a4a2a, { r: 1.5 }); dBox(3, 36, 0.5, 0.4, 0.3, 0x2a5aa8, { y0: 1.0, solid: false, r: 1.5 });
+  // the bathhouse (log cabin with a door gap and a chimney), a greenhouse of glass panes, a shed
+  const BX = 24, BZ = -16, LG = 0x8a5a2a;
+  dBox(BX, BZ - 3, 7, 3, 0.4, LG); dBox(BX - 3.5, BZ, 0.4, 3, 6, LG); dBox(BX + 3.5, BZ, 0.4, 3, 6, LG); dBox(BX - 2.2, BZ + 3, 2.6, 3, 0.4, LG); dBox(BX + 2.2, BZ + 3, 2.6, 3, 0.4, LG); dBox(BX, BZ, 8, 0.4, 7, 0x4a2e1a, { y0: 3.0, solid: false, r: 5 }); dStatic('cyl', 0x6a6a72, BX + 2, 4.6, BZ - 1.5, 0.8, 2.4, 0.8);
+  for (let k = 0; k < 3; k++) dBox(BX, BZ - 2.2 + k * 0.8, 5, 0.3 + (2 - k) * 0.3, 0.7, 0xc8964a, { r: 2.5 }); dDeco('bucket', BX - 2, BZ + 1.2, 0, 1.2, false, 2);
+  const GX = -22, GZ = -4; for (const [dx, dz, w, d] of [[0, -3, 8, 0.2], [0, 3, 8, 0.2], [-4, 0, 0.2, 6], [4, 0, 0.2, 6]]) { dBox(GX + dx, GZ + dz, w, 2.2, d, 0xaadcf0, { e: true, solid: true, r: 3 }); } dBox(GX, GZ, 8.4, 0.2, 6.4, 0xaadcf0, { y0: 2.2, solid: false, e: true, r: 4 }); for (let i = 0; i < 5; i++) dStatic('sph', pick([0xe03a3a, 0x3aaa3a, 0xffd060]), GX - 3 + i * 1.5, 0.4, GZ, 0.8, 0.7, 0.8);
+  dBox(-30, -22, 5, 2.6, 0.3, 0x7a5a32); dBox(-30, -26, 5, 2.6, 0.3, 0x7a5a32); dBox(-32.5, -24, 0.3, 2.6, 4, 0x7a5a32); dBox(-27.5, -24, 0.3, 2.6, 4, 0x7a5a32, { r: 3 }); dBox(-30, -24, 5.4, 0.2, 4.4, 0x5a3a1a, { y0: 2.6, solid: false, r: 4 }); dDeco('anvil', -30, -24, 0, 1.0, false, 2);
+  // the garage with a drivable car
+  const CX = 24, CZ = 12; dBox(CX, CZ - 3, 8, 3, 0.4, 0x9a9aa2); dBox(CX - 4, CZ, 0.4, 3, 6, 0x9a9aa2); dBox(CX + 4, CZ, 0.4, 3, 6, 0x9a9aa2); dBox(CX, CZ, 8.6, 0.3, 6.6, 0x5a5a62, { y0: 3, solid: false, r: 5 });
+  try { makeCar('sedan', CX, CZ + 0.5, Math.PI); } catch (e) {}
+  // the cellar: a hatch in the garden and a sealed shelter in the far corner
+  DACHA.hatch = new V3(-8, 0, 4); dStatic('box', 0x5a3a1a, -8, 0.06, 4, 1.8, 0.12, 1.8); dStatic('box', 0xd8b050, -8, 0.14, 4, 0.5, 0.06, 0.12); ideaLabel('⬇ ПОГРЕБ', -8, 2.2, 4, 2.4);
+  const SX = 32, SZ = -32; DACHA.shel = new V3(SX, 0, SZ); for (const [dx, dz, w, d] of [[0, -3.3, 7, 0.6], [0, 3.3, 7, 0.6], [-3.3, 0, 0.6, 6.6], [3.3, 0, 0.6, 6.6]]) { const m = new THREE.Mesh(IM_G.box, std({ color: 0x5a5a62, roughness: 0.9 })); m.position.set(SX + dx, 1.5, SZ + dz); m.scale.set(w, 3, d); addMesh(m); solid(SX + dx, 1.5, SZ + dz, w, 3, d); } dStatic('box', 0x4a4a52, SX, 3.15, SZ, 7.6, 0.3, 7.6); dStatic('box', 0x7a6a58, SX, 0.04, SZ, 6.6, 0.08, 6.6); dStatic('sph', 0xffe8b0, SX, 2.7, SZ, 0.4, 0.4, 0.4, { e: true }); dDeco('books', SX - 2, SZ - 2, 0, 1.4, false, 2); dDeco('cup', SX + 2, SZ - 2, 0, 1.4, false, 2); ideaLabel('УБЕЖИЩЕ', SX, 4.4, SZ, 2.6);
+  // trees along the edge, lamp posts
+  for (let i = 0; i < 30; i++) { const a = i / 30 * 6.283, R = 36 + (i % 3), x = Math.cos(a) * R, z = Math.sin(a) * R; if (z > 34 && Math.abs(x) < 6) continue; dBox(x, z, 0.5, 3.4, 0.5, 0x6a4a2a, { r: 2.2 }); const c = new THREE.Mesh(IM_G.sph, std({ color: pick([0x3a8a3a, 0x4a9a3a, 0x2a7a3a]), roughness: 0.9 })); c.position.set(x, 4.6, z); c.scale.set(3.6, 3.2, 3.6); addMesh(c); }
+  for (const [x, z] of [[-10, 30], [10, 30], [-14, -2], [14, -22]]) { dStatic('cyl', 0x4a4a52, x, 2.2, z, 0.18, 4.4, 0.18); dStatic('sph', 0xfff0c0, x, 4.5, z, 0.5, 0.5, 0.5, { e: true }); }
 }
-/* the drone: a quadcopter (four rotors, a bomb on a rope). Not a copy of any real aircraft */
+/* the drone: a quadcopter with a bomb on a rope. It is an original design, not a copy of any real aircraft */
 function dachaDroneMake() {
   const g = new THREE.Group(), dark = std({ color: 0x2a2e36, roughness: 0.5, metalness: 0.4 }), red = new THREE.MeshBasicMaterial({ color: 0xff3a3a });
   const body = new THREE.Mesh(IM_G.box, dark); body.scale.set(1.1, 0.35, 1.1); g.add(body); g.userData.rotors = [];
-  for (const [x, z] of [[0.9, 0.9], [-0.9, 0.9], [0.9, -0.9], [-0.9, -0.9]]) { const arm = new THREE.Mesh(IM_G.box, dark); arm.position.set(x / 2, 0, z / 2); arm.scale.set(Math.abs(x) > 0 ? 0.9 : 0.1, 0.08, Math.abs(z) > 0 ? 0.9 : 0.1); g.add(arm); const rot = new THREE.Mesh(IM_G.cyl, imMat(0xc8ccd2, true)); rot.position.set(x, 0.25, z); rot.scale.set(0.9, 0.04, 0.9); g.add(rot); g.userData.rotors.push(rot); }
-  const led = new THREE.Mesh(IM_G.sph, red); led.position.set(0, 0.25, 0); led.scale.setScalar(0.12); g.add(led);
-  const bomb = new THREE.Mesh(IM_G.cyl, std({ color: 0x3a3a2a, roughness: 0.6 })); bomb.position.set(0, -0.8, 0); bomb.scale.set(0.35, 0.9, 0.35); g.add(bomb); g.userData.bomb = bomb;
+  for (const [x, z] of [[0.9, 0.9], [-0.9, 0.9], [0.9, -0.9], [-0.9, -0.9]]) { const arm = new THREE.Mesh(IM_G.box, dark); arm.position.set(x / 2, 0, z / 2); arm.scale.set(0.9, 0.08, 0.1); arm.rotation.y = Math.atan2(-z, x); g.add(arm); const rot = new THREE.Mesh(IM_G.cyl, imMat(0xc8ccd2, true)); rot.position.set(x, 0.25, z); rot.scale.set(0.9, 0.04, 0.9); g.add(rot); g.userData.rotors.push(rot); }
+  const led = new THREE.Mesh(IM_G.sph, red); led.position.set(0, 0.25, 0); led.scale.setScalar(0.12); g.add(led); const bomb = new THREE.Mesh(IM_G.cyl, std({ color: 0x3a3a2a, roughness: 0.6 })); bomb.position.set(0, -0.8, 0); bomb.scale.set(0.35, 0.9, 0.35); g.add(bomb);
   return g;
 }
-function dachaSpawnDrone() {
-  const a = rand(0, 6.283), R = 30, sx = Math.cos(a) * R, sz = Math.sin(a) * R; let tx, tz;
-  if (!player.dead && Math.random() < 0.6) { tx = clamp(player.pos.x + rand(-2, 2), -HX + 3, HX - 3); tz = clamp(player.pos.z + rand(-2, 2), -HZ + 3, HZ - 3); } else { tx = rand(-HX + 4, HX - 4); tz = rand(-HZ + 4, HZ - 4); }
-  const m = dachaDroneMake(); m.position.set(sx, 14, sz); scene.add(m); mapObjs.push(m);
-  const ring = new THREE.Mesh(new THREE.RingGeometry(3.4, 4.2, 40).rotateX(-PI2), new THREE.MeshBasicMaterial({ color: 0xff3030, transparent: true, opacity: 0.0, depthWrite: false })); ring.position.set(tx, 0.06, tz); scene.add(ring); mapObjs.push(ring);
-  DACHA.drone = { m, sx, sz, tx, tz, t: 0, T: 6.5 }; DACHA.ring = ring; Sound.whoosh(); banner('ДРОН-СБРАСЫВАТЕЛЬ', 'летит на дачу · бомба через 6 с'); ideaFeed('🚨 Дрон-сбрасыватель над дачей', '#ff9a9a');
+function dachaSpawnDrone(aimPlayer) {
+  const a = rand(0, 6.283), R = 52, sx = Math.cos(a) * R, sz = Math.sin(a) * R; let tx, tz;
+  if (aimPlayer && !player.dead) { tx = clamp(player.pos.x + rand(-2, 2), -HX + 3, HX - 3); tz = clamp(player.pos.z + rand(-2, 2), -HZ + 3, HZ - 3); } else { tx = rand(-HX + 6, HX - 6); tz = rand(-HZ + 6, HZ - 6); if (Math.random() < 0.5) { tx = rand(-6, 6); tz = rand(-18, -10); } }
+  const m = dachaDroneMake(); m.position.set(sx, 16, sz); scene.add(m); mapObjs.push(m);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(3.6, 4.5, 40).rotateX(-PI2), new THREE.MeshBasicMaterial({ color: 0xff3030, transparent: true, opacity: 0.0, depthWrite: false })); ring.position.set(tx, 0.06, tz); scene.add(ring); mapObjs.push(ring);
+  DACHA.drones.push({ m, sx, sz, tx, tz, t: 0, T: rand(6, 8), ring });
 }
 function dachaBlast(x, z) {
-  explode(_a.set(x, 0.5, z), 1.6); shake = Math.max(shake, 1.1);
-  if (!player.dead && state === 'play') { const d = Math.hypot(player.pos.x - x, player.pos.z - z); if (d < 6) damagePlayer((1 - d / 6) * 90); }
-  for (const n of npcs.slice()) if (n.alive && Math.hypot(n.pos.x - x, n.pos.z - z) < 4.5) n.die('prop');
-  for (const rec of DACHA.walls.slice()) { const p = rec.pos; if (p && Math.hypot(p.x - x, p.z - z) < 4.2) { ideaDispose(rec); const i = DACHA.walls.indexOf(rec); if (i >= 0) DACHA.walls.splice(i, 1); } }
+  explode(_a.set(x, 0.5, z), 1.7); shake = Math.max(shake, 1.2); const inShel = DACHA.shel && Math.hypot(player.pos.x - DACHA.shel.x, player.pos.z - DACHA.shel.z) < 4;
+  if (!player.dead && state === 'play' && !inShel) { const d = Math.hypot(player.pos.x - x, player.pos.z - z); if (d < 6.5) damagePlayer((1 - d / 6.5) * 95); }
+  for (const n of npcs.slice()) if (n.alive && Math.hypot(n.pos.x - x, n.pos.z - z) < 5) n.die('prop');
+  let down = 0; for (const rec of DACHA.walls.slice()) { const p = rec.pos; if (p && Math.hypot(p.x - x, p.z - z) < rec.r) { ideaDispose(rec); const i = DACHA.walls.indexOf(rec); if (i >= 0) DACHA.walls.splice(i, 1); down++; if (down <= 5) { try { const pr = ideaSpawnObj('brick', p.x + rand(-0.6, 0.6), p.z + rand(-0.6, 0.6), rand(1.2, 2.6), 1.2); pr.body.velocity.set((p.x - x) * 1.2 + rand(-2, 2), rand(4, 9), (p.z - z) * 1.2 + rand(-2, 2)); } catch (e) {} } } }
+  DACHA.lost += down; const cr = new THREE.Mesh(IM_G.cyl, new THREE.MeshBasicMaterial({ color: 0x1a1410, transparent: true, opacity: 0.55, depthWrite: false })); cr.position.set(x, 0.02, z); cr.scale.set(5, 0.02, 5); scene.add(cr); mapObjs.push(cr);
+  if (down > 0 || Math.random() < 0.5) molotovBurst(new V3(x, 0.1, z));
+}
+function dachaUi() { let d = document.getElementById('dachaHud'); if (d) return d; d = document.createElement('div'); d.id = 'dachaHud'; d.style.cssText = 'position:fixed;left:50%;top:calc(6px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:38;font:800 12px var(--ui);letter-spacing:.06em;color:#fff;text-shadow:0 0 4px #000;white-space:nowrap;pointer-events:none;display:none'; document.body.appendChild(d); return d; }
+function dachaBtn() {
+  let b = document.getElementById('dachaShelter'); if (b) return b;
+  b = document.createElement('button'); b.id = 'dachaShelter'; b.className = 'btn primary'; b.style.cssText = 'position:fixed;left:50%;bottom:calc(18% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:49;display:none;font:900 16px var(--ui);padding:10px 22px;pointer-events:auto;box-shadow:0 0 20px rgba(255,200,90,.6)';
+  ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => b.addEventListener(e, (ev) => ev.stopPropagation()));
+  b.onclick = () => { const inside = Math.hypot(player.pos.x - DACHA.shel.x, player.pos.z - DACHA.shel.z) < 4; if (inside) { player.pos.set(DACHA.hatch.x + 1.8, 0, DACHA.hatch.z); toast('Вы вышли из убежища'); } else { player.pos.set(DACHA.shel.x, 0, DACHA.shel.z + 1.5); toast('Вы в убежище: взрывы вас не заденут'); } player.vel.set(0, 0, 0); Sound.click(700, 0.3); };
+  document.body.appendChild(b); return b;
 }
 function updDacha(dt) {
-  if (mapId !== 'dacha') { if (DACHA.on) { DACHA.on = false; DACHA.drone = null; DACHA.bomb = null; DACHA.ring = null; } return; }
+  if (mapId !== 'dacha') { if (DACHA.on) { DACHA.on = false; DACHA.drones = []; DACHA.bombs = []; DACHA.rings = []; const h = document.getElementById('dachaHud'), b = document.getElementById('dachaShelter'); if (h) h.style.display = 'none'; if (b) b.style.display = 'none'; } return; }
   if (!DACHA.on) { DACHA.on = true; DACHA.next = 30; }
-  if (state !== 'play') return;
-  DACHA.next -= dt;
-  if (DACHA.next <= 0 && !DACHA.drone && !DACHA.bomb) { DACHA.next = 30; dachaSpawnDrone(); }
-  const D = DACHA.drone;
-  if (D) {
-    D.t += dt; const k = Math.min(1, D.t / D.T), e = k;
-    D.m.position.set(lerp(D.sx, D.tx, e), 14 - Math.sin(k * Math.PI) * 2, lerp(D.sz, D.tz, e));
-    D.m.rotation.y += dt * 2.5; for (const r of D.m.userData.rotors) r.rotation.y += dt * 30;
-    if (DACHA.ring) DACHA.ring.material.opacity = 0.2 + 0.6 * k;
-    if (k >= 1) { const bm = new THREE.Mesh(IM_G.cyl, std({ color: 0x3a3a2a, roughness: 0.6 })); bm.scale.set(0.35, 0.9, 0.35); bm.position.set(D.tx, D.m.position.y - 0.9, D.tz); scene.add(bm); mapObjs.push(bm); DACHA.bomb = { m: bm, x: D.tx, z: D.tz, y: bm.position.y, vy: 0 }; scene.remove(D.m); DACHA.drone = null; }
+  const play = state === 'play'; dachaUi().style.display = play ? 'block' : 'none';
+  if (!play) { dachaBtn().style.display = 'none'; return; }
+  if (DACHA.siren > 0) { DACHA.siren -= dt; DACHA.sirT -= dt; if (DACHA.sirT <= 0) { DACHA.sirT = 0.5; Sound.click(Math.round(DACHA.siren * 2) % 2 ? 620 : 880, 0.3); } if (DACHA.siren <= 0) { const w = DACHA.wave, cnt = w % 6 === 5 ? 3 : w % 3 === 2 ? 2 : 1; for (let i = 0; i < cnt; i++) dachaSpawnDrone(i === 0 && Math.random() < 0.6); DACHA.wave++; banner('ДРОНЫ НАД ДАЧЕЙ', cnt > 1 ? 'их несколько: ищите укрытие' : 'бомба через несколько секунд'); Sound.whoosh(); } }
+  else { DACHA.next -= dt; if (DACHA.next <= 0 && !DACHA.drones.length && !DACHA.bombs.length) { DACHA.next = 30; DACHA.siren = 5; DACHA.sirT = 0; banner('ВОЗДУШНАЯ ТРЕВОГА', 'через 5 секунд прилетят дроны · погреб у забора'); for (const n of npcs) if (n.alive) n.panic = 8; } }
+  for (let i = DACHA.drones.length - 1; i >= 0; i--) {
+    const D = DACHA.drones[i]; D.t += dt; const k = Math.min(1, D.t / D.T);
+    D.m.position.set(lerp(D.sx, D.tx, k), 16 - Math.sin(k * Math.PI) * 3, lerp(D.sz, D.tz, k)); D.m.rotation.y += dt * 2.5; for (const r of D.m.userData.rotors) r.rotation.y += dt * 30; D.ring.material.opacity = 0.2 + 0.6 * k;
+    if (k >= 1) { const bm = new THREE.Mesh(IM_G.cyl, std({ color: 0x3a3a2a, roughness: 0.6 })); bm.scale.set(0.35, 0.9, 0.35); bm.position.set(D.tx, D.m.position.y - 0.9, D.tz); scene.add(bm); mapObjs.push(bm); DACHA.bombs.push({ m: bm, x: D.tx, z: D.tz, y: bm.position.y, vy: 0, ring: D.ring }); scene.remove(D.m); DACHA.drones.splice(i, 1); }
   }
-  const B = DACHA.bomb;
-  if (B) { B.vy -= 18 * dt; B.y += B.vy * dt; B.m.position.y = B.y; if (B.y <= 0.45) { scene.remove(B.m); DACHA.bomb = null; dachaBlast(B.x, B.z); if (DACHA.ring) { scene.remove(DACHA.ring); DACHA.ring = null; } } }
+  for (let i = DACHA.bombs.length - 1; i >= 0; i--) { const B = DACHA.bombs[i]; B.vy -= 18 * dt; B.y += B.vy * dt; B.m.position.y = B.y; if (B.y <= 0.45) { scene.remove(B.m); scene.remove(B.ring); DACHA.bombs.splice(i, 1); dachaBlast(B.x, B.z); } }
+  if (DACHA.mangal) { DACHA.fireT -= dt; if (DACHA.fireT <= 0) { DACHA.fireT = 0.07; spawnSprite(TEX.soft, _a.set(DACHA.mangal.x + rand(-0.4, 0.4), DACHA.mangal.y, DACHA.mangal.z + rand(-0.2, 0.2)), { color: pick([0xff8a20, 0xffc040, 0xff5a10]), additive: true, size: rand(0.3, 0.6), grow: -0.4, life: 0.5, vel: new V3(rand(-0.2, 0.2), rand(1, 2), rand(-0.2, 0.2)) }); } }
+  const h = DACHA.hatch, s = DACHA.shel, dh = h ? Math.hypot(player.pos.x - h.x, player.pos.z - h.z) : 99, inShel = s ? Math.hypot(player.pos.x - s.x, player.pos.z - s.z) < 4 : false, b = dachaBtn();
+  if (!player.dead && (dh < 2.4 || inShel)) { b.style.display = 'block'; b.textContent = inShel ? '⬆ ВЫЙТИ ИЗ УБЕЖИЩА' : '⬇ В ПОГРЕБ-УБЕЖИЩЕ'; } else b.style.display = 'none';
+  DACHA.hudT -= dt; if (DACHA.hudT <= 0) { DACHA.hudT = 0.25; dachaUi().innerHTML = (DACHA.siren > 0 ? '<b style="color:#ff6a6a">🚨 ТРЕВОГА ' + Math.ceil(DACHA.siren) + ' с</b>' : '🛩 следующая волна через <b>' + Math.max(0, Math.ceil(DACHA.next)) + '</b> с') + ` · волн: <b>${DACHA.wave}</b> · разрушено: <b>${DACHA.lost}</b>` + (inShel ? ' · 🛡 в убежище' : ''); }
 }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
