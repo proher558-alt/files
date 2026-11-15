@@ -16573,7 +16573,7 @@ function ideaPropsUpd(dt) {
   }
 }
 /* ===== characters of the game, statues, free spots ===== */
-const IDEA_CHARS = [['ник52', 'blockhead', 'Ник52'], ['nik52', 'blockhead', 'Ник52'], ['свити невест', 'svity-bride', 'Свити (невеста)'], ['свити полиц', 'svity-cop', 'Свити (полиция)'], ['бсон', 'bson', 'Бсон'], ['воскрес', 'gagarin', 'Воскреситель'], ['мелоди', 'melodie', 'Мелоди'], ['свити', 'svity-street', 'Свити'], ['продюсер', 'producer', 'Продюсер'], ['сириус', 'sirius', 'Сириус'], ['счетовод', 'ledger', 'Счетовод'], ['взыскател', 'collector', 'Взыскатель'], ['хаги', 'huggy', 'Хаги Ваги'], ['хагги', 'huggy', 'Хаги Ваги']];
+const IDEA_CHARS = [['микушк', 'mikushka', 'Микушка'], ['минутк', 'mikushka', 'Микушка'], ['котик', 'mikushka', 'Микушка'], ['ник52', 'blockhead', 'Ник52'], ['nik52', 'blockhead', 'Ник52'], ['свити невест', 'svity-bride', 'Свити (невеста)'], ['свити полиц', 'svity-cop', 'Свити (полиция)'], ['бсон', 'bson', 'Бсон'], ['воскрес', 'gagarin', 'Воскреситель'], ['мелоди', 'melodie', 'Мелоди'], ['свити', 'svity-street', 'Свити'], ['продюсер', 'producer', 'Продюсер'], ['сириус', 'sirius', 'Сириус'], ['счетовод', 'ledger', 'Счетовод'], ['взыскател', 'collector', 'Взыскатель'], ['хаги', 'huggy', 'Хаги Ваги'], ['хагги', 'huggy', 'Хаги Ваги']];
 const IDEA_STAT_MODEL = { 'кот': 'cat', 'кошк': 'cat', 'собак': 'dog', 'медвед': 'bear', 'тигр': 'tiger', 'акул': 'shark', 'динозавр': 'dino', 'пингвин': 'penguin', 'дракон': 'dino', 'паук': 'spider' };
 function ideaFreeSpot(r) {
   for (let k = 0; k < 50; k++) {
@@ -16836,6 +16836,8 @@ function ideaCrowd(x, z, R, count) {
     n.scripted = true; n.speed = 0; n.pose = pick(['tada', 'dance', 'laugh', 'hunch']); n.poseDur = Infinity; n.poseT = 0;
   }
 }
+/* Микушка the cat: a permanent cat model on the arena (no weapon) */
+function ideaCatMake(x, z, yaw, sc = 2.5) { const g = buildCat(false, 'gray'); g.scale.multiplyScalar(sc); g.position.set(x, 0, z); g.rotation.y = yaw; scene.add(g); mapObjs.push(g); return g; }
 function ideaParseWorld(t) {
   const who = () => ideaFindWho(t);
   if (/коч\W{0,3}брат/.test(t)) return { k: 'location', kind: 'sauna' };
@@ -16879,20 +16881,21 @@ function ideaWorldApply(P, t, who, me, tg, at, why) {
       const pa = ideaPosOf(A.real || 'player'), pb = ideaPosOf(B.real || 'player');
       const cx = (pa.x + pb.x) / 2, cz = (pa.z + pb.z) / 2;
       const mkCopy = (d, x, z, yaw, pose) => {
+        if (d.look === 'mikushka') { const c = ideaCatMake(x, z, yaw, 2.5); c.userData.copyOf = d.name; return c; }
         const n = mkNpc(d.look || undefined, clamp(x, -HX + 2, HX - 2), clamp(z, -HZ + 2, HZ - 2), yaw, 'human'); if (!n) return null;
         n.scripted = true; n.speed = 0; n.root.scale.setScalar(d.scale); n.pose = pose; n.poseDur = Infinity; n.poseT = 0; n.copyOf = d.name; return n;
       };
       ideaCrowd(cx, cz, 4, 12);
       const ka = mkCopy(A, pa.x, pa.z, Math.atan2(pb.x - pa.x, pb.z - pa.z), 'punch');
       const kb = mkCopy(B, pb.x, pb.z, Math.atan2(pa.x - pb.x, pa.z - pb.z), 'down');
-      if (kb) { kb.hp = kb.maxHp * 0.7; }
+      if (kb && kb.hp !== undefined) { kb.hp = kb.maxHp * 0.7; }
       IDEA.focus = new V3(cx, 1, cz); IDEA.focusS = 1.2;
       return `копии: ${A.name} пинает ${B.name} · на арене навсегда толпа и копии`;
     }
     case 'crowd': { const p = at; ideaCrowd(p.x, p.z, 9, 14); IDEA.focus = p.clone(); IDEA.focusS = 1.4; return `на арене навсегда появляется толпа`; }
     case 'zone': return ideaZoneShrink();
     case 'rocket': return ideaRocket();
-    case 'char': { let n = 0; for (const w of P.who) for (let i = 0; i < P.n; i++) { if (IDEA.chars >= 14) break; const x = clamp(at.x + rand(-4, 4), -HX + 3, HX - 3), z = clamp(at.z + rand(-4, 4), -HZ + 3, HZ - 3), c = w.look === 'huggy' ? spawnHuggy(x, z) : mkNpc(w.look, x, z, rand(0, 6.28), 'human'); if (c) { IDEA.chars++; n++; spawnSprite(TEX.soft, _a.set(x, 1, z), { color: 0xffd060, additive: true, size: 2.6, grow: 1, life: 0.6 }); } } IDEA.focus = at.clone(); return n ? `на арене появляется: ${P.who.map((w) => w.nm).join(', ')} (навсегда)` : 'арена переполнена'; }
+    case 'char': { let n = 0; for (const w of P.who) for (let i = 0; i < P.n; i++) { if (IDEA.chars >= 14) break; const x = clamp(at.x + rand(-4, 4), -HX + 3, HX - 3), z = clamp(at.z + rand(-4, 4), -HZ + 3, HZ - 3), c = w.look === 'mikushka' ? ideaCatMake(x, z, rand(0, 6.28), 2.5) : w.look === 'huggy' ? spawnHuggy(x, z) : mkNpc(w.look, x, z, rand(0, 6.28), 'human'); if (c) { IDEA.chars++; n++; spawnSprite(TEX.soft, _a.set(x, 1, z), { color: 0xffd060, additive: true, size: 2.6, grow: 1, life: 0.6 }); } } IDEA.focus = at.clone(); return n ? `на арене появляется: ${P.who.map((w) => w.nm).join(', ')} (навсегда)` : 'арена переполнена'; }
   }
   return null;
 }
