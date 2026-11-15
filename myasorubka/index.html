@@ -17243,32 +17243,32 @@ function mkNoob() {
   return g;
 }
 function noobFace(g, kind) { const fp = g.userData.facePlane; const t = cvTex(128, 128, (c) => { c.fillStyle = '#111'; if (kind === 'scream') { c.beginPath(); c.arc(44, 52, 6, 0, 6.283); c.arc(84, 52, 6, 0, 6.283); c.fill(); c.beginPath(); c.ellipse(64, 86, 12, 18, 0, 0, 6.283); c.fill(); } else if (kind === 'angry') { c.lineWidth = 6; c.strokeStyle = '#111'; c.beginPath(); c.moveTo(30, 40); c.lineTo(56, 52); c.moveTo(98, 40); c.lineTo(72, 52); c.stroke(); c.beginPath(); c.arc(44, 62, 5, 0, 6.283); c.arc(84, 62, 5, 0, 6.283); c.fill(); c.beginPath(); c.moveTo(48, 92); c.lineTo(80, 92); c.stroke(); } else if (kind === 'dead') { c.lineWidth = 5; c.strokeStyle = '#111'; for (const x of [44, 84]) { c.beginPath(); c.moveTo(x - 8, 46); c.lineTo(x + 8, 62); c.moveTo(x + 8, 46); c.lineTo(x - 8, 62); c.stroke(); } c.beginPath(); c.ellipse(64, 90, 9, 12, 0, 0, 6.283); c.fill(); } }); fp.material.map = t; fp.material.needsUpdate = true; }
-function mkMonster() {
+function mkMonster(sc = 1) {
   const g = new THREE.Group(), skin = std({ color: 0xb9ac9c, roughness: 0.95, emissive: 0x161310 }), dk = std({ color: 0x8a7a6e, roughness: 1 });
   const pv = (par, x, y, z) => { const p = new THREE.Group(); p.position.set(x, y, z); par.add(p); return p; };
   const hips = pv(g, 0, 1.55, 0), legL = pv(hips, -0.1, 0, 0), legR = pv(hips, 0.1, 0, 0), spine = pv(hips, 0, 0, 0);
   const pelv = new THREE.Mesh(IM_G.sph, skin); pelv.scale.set(0.3, 0.2, 0.2); hips.add(pelv);
-  const kneeL = pv(legL, 0, -0.78, 0), kneeR = pv(legR, 0, -0.78, 0); legL.add(cylDown(0.78, 0.065, 0.05, skin)); legR.add(cylDown(0.78, 0.065, 0.05, skin)); kneeL.add(cylDown(0.78, 0.05, 0.035, skin)); kneeR.add(cylDown(0.78, 0.05, 0.035, skin));
+  const kneeL = pv(legL, 0, -0.78, 0), kneeR = pv(legR, 0, -0.78, 0); legL.add(cylDown(0.78, 0.09, 0.065, skin)); legR.add(cylDown(0.78, 0.09, 0.065, skin)); kneeL.add(cylDown(0.78, 0.065, 0.045, skin)); kneeR.add(cylDown(0.78, 0.065, 0.045, skin));
   for (const k of [kneeL, kneeR]) { const ft = new THREE.Mesh(IM_G.box, dk); ft.scale.set(0.09, 0.05, 0.26); ft.position.set(0, -0.8, 0.07); k.add(ft); }
-  const tor = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.15, 1.05, 10).translate(0, 0.52, 0), skin); tor.scale.set(1.2, 1, 0.75); spine.add(tor); for (let i = 0; i < 5; i++) { const rb = new THREE.Mesh(IM_G.box, dk); rb.scale.set(0.24, 0.012, 0.01); rb.position.set(0, 0.45 + i * 0.1, 0.1); spine.add(rb); }
-  const neck = pv(spine, 0, 1.0, 0); const nk = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.5, 8).translate(0, 0.25, 0), skin); neck.add(nk); const head = pv(neck, 0, 0.55, 0); const hd = new THREE.Mesh(IM_G.sph, skin); hd.scale.set(0.27, 0.36, 0.27); head.add(hd); neck.rotation.x = 0.35;
-  const shL = pv(spine, -0.24, 0.9, 0), shR = pv(spine, 0.24, 0.9, 0); shL.add(cylDown(0.95, 0.05, 0.04, skin)); shR.add(cylDown(0.95, 0.05, 0.04, skin)); const elL = pv(shL, 0, -0.95, 0), elR = pv(shR, 0, -0.95, 0); elL.add(cylDown(0.92, 0.04, 0.03, skin)); elR.add(cylDown(0.92, 0.04, 0.03, skin));
-  for (const e of [elL, elR]) { const hd2 = new THREE.Mesh(IM_G.box, skin); hd2.scale.set(0.07, 0.14, 0.03); hd2.position.y = -0.98; e.add(hd2); for (let f = -1; f <= 1; f++) { const fg = cylDown(0.16, 0.012, 0.008, skin); fg.position.set(f * 0.025, -1.04, 0); e.add(fg); } }
-  g.userData = { hips, legL, legR, kneeL, kneeR, spine, neck, head, shL, shR, elL, elR };
+  const tor = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.17, 1.05, 10).translate(0, 0.52, 0), skin); tor.scale.set(1.25, 1, 0.8); spine.add(tor); for (let i = 0; i < 5; i++) { const rb = new THREE.Mesh(IM_G.box, dk); rb.scale.set(0.24, 0.012, 0.01); rb.position.set(0, 0.45 + i * 0.1, 0.1); spine.add(rb); }
+  const neck = pv(spine, 0, 1.0, 0); const nk = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.5, 8).translate(0, 0.25, 0), skin); neck.add(nk); const head = pv(neck, 0, 0.55, 0); const hd = new THREE.Mesh(IM_G.sph, skin); hd.scale.set(0.27, 0.36, 0.27); head.add(hd); neck.rotation.x = 0.35;
+  const shL = pv(spine, -0.24, 0.9, 0), shR = pv(spine, 0.24, 0.9, 0); shL.add(cylDown(0.8, 0.075, 0.06, skin)); shR.add(cylDown(0.8, 0.075, 0.06, skin)); const elL = pv(shL, 0, -0.8, 0), elR = pv(shR, 0, -0.8, 0); elL.add(cylDown(0.76, 0.06, 0.045, skin)); elR.add(cylDown(0.76, 0.06, 0.045, skin));
+  for (const e of [elL, elR]) { const hd2 = new THREE.Mesh(IM_G.box, skin); hd2.scale.set(0.09, 0.14, 0.04); hd2.position.y = -0.82; e.add(hd2); for (let f = -1; f <= 1; f++) { const fg = cylDown(0.18, 0.016, 0.01, skin); fg.position.set(f * 0.03, -0.88, 0); e.add(fg); } }
+  g.userData = { hips, legL, legR, kneeL, kneeR, spine, neck, head, shL, shR, elL, elR }; g.scale.setScalar(sc);
   return g;
 }
 function monsWalkAnim(m, dt, spd) { const u = m.userData; m.ph = (m.ph || 0) + dt * spd * 2.2; const s = Math.sin(m.ph) * Math.min(1, spd); u.legL.rotation.x = s * 0.5; u.legR.rotation.x = -s * 0.5; u.kneeL.rotation.x = Math.max(0, -s) * 0.7; u.kneeR.rotation.x = Math.max(0, s) * 0.7; u.shL.rotation.x = -s * 0.25; u.shR.rotation.x = s * 0.25; u.elL.rotation.x = -0.15; u.elR.rotation.x = -0.15; u.spine.rotation.x = 0.12; u.neck.rotation.z = Math.sin(m.ph * 0.5) * 0.1; }
 function strandBetween(m, a, b) { const d = new V3().subVectors(b, a), L = d.length(); m.position.copy(a).addScaledVector(d, 0.5); m.scale.set(1, Math.max(0.01, L), 1); m.quaternion.setFromUnitVectors(new V3(0, 1, 0), d.normalize()); }
 /* ===== the four death cutscenes (staged far from the house; each is a short scripted animation) ===== */
-const DS = { g: null, pieces: [], lightSave: null };
+const DS = { g: null, pieces: [], lightSave: null, people: [] };
 const lerpc = (a, b, t) => a + (b - a) * clamp(t, 0, 1), seg = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
 function stageBegin(col) {
-  const g = new THREE.Group(); g.position.set(ST.x, 0, ST.z); scene.add(g); DS.g = g; DS.pieces = [];
+  const g = new THREE.Group(); g.position.set(ST.x, 0, ST.z); scene.add(g); DS.g = g; DS.pieces = []; DS.people = [];
   const fl = new THREE.Mesh(new THREE.CylinderGeometry(9, 9, 0.1, 40), std({ color: col, roughness: 0.95 })); fl.position.y = -0.05; g.add(fl);
-  const M = MAPS.house; DS.lightSave = { hemi: M.hemi, l: M.lamp[1], ang: gSpot.angle, pen: gSpot.penumbra, dist: gSpot.distance }; M.hemi = 0.11; M.lamp[1] = 0; gSpot.angle = 0.95; gSpot.penumbra = 1; gSpot.distance = 22;
+  const M = MAPS.house; DS.lightSave = { hemi: M.hemi, l: M.lamp[1], ang: gSpot.angle, pen: gSpot.penumbra, dist: gSpot.distance }; M.hemi = 0.11; M.lamp[1] = 0; gSpot.angle = 0.95; gSpot.penumbra = 1; gSpot.distance = 22; story.fov = 52;
   return g;
 }
-function stageEnd() { if (DS.g) { scene.remove(DS.g); DS.g = null; } const M = MAPS.house; if (DS.lightSave) { M.hemi = DS.lightSave.hemi; M.lamp[1] = DS.lightSave.l; } gSpot.intensity = 0; if (DS.lightSave) { gSpot.angle = DS.lightSave.ang; gSpot.penumbra = DS.lightSave.pen; gSpot.distance = DS.lightSave.dist; } DS.pieces = []; }
+function stageEnd() { story.fov = 0; for (const n of DS.people) { try { n.dispose(); } catch (e) {} } DS.people = []; if (DS.g) { scene.remove(DS.g); DS.g = null; } const M = MAPS.house; if (DS.lightSave) { M.hemi = DS.lightSave.hemi; M.lamp[1] = DS.lightSave.l; } gSpot.intensity = 0; if (DS.lightSave) { gSpot.angle = DS.lightSave.ang; gSpot.penumbra = DS.lightSave.pen; gSpot.distance = DS.lightSave.dist; } DS.pieces = []; }
 function sw(x, y, z) { return new V3(ST.x + x, y, ST.z + z); }
 function spotAt(px, py, pz, tx, ty, tz, I = 90) { gSpot.position.set(ST.x + px, py, ST.z + pz); gSpot.target.position.set(ST.x + tx, ty, ST.z + tz); gSpot.target.updateMatrixWorld(); gSpot.intensity = I; }
 function cam(cx, cy, cz, lx, ly, lz) { camera.position.set(ST.x + cx, cy, ST.z + cz); camera.lookAt(ST.x + lx, ly, ST.z + lz); }
@@ -17278,114 +17278,199 @@ function rip(part, vx, vy, vz, spin = 4) { DS.g.attach(part); DS.pieces.push({ p
 function piecesUpd(dt) { for (const q of DS.pieces) { if (q.rest) continue; q.v.y -= 9.5 * dt; q.p.position.addScaledVector(q.v, dt); q.p.rotation.x += q.s.x * dt; q.p.rotation.y += q.s.y * dt; q.p.rotation.z += q.s.z * dt; if (q.p.position.y < 0.2) { q.p.position.y = 0.2; if (Math.abs(q.v.y) > 1.2) { q.v.y *= -0.3; q.v.x *= 0.6; q.v.z *= 0.6; q.s.multiplyScalar(0.5); } else { q.rest = true; } } } }
 function pool(x, z, r0, col = 0x6a0a0e) { const m = new THREE.Mesh(new THREE.CircleGeometry(1, 28).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.9, depthWrite: false })); m.position.set(x, 0.015, z); m.scale.setScalar(r0); DS.g.add(m); return m; }
 function noobPose(n, o) { const u = n.userData; if (o.armL !== undefined) u.armL.rotation.set(o.armL, 0, o.armLz || 0); if (o.armR !== undefined) u.armR.rotation.set(o.armR, 0, o.armRz || 0); if (o.legs !== undefined) { u.legL.rotation.x = o.legs; u.legR.rotation.x = -o.legs; } }
-/* 1: the window. The glass bursts, a long arm takes the noob from behind, the head is pulled off with the spine */
+/* ===== the victim is the player's own wardrobe body: a real Humanoid of type 'player', driven joint by joint ===== */
+function mkPerson(look) {
+  const kind = look !== undefined ? look : (typeof skinOk === 'function' && skinOk(settings.skin) && settings.skin !== 'default' ? settings.skin : undefined);
+  const n = new Humanoid('player', 0, 0, 0, kind); if (n.root.parent) n.root.parent.remove(n.root); DS.g.add(n.root); n.root.position.set(0, 0, 0); n.root.rotation.set(0, 0, 0);
+  const j = {}; for (const k in n.parts) j[k] = n.parts[k].pivot; DS.people.push(n);
+  const P = { n, root: n.root, j, rest: {} }; for (const k in j) P.rest[k] = j[k].rotation.clone(); return P;
+}
+function pose(P, o) { for (const k in o) { const v = o[k], r = P.j[k]; if (!r) continue; r.rotation.set(v[0] || 0, v[1] || 0, v[2] || 0); } }
+function scream(P, on) { const m = P.n.mouthOpen; if (m) { m.visible = !!on; m.scale.set(1, on ? 2.4 : 1, 1); } }
+function gripLocal(P, pivot, pt) { P.root.updateMatrixWorld(true); const w = pivot.localToWorld(pt.clone()); return P.root.worldToLocal(w); }
+function handOf(mon, side = 'R') { mon.updateMatrixWorld(true); const e = side === 'R' ? mon.userData.elR : mon.userData.elL; const w = e.localToWorld(new V3(0, -0.86, 0)); return DS.g.worldToLocal(w); }
+function aimArm(mon, side, tgt, lift = 0) {
+  const u = mon.userData, sh = side === 'R' ? u.shR : u.shL, el = side === 'R' ? u.elR : u.elL; mon.updateMatrixWorld(true);
+  const w = DS.g.localToWorld(tgt.clone()); const loc = sh.parent.worldToLocal(w); const d = loc.sub(sh.position); const l1 = 0.8, l2 = 0.86; let D = d.length(); D = clamp(D, 0.15, (l1 + l2) * 0.995);
+  const a = Math.acos(clamp((l1 * l1 + D * D - l2 * l2) / (2 * l1 * D), -1, 1)), bend = Math.PI - Math.acos(clamp((l1 * l1 + l2 * l2 - D * D) / (2 * l1 * l2), -1, 1));
+  const q = new THREE.Quaternion().setFromUnitVectors(new V3(0, -1, 0), d.normalize()); const qa = new THREE.Quaternion().setFromAxisAngle(new V3(1, 0, 0), a); const qr = new THREE.Quaternion().setFromAxisAngle(new V3(0, -1, 0), lift);
+  sh.quaternion.copy(q).multiply(qr).multiply(qa); el.rotation.set(-bend, 0, 0);
+}
+const at = (P, pivot, x = 0, y = 0, z = 0) => { const w = pivot.localToWorld(new V3(x, y, z)); return DS.g.worldToLocal(w); };
+/* put the body so that a point of it (pivot + local point) sits in the monster's hand */
+function holdBy(P, pivot, pt, hand) { const g = gripLocal(P, pivot, pt); P.root.updateMatrix(); const off = g.clone().multiply(P.root.scale).applyQuaternion(P.root.quaternion); P.root.position.copy(hand).sub(off); }
+function spine(par) { const g = new THREE.Group(); const bone = std({ color: 0xe8e0d0, roughness: 0.6 }), red = std({ color: 0x8a0f12, roughness: 0.5, emissive: 0x200204 }); for (let i = 0; i < 9; i++) { const v = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.05, 8), bone); v.position.y = -0.06 - i * 0.075; g.add(v); const r = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.08, 6), red); r.position.set(0.04 * (i % 2 ? 1 : -1), -0.06 - i * 0.075, 0.02); g.add(r); } par.add(g); return g; }
+function gutBunch(par, n = 6, len = 0.6) { const L = []; for (let i = 0; i < n; i++) { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1, 7), std({ color: pick([0xd8707e, 0xc85a6a, 0xe08a90]), roughness: 0.45, emissive: 0x2a0408 })); par.add(m); L.push({ m, ph: rand(0, 6), len: len * rand(0.7, 1.2), x: rand(-0.12, 0.12), z: rand(-0.08, 0.08) }); } return L; }
+function gutsUpd(L, a, t, k = 1, sway = 0.08) { for (const g of L) { const len = g.len * k; g.m.visible = k > 0.02; const b = new V3(a.x + g.x + Math.sin(t * 2.4 + g.ph) * sway, a.y - len, a.z + g.z + Math.cos(t * 2 + g.ph) * sway); strandBetween(g.m, new V3(a.x + g.x * 0.4, a.y, a.z + g.z * 0.4), b); g.m.scale.x = g.m.scale.z = 1; } }
+function wound(par, x, y, z, s = 0.1) { const m = new THREE.Mesh(IM_G.sph, std({ color: 0x7a0a10, roughness: 0.4, emissive: 0x300306 })); m.position.set(x, y, z); m.scale.set(s, s * 0.6, s); par.add(m); return m; }
+
+/* 1: the window (10.6 s). Back to the window, the glass bursts, a long arm takes the head from behind, the struggle,
+   the head lifts slowly with the spine, the body sinks into a heap, the head goes up out of view and comes back hanging */
 function monsDeath1() {
-  const S = stageBegin(0x1a1410), noob = mkNoob(), mon = mkMonster(), wall = std({ color: 0x4a382c, roughness: 0.9 }), frm = std({ color: 0x20140c, roughness: 0.9 });
+  const S = stageBegin(0x1a1410), mon = mkMonster(0.62), wall = std({ color: 0x3e2e24, roughness: 0.9 }), frm = std({ color: 0x1a120c, roughness: 0.9 }), mu = mon.userData;
   const wb = (x, y, w, h) => { const m = new THREE.Mesh(IM_G.box, wall); m.position.set(x, y, -0.15); m.scale.set(w, h, 0.3); S.add(m); };
-  wb(-3.3, 1.8, 4.2, 3.6); wb(3.3, 1.8, 4.2, 3.6); wb(0, 0.425, 2.4, 0.85); wb(0, 3.0, 2.4, 1.0);
-  for (const [x, y, w, h] of [[0, 0.88, 2.5, 0.1], [0, 2.52, 2.5, 0.1], [-1.22, 1.7, 0.1, 1.7], [1.22, 1.7, 0.1, 1.7], [0, 1.7, 0.05, 1.7]]) { const f = new THREE.Mesh(IM_G.box, frm); f.position.set(x, y, 0.02); f.scale.set(w, h, 0.18); S.add(f); }
-  const gm = new THREE.MeshStandardMaterial({ color: 0xc8dcea, transparent: true, opacity: 0.16, roughness: 0.05, depthWrite: false, side: THREE.DoubleSide }), pane = new THREE.Mesh(IM_G.box, gm); pane.position.set(0, 1.7, 0); pane.scale.set(2.3, 1.6, 0.02); S.add(pane);
-  const shards = []; for (let i = 0; i < 26; i++) { const sh = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.2, 3), new THREE.MeshStandardMaterial({ color: 0xc8dcea, transparent: true, opacity: 0.55, roughness: 0.1 })); sh.position.set(rand(-1.1, 1.1), rand(0.95, 2.45), 0); sh.visible = false; S.add(sh); shards.push({ m: sh, v: new V3(rand(-1.5, 1.5), rand(0.5, 3), rand(1, 4)) }); }
-  const debris = []; for (let i = 0; i < 14; i++) { const d = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.22, 3), new THREE.MeshStandardMaterial({ color: 0xb8c4cc, roughness: 0.5 })); d.rotation.set(Math.PI / 2, 0, rand(0, 6)); d.position.set(rand(-1.3, 1.3), 0.03, rand(0.4, 2.2)); d.visible = false; S.add(d); debris.push(d); }
-  noob.position.set(-0.15, 0, 1.0); S.add(noob); mon.rotation.y = -0.46; mon.position.set(0.75, 0, -0.75); S.add(mon); mon.userData.hips.rotation.x = 0.28; mon.userData.neck.rotation.x = 0.5; mon.userData.shL.rotation.x = -0.25; mon.userData.elL.rotation.x = -0.3;
-  const strands = [redTube(S), redTube(S), redTube(S), redTube(S)], blood = pool(0, 0.9, 0.01), u = noob.userData; let shat = false, split = false, fell = false, hdDet = false;
-  return { dur: 9.6, steps: [[1.0, () => { Sound.crunch(0.9); Sound.tink(0.9); }], [3.2, () => Sound.ghostVoice(0.8)], [4.4, () => { Sound.crunch(1); Sound.splat(1); }], [6.2, () => Sound.thud(0.8)]],
+  wb(-3.4, 1.8, 4.0, 3.6); wb(2.6, 1.8, 4.8, 3.6); wb(-0.6, 0.45, 1.6, 0.9); wb(-0.6, 3.1, 1.6, 1.0);
+  for (const [x, y, w, h] of [[-0.6, 0.93, 1.75, 0.1], [-0.6, 2.62, 1.75, 0.12], [-1.43, 1.76, 0.1, 1.75], [0.23, 1.76, 0.1, 1.75]]) { const f = new THREE.Mesh(IM_G.box, frm); f.position.set(x, y, 0.03); f.scale.set(w, h, 0.18); S.add(f); }
+  const gm = new THREE.MeshStandardMaterial({ color: 0xc8dcea, transparent: true, opacity: 0.18, roughness: 0.05, depthWrite: false, side: THREE.DoubleSide }), pane = new THREE.Mesh(IM_G.box, gm); pane.position.set(-0.6, 1.76, 0); pane.scale.set(1.6, 1.65, 0.02); S.add(pane);
+  const shards = []; for (let i = 0; i < 34; i++) { const sh = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.24, 3), new THREE.MeshStandardMaterial({ color: 0xc8dcea, transparent: true, opacity: 0.6, roughness: 0.1 })); sh.position.set(rand(-1.3, 0.1), rand(1.0, 2.5), 0); sh.visible = false; S.add(sh); shards.push({ m: sh, v: new V3(rand(-1, 2), rand(0.5, 2.5), rand(1.5, 4)) }); }
+  for (let i = 0; i < 18; i++) { const d = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.26, 3), new THREE.MeshStandardMaterial({ color: 0xb8c4cc, roughness: 0.5 })); d.rotation.set(Math.PI / 2, 0, rand(0, 6)); d.position.set(rand(-1.4, 1.0), 0.02, rand(0.2, 1.8)); d.visible = false; S.add(d); shards.push({ m: d, v: null, deb: true }); }
+  const P = mkPerson(), j = P.j; P.root.position.set(0.1, 0, 0.55); P.root.rotation.y = -0.3;
+  mon.position.set(-0.7, 0, -0.55); mon.rotation.y = 0.2; S.add(mon); mu.hips.rotation.x = 0.15; mu.neck.rotation.x = 0.45;
+  const sp = spine(j.head); sp.visible = false; const st = [redTube(S), redTube(S), redTube(S)]; st.forEach((s) => s.visible = false);
+  let shat = false, hdDet = false, heap = 0, blood = null;
+  return { dur: 10.8, steps: [[0.4, () => { Sound.crunch(1); Sound.tink(1); }], [0.9, () => Sound.ghostVoice(0.7)], [3.6, () => Sound.splat(0.8)], [4.6, () => Sound.crunch(0.9)], [7.4, () => { Sound.thud(0.9); Sound.splat(1); }]],
     upd(t, dt) {
-      cam(0.05, 1.45, 2.9, 0.1, 1.35, 0); spotAt(0.4, 3.4, 3.4, 0.2, 1.3, 0.2, 34); piecesUpd(dt);
-      const arm = seg(t, 0, 1.0), grab = seg(t, 1.0, 1.9); mon.userData.shR.rotation.x = lerpc(-0.1, -1.55, arm); mon.userData.elR.rotation.x = lerpc(-0.1, -0.35, arm); mon.userData.shR.rotation.z = lerpc(0, 0.25, arm);
-      if (t > 1.0 && !shat) { shat = true; pane.visible = false; for (const s of shards) s.m.visible = true; for (const d of debris) d.visible = true; }
-      for (const s of shards) if (s.m.visible) { s.v.y -= 8 * dt; s.m.position.addScaledVector(s.v, dt); s.m.rotation.x += 6 * dt; if (s.m.position.y < 0.05) { s.m.position.y = 0.05; s.v.set(0, 0, 0); } }
-      if (t < 1.0) { noob.rotation.z = Math.sin(t * 2) * 0.03; noobPose(noob, { armL: -0.1, armR: -0.1 }); }
-      else if (t < 4.4) { const k = seg(t, 1.0, 2.2); noob.position.z = lerpc(1.0, 0.36, k); noob.rotation.x = lerpc(0, -0.5, k); const fl = Math.sin(t * 22) * 0.18; noobPose(noob, { armL: -2.5 + fl, armR: -2.4 - fl, armLz: 0.4, armRz: -0.4, legs: Math.sin(t * 18) * 0.5 }); noobFace(noob, t < 2.4 ? 'scream' : 'angry'); noob.position.y = lerpc(0, 0.12, k); if (t > 3.0 && t < 4.4 && Math.random() < dt * 6) bleed(0, 1.7, 0.3, 0, 1, 1, 4); }
+      cam(0.55, 1.35, 2.35, -0.3, 1.5, 0); spotAt(0.6, 3.2, 2.4, -0.2, 1.4, 0.2, 30); piecesUpd(dt);
+      if (t > 0.4 && !shat) { shat = true; pane.visible = false; for (const s of shards) s.m.visible = true; }
+      for (const s of shards) if (s.v && s.m.visible) { s.v.y -= 9 * dt; s.m.position.addScaledVector(s.v, dt); s.m.rotation.x += 7 * dt; if (s.m.position.y < 0.03) { s.m.position.y = 0.03; s.v = null; } }
+      // the monster: the right arm goes through the window to the head and stays on it
+      const reach = seg(t, 0.35, 0.8), hd = at(P, j.head, 0, 0.1, -0.08); if (t < 7.4) aimArm(mon, 'R', new V3(-0.7, 1.2, -0.3).lerp(hd, reach)); if (t > 0.8 && t < 4.4) aimArm(mon, 'L', new V3(-0.8, 1.2, -0.3).lerp(at(P, j.torso, 0.1, 0.35, -0.1), seg(t, 0.8, 1.3))); else if (t <= 0.8) { mu.shL.rotation.set(-0.2, 0, 0); mu.elL.rotation.set(-0.3, 0, 0); }
+      const pulled = seg(t, 0.6, 1.4), hang = t > 0.6 && t < 7.4;
+      if (t < 0.4) { pose(P, { uArmL: [0.05, 0, 0.08], uArmR: [0.05, 0, -0.08] }); P.root.rotation.z = Math.sin(t * 3) * 0.02; }
+      else if (t < 3.4) { const f = Math.sin(t * 17); pose(P, { uArmL: [-2.6 + f * 0.35, 0, 0.5], lArmL: [-0.6, 0, 0], uArmR: [-2.4 - f * 0.35, 0, -0.5], lArmR: [-0.7, 0, 0], uLegL: [-0.5 * f, 0, 0], uLegR: [0.5 * f, 0, 0], lLegL: [0.4, 0, 0], lLegR: [0.4, 0, 0], head: [0.1 * f, 0.2 * f, 0] }); scream(P, true); }
+      else if (t < 4.4) { const k = seg(t, 3.4, 4.4); pose(P, { uArmL: [lerpc(-2.6, -0.1, k), 0, lerpc(0.5, 0.3, k)], uArmR: [lerpc(-2.4, -0.1, k), 0, lerpc(-0.5, -0.3, k)], uLegL: [0.05, 0, 0], uLegR: [-0.05, 0, 0] }); if (Math.random() < dt * 10) bleed(-0.05, 1.75, 0.35, 0.3, 0.6, 1.2, 4); }
+      else if (t < 7.4) { pose(P, { uArmL: [0, 0, 0.32], uArmR: [0, 0, -0.32], uLegL: [0, 0, 0.03], uLegR: [0, 0, -0.03] }); scream(P, true); }
+      if (hang) { P.root.position.set(lerpc(0.1, -0.15, pulled), lerpc(0, 0.16, pulled), lerpc(0.55, 0.22, pulled)); P.root.rotation.x = lerpc(0, -0.18, pulled); }
+      // the head comes off slowly with the spine
       if (t >= 4.4) {
-        if (!split) { split = true; noobFace(noob, 'dead'); }
-        const k = seg(t, 4.4, 6.2), hd = u.head, tp = u.torso;
-        if (t > 5.9 && !hdDet) { hdDet = true; S.attach(hd); }
-        if (!hdDet) { hd.position.set(lerpc(0, 0.12, k), lerpc(1.6, 2.55, k) + Math.sin(t * 5) * 0.03, lerpc(0, -0.12, k)); hd.rotation.z = Math.sin(t * 4) * 0.15; } else { const h2 = seg(t, 5.9, 7.0); hd.position.set(lerpc(hd.position.x, 0.6, h2), lerpc(hd.position.y, 2.1, h2) + Math.sin(t * 3) * 0.03, lerpc(hd.position.z, -0.15, h2)); hd.rotation.z = Math.sin(t * 3) * 0.2; } u.armL.rotation.x = lerpc(-2.5, 0.3, seg(t, 4.4, 5.2)); u.armR.rotation.x = lerpc(-2.4, 0.2, seg(t, 4.4, 5.2)); u.armLz = 0; u.armL.rotation.z = lerpc(0.4, 0.1, seg(t, 4.4, 5.2)); u.armR.rotation.z = lerpc(-0.4, -0.1, seg(t, 4.4, 5.2));
-        if (t < 6.4 && Math.random() < dt * 14) bleed(0, 1.5, 0.3, rand(-0.5, 0.5), 2, 0.5, 5);
-        const base = tp.localToWorld(new V3(0, 0.35, 0)), top = hd.localToWorld(new V3(0, -0.18, 0)); S.worldToLocal(base); S.worldToLocal(top);
-        strands.forEach((s, i) => { const off = (i - 1.5) * 0.04, a = base.clone().add(new V3(off, 0, off * 0.5)), b = top.clone().add(new V3(off * 0.5, 0, off)); strandBetween(s, a, b); });
-        if (t > 6.0) { const f = seg(t, 6.0, 7.0); noob.rotation.x = lerpc(-0.5, 1.55, f); noob.position.y = lerpc(0.12, 0.1, f); noob.position.z = lerpc(0.36, 0.95, f); if (!fell && f > 0.95) { fell = true; blood.scale.setScalar(0.05); } }
-        if (fell) { blood.scale.setScalar(Math.min(1.1, blood.scale.x + dt * 0.35)); }
+        sp.visible = true; st.forEach((s) => s.visible = true); const up = seg(t, 4.4, 7.3);
+        if (!hdDet) { if (P.rest.headY === undefined) P.rest.headY = j.head.position.y; j.head.position.y = P.rest.headY + up * 0.85; j.head.rotation.z = Math.sin(t * 2) * 0.08; }
+        if (t < 7.6 && Math.random() < dt * 9) bleed(-0.1, 1.6 + up * 0.8, 0.3, rand(-0.4, 0.4), 1.2, 0.8, 4);
+        const base = j.torso.localToWorld(new V3(0, 0.46, 0)); S.worldToLocal(base); const top = j.head.localToWorld(new V3(0, 0, 0)); S.worldToLocal(top);
+        if (!hdDet) st.forEach((s, i) => strandBetween(s, base.clone().add(new V3((i - 1) * 0.05, 0, 0)), top.clone().add(new V3((i - 1) * 0.03, 0, 0))));
       }
-      mon.userData.shR.rotation.x += t > 6.0 ? -0.3 * seg(t, 6.0, 7.0) : 0;
+      // the body sinks into a heap; the head goes up out of view, then comes down hanging from the hand
+      if (t >= 7.4) {
+        if (!hdDet) { hdDet = true; S.attach(j.head); st.forEach((s) => s.visible = false); blood = pool(-0.15, 0.35, 0.05); }
+        heap = seg(t, 7.4, 8.0); P.root.position.y = lerpc(0.16, 0.0, heap); P.root.rotation.x = lerpc(-0.18, 0.35, heap); P.root.position.z = lerpc(0.22, 0.35, heap);
+        pose(P, { pelvis: [0, 0, 0], uLegL: [-1.45 * heap, 0, 0.25], lLegL: [1.9 * heap, 0, 0], uLegR: [-1.4 * heap, 0, -0.25], lLegR: [1.85 * heap, 0, 0], uArmL: [0.3, 0, 0.6 * heap + 0.3], uArmR: [0.3, 0, -0.6 * heap - 0.3], torso: [0.5 * heap, 0, 0] }); j.pelvis.position.y = lerpc(1.0, 0.5, heap);
+        if (blood) blood.scale.setScalar(Math.min(0.9, blood.scale.x + dt * 0.25));
+        const H = j.head, hand = handOf(mon, 'R');
+        if (t < 9.4) aimArm(mon, 'R', new V3(-0.35, lerpc(2.0, 3.4, seg(t, 7.4, 8.1)), 0.05)); else aimArm(mon, 'R', new V3(lerpc(-0.35, -0.95, seg(t, 9.4, 10.1)), lerpc(3.4, 2.2, seg(t, 9.4, 10.1)), 0.1)); H.position.copy(handOf(mon, 'R')).add(new V3(0, -0.12, 0.05));
+        H.rotation.set(0, 0.3, Math.sin(t * 2.2) * 0.15); sp.rotation.z = Math.sin(t * 1.8) * 0.12;
+      }
     } };
 }
-/* 2: the door slit. The noob is lifted, pulled head first into a narrow slot and squeezed through, guts left hanging */
+
+/* 2: the door slot (7.6 s). Pinned to the wall with an arm pulled into the slot, squeezed, torn in two:
+   the top goes through, the legs stay with the guts; then the view from behind the wall: the monster holds the top half */
 function monsDeath2() {
-  const S = stageBegin(0x5a1414), noob = mkNoob(), wall = std({ color: 0x5c5a52, roughness: 0.95 }), u = noob.userData;
+  const S = stageBegin(0x2a0a0a), wall = std({ color: 0x5c5a52, roughness: 0.95 }), mon = mkMonster(0.62), mu = mon.userData;
+  const SX = 0.55, SY = 1.62, SW = 0.75, SH = 0.22;
   const wb = (x, y, w, h) => { const m = new THREE.Mesh(IM_G.box, wall); m.position.set(x, y, -0.15); m.scale.set(w, h, 0.3); S.add(m); };
-  wb(-2.75, 1.6, 4.5, 3.2); wb(2.75, 1.6, 4.5, 3.2); wb(0, 0.45, 1.0, 0.9); wb(0, 2.45, 1.0, 2.1);
-  for (const [x, y, w, h] of [[-0.5, 1.18, 0.05, 0.6], [0.5, 1.18, 0.05, 0.6], [0, 1.47, 1.1, 0.05], [0, 0.9, 1.1, 0.05]]) { const f = new THREE.Mesh(IM_G.box, std({ color: 0x1a1816, roughness: 0.8 })); f.position.set(x, y, 0.02); f.scale.set(w, h, 0.1); S.add(f); }
-  const carpet = new THREE.Mesh(IM_G.box, std({ color: 0x5a1212, roughness: 1 })); carpet.position.set(0, 0.01, 2); carpet.scale.set(9, 0.02, 6); S.add(carpet);
-  noob.position.set(-1.1, 0, 1.6); noob.rotation.y = 0.5; S.add(noob);
-  const guts = []; for (let i = 0; i < 7; i++) { const g = redTube(S, 0xd8707e); g.scale.set(1.8, 0.01, 1.8); guts.push({ m: g, x: -0.4 + i * 0.13, ph: rand(0, 6), L: rand(0.6, 1.05) }); }
-  const blood = pool(0.1, 0.9, 0.01, 0x24030a); let spurt = 0;
-  return { dur: 8.4, steps: [[1.4, () => Sound.whoosh()], [3.6, () => Sound.crunch(1)], [4.6, () => Sound.splat(1)], [6.2, () => Sound.thud(0.7)]],
+  wb(SX - SW / 2 - 2.5, 1.6, 5, 3.2); wb(SX + SW / 2 + 2.5, 1.6, 5, 3.2); wb(SX, (SY - SH / 2) / 2, SW, SY - SH / 2); wb(SX, (SY + SH / 2 + 3.2) / 2, SW, 3.2 - SY - SH / 2);
+  for (const [x, y, w, h] of [[SX, SY + SH / 2 + 0.02, SW + 0.08, 0.04], [SX, SY - SH / 2 - 0.02, SW + 0.08, 0.04]]) { const f = new THREE.Mesh(IM_G.box, std({ color: 0xa8a8b0, metalness: 0.6, roughness: 0.3 })); f.position.set(x, y, 0.02); f.scale.set(w, h, 0.06); S.add(f); }
+  for (let i = -2; i <= 3; i++) { const sm = new THREE.Mesh(IM_G.box, std({ color: 0x4a4842 })); sm.position.set(i * 1.2, 1.6, 0.005); sm.scale.set(0.02, 3.2, 0.01); S.add(sm); }
+  const carpet = new THREE.Mesh(IM_G.box, std({ color: 0x6a1010, roughness: 1 })); carpet.position.set(0, 0.01, 2); carpet.scale.set(9, 0.02, 4); S.add(carpet);
+  const back = new THREE.Mesh(IM_G.box, std({ color: 0x0c0a0a, roughness: 1 })); back.position.set(0, 0.01, -2.2); back.scale.set(9, 0.02, 4); S.add(back);
+  mon.position.set(1.3, 0, -1.2); mon.rotation.y = Math.PI + 0.35; S.add(mon); mu.spine.rotation.x = 0.2;
+  const P = mkPerson(), j = P.j; P.root.position.set(0.0, 0.18, 0.22); const gutsTop = gutBunch(S, 7, 0.55), gutsSlot = gutBunch(S, 5, 0.9); let torn = false, inside = false, tp = null, poolM = null;
+  return { dur: 7.8, steps: [[0.2, () => Sound.ghostVoice(0.6)], [1.2, () => Sound.crunch(0.8)], [3.2, () => { Sound.crunch(1); Sound.splat(1); }], [4.6, () => Sound.whoosh()], [5.3, () => Sound.thud(0.5)]],
     upd(t, dt) {
-      cam(0.7, 1.45, 2.6, 0.05, 1.1, 0); spotAt(1.0, 3.2, 2.8, 0.1, 1.0, 0.2, 30);
-      const a = seg(t, 0, 1.4), b = seg(t, 1.4, 3.4), c = seg(t, 3.4, 6.2);
-      noob.position.x = lerpc(-1.1, 0.1, b); noob.rotation.y = lerpc(0.5, 0, b);
-      noobPose(noob, { armL: -2.2 + Math.sin(t * 14) * 0.2, armR: -2.0 - Math.sin(t * 14) * 0.2, armLz: 0.5, armRz: -0.5, legs: Math.sin(t * 10) * 0.4 * (1 - b) }); noobFace(noob, t < 1.6 ? 'angry' : 'scream');
-      if (t < 1.4) { noob.position.z = lerpc(1.6, 1.15, a); noob.rotation.z = lerpc(0, 0.12, a); }
-      else { noob.rotation.z = 0; noob.rotation.x = lerpc(0, -1.5, b); noob.position.y = lerpc(0, 1.17, b); noob.position.z = lerpc(1.15, 0.78, b); }
-      if (t > 3.4) { const k = c; noob.position.z = lerpc(0.78, -2.15, k); noob.scale.set(lerpc(1, 0.55, seg(t, 3.4, 4.2)), 1, lerpc(1, 0.42, seg(t, 3.4, 4.4))); }
-      if (t > 3.7 && t < 6.0 && Math.random() < dt * 22) { bleed(0.05, 1.2, 0.15, rand(-0.6, 0.6), 0.4, 1.8, 3); }
-      const gs = seg(t, 3.9, 6.0); guts.forEach((g, i) => { g.m.visible = t > 3.9; const L = g.L * gs; g.m.scale.set(1.8, Math.max(0.02, L), 1.8); g.m.position.set(g.x + Math.sin(t * 3 + g.ph) * 0.03, 0.9 - L / 2, 0.08 + Math.cos(t * 2 + g.ph) * 0.02); g.m.rotation.z = Math.sin(t * 2.6 + g.ph) * 0.12; });
-      blood.scale.setScalar(Math.min(1.2, seg(t, 4.0, 8.0) * 1.2)); if (blood.scale.x < 0.02) blood.scale.setScalar(0.01);
-      if (t > 5.2) { for (const k of ['legL', 'legR']) u[k].rotation.x = Math.sin(t * 9) * 0.35 * (1 - seg(t, 5.2, 6.1)); }
-    } };
-}
-/* 3: outside in the dark. The monster picks the noob up by the head and tears the limbs and the head off */
-function monsDeath3() {
-  const S = stageBegin(0x2a1c12), noob = mkNoob(), mon = mkMonster(), u = noob.userData, mu = mon.userData;
-  for (let i = 0; i < 10; i++) { const l = new THREE.Mesh(IM_G.sph, imMat(0xffd070, true)); l.position.set(rand(-7, 7), rand(0.6, 3), rand(-7, -2)); l.scale.setScalar(0.12); S.add(l); }
-  S.add(noob); S.add(mon); noob.position.set(1.0, 0, 0.5); noob.rotation.y = -1.0; mon.position.set(-1.6, 0, -0.2); mon.rotation.y = 1.1;
-  let ripL = false, ripR = false, ripH = false, ripT = false, poolM = null;
-  return { dur: 11, steps: [[2.0, () => Sound.ghostVoice(1)], [3.3, () => { Sound.crunch(1); Sound.splat(1); }], [4.1, () => { Sound.crunch(1); Sound.splat(1); }], [5.4, () => { Sound.crunch(1); Sound.splat(1); Sound.boom(); }], [7.2, () => Sound.thud(0.8)]],
-    upd(t, dt) {
-      cam(0.3, 1.6, 3.9, 0, 1.1, 0); spotAt(-1, 4.4, 3.4, 0, 1, 0, 30); piecesUpd(dt);
-      const walk = seg(t, 0, 1.6); mon.position.x = lerpc(-3.2, -0.55, walk); monsWalkAnim(mon, dt, walk < 1 ? 1.1 : 0); if (walk >= 1) { mu.spine.rotation.x = 0.28; mu.neck.rotation.x = 0.6; }
-      const grab = seg(t, 1.6, 2.6); mu.shR.rotation.x = lerpc(-0.1, -1.15, grab); mu.shR.rotation.z = lerpc(0, -0.7, grab); mu.elR.rotation.x = lerpc(-0.1, -1.1, grab); mu.shL.rotation.x = lerpc(-0.1, -0.9, grab); mu.shL.rotation.z = lerpc(0, -0.5, grab);
-      if (t < 2.6) { noobPose(noob, { armL: -0.1, armR: -0.1 }); noobFace(noob, t < 1.6 ? 'angry' : 'scream'); noob.rotation.z = Math.sin(t * 3) * 0.04; }
-      else if (t < 7.2) { const lift = seg(t, 2.6, 3.4); noob.position.y = lerpc(0, 0.55, lift); noob.position.x = lerpc(1.0, 0.45, lift); const k = Math.sin(t * 20); noobPose(noob, { armL: -2.0 + k * 0.4, armR: -2.0 - k * 0.4, legs: k * 0.6 }); noobFace(noob, 'scream'); }
-      if (t > 3.3 && !ripL) { ripL = true; const w = u.armL.getWorldPosition(new V3()); rip(u.armL, -3, 3.5, 2.2); bleed(0.45 - 0.5, 1.4, 0.5, -1, 1, 1, 12); }
-      if (t > 4.1 && !ripR) { ripR = true; rip(u.armR, 3, 4, 1.5); bleed(0.45 + 0.5, 1.4, 0.5, 1, 1, 1, 12); }
-      if (t > 5.4 && !ripH) { ripH = true; rip(u.head, -2.2, 6.5, -1); bleed(0.45, 1.7, 0.5, 0, 2, 1, 16); noobFace(noob, 'dead'); }
-      if (t > 5.4 && t < 7.2 && Math.random() < dt * 14) bleed(0.45, 1.5, 0.5, rand(-1, 1), 1.5, rand(0, 1.5), 5);
-      if (t > 7.2 && !ripT) { ripT = true; rip(u.legL, -1.5, 3, 2); rip(u.legR, 2, 3, 1.4); rip(u.torso, 0.4, 2, 2.6, 2); poolM = pool(0.5, 0.5, 0.01); }
-      if (poolM) poolM.scale.setScalar(Math.min(1.5, poolM.scale.x + dt * 0.5));
-      if (t > 7.2) { mu.shR.rotation.x = lerpc(-1.15, -0.4, seg(t, 7.2, 8.4)); mu.spine.rotation.x = lerpc(0.28, 0.1, seg(t, 7.2, 9)); mu.neck.rotation.z = Math.sin(t * 1.2) * 0.2; }
-    } };
-}
-/* 4: inside the dim room. Slaps, a grab by the neck, the head pulled out with the spine */
-function monsDeath4() {
-  const S = stageBegin(0x2a2018), noob = mkNoob(), mon = mkMonster(), u = noob.userData, mu = mon.userData;
-  const back = new THREE.Mesh(IM_G.box, std({ color: 0x2c241e, roughness: 0.95 })); back.position.set(0, 1.6, -1.5); back.scale.set(9, 3.2, 0.2); S.add(back);
-  const side = new THREE.Mesh(IM_G.box, std({ color: 0x241c16, roughness: 0.95 })); side.position.set(-3.2, 1.6, 0); side.scale.set(0.2, 3.2, 6); S.add(side);
-  S.add(noob); S.add(mon); noob.position.set(0.6, 0, 0.2); noob.rotation.y = -0.35; mon.position.set(-1.5, 0, 0.1); mon.rotation.y = 1.25;
-  const strands = [redTube(S), redTube(S), redTube(S), redTube(S)]; let hit1 = false, hit2 = false, pulled = false, poolM = null, hdDet = false;
-  return { dur: 9, steps: [[1.5, () => { Sound.thud(0.9); Sound.crunch(0.5); }], [2.5, () => { Sound.thud(0.9); Sound.crunch(0.5); }], [4.2, () => { Sound.crunch(1); Sound.splat(1); }], [6.5, () => Sound.thud(0.8)]],
-    upd(t, dt) {
-      cam(0.0, 1.45, 3.1, -0.1, 1.2, 0); spotAt(0, 3.5, 3.0, 0, 1.1, 0, 30); piecesUpd(dt);
-      mu.spine.rotation.x = lerpc(0.1, 0.35, seg(t, 0, 1.2)); mu.neck.rotation.x = 0.5;
-      const sw1 = seg(t, 1.1, 1.6), sw2 = seg(t, 2.1, 2.6), gr = seg(t, 3.0, 3.9);
-      mu.shR.rotation.set(lerpc(-0.1, -1.4, seg(t, 0.6, 1.1)) - (t > 1.1 ? 0.5 * Math.sin(sw1 * Math.PI) : 0), 0, lerpc(0, -0.5, sw1) * (t < 2 ? 1 : 0));
-      mu.shL.rotation.set(lerpc(-0.1, -1.4, seg(t, 1.6, 2.1)) - (t > 2.1 ? 0.5 * Math.sin(sw2 * Math.PI) : 0), 0, 0);
-      if (t > 3.0) { mu.shR.rotation.set(lerpc(-0.5, -1.25, gr), 0, lerpc(0, -0.45, gr)); mu.elR.rotation.x = lerpc(-0.1, -0.5, gr); }
-      if (t < 1.4) { noobPose(noob, { armL: -0.15, armR: -0.15 }); noobFace(noob, 'angry'); }
-      else if (t < 3.0) { const kick = (t < 2 ? seg(t, 1.4, 1.8) : seg(t, 2.4, 2.8)); noob.rotation.z = (t < 2.2 ? 1 : -1) * Math.sin(kick * Math.PI) * 0.35; noob.position.x = 0.6 + (t < 2.2 ? 0.08 : 0.16) * seg(t, 1.4, 3.0); noobFace(noob, 'scream'); noobPose(noob, { armL: -0.9, armR: -0.7 }); }
-      else if (t < 4.2) { noob.position.y = lerpc(0, 0.25, gr); noob.rotation.z = 0; noobPose(noob, { armL: -2.0 + Math.sin(t * 18) * 0.3, armR: -1.9 - Math.sin(t * 18) * 0.3, legs: Math.sin(t * 16) * 0.5 }); noobFace(noob, 'scream'); }
-      if (t >= 4.2) {
-        if (!pulled) { pulled = true; noobFace(noob, 'dead'); }
-        const k = seg(t, 4.2, 5.8), hd = u.head; if (t > 5.5 && !hdDet) { hdDet = true; S.attach(hd); }
-        if (!hdDet) { hd.position.set(lerpc(0, -0.45, k), lerpc(1.6, 2.3, k) + Math.sin(t * 5) * 0.03, lerpc(0, 0.25, k)); hd.rotation.z = Math.sin(t * 4) * 0.2; } else { const h2 = seg(t, 5.5, 6.6); hd.position.set(lerpc(hd.position.x, -0.7, h2), lerpc(hd.position.y, 1.9, h2) + Math.sin(t * 3) * 0.03, lerpc(hd.position.z, 0.2, h2)); hd.rotation.z = Math.sin(t * 3) * 0.2; }
-        const base = u.torso.localToWorld(new V3(0, 0.35, 0)), top = hd.localToWorld(new V3(0, -0.18, 0)); S.worldToLocal(base); S.worldToLocal(top); strands.forEach((s, i) => { const o = (i - 1.5) * 0.035; strandBetween(s, base.clone().add(new V3(o, 0, 0)), top.clone().add(new V3(0, 0, o))); });
-        if (t < 6.2 && Math.random() < dt * 16) bleed(0.6, 1.5, 0.3, rand(-1, 1), 2, 0.4, 5);
-        mu.shR.rotation.x = lerpc(-1.25, -1.9, k);
-        const f = seg(t, 5.6, 6.6); noob.rotation.z = lerpc(0, -1.5, f); noob.position.y = lerpc(0.25, 0.08, f); noob.position.x = 0.7 + f * 0.25; u.armL.rotation.x = lerpc(-2, 0.2, f); u.armR.rotation.x = lerpc(-1.9, 0.2, f);
-        if (f > 0.9 && !poolM) poolM = pool(0.95, 0.2, 0.01); if (poolM) poolM.scale.setScalar(Math.min(1.1, poolM.scale.x + dt * 0.3));
+      if (t < 5.3) { cam(-0.55, 2.45, 2.0, 0.4, 1.3, 0); spotAt(0.4, 3.6, 1.6, 0.4, 1.3, 0, 30); }
+      else { cam(-1.0, 4.0, -2.9, 0.75, 1.3, -0.5); spotAt(-0.2, 4.4, -2.2, 0.9, 1.3, -0.8, 42); }
+      const f = Math.sin(t * 13);
+      if (t < 3.2) {
+        const k = seg(t, 1.0, 3.0); P.root.position.set(lerpc(0.0, 0.18, k), 0.18 + 0.05 * Math.sin(t * 6), 0.22); P.root.rotation.set(0, lerpc(0.2, -0.4, k), lerpc(0, -0.55, k));
+        pose(P, { uArmL: [-0.5, 0, 1.7], lArmL: [0, 0, 0.1], uArmR: [-1.4 + f * 0.5, 0, -0.7], lArmR: [-1.0, 0, 0], head: [0.2, -0.4 + f * 0.1, 0.2], uLegL: [-0.35 * f, 0, 0.1], uLegR: [0.35 * f, 0, -0.1], lLegL: [0.5, 0, 0], lLegR: [0.5, 0, 0], torso: [0, 0, -0.25 * k] }); P.root.scale.set(lerpc(1, 0.8, k), 1, lerpc(1, 0.7, k)); scream(P, true);
+        if (t > 1.2 && Math.random() < dt * 8) bleed(SX - 0.1, SY, 0.1, -0.5, 0.3, 1, 3);
+        gutsUpd(gutsTop, new V3(SX - 0.2, SY - 0.05, 0.12), t, seg(t, 1.6, 3.0) * 0.5);
+      } else {
+        if (!torn) { torn = true; tp = j.torso; S.attach(tp); P.root.rotation.set(0, -0.2, 0); P.root.scale.set(1, 1, 1); P.root.position.set(0.2, 0, 0.25); poolM = pool(0.25, 0.4, 0.05); }
+        // the legs stand, the guts hang between the pelvis and the slot
+        pose(P, { uLegL: [0, 0, 0.05], uLegR: [0, 0, -0.05], lLegL: [0.1, 0, 0], lLegR: [0.1, 0, 0] });
+        const pel = j.pelvis.localToWorld(new V3(0, 0.12, 0)); S.worldToLocal(pel);
+        const k = seg(t, 3.2, 4.4), k2 = seg(t, 4.4, 5.2);
+        tp.position.set(lerpc(tp.position.x, SX - 0.05, 0.2), lerpc(tp.position.y, SY - 0.35 + k2 * 0.4, 0.2), lerpc(tp.position.z, 0.15 - k2 * 1.2, 0.25)); tp.rotation.set(0, 0, 0);
+        pose({ j: { uArmL: tp.children.find ? j.uArmL : j.uArmL, uArmR: j.uArmR } }, {}); j.uArmL.rotation.set(0, 0, 1.45 - k2 * 0.4); j.uArmR.rotation.set(0, 0, -1.45 + k2 * 0.4); j.head.rotation.set(0.3, 0, Math.sin(t * 3) * 0.1);
+        if (t > 4.4) { inside = true; tp.scale.set(lerpc(1, 0.35, k2), 1, lerpc(1, 0.3, k2)); }
+        gutsUpd(gutsTop, new V3(pel.x, Math.max(pel.y + 0.5, SY - 0.1), pel.z + 0.05), t, 0.9, 0.05);
+        gutsUpd(gutsSlot, new V3(SX - 0.05, SY - 0.05, 0.1), t, 0.7 + k * 0.3);
+        if (t < 5.2 && Math.random() < dt * 12) bleed(SX, SY - 0.3, 0.2, rand(-0.6, 0.6), 0.5, 1.4, 3);
+        if (poolM) poolM.scale.setScalar(Math.min(0.9, poolM.scale.x + dt * 0.3));
+        if (t >= 5.3) { // behind the wall: the monster holds the upper half, guts dangling
+          tp.scale.set(1, 1, 1); aimArm(mon, 'R', new V3(0.95, 1.75, -0.75)); aimArm(mon, 'L', new V3(0.75, 1.3, -0.7));
+          const hand = handOf(mon, 'R'); tp.position.copy(hand).add(new V3(0, -0.15, 0)); tp.rotation.set(0.2, 0.6, Math.sin(t * 2) * 0.1);
+          const tb = tp.localToWorld(new V3(0, -0.05, 0)); S.worldToLocal(tb); gutsUpd(gutsSlot, tb, t, 1.0, 0.1);
+        }
       }
+    } };
+}
+
+/* 3: outside (18 s). Grabbed by the head, lifted, bitten in the chest, swung, a leg torn off, hung upside down,
+   an arm torn off, flipped, the pelvis torn off, the torso held up with the guts hanging, torn from the head, the head held up */
+function monsDeath3() {
+  const S = stageBegin(0x2a1e14), mon = mkMonster(0.62), mu = mon.userData;
+  for (let i = 0; i < 9; i++) { const l = new THREE.Mesh(IM_G.sph, imMat(0xffe080, true)); l.position.set(rand(-7, 7), rand(0.8, 3.2), rand(-8, -3)); l.scale.setScalar(0.06); S.add(l); }
+  const P = mkPerson(), j = P.j; P.root.position.set(0.35, 0, 0.2); P.root.rotation.y = -1.45; mon.position.set(-0.55, 0, 0.1); mon.rotation.y = 1.5; S.add(mon);
+  let legL = false, armR = false, pelv = false, tor = false, hole = null, poolM = null, T = null; const guts = gutBunch(S, 7, 0.75); guts.forEach((g) => g.m.visible = false); const sp = spine(S); sp.visible = false;
+  const HX = -0.55; // monster x
+  return { dur: 18, steps: [[0.6, () => Sound.ghostVoice(0.8)], [2.7, () => { Sound.crunch(1); Sound.splat(1); }], [5.5, () => { Sound.crunch(1); Sound.splat(1); }], [7.8, () => { Sound.crunch(1); Sound.splat(1); }], [9.9, () => { Sound.crunch(1); Sound.splat(1); }], [14.4, () => { Sound.crunch(1); Sound.splat(1); Sound.boom(); }], [16.6, () => Sound.thud(0.6)]],
+    upd(t, dt) {
+      cam(0.15, 1.75, 4.1, -0.05, 1.65, 0); spotAt(-0.4, 4.4, 2.4, -0.1, 1.3, 0, 36); piecesUpd(dt);
+      mu.hips.rotation.x = 0.06; mu.neck.rotation.x = 0.5; mu.spine.rotation.x = 0.12; mu.shL.rotation.set(-0.1, 0, -0.6); mu.elL.rotation.set(0, 0, 1.9); // the left hand on the hip, like in the video
+      const F = Math.sin(t * 15);
+      if (t < 0.6) { pose(P, { uArmL: [0, 0, 0.1], uArmR: [0, 0, -0.1] }); aimArm(mon, 'R', new V3(HX + 0.25, 0.9, 0.2)); return; }
+      if (t < 1.3) { const h = at(P, j.head, 0, 0.12, 0), k = seg(t, 0.6, 1.1); aimArm(mon, 'R', new V3(lerpc(HX + 0.3, h.x, k), lerpc(0.95, h.y, k), lerpc(0.2, h.z, k))); pose(P, { uArmL: [-1.4, 0, 0.4], lArmL: [-0.8, 0, 0], uArmR: [-1.2, 0, -0.4], lArmR: [-0.9, 0, 0], torso: [-0.2, 0, 0] }); scream(P, true); return; }
+      // lifted by the head, up next to the monster's head, kicking
+      if (t < 2.6) { const k = seg(t, 1.3, 2.2), tg = new V3(lerpc(0.2, 0.0, k), lerpc(1.75, 2.45, k), 0.18); aimArm(mon, 'R', tg); P.root.rotation.set(0, -1.45, 0); pose(P, { uArmL: [-2.2 + F * 0.4, 0, 0.5], uArmR: [-2.0 - F * 0.4, 0, -0.5], uLegL: [-0.5 * F, 0, 0], uLegR: [0.5 * F, 0, 0], lLegL: [0.6, 0, 0], lLegR: [0.6, 0, 0] }); holdBy(P, j.head, new V3(0, 0.12, 0), handOf(mon, 'R')); return; }
+      // the bite into the chest
+      if (t < 3.4) { const tg = new V3(-0.15, 2.5, 0.18); aimArm(mon, 'R', tg); mu.neck.rotation.x = 0.9 + 0.2 * Math.sin(t * 20); P.root.rotation.set(0, -1.45, 0.15); pose(P, { uArmL: [-1.0 + F * 0.3, 0, 0.6], uArmR: [-1.2 - F * 0.3, 0, -0.6] }); scream(P, true); holdBy(P, j.head, new V3(0, 0.12, 0), handOf(mon, 'R')); if (!hole) hole = wound(j.torso, 0, 0.25, 0.13, 0.15); if (Math.random() < dt * 14) { const c = at(P, j.torso, 0, 0.25, 0.13); bleed(c.x, c.y, c.z, rand(-1, 1), 0.5, 1, 4); } return; }
+      // swung by the leg, horizontal
+      if (t < 5.5) { const sw = Math.sin((t - 3.4) * 3); aimArm(mon, 'R', new V3(0.05 + sw * 0.15, 1.85 + sw * 0.15, 0.2)); P.root.rotation.set(0, -1.45, Math.PI / 2 + 0.2 + sw * 0.25); pose(P, { uArmL: [0, 0, 1.3 + sw * 0.3], uArmR: [0, 0, -1.3 - sw * 0.3], head: [0, 0, 0.3] }); scream(P, false); holdBy(P, j.lLegL, new V3(0, -0.4, 0), handOf(mon, 'R')); return; }
+      if (!legL) { legL = true; const c = at(P, j.pelvis); rip(j.uLegR, 1.6, 2.2, 1.4); bleed(c.x, c.y, c.z, 0, 1, 1, 14); poolM = pool(0.25, 0.3, 0.05); }
+      // hung upside down by the leg, blood dripping; then the right arm is torn off
+      if (t < 8.4) { aimArm(mon, 'R', new V3(0.1, 2.25, 0.2)); P.root.rotation.set(0, -1.45 + Math.sin(t) * 0.2, Math.PI); pose(P, { uArmL: [0, 0, 0.3 + Math.sin(t * 2) * 0.15], uArmR: [0, 0, -0.3 - Math.sin(t * 2) * 0.15] }); holdBy(P, j.lLegL, new V3(0, -0.4, 0), handOf(mon, 'R'));
+        if (Math.random() < dt * 9) { const c = at(P, j.pelvis); bleed(c.x, c.y, c.z, 0, -1, 0, 2); }
+        if (t > 7.4 && t < 7.8) { const a = at(P, j.uArmR); aimArm(mon, 'L', a); }
+        if (t > 7.8 && !armR) { armR = true; const c = at(P, j.uArmR); rip(j.uArmR, 1.2, 2.5, 1.8); bleed(c.x, c.y, c.z, 1, 0.5, 1, 12); }
+        if (poolM) poolM.scale.setScalar(Math.min(1.1, poolM.scale.x + dt * 0.15)); return; }
+      // flipped and held by the head; the pelvis with the last leg is torn off; the guts hang
+      if (t < 14.4) { aimArm(mon, 'R', new V3(0.1, lerpc(2.25, 2.45, seg(t, 8.4, 9.2)), 0.2)); P.root.rotation.set(0, -1.4, Math.sin(t * 1.5) * 0.08); pose(P, { uArmL: [0, 0, 0.2], head: [0.2, 0, 0] }); holdBy(P, j.head, new V3(0, 0.12, 0), handOf(mon, 'R'));
+        if (t > 9.4 && t < 9.9) aimArm(mon, 'L', at(P, j.pelvis));
+        if (t > 9.9 && !pelv) { pelv = true; T = j.torso; S.attach(T); const c = at(P, T); rip(j.pelvis, 0.8, 1.5, 1.5); bleed(c.x, c.y, c.z, 0, -0.5, 1, 18); guts.forEach((g) => g.m.visible = true); }
+        if (T) { T.updateMatrixWorld(true); const hw = at(P, j.head, 0, 0.12, 0); T.position.add(handOf(mon, 'R').sub(hw)); T.rotation.set(0, -1.4, Math.sin(t * 1.5) * 0.08); const bot = at(P, T, 0, 0.0, 0); gutsUpd(guts, bot, t, seg(t, 9.9, 11), 0.05); if (Math.random() < dt * 6) bleed(bot.x, bot.y, bot.z, 0, -1, 0, 2); }
+        return; }
+      // the torso is torn from the head with a burst; the head is held up with the spine hanging
+      if (!tor) { tor = true; S.attach(j.head); rip(T, 1.0, 1.0, 1.4, 3); guts.forEach((g) => g.m.visible = false); sp.visible = true; const c = j.head.position; bleed(c.x, c.y, c.z, 0, -1, 1, 22); bleed(c.x, c.y, c.z, -1, 1, 0.5, 12); }
+      const up = seg(t, 14.6, 15.6), down = seg(t, 16.6, 17.6); aimArm(mon, 'R', new V3(lerpc(0.1, -0.1, up), lerpc(2.3, 2.75, up) - down * 1.2, lerpc(0.2, 0.3, down)));
+      const H = j.head; H.position.copy(handOf(mon, 'R')).add(new V3(0, -0.08, 0)); H.rotation.set(0, -1.4, Math.sin(t * 2) * 0.08); sp.position.copy(H.position).add(new V3(0, -0.12, 0)); sp.rotation.set(0, 0, Math.sin(t * 2) * 0.1);
+      if (down > 0.95 && !P.dropped) { P.dropped = true; rip(H, 0.5, 0.3, 0.6); rip(sp, 0.5, 0.3, 0.6); }
+    } };
+}
+
+/* 4: inside (7.6 s). A punch to the face, the hand in the chest, the arm torn off and thrown away, a step back,
+   the head grabbed, the second lunge tears the top of the head off, the body sinks to its knees */
+function monsDeath4() {
+  const S = stageBegin(0x2a2018), mon = mkMonster(0.62), mu = mon.userData;
+  const back = new THREE.Mesh(IM_G.box, std({ color: 0x2e241c, roughness: 0.95 })); back.position.set(0, 1.6, -1.4); back.scale.set(9, 3.2, 0.2); S.add(back);
+  for (let i = -3; i <= 3; i++) { const p = new THREE.Mesh(IM_G.box, std({ color: 0x241a14, roughness: 0.95 })); p.position.set(i * 1.1, 1.6, -1.29); p.scale.set(0.05, 3.2, 0.02); S.add(p); }
+  const P = mkPerson(), j = P.j; P.root.position.set(0.4, 0, 0.0); P.root.rotation.y = -1.3; mon.position.set(-0.7, 0, -0.05); mon.rotation.y = 1.5; S.add(mon);
+  let armOff = false, top = false, poolM = null; const MX = -0.7;
+  return { dur: 7.8, steps: [[0.2, () => { Sound.thud(0.9); Sound.crunch(0.4); }], [1.6, () => { Sound.crunch(1); Sound.splat(1); }], [5.4, () => { Sound.crunch(1); Sound.splat(1); }], [6.6, () => Sound.thud(0.7)]],
+    upd(t, dt) {
+      cam(0.2, 1.4, 2.9, -0.1, 1.3, 0); spotAt(0.2, 3.4, 2.4, 0, 1.2, 0, 32); piecesUpd(dt); mu.neck.rotation.x = 0.5;
+      const lean = (a, b) => Math.sin(seg(t, a, b) * Math.PI);
+      mon.position.x = MX + 0.22 * lean(0, 0.7) + 0.3 * lean(3.2, 4.6) + 0.35 * lean(5.0, 6.1) - 0.2 * seg(t, 6.2, 7.4); mu.spine.rotation.x = 0.15 + 0.35 * lean(3.2, 4.6) + 0.4 * lean(5.0, 6.1);
+      mu.legL.rotation.x = -0.3 * lean(3.2, 4.6) - 0.3 * lean(5.0, 6.1); mu.kneeL.rotation.x = 0.4 * lean(3.2, 4.6); mu.legR.rotation.x = 0.25 * lean(0, 0.7);
+      const face = at(P, j.head, 0, 0.05, 0.1), chest = at(P, j.torso, 0, 0.25, 0.1), shL = at(P, j.uArmL, 0, -0.05, 0);
+      // the monster's right hand: punch -> chest -> the arm -> back -> the head -> the top of the head
+      if (t < 0.7) aimArm(mon, 'R', face.clone().lerp(new V3(MX + 0.3, 1.0, 0.2), 1 - Math.sin(seg(t, 0, 0.7) * Math.PI)));
+      else if (t < 1.6) aimArm(mon, 'R', chest.clone().lerp(shL, seg(t, 1.0, 1.5)));
+      else if (t < 2.4) aimArm(mon, 'R', new V3(lerpc(shL.x, MX - 0.1, seg(t, 1.6, 2.2)), lerpc(shL.y, 1.7, seg(t, 1.6, 2.2)), 0.35));
+      else if (t < 3.2) aimArm(mon, 'R', new V3(MX + 0.2, lerpc(1.6, 1.0, seg(t, 2.4, 3.0)), 0.25));
+      else if (t < 5.4) aimArm(mon, 'R', face.clone().add(new V3(0, 0.1, 0)));
+      else aimArm(mon, 'R', new V3(lerpc(face.x, MX + 0.1, seg(t, 5.4, 6.0)), lerpc(face.y + 0.15, 2.2, seg(t, 5.4, 6.0)), 0.2));
+      if (t > 3.3 && t < 5.4) aimArm(mon, 'L', face.clone().add(new V3(-0.05, 0.05, 0.1))); else if (t < 5.4) { mu.shL.rotation.set(-0.2, 0, 0.1); mu.elL.rotation.set(-0.2, 0, 0); } else aimArm(mon, 'L', new V3(MX + 0.3, 1.0 + seg(t, 5.4, 6.0) * 0.6, 0.3));
+      // the victim
+      if (t < 0.7) { const k = seg(t, 0.15, 0.35); pose(P, { head: [-0.35 * k, 0.2 * k, 0], uArmL: [-1.6 * k, 0, 0.3], lArmL: [-1.3 * k, 0, 0], uArmR: [-1.4 * k, 0, -0.3], lArmR: [-1.4 * k, 0, 0], torso: [-0.15 * k, 0, 0] }); scream(P, true); }
+      else if (t < 1.6) pose(P, { uArmL: [-1.0, 0, 0.6], lArmL: [-0.6, 0, 0], uArmR: [-0.8, 0, -0.2], lArmR: [-1.2, 0, 0], head: [0.05, 0, 0] });
+      if (t >= 1.6 && !armOff) { armOff = true; const c = at(P, j.uArmL); S.attach(j.uArmL); P.held = j.uArmL; bleed(c.x, c.y, c.z, -1, 0.5, 0.5, 14); wound(j.torso, 0.24, 0.4, 0, 0.1); }
+      if (P.held) { if (t < 2.3) { P.held.position.copy(handOf(mon, 'R')); P.held.rotation.set(0.3, 0, 2.6); } else { rip(P.held, -2.6, 0.6, 0.8, 5); P.held = null; } }
+      if (t >= 1.6 && t < 5.4) { const k = Math.sin(t * 3); pose(P, { uArmR: [-0.9 - 0.3 * k, 0, -0.3], lArmR: [-0.9, 0, 0], head: [0.1, 0.1 * k, 0], torso: [0.05, 0, 0] }); scream(P, t > 3.3); if (Math.random() < dt * 5) { const c = at(P, j.torso, 0.24, 0.4, 0); bleed(c.x, c.y, c.z, 0, -0.5, 0.3, 2); } if (t > 4 && Math.random() < dt * 4) bleed(face.x, face.y + 0.1, face.z, 0, 0.2, 0.2, 2); }
+      if (t >= 5.4 && !top) { top = true; const H = j.head; wound(H, 0, 0.12, 0, 0.13); const cap = new THREE.Mesh(IM_G.sph, std({ color: 0x3a2618, roughness: 0.8 })); cap.scale.set(0.15, 0.06, 0.15); cap.position.copy(at(P, H, 0, 0.15, 0)); S.add(cap); P.cap = cap; H.traverse((o) => { if (o.userData && o.userData.hair) o.visible = false; }); const c = cap.position; bleed(c.x, c.y, c.z, 0, 1.5, 0.3, 18); poolM = pool(0.45, 0.15, 0.05); }
+      if (P.cap) { if (t < 6.1) P.cap.position.copy(handOf(mon, 'R')); else if (!P.capDrop) { P.capDrop = true; rip(P.cap, -1.2, 0.3, 0.4); } }
+      if (t >= 5.4) { const k = seg(t, 6.0, 6.9), k2 = seg(t, 6.9, 7.6); pose(P, { uLegL: [-1.5 * k, 0, 0.05], lLegL: [2.2 * k, 0, 0], uLegR: [-1.5 * k, 0, -0.05], lLegR: [2.2 * k, 0, 0], uArmR: [lerpc(-0.9, 0.2, k), 0, -0.3], torso: [0.35 * k + 0.4 * k2, 0, 0], head: [0.4 * k + 0.3 * k2, 0, 0.1] }); j.pelvis.position.y = lerpc(P.pelY ?? (P.pelY = j.pelvis.position.y), P.pelY * 0.55, k); scream(P, false); if (Math.random() < dt * 10 && t < 6.6) { const c = at(P, j.head, 0, 0.12, 0); bleed(c.x, c.y, c.z, rand(-0.5, 0.5), 1.2, 0.3, 3); } if (poolM) poolM.scale.setScalar(Math.min(0.8, poolM.scale.x + dt * 0.2)); }
     } };
 }
 const MONS_DEATHS = { window: monsDeath1, door: monsDeath2, out: monsDeath3, inside: monsDeath4 };
@@ -17432,7 +17517,7 @@ function monsStart(players) {
   Object.assign(MONS, { on: false, players, bots: [], monsters: [], wave: 0, evT: 15, t: 0, hide: null, alert: null, ev: null, dead: false, win: false, stare: 0, inside: null, scared: 0, hudT: 0, act: null, over: false });
   monsDoorSet(true, true); for (const s of MONS.spots) s.occ = null;
   const names = IDEA_NAMES.slice().sort(() => Math.random() - 0.5);
-  for (let i = 0; i < players - 1; i++) { const n = mkNpc('noob', -4.8 + (i % 3) * 0.6, -1.5 + Math.floor(i / 3) * 0.9, Math.PI, 'human'); n.scripted = true; ideaTag(n, names[i]); MONS.bots.push({ n, name: names[i], dead: false, hid: null, spot: null, role: null, wp: null, t: rand(0, 3), hidT: 0, i }); }
+  for (let i = 0; i < players - 1; i++) { const n = mkNpc(undefined, -4.8 + (i % 3) * 0.6, -1.5 + Math.floor(i / 3) * 0.9, Math.PI, 'human'); n.scripted = true; ideaTag(n, names[i]); MONS.bots.push({ n, name: names[i], dead: false, hid: null, spot: null, role: null, wp: null, t: rand(0, 3), hidT: 0, i }); }
   monsIntro();
 }
 function monsIntro() {
