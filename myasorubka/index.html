@@ -488,6 +488,8 @@ body.touch #wAmmo{font-size:26px}
       <button class="btn" data-spawn="x-timemachine">Машина времени<small></small></button>
       <button class="btn" data-spawn="huggy" id="spHuggy" style="display:none">Хаги Ваги<small>Монстр, идёт за вами</small></button>
       <button class="btn" data-spawn="melodie">Мелоди<small>Соведущая, розовые волосы и бант</small></button>
+      <button class="btn" data-spawn="bottle" id="spBottle" style="display:none">Бутылочный человечек<small>Мод из мастерской</small></button>
+      <button class="btn" data-spawn="blockhead" id="spBlock" style="display:none">Блочный герой<small>Мод из мастерской</small></button>
       <button class="btn" data-spawn="x-svity-street">Свити · Уличная<small id="xs1"></small></button>
       <button class="btn" data-spawn="x-svity-cop">Свити · Полицейская<small id="xs2"></small></button>
       <button class="btn" data-spawn="x-svity-gala">Свити · Вечерняя<small id="xs3"></small></button>
@@ -8410,7 +8412,7 @@ function resume() { $('cine').classList.remove('on'); if (Music.on && Music.scen
 function pauseGame() { if (state !== 'play') return; document.body.classList.remove('playing'); state = 'pause'; W.fireHeld = false; $('menu').hidden = false; $('resumeBtn').hidden = false; $('hud').hidden = true; $('touch').hidden = true; if (document.pointerLockElement) document.exitPointerLock(); }
 function exclNeed(k) { if (k === 'gitler' || k === 'german' || k === 'timemachine') return ['ww2']; const e = EXCL.find((x) => x[0] === k); return e ? e[3] : k === 'producer' ? ['pawn'] : ['good', 'bad']; }
 function syncExclSpawn() { const u = getUn(); document.querySelectorAll('[data-spawn^="x-"]').forEach((b) => { const k = b.dataset.spawn.slice(2), need = exclNeed(k), ok = need.every((q) => u[q]), sm2 = b.querySelector('small'); if (sm2) sm2.textContent = ok ? (k === 'gagarin' ? 'Бессмертен: пуля, нож и взрыв включают свои кат-сцены' : 'Эксклюзив') : '🔒 ' + need.map((q) => UNL_TXT[q]).join(' + '); b.style.opacity = ok ? '' : '.55'; }); }
-function openSpawn() { syncExclSpawn(); state = 'spawn'; W.fireHeld = false; $('spawn').hidden = false; $('touch').hidden = true; if (document.pointerLockElement) document.exitPointerLock(); }
+function openSpawn() { if (typeof modsUi === 'function') modsUi(); syncExclSpawn(); state = 'spawn'; W.fireHeld = false; $('spawn').hidden = false; $('touch').hidden = true; if (document.pointerLockElement) document.exitPointerLock(); }
 function closeSpawn() { $('spawn').hidden = true; resume(); }
 $('playSandbox').onclick = () => { lockFromClick = true; tryLandscape(); startGame('sandbox'); };
 $('playWaves').onclick = () => { lockFromClick = true; tryLandscape(); startGame('waves'); };
@@ -17056,6 +17058,7 @@ function startCh2(cp) {
 }
 function modsUi() {
   const M = getMods(), on = !!M.huggy, c = document.getElementById('chipFactory'), b = document.getElementById('spHuggy'); if (c) c.style.display = on ? '' : 'none'; if (b) b.style.display = on ? '' : 'none';
+  for (const id of ['bottle', 'blockhead']) { const e = document.getElementById(id === 'bottle' ? 'spBottle' : 'spBlock'); if (e) e.style.display = M[id] ? '' : 'none'; }
   { const dc = document.getElementById('chipDacha'); if (dc) dc.style.display = M.dacha ? '' : 'none'; if (!M.dacha && settings.map === 'dacha') { settings.map = 'polygon'; saveSettings(); syncChips(); } }
   if (!on && settings.map === 'factory') { settings.map = 'polygon'; saveSettings(); if (state === 'menu' && mapId === 'factory') { loadMap('polygon'); populateSandbox(); placePills(); } syncChips(); }
 }
