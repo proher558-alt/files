@@ -7968,6 +7968,7 @@ function admItems(tab) {
   return [
     { sec: 'Читы' },
     { l: 'Секретная глава: Чистая любовь' + (secretLoveSeen() ? ' · открыта' : ''), s: 'Свити я люблю тебя. Без выстрелов', f: () => { admClose(); if (state !== 'play') { toast('Сначала войдите в игру'); return; } if (!ideaSecretLove()) toast('Сейчас нельзя: дождитесь окончания катсцены'); } },
+    { l: 'Призвать дрон (карта «Дача»)', s: 'Дрон прилетает и бросает бомбу в вас. Нужна карта «Дача»', f: () => { admClose(); if (mapId !== 'dacha' || state !== 'play') { toast('Откройте карту «Дача» (установите мод в мастерской)'); return; } dachaSpawnDrone(true); banner('ДРОН ПРИЗВАН', 'через админ-панель'); } },
     { l: 'Удача 100: ' + on(settings.luck), s: 'Мелкие шансы 100%: копьё, приступ, Микушка, пилы. В «Выживи свои идеи» — 90% за вами', on: !!settings.luck, f: () => { settings.luck = !settings.luck; saveSettings(); admRender(); } },
     { l: 'Бессмертие: ' + on(settings.god), s: 'Урон по вам не проходит', on: !!settings.god, f: () => { settings.god = !settings.god; saveSettings(); admRender(); } },
     { l: 'Патроны: ' + on(settings.ammo), s: 'Магазин не пустеет', on: !!settings.ammo, f: () => { settings.ammo = !settings.ammo; saveSettings(); admRender(); } },
@@ -13099,7 +13100,7 @@ function addBlockCatExtras(n) {
   blk('torso', 0x4a7fb0, 1.05); blk('pelvis', 0xb8b8b8, 1.06); for (const s of ['L', 'R']) { blk('uArm' + s, 0xf4f4f4, 1.2); blk('lArm' + s, 0xf4f4f4, 1.2); blk('uLeg' + s, 0xb8b8b8, 1.12); blk('lLeg' + s, 0xf4f4f4, 1.12); }
 }
 MAPS.dacha = { name: 'Дача', desc: 'Большая дача: дом с комнатами, баня, теплица, гараж с машиной, сад, пруд и подвал. Волны дронов с сиреной.', story: true, hx: 40, hz: 40, h: 14, spawn: [0, 30, 0], fog: 0xbcd6e8, fogD: 0.007, bg: 0x9fc4e0, sun: 1.6, hemi: 0.95, lamp: [0xffe6b0, 22, 45], lamps: [[-14, 6, -14], [14, 6, -14], [-14, 6, 14], [14, 6, 14]], red: [[0, 8, 0], 0xff9a5a, 1], build: buildDacha, npcs: { human: 6, zombie: 0, soldier: 0 }, props: [], pills: [] };
-const DACHA = { on: false, next: 30, wave: 0, siren: 0, sirT: 0, drones: [], bombs: [], rings: [], walls: [], hatch: null, shel: null, hudT: 0, fireT: 0, mangal: null, lost: 0 };
+const DACHA = { on: false, next: 30, wave: 0, siren: 0, sirT: 0, drones: [], bombs: [], rings: [], walls: [], hatch: null, shel: null, hudT: 0, fireT: 0, mangal: null, lost: 0, radar: null, dish: null, radCd: 0 };
 /* breakable building pieces: each remembers where it stands so a blast can remove it */
 function dBox(x, z, sx, sy, sz, col, o = {}) {
   const rec = { bodies: [], obs: [], meshes: [], r: o.r || 4.4 }, y0 = o.y0 || 0, m = new THREE.Mesh(IM_G.box, o.e ? imMat(col, true) : std({ color: col, roughness: 0.8 })); m.position.set(x, y0 + sy / 2, z); m.scale.set(sx, sy, sz); m.castShadow = m.receiveShadow = !o.e; addMesh(m); rec.meshes.push(m);
@@ -13111,7 +13112,7 @@ function dDeco(key, x, z, rot = 0, sc = 1, solid = true, r = 3) {
 }
 function dStatic(geo, col, x, y, z, sx, sy, sz, o = {}) { const m = new THREE.Mesh(IM_G[geo], imMat(col, o.e)); m.position.set(x, y, z); m.scale.set(sx, sy, sz); if (o.ry) m.rotation.y = o.ry; addMesh(m); return m; }
 function buildDacha() {
-  Object.assign(DACHA, { drones: [], bombs: [], rings: [], walls: [], next: 30, wave: 0, siren: 0, hatch: null, shel: null, mangal: null, lost: 0 }); VEH.arena = { half: HX - 1 };
+  Object.assign(DACHA, { drones: [], bombs: [], rings: [], walls: [], next: 30, wave: 0, siren: 0, hatch: null, shel: null, mangal: null, lost: 0, radar: null, dish: null, radCd: 0 }); VEH.arena = { half: HX - 1 };
   floorMesh(std({ color: 0x5a9a3a, roughness: 0.95 }), HX * 2, HZ * 2);
   // dirt path from the gate to the house, flower strips
   for (let i = 0; i < 13; i++) dStatic('box', 0xb8a884, 0, 0.02, 38 - i * 2.1, 2.2, 0.04, 1.8); for (let i = 0; i < 14; i++) for (const s of [-1, 1]) dStatic('sph', pick([0xff7aa8, 0xffd060, 0xffffff, 0xc080ff]), s * 1.9, 0.18, 38 - i * 1.95, 0.35, 0.35, 0.35);
@@ -13153,6 +13154,10 @@ function buildDacha() {
   // the cellar: a hatch in the garden and a sealed shelter in the far corner
   DACHA.hatch = new V3(-8, 0, 4); dStatic('box', 0x5a3a1a, -8, 0.06, 4, 1.8, 0.12, 1.8); dStatic('box', 0xd8b050, -8, 0.14, 4, 0.5, 0.06, 0.12); ideaLabel('⬇ ПОГРЕБ', -8, 2.2, 4, 2.4);
   const SX = 32, SZ = -32; DACHA.shel = new V3(SX, 0, SZ); for (const [dx, dz, w, d] of [[0, -3.3, 7, 0.6], [0, 3.3, 7, 0.6], [-3.3, 0, 0.6, 6.6], [3.3, 0, 0.6, 6.6]]) { const m = new THREE.Mesh(IM_G.box, std({ color: 0x5a5a62, roughness: 0.9 })); m.position.set(SX + dx, 1.5, SZ + dz); m.scale.set(w, 3, d); addMesh(m); solid(SX + dx, 1.5, SZ + dz, w, 3, d); } dStatic('box', 0x4a4a52, SX, 3.15, SZ, 7.6, 0.3, 7.6); dStatic('box', 0x7a6a58, SX, 0.04, SZ, 6.6, 0.08, 6.6); dStatic('sph', 0xffe8b0, SX, 2.7, SZ, 0.4, 0.4, 0.4, { e: true }); dDeco('books', SX - 2, SZ - 2, 0, 1.4, false, 2); dDeco('cup', SX + 2, SZ - 2, 0, 1.4, false, 2); ideaLabel('УБЕЖИЩЕ', SX, 4.4, SZ, 2.6);
+  // the military radar truck: an olive truck with a spinning radar dish; press the radar to call a drone
+  { const TX = 32, TZ = -4, OL = 0x4a5a3a, DK = 0x2a3220; dBox(TX, TZ, 6.4, 1.1, 2.6, OL, { y0: 0.7, r: 3.5 }); dBox(TX + 2.6, TZ, 1.9, 1.5, 2.5, OL, { y0: 0.7, r: 3 }); dBox(TX + 3.56, TZ, 0.06, 0.7, 2.0, 0x7ad0ff, { y0: 1.5, e: true, solid: false, r: 2 }); dBox(TX - 0.6, TZ, 4.4, 1.6, 2.4, DK, { y0: 1.8, r: 3 }); dBox(TX - 0.6, TZ, 4.6, 0.12, 2.6, 0x3a4a2a, { y0: 3.4, solid: false, r: 3 });
+    for (const [wx, wz] of [[-2, -1.4], [-2, 1.4], [0.6, -1.4], [0.6, 1.4], [3, -1.3], [3, 1.3]]) { const w = new THREE.Mesh(IM_G.cyl, imMat(0x1a1a1e)); w.rotation.x = PI2; w.scale.set(1.1, 0.5, 1.1); w.position.set(TX + wx, 0.55, TZ + wz); addMesh(w); }
+    const dish = new THREE.Group(); dish.position.set(TX - 0.6, 3.5, TZ); const mast = new THREE.Mesh(IM_G.cyl, imMat(0x6a6a72)); mast.scale.set(0.2, 1.1, 0.2); mast.position.y = 0.55; dish.add(mast); const pl = new THREE.Mesh(IM_G.box, imMat(0x8a8a92)); pl.scale.set(0.15, 1.4, 2.6); pl.position.set(0, 1.5, 0); dish.add(pl); const bm = new THREE.Mesh(IM_G.box, imMat(0xff3030, true)); bm.scale.set(0.12, 0.12, 0.12); bm.position.set(0, 2.3, 0); dish.add(bm); addMesh(dish); DACHA.dish = dish; DACHA.radar = new V3(TX - 0.6, 0, TZ + 3.2); ideaLabel('📡 РАДАР', TX - 0.6, 5.8, TZ, 2.6); }
   // trees along the edge, lamp posts
   for (let i = 0; i < 30; i++) { const a = i / 30 * 6.283, R = 36 + (i % 3), x = Math.cos(a) * R, z = Math.sin(a) * R; if (z > 34 && Math.abs(x) < 6) continue; dBox(x, z, 0.5, 3.4, 0.5, 0x6a4a2a, { r: 2.2 }); const c = new THREE.Mesh(IM_G.sph, std({ color: pick([0x3a8a3a, 0x4a9a3a, 0x2a7a3a]), roughness: 0.9 })); c.position.set(x, 4.6, z); c.scale.set(3.6, 3.2, 3.6); addMesh(c); }
   for (const [x, z] of [[-10, 30], [10, 30], [-14, -2], [14, -22]]) { dStatic('cyl', 0x4a4a52, x, 2.2, z, 0.18, 4.4, 0.18); dStatic('sph', 0xfff0c0, x, 4.5, z, 0.5, 0.5, 0.5, { e: true }); }
@@ -13188,10 +13193,27 @@ function dachaBtn() {
   b.onclick = () => { const inside = Math.hypot(player.pos.x - DACHA.shel.x, player.pos.z - DACHA.shel.z) < 4; if (inside) { player.pos.set(DACHA.hatch.x + 1.8, 0, DACHA.hatch.z); toast('Вы вышли из убежища'); } else { player.pos.set(DACHA.shel.x, 0, DACHA.shel.z + 1.5); toast('Вы в убежище: взрывы вас не заденут'); } player.vel.set(0, 0, 0); Sound.click(700, 0.3); };
   document.body.appendChild(b); return b;
 }
+function dachaRadarUi() {
+  let d = document.getElementById('dachaRadar'); if (d) return d;
+  d = document.createElement('div'); d.id = 'dachaRadar'; d.style.cssText = 'position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(24% + env(safe-area-inset-bottom,0px));z-index:49;display:none;width:150px;text-align:center;font-family:var(--ui);pointer-events:auto;background:rgba(6,18,10,.86);border:2px solid #3aff7a;border-radius:12px;padding:6px;box-shadow:0 0 16px rgba(58,255,122,.4)';
+  d.innerHTML = '<div style="font:900 11px var(--ui);color:#7aff9a;letter-spacing:.14em">📡 РАДАР</div><canvas id="dachaRadarC" width="138" height="138" style="width:138px;height:138px"></canvas><button class="btn primary" id="dachaCall" style="width:100%;margin:4px 0 0;padding:7px 4px;font:900 12px var(--ui)">📡 ВЫЗВАТЬ ДРОН</button><small id="dachaRadarT" style="color:#9affb4;font-size:10px"></small>';
+  document.body.appendChild(d); d.querySelectorAll('button').forEach((el) => ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => el.addEventListener(e, (ev) => ev.stopPropagation())));
+  d.querySelector('#dachaCall').onclick = () => { if (DACHA.radCd > 0) return; DACHA.radCd = 12; dachaSpawnDrone(true); banner('ДРОН ВЫЗВАН', 'радар навёл его на вас'); Sound.zap(0.5); };
+  return d;
+}
+function dachaRadarDraw(t) {
+  const c = document.getElementById('dachaRadarC'); if (!c) return; const g = c.getContext('2d'), W = 138, R = 66, O = DACHA.radar, RANGE = 70;
+  g.clearRect(0, 0, W, W); g.fillStyle = '#04140a'; g.beginPath(); g.arc(69, 69, R, 0, 6.283); g.fill(); g.strokeStyle = '#1f7a40'; g.lineWidth = 1; for (const k of [0.33, 0.66, 1]) { g.beginPath(); g.arc(69, 69, R * k, 0, 6.283); g.stroke(); } g.beginPath(); g.moveTo(3, 69); g.lineTo(135, 69); g.moveTo(69, 3); g.lineTo(69, 135); g.stroke();
+  const a = (t * 2) % 6.283; g.strokeStyle = 'rgba(90,255,140,.8)'; g.lineWidth = 2; g.beginPath(); g.moveTo(69, 69); g.lineTo(69 + Math.cos(a) * R, 69 + Math.sin(a) * R); g.stroke();
+  const dot = (x, z, col, r) => { let dx = (x - O.x) / RANGE * R, dz = (z - O.z) / RANGE * R; const m = Math.hypot(dx, dz); if (m > R - 3) { dx *= (R - 3) / m; dz *= (R - 3) / m; } g.fillStyle = col; g.beginPath(); g.arc(69 + dx, 69 + dz, r, 0, 6.283); g.fill(); };
+  dot(player.pos.x, player.pos.z, '#4ad8ff', 3); for (const D of DACHA.drones) dot(D.m.position.x, D.m.position.z, (Math.floor(t * 4) % 2) ? '#ff3030' : '#ff9a9a', 4); for (const B of DACHA.bombs) dot(B.x, B.z, '#ffd040', 3);
+}
 function updDacha(dt) {
-  if (mapId !== 'dacha') { if (DACHA.on) { DACHA.on = false; DACHA.drones = []; DACHA.bombs = []; DACHA.rings = []; const h = document.getElementById('dachaHud'), b = document.getElementById('dachaShelter'); if (h) h.style.display = 'none'; if (b) b.style.display = 'none'; } return; }
+  if (mapId !== 'dacha') { if (DACHA.on) { DACHA.on = false; DACHA.drones = []; DACHA.bombs = []; DACHA.rings = []; const h = document.getElementById('dachaHud'), b = document.getElementById('dachaShelter'); if (h) h.style.display = 'none'; if (b) b.style.display = 'none'; const rr = document.getElementById('dachaRadar'); if (rr) rr.style.display = 'none'; } return; }
   if (!DACHA.on) { DACHA.on = true; DACHA.next = 30; }
   const play = state === 'play'; dachaUi().style.display = play ? 'block' : 'none';
+  if (DACHA.dish) DACHA.dish.rotation.y += dt * 1.6; DACHA.radCd = Math.max(0, DACHA.radCd - dt);
+  { const rp = dachaRadarUi(), R0 = DACHA.radar, near = play && !player.dead && R0 && Math.hypot(player.pos.x - R0.x, player.pos.z - R0.z) < 9; rp.style.display = near ? 'block' : 'none'; if (near) { dachaRadarDraw(performance.now() / 1000); const bt = rp.querySelector('#dachaCall'); bt.disabled = DACHA.radCd > 0; rp.querySelector('#dachaRadarT').textContent = DACHA.radCd > 0 ? 'перезарядка ' + Math.ceil(DACHA.radCd) + ' с' : 'дронов в небе: ' + DACHA.drones.length; } }
   if (!play) { dachaBtn().style.display = 'none'; return; }
   if (DACHA.siren > 0) { DACHA.siren -= dt; DACHA.sirT -= dt; if (DACHA.sirT <= 0) { DACHA.sirT = 0.5; Sound.click(Math.round(DACHA.siren * 2) % 2 ? 620 : 880, 0.3); } if (DACHA.siren <= 0) { const w = DACHA.wave, cnt = w % 6 === 5 ? 3 : w % 3 === 2 ? 2 : 1; for (let i = 0; i < cnt; i++) dachaSpawnDrone(i === 0 && Math.random() < 0.6); DACHA.wave++; banner('ДРОНЫ НАД ДАЧЕЙ', cnt > 1 ? 'их несколько: ищите укрытие' : 'бомба через несколько секунд'); Sound.whoosh(); } }
   else { DACHA.next -= dt; if (DACHA.next <= 0 && !DACHA.drones.length && !DACHA.bombs.length) { DACHA.next = 30; DACHA.siren = 5; DACHA.sirT = 0; banner('ВОЗДУШНАЯ ТРЕВОГА', 'через 5 секунд прилетят дроны · погреб у забора'); for (const n of npcs) if (n.alive) n.panic = 8; } }
