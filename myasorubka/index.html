@@ -16573,7 +16573,7 @@ function ideaPropsUpd(dt) {
   }
 }
 /* ===== characters of the game, statues, free spots ===== */
-const IDEA_CHARS = [['ник52', 'blockhead', 'Ник52'], ['nik52', 'blockhead', 'Ник52'], ['воскрес', 'gagarin', 'Воскреситель'], ['мелоди', 'melodie', 'Мелоди'], ['свити', 'svity-street', 'Свити'], ['продюсер', 'producer', 'Продюсер'], ['сириус', 'sirius', 'Сириус'], ['счетовод', 'ledger', 'Счетовод'], ['взыскател', 'collector', 'Взыскатель'], ['хаги', 'huggy', 'Хаги Ваги'], ['хагги', 'huggy', 'Хаги Ваги']];
+const IDEA_CHARS = [['ник52', 'blockhead', 'Ник52'], ['nik52', 'blockhead', 'Ник52'], ['свити невест', 'svity-bride', 'Свити (невеста)'], ['свити полиц', 'svity-cop', 'Свити (полиция)'], ['бсон', 'bson', 'Бсон'], ['воскрес', 'gagarin', 'Воскреситель'], ['мелоди', 'melodie', 'Мелоди'], ['свити', 'svity-street', 'Свити'], ['продюсер', 'producer', 'Продюсер'], ['сириус', 'sirius', 'Сириус'], ['счетовод', 'ledger', 'Счетовод'], ['взыскател', 'collector', 'Взыскатель'], ['хаги', 'huggy', 'Хаги Ваги'], ['хагги', 'huggy', 'Хаги Ваги']];
 const IDEA_STAT_MODEL = { 'кот': 'cat', 'кошк': 'cat', 'собак': 'dog', 'медвед': 'bear', 'тигр': 'tiger', 'акул': 'shark', 'динозавр': 'dino', 'пингвин': 'penguin', 'дракон': 'dino', 'паук': 'spider' };
 function ideaFreeSpot(r) {
   for (let k = 0; k < 50; k++) {
@@ -16832,7 +16832,7 @@ function ideaCrowd(x, z, R, count) {
   const cx = clamp(x, -HX + R + 1, HX - R - 1), cz = clamp(z, -HZ + R + 1, HZ - R - 1);
   for (let i = 0; i < count; i++) {
     const a = i / count * 6.283 + rand(-0.1, 0.1), px = cx + Math.cos(a) * R * rand(0.7, 1), pz = cz + Math.sin(a) * R * rand(0.7, 1);
-    const n = spawnNPC('human', px, pz, Math.atan2(cx - px, cz - pz)); if (!n) continue;
+    const n = mkNpc(undefined, px, pz, Math.atan2(cx - px, cz - pz), 'human'); if (!n) continue;
     n.scripted = true; n.speed = 0; n.pose = pick(['tada', 'dance', 'laugh', 'hunch']); n.poseDur = Infinity; n.poseT = 0;
   }
 }
@@ -16866,20 +16866,28 @@ function ideaWorldApply(P, t, who, me, tg, at, why) {
       if (!spec) spec = { model: pick(['elephant', 'dino', 'unicorn', 'cat', 'giraffe']), name: 'Статуя' };
       const s = ideaStatue(spec); return s ? `на арене навсегда встаёт статуя «${spec.name}»` : 'для статуи не нашлось места'; }
     case 'kick': {
-      const R = P.who.map((w) => (w.t === 'bot' ? w.b : w.t === 'player' ? 'player' : w.t === 'me' ? me : null));
-      const A = R[0], B = R[1]; if (!A || !B || A === B) return 'пинок не получился';
-      const nm = (o) => (o === 'player' ? IDEA.name : o.name), pa = ideaPosOf(A), pb = ideaPosOf(B);
-      ideaCrowd((pa.x + pb.x) / 2, (pa.z + pb.z) / 2, 4, 12);
-      for (const [X, pose, role] of [[A, 'punch', 'kicker'], [B, 'down', 'victim']]) {
-        if (X === 'player') { if (role === 'victim') ideaHurtPlayer(12); continue; }
-        if (!X.alive || !X.n || X.n.state !== 'alive') continue;
-        const n = X.n, p = role === 'kicker' ? pa : pb;
-        X.stun = 1e9; X.kicks = true; n.pos.set(p.x, 0, p.z); n.yaw = role === 'kicker' ? Math.atan2(pb.x - pa.x, pb.z - pa.z) : Math.atan2(pa.x - pb.x, pa.z - pb.z);
-        n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; n.speed = 0; n.pose = pose; n.poseDur = Infinity; n.poseT = 0;
-        if (role === 'victim') ideaHurtBot(X, 30, 'пинок', null);
-      }
-      IDEA.focus = new V3((pa.x + pb.x) / 2, 1, (pa.z + pb.z) / 2); IDEA.focusS = 1.2;
-      return `${nm(A)} пинает ${nm(B)}: на арене навсегда появилась толпа`;
+      /* copies: the kicker and the kicked are copied into the arena, the real players and bots are not touched */
+      const desc = (w) => {
+        if (!w) return null;
+        if (w.t === 'bot') return { look: w.b.look || undefined, name: w.b.name, scale: w.b.scale || 1, real: w.b };
+        if (w.t === 'player') return { look: IDEA.look || undefined, name: IDEA.name, scale: IDEA.scale || 1, real: 'player' };
+        if (w.t === 'me') return me === 'player' ? desc({ t: 'player' }) : desc({ t: 'bot', b: me });
+        if (w.t === 'char') return { look: w.look, name: w.nm, scale: 1, real: null };
+        return null;
+      };
+      const A = desc(P.who[0]), B = desc(P.who[1]); if (!A || !B) return 'пинок не получился';
+      const pa = ideaPosOf(A.real || 'player'), pb = ideaPosOf(B.real || 'player');
+      const cx = (pa.x + pb.x) / 2, cz = (pa.z + pb.z) / 2;
+      const mkCopy = (d, x, z, yaw, pose) => {
+        const n = mkNpc(d.look || undefined, clamp(x, -HX + 2, HX - 2), clamp(z, -HZ + 2, HZ - 2), yaw, 'human'); if (!n) return null;
+        n.scripted = true; n.speed = 0; n.root.scale.setScalar(d.scale); n.pose = pose; n.poseDur = Infinity; n.poseT = 0; n.copyOf = d.name; return n;
+      };
+      ideaCrowd(cx, cz, 4, 12);
+      const ka = mkCopy(A, pa.x, pa.z, Math.atan2(pb.x - pa.x, pb.z - pa.z), 'punch');
+      const kb = mkCopy(B, pb.x, pb.z, Math.atan2(pa.x - pb.x, pa.z - pb.z), 'down');
+      if (kb) { kb.hp = kb.maxHp * 0.7; }
+      IDEA.focus = new V3(cx, 1, cz); IDEA.focusS = 1.2;
+      return `копии: ${A.name} пинает ${B.name} · на арене навсегда толпа и копии`;
     }
     case 'crowd': { const p = at; ideaCrowd(p.x, p.z, 9, 14); IDEA.focus = p.clone(); IDEA.focusS = 1.4; return `на арене навсегда появляется толпа`; }
     case 'zone': return ideaZoneShrink();
