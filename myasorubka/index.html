@@ -489,7 +489,7 @@ body.touch #wAmmo{font-size:26px}
       <button class="btn" data-spawn="huggy" id="spHuggy" style="display:none">Хаги Ваги<small>Монстр, идёт за вами</small></button>
       <button class="btn" data-spawn="melodie">Мелоди<small>Соведущая, розовые волосы и бант</small></button>
       <button class="btn" data-spawn="bottle" id="spBottle" style="display:none">Бутылочный человечек<small>Мод из мастерской</small></button>
-      <button class="btn" data-spawn="blockhead" id="spBlock" style="display:none">Блочный герой<small>Мод из мастерской</small></button>
+      <button class="btn" data-spawn="blockhead" id="spBlock" style="display:none">Ник52<small>Мод из мастерской</small></button>
       <button class="btn" data-spawn="x-svity-street">Свити · Уличная<small id="xs1"></small></button>
       <button class="btn" data-spawn="x-svity-cop">Свити · Полицейская<small id="xs2"></small></button>
       <button class="btn" data-spawn="x-svity-gala">Свити · Вечерняя<small id="xs3"></small></button>
@@ -11294,7 +11294,7 @@ $('wardOv').addEventListener('pointerdown', (e) => { if (e.target === $('wardOv'
 addEventListener('pointermove', (e) => { if (WP.drag) WP.rot = WP.drag.r + (e.clientX - WP.drag.x) * 0.012; });
 addEventListener('pointerup', () => { WP.drag = null; }); addEventListener('pointercancel', () => { WP.drag = null; });
 /* ===== general spawn settings: how people, zombies, soldiers, dummies, Svity, the resurrector, barrels and crates look when they appear ===== */
-var SPK = [['human', 'Люди'], ['zombie', 'Зомби'], ['soldier', 'Солдаты'], ['dummy', 'Манекены'], ['svity', 'Свити'], ['gagarin', 'Воскреситель'], ['bottle', 'Бутылка'], ['blockhead', 'Блочный герой'], ['barrel', 'Бочки'], ['crate', 'Ящики']];
+var SPK = [['human', 'Люди'], ['zombie', 'Зомби'], ['soldier', 'Солдаты'], ['dummy', 'Манекены'], ['svity', 'Свити'], ['gagarin', 'Воскреситель'], ['bottle', 'Бутылка'], ['blockhead', 'Ник52'], ['barrel', 'Бочки'], ['crate', 'Ящики']];
 var SZ = [['height', 'Рост', 50, 200], ['build', 'Телосложение', 50, 200], ['head', 'Голова', 30, 300], ['eyes', 'Глаза', 30, 300], ['arms', 'Руки', 50, 200], ['hands', 'Кисти', 30, 300], ['fingers', 'Пальцы', 30, 300], ['legs', 'Ноги', 50, 200], ['hair', 'Волосы', 30, 300], ['chest', 'Грудь', 60, 150]];
 var SZP = [['size', 'Размер', 30, 300]];
 var SPRE = { norm: ['Обычные', {}], big: ['Гиганты', { height: [130, 170], build: [115, 160], hands: [120, 160] }], tiny: ['Малыши', { height: [55, 75], head: [110, 140], eyes: [110, 150] }], heads: ['Головастики', { head: [180, 260], eyes: [140, 220], height: [70, 90], legs: [70, 90] }], chaos: ['Хаос', 'chaos'] };
@@ -11778,7 +11778,7 @@ const MOD_BASE = WEAPONS.length;
 var BIN_LIST = [], BOTTLE = { has: false };
 const MIK_SKINS = { gray: ['Серый', 0xa39a94, 0x5a524d], orange: ['Рыжий', 0xe0903a, 0xa05a1a], black: ['Чёрный', 0x2a2a30, 0x101014], smile: ['Улыбашка', 0xf0e0c8, 0xb08a6a] };
 GRIP.mikushka = [0, -0.04, 0.03]; GRIP.custom = GRIP.machete;
-const MODS_CATALOG = [{ id: 'bottle', cat: 'spawn', name: 'Бутылочный человечек', img: "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27220%27%20height%3D%27220%27%3E%3Crect%20width%3D%27220%27%20height%3D%27220%27%20fill%3D%27%23141a1e%27/%3E%3Cpath%20d%3D%27M96%2020h28v22h-28z%27%20fill%3D%27%231a3a8a%27/%3E%3Cpath%20d%3D%27M92%2042h36v22c24%2010%2030%2030%2030%2060v86c0%208-6%2012-12%2012h-72c-6%200-12-4-12-12v-86c0-30%206-50%2030-60z%27%20fill%3D%27%23bfe6d2%27%20opacity%3D%270.45%27%20stroke%3D%27%239fd8c0%27/%3E%3Ccircle%20cx%3D%27110%27%20cy%3D%27112%27%20r%3D%2716%27%20fill%3D%27%23d8c8b0%27/%3E%3Crect%20x%3D%2784%27%20y%3D%27132%27%20width%3D%2752%27%20height%3D%2744%27%20fill%3D%27%23f4f2ea%27/%3E%3Crect%20x%3D%2784%27%20y%3D%27132%27%20width%3D%2752%27%20height%3D%2712%27%20fill%3D%27%231a3a9a%27/%3E%3C/svg%3E", desc: 'Человечек внутри стеклянной бутылки с этикеткой. Появляется в спавн-меню.' }, { id: 'blockhead', cat: 'spawn', name: 'Блочный герой', img: "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27220%27%20height%3D%27220%27%3E%3Crect%20width%3D%27220%27%20height%3D%27220%27%20fill%3D%27%231b1e26%27/%3E%3Crect%20x%3D%2770%27%20y%3D%2730%27%20width%3D%2780%27%20height%3D%2770%27%20fill%3D%27%23f4f4f4%27/%3E%3Crect%20x%3D%2770%27%20y%3D%2730%27%20width%3D%2780%27%20height%3D%2714%27%20fill%3D%27%23c02a2a%27/%3E%3Ccircle%20cx%3D%2795%27%20cy%3D%2768%27%20r%3D%275%27%20fill%3D%27%23111%27/%3E%3Ccircle%20cx%3D%27125%27%20cy%3D%2768%27%20r%3D%275%27%20fill%3D%27%23111%27/%3E%3Crect%20x%3D%2758%27%20y%3D%27104%27%20width%3D%27104%27%20height%3D%2770%27%20fill%3D%27%234a7fb0%27/%3E%3Crect%20x%3D%2736%27%20y%3D%27110%27%20width%3D%2722%27%20height%3D%2756%27%20fill%3D%27%23f4f4f4%27/%3E%3Crect%20x%3D%27162%27%20y%3D%27110%27%20width%3D%2722%27%20height%3D%2756%27%20fill%3D%27%23f4f4f4%27/%3E%3Crect%20x%3D%2772%27%20y%3D%27178%27%20width%3D%2730%27%20height%3D%2728%27%20fill%3D%27%23b8b8b8%27/%3E%3Crect%20x%3D%27118%27%20y%3D%27178%27%20width%3D%2730%27%20height%3D%2728%27%20fill%3D%27%23b8b8b8%27/%3E%3C/svg%3E", desc: 'Блочный персонаж с кубической головой, повязкой и мордочкой. Появляется в спавн-меню.' }, { id: 'dacha', cat: 'map', name: 'Карта «Дача»', img: 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22><rect width=%22220%22 height=%22220%22 fill=%22%231d2a14%22/><polygon points=%2250,120 110,60 170,120%22 fill=%22%238a3a2a%22/><rect x=%2262%22 y=%22120%22 width=%2296%22 height=%2268%22 fill=%22%23c8a070%22/><circle cx=%22186%22 cy=%2262%22 r=%2218%22 fill=%22%233a8a3a%22/></svg>', desc: 'Дачный участок: дом, сад, забор. Каждые 30 секунд сюда прилетает дрон-сбрасыватель и бросает бомбу: она рушит стены и ранит людей.' }, { id: 'spear', cat: 'weapon', name: 'Копьё', img: 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22><rect width=%22220%22 height=%22220%22 fill=%22%23181f14%22/><path d=%22M30 200 L170 40%22 stroke=%22%238a6a3a%22 stroke-width=%228%22/><path d=%22M170 40 L196 14 L186 56 Z%22 fill=%22%23c8ccd2%22/><text x=%22110%22 y=%22212%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22%23ffd080%22>КОПЬЁ</text></svg>', desc: 'Оружие. Слабый урон, но 15% ударов пронзают насквозь, и копьё остаётся в теле. Раз в 8 секунд копьё можно метнуть (кнопка «Бросок»), шанс тот же.' }, { id: 'sawgun', cat: 'weapon', name: 'Пиломёт', img: 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22><rect width=%22220%22 height=%22220%22 fill=%22%23241a10%22/><circle cx=%22110%22 cy=%22110%22 r=%2270%22 fill=%22%23b8bcc4%22/><circle cx=%22110%22 cy=%22110%22 r=%2222%22 fill=%22%23241a10%22/><text x=%22110%22 y=%22205%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22%23ffd080%22>ПИЛОМЁТ</text></svg>', desc: 'Оружие. Выстреливает крутящимися пилами: 8 патронов, большой урон, перезарядка.' }, { id: 'axe', cat: 'weapon', name: 'Топор', img: 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22><rect width=%22220%22 height=%22220%22 fill=%22%23101820%22/><path d=%22M60 170 L120 40 L170 60 L110 180 Z%22 fill=%22%23aab4c0%22/><text x=%22110%22 y=%22208%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22%23ffd080%22>ТОПОР</text></svg>', desc: 'Оружие ближнего боя. Тяжёлый удар, медленно, но сносит с одного замаха.' }, { id: 'mikushka', cat: 'spawn', name: 'Котик Микушка', img: 'data:image/jpeg;base64,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', desc: 'Оружие. Кидаете кота мягко: 8 секунд он царапает ближайших врагов. Суперсила «МЯУ»: кот кричит и отталкивает всех рядом (перезарядка 6 с).' }];
+const MODS_CATALOG = [{ id: 'bottle', cat: 'spawn', name: 'Бутылочный человечек', img: "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27220%27%20height%3D%27220%27%3E%3Crect%20width%3D%27220%27%20height%3D%27220%27%20fill%3D%27%23141a1e%27/%3E%3Cpath%20d%3D%27M96%2020h28v22h-28z%27%20fill%3D%27%231a3a8a%27/%3E%3Cpath%20d%3D%27M92%2042h36v22c24%2010%2030%2030%2030%2060v86c0%208-6%2012-12%2012h-72c-6%200-12-4-12-12v-86c0-30%206-50%2030-60z%27%20fill%3D%27%23bfe6d2%27%20opacity%3D%270.45%27%20stroke%3D%27%239fd8c0%27/%3E%3Ccircle%20cx%3D%27110%27%20cy%3D%27112%27%20r%3D%2716%27%20fill%3D%27%23d8c8b0%27/%3E%3Crect%20x%3D%2784%27%20y%3D%27132%27%20width%3D%2752%27%20height%3D%2744%27%20fill%3D%27%23f4f2ea%27/%3E%3Crect%20x%3D%2784%27%20y%3D%27132%27%20width%3D%2752%27%20height%3D%2712%27%20fill%3D%27%231a3a9a%27/%3E%3C/svg%3E", desc: 'Человечек внутри стеклянной бутылки с этикеткой. Появляется в спавн-меню.' }, { id: 'blockhead', cat: 'spawn', name: 'Ник52', img: "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27220%27%20height%3D%27220%27%3E%3Crect%20width%3D%27220%27%20height%3D%27220%27%20fill%3D%27%231b1e26%27/%3E%3Crect%20x%3D%2770%27%20y%3D%2730%27%20width%3D%2780%27%20height%3D%2770%27%20fill%3D%27%23f4f4f4%27/%3E%3Crect%20x%3D%2770%27%20y%3D%2730%27%20width%3D%2780%27%20height%3D%2714%27%20fill%3D%27%23c02a2a%27/%3E%3Ccircle%20cx%3D%2795%27%20cy%3D%2768%27%20r%3D%275%27%20fill%3D%27%23111%27/%3E%3Ccircle%20cx%3D%27125%27%20cy%3D%2768%27%20r%3D%275%27%20fill%3D%27%23111%27/%3E%3Crect%20x%3D%2758%27%20y%3D%27104%27%20width%3D%27104%27%20height%3D%2770%27%20fill%3D%27%234a7fb0%27/%3E%3Crect%20x%3D%2736%27%20y%3D%27110%27%20width%3D%2722%27%20height%3D%2756%27%20fill%3D%27%23f4f4f4%27/%3E%3Crect%20x%3D%27162%27%20y%3D%27110%27%20width%3D%2722%27%20height%3D%2756%27%20fill%3D%27%23f4f4f4%27/%3E%3Crect%20x%3D%2772%27%20y%3D%27178%27%20width%3D%2730%27%20height%3D%2728%27%20fill%3D%27%23b8b8b8%27/%3E%3Crect%20x%3D%27118%27%20y%3D%27178%27%20width%3D%2730%27%20height%3D%2728%27%20fill%3D%27%23b8b8b8%27/%3E%3C/svg%3E", desc: 'Блочный персонаж с кубической головой, повязкой и мордочкой. Появляется в спавн-меню.' }, { id: 'dacha', cat: 'map', name: 'Карта «Дача»', img: 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22><rect width=%22220%22 height=%22220%22 fill=%22%231d2a14%22/><polygon points=%2250,120 110,60 170,120%22 fill=%22%238a3a2a%22/><rect x=%2262%22 y=%22120%22 width=%2296%22 height=%2268%22 fill=%22%23c8a070%22/><circle cx=%22186%22 cy=%2262%22 r=%2218%22 fill=%22%233a8a3a%22/></svg>', desc: 'Дачный участок: дом, сад, забор. Каждые 30 секунд сюда прилетает дрон-сбрасыватель и бросает бомбу: она рушит стены и ранит людей.' }, { id: 'spear', cat: 'weapon', name: 'Копьё', img: 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22><rect width=%22220%22 height=%22220%22 fill=%22%23181f14%22/><path d=%22M30 200 L170 40%22 stroke=%22%238a6a3a%22 stroke-width=%228%22/><path d=%22M170 40 L196 14 L186 56 Z%22 fill=%22%23c8ccd2%22/><text x=%22110%22 y=%22212%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22%23ffd080%22>КОПЬЁ</text></svg>', desc: 'Оружие. Слабый урон, но 15% ударов пронзают насквозь, и копьё остаётся в теле. Раз в 8 секунд копьё можно метнуть (кнопка «Бросок»), шанс тот же.' }, { id: 'sawgun', cat: 'weapon', name: 'Пиломёт', img: 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22><rect width=%22220%22 height=%22220%22 fill=%22%23241a10%22/><circle cx=%22110%22 cy=%22110%22 r=%2270%22 fill=%22%23b8bcc4%22/><circle cx=%22110%22 cy=%22110%22 r=%2222%22 fill=%22%23241a10%22/><text x=%22110%22 y=%22205%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22%23ffd080%22>ПИЛОМЁТ</text></svg>', desc: 'Оружие. Выстреливает крутящимися пилами: 8 патронов, большой урон, перезарядка.' }, { id: 'axe', cat: 'weapon', name: 'Топор', img: 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22><rect width=%22220%22 height=%22220%22 fill=%22%23101820%22/><path d=%22M60 170 L120 40 L170 60 L110 180 Z%22 fill=%22%23aab4c0%22/><text x=%22110%22 y=%22208%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22%23ffd080%22>ТОПОР</text></svg>', desc: 'Оружие ближнего боя. Тяжёлый удар, медленно, но сносит с одного замаха.' }, { id: 'mikushka', cat: 'spawn', name: 'Котик Микушка', img: 'data:image/jpeg;base64,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', desc: 'Оружие. Кидаете кота мягко: 8 секунд он царапает ближайших врагов. Суперсила «МЯУ»: кот кричит и отталкивает всех рядом (перезарядка 6 с).' }];
 const WS = { color: '#ff6ab0' }, WS_COLORS = ['#ff6ab0', '#4ad8ff', '#f2c200', '#7aff6a', '#ffffff', '#2a2a2a', '#c060ff', '#ff4a3a'];
 const CAT = { out: false, root: null, st: '', t: 0, from: new V3(), to: new V3(), pos: new V3(), tgt: null, tgtT: 0, scT: 0, meowCd: 0, map: '' };
 function lucky(p) { return settings.luck ? true : Math.random() < p; }
@@ -15730,6 +15730,209 @@ const IDEA_WORDS = [
   ['лилипут', 'shrinkall'], ['уменьш', 'shrinkall'], ['гулливер', 'growall'], ['увелич', 'growall'],
   ['кошек', 'emoji', '🐈'], ['уток', 'emoji', '🦆'], ['овец', 'emoji', '🐑'], ['ведер', 'emoji', '🪣'], ['филин', 'emoji', '🦉'], ['банановая', 'slip'], ['все маленьк', 'shrinkall'], ['все крошеч', 'shrinkall'], ['все велик', 'growall'], ['все огромн', 'growall'], ['клон', 'clone'], ['двойник', 'clone'], ['копию', 'clone'], ['армия', 'army'], ['армию', 'army'], ['полици', 'army'], ['охранник', 'army'],
 ];
+/* 200 more words; each one gets its own cutscene title */
+const IDEA_WORDS2 = [
+  ["лягуш", "emoji", "🐸", "🐸 ЛЯГУШКИ"],
+  ["утк", "emoji", "🦆", "🦆 УТКИ"],
+  ["гус", "emoji", "🦢", "🦢 ГУСИ"],
+  ["корова", "emoji", "🐄", "🐄 КОРОВЫ"],
+  ["свин", "emoji", "🐖", "🐖 СВИНЬИ"],
+  ["курин", "emoji", "🐔", "🐔 КУРИЦЫ"],
+  ["рыб", "emoji", "🐟", "🐟 РЫБЫ"],
+  ["ёж", "emoji", "🦔", "🦔 ЕЖИ"],
+  ["сов", "emoji", "🦉", "🦉 СОВЫ"],
+  ["единорог", "emoji", "🦄", "🦄 ЕДИНОРОГИ"],
+  ["обезьян", "emoji", "🐒", "🐒 ОБЕЗЬЯНЫ"],
+  ["зме", "emoji", "🐍", "🐍 ЗМЕИ"],
+  ["пчел", "emoji", "🐝", "🐝 ПЧЁЛЫ"],
+  ["кролик", "emoji", "🐇", "🐇 КРОЛИКИ"],
+  ["хомяк", "emoji", "🐹", "🐹 ХОМЯКИ"],
+  ["лошад", "emoji", "🐎", "🐎 ЛОШАДИ"],
+  ["овц", "emoji", "🐑", "🐑 ОВЦЫ"],
+  ["кит", "emoji", "🐋", "🐋 КИТЫ"],
+  ["осьминог", "emoji", "🐙", "🐙 ОСЬМИНОГИ"],
+  ["слон", "emoji", "🐘", "🐘 СЛОНЫ"],
+  ["жираф", "emoji", "🦒", "🦒 ЖИРАФЫ"],
+  ["крокодил", "emoji", "🐊", "🐊 КРОКОДИЛЫ"],
+  ["мишк", "emoji", "🧸", "🧸 МИШКИ"],
+  ["ботинок", "emoji", "👞", "👞 БОТИНКИ"],
+  ["тапок", "emoji", "🩴", "🩴 ТАПКИ"],
+  ["холодильник", "emoji", "🗄", "🗄 ХОЛОДИЛЬНИКИ"],
+  ["телевизор", "emoji", "📺", "📺 ТЕЛЕВИЗОРЫ"],
+  ["диван", "emoji", "🛋", "🛋 ДИВАНЫ"],
+  ["стул", "emoji", "🪑", "🪑 СТУЛЬЯ"],
+  ["унитаз", "emoji", "🚽", "🚽 УНИТАЗЫ"],
+  ["ванн", "emoji", "🛁", "🛁 ВАННЫ"],
+  ["пианино", "emoji", "🎹", "🎹 ПИАНИНО"],
+  ["сейф", "emoji", "🔒", "🔒 СЕЙФЫ"],
+  ["наковальн", "emoji", "⚒", "⚒ НАКОВАЛЬНИ"],
+  ["гир", "emoji", "🏋", "🏋 ГИРИ"],
+  ["кастрюл", "emoji", "🍲", "🍲 КАСТРЮЛИ"],
+  ["сковород", "emoji", "🍳", "🍳 СКОВОРОДЫ"],
+  ["ведр", "emoji", "🪣", "🪣 ВЁДРА"],
+  ["книг", "emoji", "📚", "📚 КНИГИ"],
+  ["ноутбук", "emoji", "💻", "💻 НОУТБУКИ"],
+  ["смартфон", "emoji", "📱", "📱 ТЕЛЕФОНЫ"],
+  ["колокол", "emoji", "🔔", "🔔 КОЛОКОЛА"],
+  ["кирпич", "emoji", "🧱", "🧱 КИРПИЧИ"],
+  ["камн", "emoji", "🪨", "🪨 КАМНИ"],
+  ["утюг", "emoji", "🧺", "🧺 УТЮГИ"],
+  ["подуш", "soft", "🛏", "🛏 ПОДУШКИ"],
+  ["шарик", "soft", "🎈", "🎈 ШАРИКИ"],
+  ["мяч", "soft", "⚽", "⚽ МЯЧИ"],
+  ["пицц", "food", "🍕", "🍕 ПИЦЦА"],
+  ["бургер", "food", "🍔", "🍔 БУРГЕРЫ"],
+  ["торт", "food", "🎂", "🎂 ТОРТЫ"],
+  ["мороженое", "food", "🍦", "🍦 МОРОЖЕНОЕ"],
+  ["пончик", "food", "🍩", "🍩 ПОНЧИКИ"],
+  ["шоколад", "food", "🍫", "🍫 ШОКОЛАД"],
+  ["конфет", "food", "🍬", "🍬 КОНФЕТЫ"],
+  ["шаурм", "food", "🌯", "🌯 ШАУРМА"],
+  ["пельмен", "food", "🥟", "🥟 ПЕЛЬМЕНИ"],
+  ["блин", "food", "🥞", "🥞 БЛИНЫ"],
+  ["картош", "food", "🥔", "🥔 КАРТОШКА"],
+  ["морков", "food", "🥕", "🥕 МОРКОВЬ"],
+  ["хлеб", "food", "🍞", "🍞 ХЛЕБ"],
+  ["сыр", "food", "🧀", "🧀 СЫР"],
+  ["сосиск", "food", "🌭", "🌭 СОСИСКИ"],
+  ["чай", "food", "☕", "☕ ЧАЙ"],
+  ["сок", "food", "🧃", "🧃 СОК"],
+  ["молок", "food", "🥛", "🥛 МОЛОКО"],
+  ["огурц", "food", "🥒", "🥒 ОГУРЦЫ"],
+  ["помидор", "food", "🍅", "🍅 ПОМИДОРЫ"],
+  ["арбуз", "food", "🍉", "🍉 АРБУЗЫ"],
+  ["яблок", "food", "🍎", "🍎 ЯБЛОКИ"],
+  ["банан", "food", "🍌", "🍌 БАНАНЫ"],
+  ["печень", "food", "🍪", "🍪 ПЕЧЕНЬЕ"],
+  ["мороз", "freeze", null, "❄ МОРОЗ"],
+  ["метел", "freeze", null, "🌨 МЕТЕЛЬ"],
+  ["гололед", "freeze", null, "🧊 ГОЛОЛЁД"],
+  ["иней", "freeze", null, "❄ ИНЕЙ"],
+  ["вьюг", "freeze", null, "🌨 ВЬЮГА"],
+  ["сосульк", "freeze", null, "🧊 СОСУЛЬКИ"],
+  ["туман", "fog", null, "🌫 ТУМАН"],
+  ["смог", "fog", null, "🌫 СМОГ"],
+  ["дымк", "fog", null, "🌫 ДЫМКА"],
+  ["мгл", "fog", null, "🌫 МГЛА"],
+  ["солнц", "sun", null, "☀ СОЛНЦЕ"],
+  ["рассвет", "sun", null, "🌅 РАССВЕТ"],
+  ["полдень", "sun", null, "☀ ПОЛДЕНЬ"],
+  ["лучи", "sun", null, "☀ ЛУЧИ"],
+  ["жар", "heat", null, "🥵 ЖАРА"],
+  ["пекл", "heat", null, "🔥 ПЕКЛО"],
+  ["зной", "heat", null, "🥵 ЗНОЙ"],
+  ["духот", "heat", null, "🥵 ДУХОТА"],
+  ["цунами", "flood", null, "🌊 ЦУНАМИ"],
+  ["потоп", "flood", null, "🌊 ПОТОП"],
+  ["наводнен", "flood", null, "🌊 НАВОДНЕНИЕ"],
+  ["ливень", "flood", null, "🌧 ЛИВЕНЬ"],
+  ["океан", "flood", null, "🌊 ОКЕАН"],
+  ["прилив", "flood", null, "🌊 ПРИЛИВ"],
+  ["водопад", "flood", null, "🌊 ВОДОПАД"],
+  ["торнадо", "tornado", null, "🌪 ТОРНАДО"],
+  ["ураган", "tornado", null, "🌪 УРАГАН"],
+  ["смерч", "tornado", null, "🌪 СМЕРЧ"],
+  ["вихр", "tornado", null, "🌪 ВИХРЬ"],
+  ["циклон", "tornado", null, "🌀 ЦИКЛОН"],
+  ["тайфун", "tornado", null, "🌀 ТАЙФУН"],
+  ["вулкан", "lava", null, "🌋 ВУЛКАН"],
+  ["магм", "lava", null, "🌋 МАГМА"],
+  ["извержен", "lava", null, "🌋 ИЗВЕРЖЕНИЕ"],
+  ["кратер", "lava", null, "🌋 КРАТЕР"],
+  ["воронк", "hole", null, "🕳 ВОРОНКА"],
+  ["вакуум", "hole", null, "🕳 ВАКУУМ"],
+  ["пылесос", "hole", null, "🕳 ПЫЛЕСОС"],
+  ["провал", "hole", null, "🕳 ПРОВАЛ"],
+  ["яд", "poison", null, "☣ ЯД"],
+  ["токсин", "poison", null, "☣ ТОКСИН"],
+  ["радиац", "poison", null, "☢ РАДИАЦИЯ"],
+  ["кислот", "poison", null, "🧪 КИСЛОТА"],
+  ["химикат", "poison", null, "🧪 ХИМИКАТЫ"],
+  ["зель", "poison", null, "🧪 ЗЕЛЬЕ"],
+  ["вирус", "virus", null, "🦠 ВИРУС"],
+  ["чум", "virus", null, "🦠 ЧУМА"],
+  ["зараз", "virus", null, "🦠 ЗАРАЗА"],
+  ["эпидем", "virus", null, "🦠 ЭПИДЕМИЯ"],
+  ["пандем", "virus", null, "🦠 ПАНДЕМИЯ"],
+  ["салют", "fireworks", null, "🎆 САЛЮТ"],
+  ["фейерверк", "fireworks", null, "🎆 ФЕЙЕРВЕРК"],
+  ["петард", "fireworks", null, "🧨 ПЕТАРДЫ"],
+  ["конфетти", "fireworks", null, "🎊 КОНФЕТТИ"],
+  ["гирлянд", "fireworks", null, "✨ ГИРЛЯНДЫ"],
+  ["новый год", "fireworks", null, "🎄 НОВЫЙ ГОД"],
+  ["дискотек", "music", null, "🪩 ДИСКОТЕКА"],
+  ["музык", "music", null, "🎵 МУЗЫКА"],
+  ["концерт", "music", null, "🎤 КОНЦЕРТ"],
+  ["караоке", "music", null, "🎤 КАРАОКЕ"],
+  ["рок", "music", null, "🎸 РОК"],
+  ["диджей", "music", null, "🎧 ДИДЖЕЙ"],
+  ["гитар", "music", null, "🎸 ГИТАРА"],
+  ["замедл", "slowmo", null, "⏳ ЗАМЕДЛЕНИЕ"],
+  ["слоумо", "slowmo", null, "⏳ СЛОУМО"],
+  ["пауз", "slowmo", null, "⏸ ПАУЗА"],
+  ["черепах", "slowmo", null, "🐢 ЧЕРЕПАХИ"],
+  ["батут", "bounce", null, "🦘 БАТУТ"],
+  ["пружин", "bounce", null, "🦘 ПРУЖИНА"],
+  ["кенгуру", "bounce", null, "🦘 КЕНГУРУ"],
+  ["парашют", "bounce", null, "🪂 ПАРАШЮТ"],
+  ["крыл", "bounce", null, "🪽 КРЫЛЬЯ"],
+  ["телепорт", "swap", null, "🌀 ТЕЛЕПОРТ"],
+  ["обмен", "swap", null, "🔄 ОБМЕН МЕСТАМИ"],
+  ["зеркал", "swap", null, "🪞 ЗЕРКАЛО"],
+  ["крепост", "wall", null, "🏰 КРЕПОСТЬ"],
+  ["бункер", "wall", null, "🏰 БУНКЕР"],
+  ["баррикад", "wall", null, "🧱 БАРРИКАДА"],
+  ["башн", "wall", null, "🗼 БАШНЯ"],
+  ["укрыт", "wall", null, "🏠 УКРЫТИЕ"],
+  ["мин", "mines", null, "💣 МИНЫ"],
+  ["капкан", "mines", null, "🪤 КАПКАНЫ"],
+  ["растяжк", "mines", null, "💥 РАСТЯЖКИ"],
+  ["кожур", "slip", null, "🍌 КОЖУРА"],
+  ["мыл", "slip", null, "🧼 МЫЛО"],
+  ["каток", "slip", null, "⛸ КАТОК"],
+  ["масл", "slip", null, "🛢 МАСЛО"],
+  ["деньг", "money", null, "💵 ДЕНЬГИ"],
+  ["золот", "money", null, "🪙 ЗОЛОТО"],
+  ["клад", "money", null, "💰 КЛАД"],
+  ["бриллиант", "money", null, "💎 БРИЛЛИАНТЫ"],
+  ["миллион", "money", null, "💰 МИЛЛИОН"],
+  ["сокровищ", "money", null, "💰 СОКРОВИЩА"],
+  ["лилипут", "shrinkall", null, "🐜 ЛИЛИПУТЫ"],
+  ["гулливер", "growall", null, "🗿 ГУЛЛИВЕРЫ"],
+  ["клон", "clone", null, "👯 КЛОНЫ"],
+  ["двойник", "clone", null, "👯 ДВОЙНИКИ"],
+  ["армия", "army", null, "🪖 АРМИЯ"],
+  ["спецназ", "army", null, "🪖 СПЕЦНАЗ"],
+  ["гвардия", "army", null, "🪖 ГВАРДИЯ"],
+  ["легион", "army", null, "🪖 ЛЕГИОН"],
+  ["радуг", "healall", null, "🌈 РАДУГА"],
+  ["любов", "healall", null, "💖 ЛЮБОВЬ"],
+  ["доброт", "healall", null, "💖 ДОБРОТА"],
+  ["обнимаш", "healall", null, "🤗 ОБНИМАШКИ"],
+  ["покой", "healall", null, "🕊 ПОКОЙ"],
+  ["толп", "crowd", null, "👥 ТОЛПА"],
+  ["народ", "crowd", null, "👥 НАРОД"],
+  ["митинг", "crowd", null, "👥 МИТИНГ"],
+  ["фанат", "crowd", null, "👥 ФАНАТЫ"],
+  ["зрител", "crowd", null, "👥 ЗРИТЕЛИ"],
+  ["парад", "crowd", null, "🎺 ПАРАД"],
+  ["гост", "crowd", null, "👥 ГОСТИ"],
+  ["мир", "healall", null, "🕊 МИР"],
+  ["ананас", "food", "🍌", "🍍 АНАНАСЫ"],
+  ["груш", "food", "🍎", "🍐 ГРУШИ"],
+  ["лимон", "food", "🍅", "🍋 ЛИМОНЫ"],
+  ["котлет", "food", "🍔", "🥩 КОТЛЕТЫ"],
+  ["суп", "food", "🍲", "🍲 СУПЫ"],
+  ["каш", "food", "🍱", "🥣 КАШИ"],
+  ["салат", "food", "🥒", "🥗 САЛАТЫ"],
+  ["борщ", "food", "🍲", "🍲 БОРЩ"],
+  ["мясо", "food", "🍔", "🥩 МЯСО"],
+  ["рыбк", "food", "🐟", "🐟 РЫБКА"],
+  ["кекс", "food", "🍩", "🧁 КЕКСЫ"],
+  ["вафл", "food", "🥞", "🧇 ВАФЛИ"],
+  ["тыкв", "food", "🍉", "🎃 ТЫКВЫ"],
+  ["кефир", "food", "🥛", "🥛 КЕФИР"],
+];
 /* ===================== SERVERS · «ВЫЖИВИ СВОИ ИДЕИ»: a battle royale where every 10 seconds what you write comes true ===================== */
 const IDEA = { on: false, bots: [], feed: [], pending: '', name: 'Игрок', roundT: 20, drops: [], fx: [], mines: [], cut: false, locs: [], statues: [], guests: 0, zone: null, rocket: null, riding: false, chute: false, canopy: null, round: 0, sent: 0, ok: 0, t0: 0, form: '', look: null, scale: 1, spd: 1, armor: 1, dmgMul: 1, evade: 0, lives: 0, ghost: 0, shield: 0, spdT: 0, lava: 0, acid: 0, grav: 0, night: 0, dance: 0, tornado: 0, car: 0, allow: ['fists', 'pistol'], over: false, kills0: 0 };
 const IDEA_NAMES = ['КиллерКот', 'Вася_228', 'ПельменьБог', 'Нагибатор3000', 'ТихийУжас', 'Лёха', 'Mr_Zombie', 'Кексик', 'БабкаСТапком', 'Шаурмен', 'ДедИнсайд', 'КотБаюн', 'Ржавый', 'Пончик', 'Тень', 'Сосиска', 'ГромГромыч', 'Пуля', 'Снежок', 'Бублик', 'ЖелезныйДрын', 'Креветка', 'Таракан', 'ЗлойГусь', 'Бульдозер', 'Кактус', 'Варенье', 'Пиксель', 'ХомякУбийца', 'Чебурек', 'Дрон', 'Лягушонок', 'КапитанКрюк', 'Гаечка', 'Мармелад', 'Фантом', 'Капуста', 'Йогурт', 'Свинтус', 'Огурчик', 'Чупакабра', 'Валера', 'Маргарита', 'Ниндзя', 'Пират', 'Холодец', 'Шпрот', 'Зефир', 'Буран', 'Ватрушка', 'Кефирка', 'Ёжик', 'Сухарь', 'Трактор', 'Лимончик', 'Фонарь', 'Пушистик', 'Грибочек', 'Ракетка', 'Чайник', 'Кузя', 'Мотылёк', 'Баклажан', 'Тостер', 'Сырник', 'Перец', 'Гусь', 'Медведь', 'Крендель', 'Бегемот'];
@@ -15851,7 +16054,9 @@ function ideaGive(id) { const i = WEAPONS.findIndex((w) => w.id === id); if (i <
 function ideaCar() { const C = makeCar(pick(['sport', 'sedan', 'pickup']), player.pos.x, player.pos.z, player.yaw + Math.PI); vehEnter(C); IDEA.car = 20; IDEA.carC = C; }
 function ideaRam(from, tgt, who) { const tp = ideaPosOf(tgt || 'player'), a = rand(0, 6.28), sx = clamp(tp.x + Math.cos(a) * 22, -HX + 4, HX - 4), sz = clamp(tp.z + Math.sin(a) * 22, -HZ + 4, HZ - 4); const C = makeCar(pick(['truck', 'sedan', 'pickup', 'sport']), sx, sz, Math.atan2(tp.x - sx, tp.z - sz), { col: pick([0xc81818, 0x1a1a1e, 0xe8e8e0]), ai: { kind: 'ram', tgt: tgt || 'player', life: 7 } }); C.vx = Math.sin(C.yaw) * 14; C.vz = Math.cos(C.yaw) * 14; Sound.thud(0.4); }
 function ideaParse(t) {
-  t = t.toLowerCase().replace(/ё/g, 'е'); const num = clamp(parseInt((t.match(/\d+/) || ['3'])[0], 10) || 3, 1, 6);
+  t = t.toLowerCase().replace(/ё/g, 'е');
+  if (/пина[её]т|пина[юе]|пнул|пнёт|пнет/.test(t)) { let kw = ideaFindWho(t); if (kw.length === 1 && kw[0].t !== 'me') kw = [{ t: 'me' }, kw[0]]; if (kw.length >= 2) return { k: 'kick', who: kw.slice(0, 2), ti: '👟 ПИНОК' }; }
+  const num = clamp(parseInt((t.match(/\d+/) || ['3'])[0], 10) || 3, 1, 6);
   const FORMS = [[/зомби|мертвец|пуст/, 'zombie'], [/гигант|великан|больш|огромн/, 'giant'], [/маленьк|муравь|крошеч|малыш|мыш/, 'small'], [/воскрес/, 'gg'], [/свити/, 'svity'], [/хаги|хагги|huggy/, 'huggy'], [/солдат|спецназ|воен/, 'soldier'], [/невидим|призрак|привидени/, 'ghost'], [/мелоди/, 'melodie'], [/машин|танк|авто|грузовик|фур/, 'car']];
   const wb = (st) => { let i = t.indexOf(st); while (i >= 0) { if (i === 0 || !/[а-яa-z]/.test(t[i - 1])) return true; i = t.indexOf(st, i + 1); } return false; };
   if (/превра|стать|стал|становл|я теперь|сделай меня|обернуть/.test(t)) { for (const [re, f] of FORMS) if (re.test(t)) return { k: 'form', f }; for (const st in IDEA_FX) if (wb(st)) return { k: 'formx', f: st }; }
@@ -15862,7 +16067,7 @@ function ideaParse(t) {
   const give = /дай|дать|выдай|получ|хочу|(^|\s)мне(\s|$)/.test(t) && !/дожд|град|с неба/.test(t);
   const WP = [[/автомат|калаш|винтовк/, 'rifle'], [/дробовик|ружь/, 'shotgun'], [/пистолет/, 'pistol'], [/огнем[её]т/, 'flame'], [/бензопил/, 'saw'], [/арбалет/, 'bow'], [/мачете|меч|нож/, 'machete'], [/гранат/, 'grenade']];
   if (give) for (const [re, id] of WP) if (re.test(t)) return { k: 'give', id };
-  { let best = null; for (const [st, k, a] of IDEA_WORDS) if ((!best || st.length > best[0].length) && wb(st)) best = [st, k, a]; if (best) return { k: best[1], a: best[2], st: best[0] }; }
+  { let best = null; for (const [st, k, a, ti] of [...IDEA_WORDS2, ...IDEA_WORDS.map((w) => [...w, null])]) if ((!best || st.length > best[0].length) && wb(st)) best = [st, k, a, ti]; if (best) return { k: best[1], a: best[2], st: best[0], ti: best[3] }; }
   if (/аптечк|вылеч|здоров|(^|\s)хп(\s|$)|жизн/.test(t)) return { k: 'heal' };
   if (/бессмерт|щит|брон|неуязв/.test(t)) return { k: 'shield' };
   if (/скорост|быстр|ноги|бег/.test(t)) return { k: 'speed' };
@@ -15887,7 +16092,7 @@ function ideaParse(t) {
 }
 function ideaApply(text, who) {
   const P = ideaParse(text), t = text.toLowerCase().replace(/ё/g, 'е'), me = who || 'player', tg = ideaTarget(t, who), at = ideaPosOf(tg || me), why = `идея ${ideaWho(who)}`;
-  IDEA.ckind = P.k; IDEA.focus = at.clone(); IDEA.focusS = 1;
+  IDEA.ckind = P.k; IDEA.ckTitle = P.ti || null; IDEA.focus = at.clone(); IDEA.focusS = 1;
   { const r = ideaWorldApply(P, t, who, me, tg, at, why); if (r) return r; }
   { const r = ideaNewApply(P, t, who, me, tg, at, why); if (r) return r; }
   switch (P.k) {
@@ -16100,7 +16305,7 @@ function ideaAskSubmit(v) {
 function ideaCamKind(k) {
   if (/^(form|formx|give|heal|shield|speed|bounce|food|swap|money)$/.test(k)) return 'close';
   if (/^(meteor|bombs|rain|emoji|soft|bolt|fireworks)$/.test(k)) return 'sky';
-  if (/^(spawn|fire|ram|kill|thing|wall|poison|clone|army|virus|mines|hole|wedding|statue|location|char|rocket)$/.test(k)) return 'orbit';
+  if (/^(spawn|fire|ram|kill|thing|wall|poison|clone|army|virus|mines|hole|wedding|statue|location|char|rocket|kick|crowd)$/.test(k)) return 'orbit';
   return 'aerial';
 }
 function ideaCam(kind, F, t, a0, sz = 1) {
@@ -16115,7 +16320,7 @@ function ideaPlayAll(list, i) {
   if (IDEA.over || i >= list.length) { ideaCutEnd(); return; }
   const e = list[i];
   if ((e.who && !e.who.alive) || (!e.who && player.dead)) { ideaFeed(`☠ ${e.name} не дожил до своей идеи`, '#a8a0b0'); return ideaPlayAll(list, i + 1); }
-  IDEA.focus = null; IDEA.focusS = 1; IDEA.ckind = 'thing'; let r = '';
+  IDEA.focus = null; IDEA.focusS = 1; IDEA.ckind = 'thing'; IDEA.ckTitle = null; let r = '';
   try { r = ideaApply(e.text, e.who); } catch (err) { r = 'что-то пошло не так'; }
   if (!e.who) IDEA.ok++;
   ideaFeed(`${e.who ? '💬 ' + e.name : '✔ Вы'}: «${e.text}» → ${r}`, e.who ? '#ffe8a0' : '#8fff9a');
@@ -16124,7 +16329,7 @@ function ideaPlayAll(list, i) {
   story.showAvatar = !VEH.in;
   const fs = IDEA.focusS || 1;
   runCut([[dur - 0.35, () => subOff()]], (t) => ideaCam(kind, F, t, a0, fs), dur, () => ideaPlayAll(list, i + 1));
-  ideaCard(`${IDEA_KIND_T[IDEA.ckind] || '💡 ИДЕЯ'} · ${e.who ? e.name : 'ВАША ИДЕЯ'} ${list.length > 1 ? ' · ' + (i + 1) + '/' + list.length : ''}`, `«${e.text.slice(0, 48)}»`);
+  ideaCard(`${IDEA.ckTitle || IDEA_KIND_T[IDEA.ckind] || '💡 ИДЕЯ'} · ${e.who ? e.name : 'ВАША ИДЕЯ'} ${list.length > 1 ? ' · ' + (i + 1) + '/' + list.length : ''}`, `«${e.text.slice(0, 48)}»`);
   sub(e.who ? e.name : IDEA.name, r); Sound.whoosh();
 }
 function ideaCard(top, txt) { let c = document.getElementById('ideaCard'); if (!c) { c = document.createElement('div'); c.id = 'ideaCard'; c.style.cssText = 'position:fixed;left:50%;top:calc(6px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:47;pointer-events:none;text-align:center;font-family:var(--ui);white-space:nowrap;transition:opacity .3s'; document.body.appendChild(c); } if (!top) { c.style.opacity = 0; return; } c.innerHTML = `<div style="font:800 11px var(--ui);letter-spacing:.14em;color:#ff9ad0">${top.replace(/</g, '&lt;')}</div><div style="font:700 15px var(--ui);color:#fff;text-shadow:0 0 8px #ff3aa0">${txt.replace(/</g, '&lt;')}</div>`; c.style.opacity = 1; }
@@ -16368,7 +16573,7 @@ function ideaPropsUpd(dt) {
   }
 }
 /* ===== characters of the game, statues, free spots ===== */
-const IDEA_CHARS = [['воскрес', 'gagarin', 'Воскреситель'], ['мелоди', 'melodie', 'Мелоди'], ['свити', 'svity-street', 'Свити'], ['продюсер', 'producer', 'Продюсер'], ['сириус', 'sirius', 'Сириус'], ['счетовод', 'ledger', 'Счетовод'], ['взыскател', 'collector', 'Взыскатель'], ['хаги', 'huggy', 'Хаги Ваги'], ['хагги', 'huggy', 'Хаги Ваги']];
+const IDEA_CHARS = [['ник52', 'blockhead', 'Ник52'], ['nik52', 'blockhead', 'Ник52'], ['воскрес', 'gagarin', 'Воскреситель'], ['мелоди', 'melodie', 'Мелоди'], ['свити', 'svity-street', 'Свити'], ['продюсер', 'producer', 'Продюсер'], ['сириус', 'sirius', 'Сириус'], ['счетовод', 'ledger', 'Счетовод'], ['взыскател', 'collector', 'Взыскатель'], ['хаги', 'huggy', 'Хаги Ваги'], ['хагги', 'huggy', 'Хаги Ваги']];
 const IDEA_STAT_MODEL = { 'кот': 'cat', 'кошк': 'cat', 'собак': 'dog', 'медвед': 'bear', 'тигр': 'tiger', 'акул': 'shark', 'динозавр': 'dino', 'пингвин': 'penguin', 'дракон': 'dino', 'паук': 'spider' };
 function ideaFreeSpot(r) {
   for (let k = 0; k < 50; k++) {
@@ -16622,6 +16827,15 @@ function ideaRocketUpd(dt) {
 }
 function ideaLocsUpd(dt) { for (const l of IDEA.locs) { if (l.kind === 'sauna') { if (Math.random() < dt * 8) spawnSprite(TEX.smoke, _a.set(l.chim[0], 6.7, l.chim[1]), { color: 0xc8c8d0, size: 1.2, grow: 1.6, life: 2.4, opacity: 0.45, vel: new V3(0.3, 1.2, 0.1) }); if (Math.random() < dt * 14) spawnSprite(TEX.smoke, _a.set(l.stove[0] + rand(-1.5, 1.5), 1.4, l.stove[1] + rand(-1, 2)), { color: 0xffffff, size: 1.4, grow: 1.2, life: 2.0, opacity: 0.35, vel: new V3(0, 0.8, 0) }); } } for (const l of IDEA.locs) if (l.kind === 'fountain' && Math.random() < dt * 22) spawnSprite(TEX.soft, _a.set(l.cx + rand(-0.2, 0.2), 3.0, l.cz + rand(-0.2, 0.2)), { color: 0x9ad0ff, additive: true, size: 0.22, grow: 0, life: 1.0, vel: new V3(rand(-1.2, 1.2), rand(1, 2.4), rand(-1.2, 1.2)) }); }
 /* ===== parse + apply for the new world words ===== */
+/* a permanent crowd: people in a ring that cheer forever */
+function ideaCrowd(x, z, R, count) {
+  const cx = clamp(x, -HX + R + 1, HX - R - 1), cz = clamp(z, -HZ + R + 1, HZ - R - 1);
+  for (let i = 0; i < count; i++) {
+    const a = i / count * 6.283 + rand(-0.1, 0.1), px = cx + Math.cos(a) * R * rand(0.7, 1), pz = cz + Math.sin(a) * R * rand(0.7, 1);
+    const n = spawnNPC('human', px, pz, Math.atan2(cx - px, cz - pz)); if (!n) continue;
+    n.scripted = true; n.speed = 0; n.pose = pick(['tada', 'dance', 'laugh', 'hunch']); n.poseDur = Infinity; n.poseT = 0;
+  }
+}
 function ideaParseWorld(t) {
   const who = () => ideaFindWho(t);
   if (/коч\W{0,3}брат/.test(t)) return { k: 'location', kind: 'sauna' };
@@ -16651,6 +16865,23 @@ function ideaWorldApply(P, t, who, me, tg, at, why) {
       if (!spec) { let best = null; for (const [st, k, a] of IDEA_WORDS) if ((k === 'emoji' || k === 'soft' || k === 'food') && T.includes(st) && (!best || st.length > best[0].length) && IM_EMO[a]) best = [st, IM_EMO[a]]; for (const st in IDEA_STAT_MODEL) if (T.includes(st) && (!best || st.length > best[0].length)) best = [st, IDEA_STAT_MODEL[st]]; if (best) spec = { model: best[1], name: best[0][0].toUpperCase() + best[0].slice(1) }; }
       if (!spec) spec = { model: pick(['elephant', 'dino', 'unicorn', 'cat', 'giraffe']), name: 'Статуя' };
       const s = ideaStatue(spec); return s ? `на арене навсегда встаёт статуя «${spec.name}»` : 'для статуи не нашлось места'; }
+    case 'kick': {
+      const R = P.who.map((w) => (w.t === 'bot' ? w.b : w.t === 'player' ? 'player' : w.t === 'me' ? me : null));
+      const A = R[0], B = R[1]; if (!A || !B || A === B) return 'пинок не получился';
+      const nm = (o) => (o === 'player' ? IDEA.name : o.name), pa = ideaPosOf(A), pb = ideaPosOf(B);
+      ideaCrowd((pa.x + pb.x) / 2, (pa.z + pb.z) / 2, 4, 12);
+      for (const [X, pose, role] of [[A, 'punch', 'kicker'], [B, 'down', 'victim']]) {
+        if (X === 'player') { if (role === 'victim') ideaHurtPlayer(12); continue; }
+        if (!X.alive || !X.n || X.n.state !== 'alive') continue;
+        const n = X.n, p = role === 'kicker' ? pa : pb;
+        X.stun = 1e9; X.kicks = true; n.pos.set(p.x, 0, p.z); n.yaw = role === 'kicker' ? Math.atan2(pb.x - pa.x, pb.z - pa.z) : Math.atan2(pa.x - pb.x, pa.z - pb.z);
+        n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; n.speed = 0; n.pose = pose; n.poseDur = Infinity; n.poseT = 0;
+        if (role === 'victim') ideaHurtBot(X, 30, 'пинок', null);
+      }
+      IDEA.focus = new V3((pa.x + pb.x) / 2, 1, (pa.z + pb.z) / 2); IDEA.focusS = 1.2;
+      return `${nm(A)} пинает ${nm(B)}: на арене навсегда появилась толпа`;
+    }
+    case 'crowd': { const p = at; ideaCrowd(p.x, p.z, 9, 14); IDEA.focus = p.clone(); IDEA.focusS = 1.4; return `на арене навсегда появляется толпа`; }
     case 'zone': return ideaZoneShrink();
     case 'rocket': return ideaRocket();
     case 'char': { let n = 0; for (const w of P.who) for (let i = 0; i < P.n; i++) { if (IDEA.chars >= 14) break; const x = clamp(at.x + rand(-4, 4), -HX + 3, HX - 3), z = clamp(at.z + rand(-4, 4), -HZ + 3, HZ - 3), c = w.look === 'huggy' ? spawnHuggy(x, z) : mkNpc(w.look, x, z, rand(0, 6.28), 'human'); if (c) { IDEA.chars++; n++; spawnSprite(TEX.soft, _a.set(x, 1, z), { color: 0xffd060, additive: true, size: 2.6, grow: 1, life: 0.6 }); } } IDEA.focus = at.clone(); return n ? `на арене появляется: ${P.who.map((w) => w.nm).join(', ')} (навсегда)` : 'арена переполнена'; }
