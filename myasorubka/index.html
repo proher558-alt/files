@@ -17173,7 +17173,7 @@ function updDacha(dt) {
 /* ===== server «Не открывай»: a night in a big house, tall pale monsters outside. Bots only, no real online ===== */
 const HW = 14, HD = 10, HH = 3.2; // the house: x ±14, z ±10 (four times the old one), walls 3.2 m
 MAPS.house = { name: 'Дом', desc: '', story: true, hx: 64, hz: 64, h: 30, spawn: [-6.5, -4.2, 0], fog: 0x05070c, fogD: 0.02, bg: 0x020308, sun: 0.05, hemi: 0.13, lamp: [0xffc27a, 10, 15], lamps: [[-7, 2.85, -4.5], [9, 2.85, -5], [8, 2.85, 5], [-4, 2.85, 6.5]], red: [[0, 2.9, 6], 0xff3a2a, 0], build: buildHouse, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] };
-const MONS = { on: false, players: 1, bots: [], monsters: [], doorOpen: true, doorAng: 1.4, doorTgt: 1.4, doorSpd: 4, doorRattle: 0, doorLeaf: null, doorKnob: null, doorRec: null, spots: [], wins: [], wave: 0, WAVES: 6, evT: 16, t: 0, hide: null, alert: null, dead: false, win: false, stare: 0, inside: null, hudT: 0, near: null, outT: 0, fx: {} };
+const MONS = { on: false, players: 1, bots: [], monsters: [], doorOpen: true, doorAng: 1.4, doorTgt: 1.4, doorSpd: 4, doorRattle: 0, doorLeaf: null, doorKnob: null, doorRec: null, spots: [], wins: [], wave: 0, evT: 16, t: 0, hour: 0, hLen: 55, mtype: 'all', diff: 'classic', diffD: { name: 'Классика', hLen: 55, tK: 1, extra: 0 }, heart: 70, breath: 100, holdBreath: false, calmT: 0, braveT: 0, gasp: 0, beatT: 0, items: { bat: 0, pill: 0, energy: 0 }, flash: { on: false, bat: 100 }, pickups: [], power: null, powerDone: false, restocked: false, fixT: 0, sniffCd: 0, sunrise: false, lastKind: 'lanky', hide: null, alert: null, dead: false, win: false, stare: 0, inside: null, hudT: 0, near: null, outT: 0, fx: {} };
 const ST = { x: -48, z: -48 };
 // windows: [x, z, outward side]
 const MON_WIN = [[-10, -HD, 'n'], [-3, -HD, 'n'], [9, -HD, 'n'], [-HW, -5, 'w'], [-HW, 6.5, 'w'], [HW, -5, 'e'], [HW, 5, 'e'], [9, HD, 's'], [-3.5, HD, 's']];
@@ -17270,7 +17270,19 @@ function buildHouse() {
   for (let k = 0; k < 7; k++) { const s = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.45, 0.06, 9), texM(T.stone, 1, 1)); s.position.set(rand(-0.25, 0.25), 0.03, HD + 3.4 + k * 1.15); addMesh(s); }
   { const fm = std({ color: 0x4a3a2e, roughness: 1 }); const FL = []; const fence = (x0, z0, x1, z1) => { const L = Math.hypot(x1 - x0, z1 - z0), n = Math.round(L / 0.5); for (let k = 0; k <= n; k++) { const x = x0 + (x1 - x0) * k / n, z = z0 + (z1 - z0) * k / n; if (Math.abs(x) < 1.3 && z > 18) continue; FL.push([x, 0.6, z, 0.1, 1.2 + (k % 2) * 0.1, 0.1]); } for (const y of [0.35, 0.95]) FL.push([(x0 + x1) / 2, y, (z0 + z1) / 2, Math.abs(x1 - x0) + 0.1, 0.07, Math.abs(z1 - z0) + 0.1]); };
     fence(-24, -18, 24, -18); fence(-24, -18, -24, 19); fence(24, -18, 24, 19); fence(-24, 19, -1.3, 19); fence(1.3, 19, 24, 19); instMany(IM_G.box, fm, FL, null, false); }
-  { hbox(17.5, -13, 3.2, 2.4, 2.6, 0, { mat: texM(T.siding, 1.5, 1, { color: 0x8a6a5a }) }); const r = new THREE.Mesh(IM_G.box, std({ color: 0x2a201c })); r.position.set(17.5, 2.55, -13); r.scale.set(3.6, 0.15, 3.0); r.rotation.x = 0.15; addMesh(r); const d = new THREE.Mesh(IM_G.box, std({ color: 0x3a2a20 })); d.position.set(17.5, 0.95, -11.68); d.scale.set(1.0, 1.9, 0.04); addMesh(d); }
+  // the night street beyond the gate: a cracked road, sleeping neighbour houses, lampposts
+  { const road = new THREE.Mesh(IM_G.box, texM(T.stone, 14, 2, { color: 0x3c3c40, roughness: 1 })); road.position.set(0, 0.012, 23.5); road.scale.set(110, 0.02, 7); addMesh(road);
+    const DL = []; for (let x = -52; x < 52; x += 4) DL.push([x, 0.03, 23.5, 1.6, 0.012, 0.16]); instMany(IM_G.box, std({ color: 0x8a8a7a, roughness: 1 }), DL, null, false);
+    for (const [hx, hz, hw, hc] of [[-34, 33, 9, 0x4a4038], [-6, 35, 11, 0x3c4248], [26, 33, 8, 0x45383c]]) {
+      hbox(hx, hz, hw, 4.2, 7, hc, { mat: texM(T.siding, hw / 3, 1.6, { color: hc }), solid: false, cast: false });
+      const rf2 = new THREE.Mesh(IM_G.box, texM(T.roof, 4, 2)); rf2.position.set(hx, 4.9, hz); rf2.scale.set(hw + 1.2, 1.4, 8.2); rf2.rotation.z = 0.04; rf2.receiveShadow = false; addMesh(rf2);
+      const WL = []; for (let wx = -1; wx <= 1; wx++) WL.push([hx + wx * hw * 0.3, 2.2, hz - 3.56, 1.0, 1.2, 0.06]); const wm = new THREE.Mesh(IM_G.box, std({ color: 0x15161c, emissive: 0x08080c, roughness: 0.2 })); instMany(IM_G.box, std({ color: 0x1a1b22, emissive: 0x0a0a10, roughness: 0.2 }), WL, null, false);
+    }
+    const LP = []; for (const lx of [-28, 0, 28]) { LP.push([lx, 2.6, 20.6, 0.14, 5.2, 0.14]); const hd3 = new THREE.Mesh(IM_G.box, std({ color: 0xd8e8f0, emissive: 0x4a5a3a })); hd3.position.set(lx, 5.0, 21.0); hd3.scale.set(0.4, 0.12, 0.7); addMesh(hd3); } instMany(IM_G.cyl, std({ color: 0x2a2a2e, metalness: 0.5 }), LP, null, false);
+    { const bs = new THREE.Mesh(IM_G.box, std({ color: 0x2a3440, roughness: 0.8 })); bs.position.set(12, 1.25, 21.0); bs.scale.set(2.6, 2.5, 0.15); addMesh(bs); const bb = new THREE.Mesh(IM_G.box, std({ color: 0x1a2028 })); bb.position.set(12, 0.5, 21.4); bb.scale.set(2.2, 0.5, 0.5); addMesh(bb); } }
+  { hbox(17.5, -13, 3.2, 2.4, 2.6, 0, { mat: texM(T.siding, 1.5, 1, { color: 0x8a6a5a }) }); const r = new THREE.Mesh(IM_G.box, std({ color: 0x2a201c })); r.position.set(17.5, 2.55, -13); r.scale.set(3.6, 0.15, 3.0); r.rotation.x = 0.15; addMesh(r); const d = new THREE.Mesh(IM_G.box, std({ color: 0x3a2a20 })); d.position.set(17.5, 0.95, -11.68); d.scale.set(1.0, 1.9, 0.04); addMesh(d);
+    const bk = new THREE.Mesh(IM_G.box, std({ color: 0x4a4a52, metalness: 0.4, roughness: 0.5, emissive: 0x082008 })); bk.position.set(16.3, 1.3, -11.66); bk.scale.set(0.5, 0.7, 0.1); addMesh(bk); MONS.breakerM = bk;
+    const lv = new THREE.Mesh(IM_G.box, std({ color: 0xc02020, roughness: 0.4 })); lv.position.set(16.3, 1.25, -11.58); lv.scale.set(0.08, 0.3, 0.06); addMesh(lv); }
   { const car = new THREE.Group(); car.position.set(-13, 0, 14.5); car.rotation.y = 0.25; const body = std({ color: 0x5a1a1a, roughness: 0.4, metalness: 0.4 }); const b1 = new THREE.Mesh(IM_G.box, body); b1.position.y = 0.7; b1.scale.set(1.8, 0.7, 4.2); car.add(b1); const b2 = new THREE.Mesh(IM_G.box, body); b2.position.set(0, 1.3, -0.2); b2.scale.set(1.6, 0.6, 2.2); car.add(b2); const gw = new THREE.Mesh(IM_G.box, std({ color: 0x101820, roughness: 0.1, metalness: 0.6 })); gw.position.set(0, 1.32, -0.2); gw.scale.set(1.62, 0.45, 2.0); car.add(gw); for (const [x, z] of [[-0.85, 1.3], [0.85, 1.3], [-0.85, -1.3], [0.85, -1.3]]) { const w = new THREE.Mesh(IM_G.cyl, std({ color: 0x111111 })); w.rotation.z = Math.PI / 2; w.position.set(x, 0.36, z); w.scale.set(0.7, 0.25, 0.7); car.add(w); } addMesh(car); solid(-13, 0.9, 14.5, 2.4, 1.8, 4.4); }
   { const p = new THREE.Mesh(IM_G.cyl, std({ color: 0x2a2a2e, metalness: 0.5 })); p.position.set(7, 2.6, 21); p.scale.set(0.14, 5.2, 0.14); addMesh(p); const h = new THREE.Mesh(IM_G.box, std({ color: 0xd8f0ff, emissive: 0x9ad0ff })); h.position.set(7, 5.15, 20.4); h.scale.set(0.5, 0.12, 0.9); addMesh(h);  }
   { const sw = std({ color: 0x3a2a20 }); for (const s of [-1, 1]) { const l = new THREE.Mesh(IM_G.box, sw); l.position.set(-17 + s * 1, 1.2, -6); l.scale.set(0.12, 2.4, 0.12); l.rotation.z = s * -0.12; addMesh(l); } const top = new THREE.Mesh(IM_G.box, sw); top.position.set(-17, 2.35, -6); top.scale.set(2.4, 0.12, 0.12); addMesh(top); const seat = new THREE.Group(); seat.position.set(-17, 2.3, -6); addMesh(seat); const st = new THREE.Mesh(IM_G.box, sw); st.position.y = -1.7; st.scale.set(0.7, 0.06, 0.3); seat.add(st); for (const s of [-1, 1]) { const r = new THREE.Mesh(IM_G.box, std({ color: 0x777777 })); r.position.set(s * 0.32, -0.85, 0); r.scale.set(0.02, 1.7, 0.02); seat.add(r); } MONS.fx.swing = seat; }
@@ -17336,6 +17348,7 @@ function furnishHouse(T) {
   { const rod = new THREE.Mesh(IM_G.cyl, std({ color: 0xc0c0c0, metalness: 0.8 })); rod.rotation.z = Math.PI / 2; rod.position.set(-11.0, 2.1, HD - 1.05); rod.scale.set(0.025, 2.2, 0.025); addMesh(rod); const cur = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 1.6, 12, 1), std({ color: 0xd8e8f0, roughness: 0.9, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })); const p = cur.geometry.attributes.position; for (let k = 0; k < p.count; k++) p.setZ(k, Math.sin(p.getX(k) * 12) * 0.05); p.needsUpdate = true; cur.geometry.computeVertexNormals(); cur.position.set(-11.0, 1.3, HD - 1.05); addMesh(cur); MONS.fx.shower = cur; }
   im('toilet', -7.0, HD - 0.4, Math.PI, 1.0, [0.5, 0.8, 0.7]);
   { hbox(-HW + 0.45, 4.6, 0.6, 0.85, 0.9, 0, { mat: std({ color: 0xf0f0f0, roughness: 0.3 }), y0: 0.06 }); const mir = new THREE.Mesh(IM_G.box, std({ color: 0xc8d8e8, metalness: 0.9, roughness: 0.05 })); mir.position.set(-HW + 0.18, 1.7, 4.6); mir.scale.set(0.02, 0.8, 0.7); addMesh(mir); }
+  for (const sp2 of MONS.spots) sp2.view = sp2.doors ? 'slats' : sp2.id === 'bath' ? 'bath' : 'bed';
 }
 /* the front door: open = unlocked and swung into the hall; closed = locked and solid. The leaf animates every frame */
 function monsDoorSet(open, silent, slam) {
@@ -17356,7 +17369,7 @@ function monsHouseTick(dt) {
   // fire, lamps, clock, swing, shower curtain
   fx.fire.forEach((f, k) => { const s = 0.8 + Math.sin(now * (9 + k) + k * 2) * 0.25 + Math.random() * 0.1; f.scale.set(0.14 * s, 0.42 * s, 0.14 * s); f.position.y = 0.3 + 0.2 * s; }); if (fx.fireL) fx.fireL.intensity = 4 + Math.sin(now * 13) * 0.8 + Math.random() * 0.8;
   if (fx.porch) { const fl = Math.random() < 0.015 ? 0.15 : 1; fx.porch.L.intensity = 6 * fl; fx.porch.lb.material.emissive.setHex(fl < 1 ? 0x201000 : 0xffc060); }
-  if (fx.clock) { const d = new Date(), sec = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds(); fx.clock.h.rotation.z = -(sec / 43200) * 6.283; fx.clock.m.rotation.z = -((sec % 3600) / 3600) * 6.283; }
+  if (fx.clock) { let hh, mm2; if (MONS.on) { hh = MONS.hour; mm2 = MONS.hour % 1; } else { const d = new Date(); hh = d.getHours() % 12 + d.getMinutes() / 60; mm2 = d.getMinutes() / 60; } fx.clock.h.rotation.z = -(hh / 12) * 6.283; fx.clock.m.rotation.z = -mm2 * 6.283; }
   if (fx.swing) fx.swing.rotation.x = Math.sin(now * 0.9) * 0.18; if (fx.shower) fx.shower.rotation.y = Math.sin(now * 0.7) * 0.03;
   if (fx.tvGlow) fx.tvGlow.intensity = MONS.tvOn ? 2.2 + Math.random() * 0.6 : 0;
 }
@@ -17384,18 +17397,45 @@ function mkNoob() {
   return g;
 }
 function noobFace(g, kind) { const fp = g.userData.facePlane; const t = cvTex(128, 128, (c) => { c.fillStyle = '#111'; if (kind === 'scream') { c.beginPath(); c.arc(44, 52, 6, 0, 6.283); c.arc(84, 52, 6, 0, 6.283); c.fill(); c.beginPath(); c.ellipse(64, 86, 12, 18, 0, 0, 6.283); c.fill(); } else if (kind === 'angry') { c.lineWidth = 6; c.strokeStyle = '#111'; c.beginPath(); c.moveTo(30, 40); c.lineTo(56, 52); c.moveTo(98, 40); c.lineTo(72, 52); c.stroke(); c.beginPath(); c.arc(44, 62, 5, 0, 6.283); c.arc(84, 62, 5, 0, 6.283); c.fill(); c.beginPath(); c.moveTo(48, 92); c.lineTo(80, 92); c.stroke(); } else if (kind === 'dead') { c.lineWidth = 5; c.strokeStyle = '#111'; for (const x of [44, 84]) { c.beginPath(); c.moveTo(x - 8, 46); c.lineTo(x + 8, 62); c.moveTo(x + 8, 46); c.lineTo(x - 8, 62); c.stroke(); } c.beginPath(); c.ellipse(64, 90, 9, 12, 0, 0, 6.283); c.fill(); } }); fp.material.map = t; fp.material.needsUpdate = true; }
-function mkMonster(sc = 1) {
-  const g = new THREE.Group(), skin = std({ color: 0xb9ac9c, roughness: 0.95, emissive: 0x161310 }), dk = std({ color: 0x8a7a6e, roughness: 1 });
+/* ===== three monster kinds, each an original design (no copies) ===== */
+const MON_KINDS = {
+  lanky: { id: 'lanky', name: 'Тощий', emoji: '🩻', desc: 'высокий и терпеливый', sc: 0.72, skin: 0xb9ac9c, speed: 1.0, breachK: 1.0, sniffP: 0.4, sniffDur: 5.0, limb: 1.0, hunch: 0, headK: 1.0, freq: 1.0 },
+  sniffer: { id: 'sniffer', name: 'Ищейка', emoji: '👃', desc: 'сутулая, вынюхивает укрытия', sc: 0.66, skin: 0xa89a86, speed: 0.85, breachK: 1.25, sniffP: 0.78, sniffDur: 6.5, limb: 1.12, hunch: 0.4, headK: 1.2, freq: 0.9 },
+  runner: { id: 'runner', name: 'Бегун', emoji: '🦴', desc: 'быстрый, но слабее ломает', sc: 0.6, skin: 0x8f8178, speed: 1.55, breachK: 1.4, sniffP: 0.3, sniffDur: 4.2, limb: 0.96, hunch: 0.14, headK: 0.88, freq: 1.5 }
+};
+const MON_MATS = {};
+function monSkin(kind) {
+  if (MON_MATS[kind]) return MON_MATS[kind];
+  const col = new THREE.Color(MON_KINDS[kind].skin), hx = '#' + col.getHexString();
+  const tex = cvTex(128, 128, (g) => {
+    g.fillStyle = hx; g.fillRect(0, 0, 128, 128);
+    for (let i = 0; i < 30; i++) { g.strokeStyle = `rgba(86,96,126,${rand(0.05, 0.15)})`; g.lineWidth = rand(0.6, 1.5); g.beginPath(); let x = rand(0, 128), y = rand(0, 128); g.moveTo(x, y); for (let k = 0; k < 4; k++) { x += rand(-16, 16); y += rand(8, 22); g.lineTo(x, y); } g.stroke(); }
+    for (let i = 0; i < 24; i++) { g.fillStyle = `rgba(60,48,42,${rand(0.04, 0.1)})`; g.beginPath(); g.ellipse(rand(0, 128), rand(0, 128), rand(2, 7), rand(2, 5), rand(0, 3), 0, 6.283); g.fill(); }
+    for (let i = 0; i < 260; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.08})`; g.fillRect(Math.random() * 128, Math.random() * 128, 1.5, 1.5); }
+  });
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  return MON_MATS[kind] = std({ map: tex, roughness: 0.95, emissive: 0x0b0907 });
+}
+function mkMonster(sc = 1, kind = 'lanky') {
+  const d = MON_KINDS[kind] || MON_KINDS.lanky, g = new THREE.Group(), skin = monSkin(d.id), dk = std({ color: 0x6e6056, roughness: 1 }), L = d.limb;
   const pv = (par, x, y, z) => { const p = new THREE.Group(); p.position.set(x, y, z); par.add(p); return p; };
   const hips = pv(g, 0, 1.55, 0), legL = pv(hips, -0.1, 0, 0), legR = pv(hips, 0.1, 0, 0), spine = pv(hips, 0, 0, 0);
   const pelv = new THREE.Mesh(IM_G.sph, skin); pelv.scale.set(0.3, 0.2, 0.2); hips.add(pelv);
   const kneeL = pv(legL, 0, -0.78, 0), kneeR = pv(legR, 0, -0.78, 0); legL.add(cylDown(0.78, 0.09, 0.065, skin)); legR.add(cylDown(0.78, 0.09, 0.065, skin)); kneeL.add(cylDown(0.78, 0.065, 0.045, skin)); kneeR.add(cylDown(0.78, 0.065, 0.045, skin));
-  for (const k of [kneeL, kneeR]) { const ft = new THREE.Mesh(IM_G.box, dk); ft.scale.set(0.09, 0.05, 0.26); ft.position.set(0, -0.8, 0.07); k.add(ft); }
-  const tor = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.17, 1.05, 10).translate(0, 0.52, 0), skin); tor.scale.set(1.25, 1, 0.8); spine.add(tor); for (let i = 0; i < 5; i++) { const rb = new THREE.Mesh(IM_G.box, dk); rb.scale.set(0.24, 0.012, 0.01); rb.position.set(0, 0.45 + i * 0.1, 0.1); spine.add(rb); }
-  const neck = pv(spine, 0, 1.0, 0); const nk = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.5, 8).translate(0, 0.25, 0), skin); neck.add(nk); const head = pv(neck, 0, 0.55, 0); const hd = new THREE.Mesh(IM_G.sph, skin); hd.scale.set(0.27, 0.36, 0.27); head.add(hd); neck.rotation.x = 0.35;
-  const shL = pv(spine, -0.24, 0.9, 0), shR = pv(spine, 0.24, 0.9, 0); shL.add(cylDown(0.8, 0.075, 0.06, skin)); shR.add(cylDown(0.8, 0.075, 0.06, skin)); const elL = pv(shL, 0, -0.8, 0), elR = pv(shR, 0, -0.8, 0); elL.add(cylDown(0.76, 0.06, 0.045, skin)); elR.add(cylDown(0.76, 0.06, 0.045, skin));
-  for (const e of [elL, elR]) { const hd2 = new THREE.Mesh(IM_G.box, skin); hd2.scale.set(0.09, 0.14, 0.04); hd2.position.y = -0.82; e.add(hd2); for (let f = -1; f <= 1; f++) { const fg = cylDown(0.18, 0.016, 0.01, skin); fg.position.set(f * 0.03, -0.88, 0); e.add(fg); } }
-  g.userData = { hips, legL, legR, kneeL, kneeR, spine, neck, head, shL, shR, elL, elR }; g.scale.setScalar(sc);
+  for (const k of [kneeL, kneeR]) { const ft = new THREE.Mesh(IM_G.box, dk); ft.scale.set(0.1, 0.05, 0.3); ft.position.set(0, -0.8, 0.09); k.add(ft); for (let c = -1; c <= 1; c++) { const cl = new THREE.Mesh(new THREE.ConeGeometry(0.016, 0.07, 5).rotateX(Math.PI / 2), dk); cl.position.set(c * 0.03, -0.8, 0.25); k.add(cl); } }
+  const tor = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.17, 1.05, 10).translate(0, 0.52, 0), skin); tor.scale.set(1.25, 1, 0.8); spine.add(tor);
+  for (let i = 0; i < 5; i++) { const rb = new THREE.Mesh(IM_G.box, dk); rb.scale.set(0.24, 0.012, 0.01); rb.position.set(0, 0.45 + i * 0.1, 0.1); spine.add(rb); }
+  for (let i = 0; i < 6; i++) { const sp2 = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.09, 5), skin); sp2.position.set(0, 0.35 + i * 0.13, -0.12); sp2.rotation.x = -1.9; spine.add(sp2); }
+  const neck = pv(spine, 0, 1.0, 0); const nk = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.5, 8).translate(0, 0.25, 0), skin); neck.add(nk); const head = pv(neck, 0, 0.55, 0);
+  const hd = new THREE.Mesh(IM_G.sph, skin); hd.scale.set(0.27, 0.36 * d.headK, 0.29 + (d.id === 'sniffer' ? 0.06 : 0)); if (d.id === 'sniffer') hd.position.z = 0.04; head.add(hd); neck.rotation.x = 0.35;
+  const sock = std({ color: 0x14100c, roughness: 1 }); for (const s of [-1, 1]) { const e = new THREE.Mesh(IM_G.sph, sock); e.scale.set(0.055, 0.075, 0.03); e.position.set(s * 0.1, 0.07 * d.headK, 0.24 + (d.id === 'sniffer' ? 0.06 : 0)); head.add(e); }
+  if (d.id === 'sniffer') for (const s of [-1, 1]) { const n = new THREE.Mesh(IM_G.sph, sock); n.scale.set(0.028, 0.045, 0.02); n.position.set(s * 0.035, -0.05, 0.32); head.add(n); }
+  const jaw = pv(head, 0, -0.16 * d.headK, 0.05); { const jm = new THREE.Mesh(IM_G.box, skin); jm.scale.set(0.16, 0.07, 0.2); jm.position.set(0, -0.02, 0.07); jaw.add(jm); const inn = new THREE.Mesh(IM_G.box, std({ color: 0x3a0a0c, roughness: 0.6, emissive: 0x1a0204 })); inn.scale.set(0.13, 0.05, 0.16); inn.position.set(0, 0.015, 0.06); jaw.add(inn); for (let t = -2; t <= 2; t++) { const th = new THREE.Mesh(new THREE.ConeGeometry(0.012, 0.045, 4), std({ color: 0xd8d0b8, roughness: 0.4 })); th.position.set(t * 0.028, 0.035, 0.15); jaw.add(th); const tl = th.clone(); tl.rotation.x = Math.PI; tl.position.set(t * 0.028 + 0.013, 0.09, 0.16); head.add(tl); } }
+  const drool = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.004, 0.3, 5).translate(0, -0.15, 0), std({ color: 0xb8c8c0, transparent: true, opacity: 0.55, roughness: 0.2 })); drool.position.set(0.02, -0.04, 0.15); drool.visible = false; jaw.add(drool);
+  const shL = pv(spine, -0.24, 0.9, 0), shR = pv(spine, 0.24, 0.9, 0); shL.add(cylDown(0.8 * L, 0.075, 0.06, skin)); shR.add(cylDown(0.8 * L, 0.075, 0.06, skin)); const elL = pv(shL, 0, -0.8 * L, 0), elR = pv(shR, 0, -0.8 * L, 0); elL.add(cylDown(0.76 * L, 0.06, 0.045, skin)); elR.add(cylDown(0.76 * L, 0.06, 0.045, skin));
+  for (const e of [elL, elR]) { const hd2 = new THREE.Mesh(IM_G.box, skin); hd2.scale.set(0.09, 0.14, 0.04); hd2.position.y = -0.82 * L; e.add(hd2); for (let f = 0; f < 4; f++) { const fg = cylDown(0.2, 0.014, 0.007, skin); fg.position.set((f - 1.5) * 0.022, -0.88 * L, 0); fg.rotation.x = 0.12; e.add(fg); } }
+  g.userData = { hips, legL, legR, kneeL, kneeR, spine, neck, head, shL, shR, elL, elR, jaw, drool, kind: d.id, def: d, armL: L };
+  g.scale.setScalar(sc);
   return g;
 }
 function strandBetween(m, a, b) { const d = new V3().subVectors(b, a), L = d.length(); m.position.copy(a).addScaledVector(d, 0.5); m.scale.set(1, Math.max(0.01, L), 1); m.quaternion.setFromUnitVectors(new V3(0, 1, 0), d.normalize()); }
@@ -17447,7 +17487,7 @@ function wound(par, x, y, z, s = 0.1) { const m = new THREE.Mesh(IM_G.sph, std({
 /* 1: the window (10.6 s). Back to the window, the glass bursts, a long arm takes the head from behind, the struggle,
    the head lifts slowly with the spine, the body sinks into a heap, the head goes up out of view and comes back hanging */
 function monsDeath1() {
-  const S = stageBegin(0x1a1410), mon = mkMonster(0.62), wall = std({ color: 0x3e2e24, roughness: 0.9 }), frm = std({ color: 0x1a120c, roughness: 0.9 }), mu = mon.userData;
+  const S = stageBegin(0x1a1410), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), wall = std({ color: 0x3e2e24, roughness: 0.9 }), frm = std({ color: 0x1a120c, roughness: 0.9 }), mu = mon.userData;
   const wb = (x, y, w, h) => { const m = new THREE.Mesh(IM_G.box, wall); m.position.set(x, y, -0.15); m.scale.set(w, h, 0.3); S.add(m); };
   wb(-3.4, 1.8, 4.0, 3.6); wb(2.6, 1.8, 4.8, 3.6); wb(-0.6, 0.45, 1.6, 0.9); wb(-0.6, 3.1, 1.6, 1.0);
   for (const [x, y, w, h] of [[-0.6, 0.93, 1.75, 0.1], [-0.6, 2.62, 1.75, 0.12], [-1.43, 1.76, 0.1, 1.75], [0.23, 1.76, 0.1, 1.75]]) { const f = new THREE.Mesh(IM_G.box, frm); f.position.set(x, y, 0.03); f.scale.set(w, h, 0.18); S.add(f); }
@@ -17495,7 +17535,7 @@ function monsDeath1() {
 /* 2: the door slot (7.6 s). Pinned to the wall with an arm pulled into the slot, squeezed, torn in two:
    the top goes through, the legs stay with the guts; then the view from behind the wall: the monster holds the top half */
 function monsDeath2() {
-  const S = stageBegin(0x2a0a0a), wall = std({ color: 0x5c5a52, roughness: 0.95 }), mon = mkMonster(0.62), mu = mon.userData;
+  const S = stageBegin(0x2a0a0a), wall = std({ color: 0x5c5a52, roughness: 0.95 }), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData;
   const SX = 0.55, SY = 1.62, SW = 0.75, SH = 0.22;
   const wb = (x, y, w, h) => { const m = new THREE.Mesh(IM_G.box, wall); m.position.set(x, y, -0.15); m.scale.set(w, h, 0.3); S.add(m); };
   wb(SX - SW / 2 - 2.5, 1.6, 5, 3.2); wb(SX + SW / 2 + 2.5, 1.6, 5, 3.2); wb(SX, (SY - SH / 2) / 2, SW, SY - SH / 2); wb(SX, (SY + SH / 2 + 3.2) / 2, SW, 3.2 - SY - SH / 2);
@@ -17540,7 +17580,7 @@ function monsDeath2() {
 /* 3: outside (18 s). Grabbed by the head, lifted, bitten in the chest, swung, a leg torn off, hung upside down,
    an arm torn off, flipped, the pelvis torn off, the torso held up with the guts hanging, torn from the head, the head held up */
 function monsDeath3() {
-  const S = stageBegin(0x2a1e14), mon = mkMonster(0.62), mu = mon.userData;
+  const S = stageBegin(0x2a1e14), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData;
   for (let i = 0; i < 9; i++) { const l = new THREE.Mesh(IM_G.sph, imMat(0xffe080, true)); l.position.set(rand(-7, 7), rand(0.8, 3.2), rand(-8, -3)); l.scale.setScalar(0.06); S.add(l); }
   const P = mkPerson(), j = P.j; P.root.position.set(0.35, 0, 0.2); P.root.rotation.y = -1.45; mon.position.set(-0.55, 0, 0.1); mon.rotation.y = 1.5; S.add(mon);
   let legL = false, armR = false, pelv = false, tor = false, hole = null, poolM = null, T = null; const guts = gutBunch(S, 7, 0.75); guts.forEach((g) => g.m.visible = false); const sp = spine(S); sp.visible = false;
@@ -17582,7 +17622,7 @@ function monsDeath3() {
 /* 4: inside (7.6 s). A punch to the face, the hand in the chest, the arm torn off and thrown away, a step back,
    the head grabbed, the second lunge tears the top of the head off, the body sinks to its knees */
 function monsDeath4() {
-  const S = stageBegin(0x2a2018), mon = mkMonster(0.62), mu = mon.userData;
+  const S = stageBegin(0x2a2018), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData;
   const back = new THREE.Mesh(IM_G.box, std({ color: 0x2e241c, roughness: 0.95 })); back.position.set(0, 1.6, -1.4); back.scale.set(9, 3.2, 0.2); S.add(back);
   for (let i = -3; i <= 3; i++) { const p = new THREE.Mesh(IM_G.box, std({ color: 0x241a14, roughness: 0.95 })); p.position.set(i * 1.1, 1.6, -1.29); p.scale.set(0.05, 3.2, 0.02); S.add(p); }
   const P = mkPerson(), j = P.j; P.root.position.set(0.4, 0, 0.0); P.root.rotation.y = -1.3; mon.position.set(-0.7, 0, -0.05); mon.rotation.y = 1.5; S.add(mon);
@@ -17613,9 +17653,158 @@ function monsDeath4() {
       if (t >= 5.4) { const k = seg(t, 6.0, 6.9), k2 = seg(t, 6.9, 7.6); pose(P, { uLegL: [-1.5 * k, 0, 0.05], lLegL: [2.2 * k, 0, 0], uLegR: [-1.5 * k, 0, -0.05], lLegR: [2.2 * k, 0, 0], uArmR: [lerpc(-0.9, 0.2, k), 0, -0.3], torso: [0.35 * k + 0.4 * k2, 0, 0], head: [0.4 * k + 0.3 * k2, 0, 0.1] }); j.pelvis.position.y = lerpc(P.pelY ?? (P.pelY = j.pelvis.position.y), P.pelY * 0.55, k); scream(P, false); if (Math.random() < dt * 10 && t < 6.6) { const c = at(P, j.head, 0, 0.12, 0); bleed(c.x, c.y, c.z, rand(-0.5, 0.5), 1.2, 0.3, 3); } if (poolM) poolM.scale.setScalar(Math.min(0.8, poolM.scale.x + dt * 0.2)); }
     } };
 }
-const MONS_DEATHS = { window: monsDeath1, door: monsDeath2, out: monsDeath3, inside: monsDeath4 };
+/* ===== items, flashlight, fear (heart and breath), power cut, sniffing, sunrise ===== */
+const MONS_DIFF = { easy: { name: 'Новичок', hLen: 48, tK: 1.5, extra: 0 }, classic: { name: 'Классика', hLen: 55, tK: 1.0, extra: 0 }, nightmare: { name: 'Кошмар', hLen: 62, tK: 0.72, extra: 1 } };
+const PICK_PTS = [[-6.5, -7.6, 0.56], [9, -4.6, 0.9], [7.0, -9.1, 1.06], [13.4, 1.9, 0.68], [12.4, 9.2, 0.9], [1.9, 9.6, 0.64], [-11.6, 4.6, 0.97], [0.3, -5.6, 0.86], [17.5, -11.3, 0.35], [-16.6, -6, 0.35], [-13.2, 13.2, 1.15], [2.6, -8.9, 0.35]];
+const MONS_IT = { bat: { n: 'Батарейка (+45% фонаря)', e: '🔋' }, pill: { n: 'Таблетки для сердца', e: '💊' }, energy: { n: 'Энергетик', e: '⚡' } };
+function monsMkPickup(type, x, z, y) {
+  const g = new THREE.Group(); g.position.set(x, y, z);
+  if (type === 'bat') { const b = new THREE.Mesh(IM_G.cyl, std({ color: 0xe8c020, roughness: 0.4, emissive: 0x403008 })); b.scale.set(0.07, 0.18, 0.07); g.add(b); const c = new THREE.Mesh(IM_G.cyl, std({ color: 0xc87030, metalness: 0.7 })); c.scale.set(0.03, 0.03, 0.03); c.position.y = 0.105; g.add(c); }
+  else if (type === 'pill') { const b = new THREE.Mesh(IM_G.box, std({ color: 0xf4f4f0, roughness: 0.4, emissive: 0x303030 })); b.scale.set(0.16, 0.07, 0.11); g.add(b); const cr = new THREE.Mesh(IM_G.box, std({ color: 0xd02020, emissive: 0x500808 })); cr.scale.set(0.08, 0.02, 0.016); cr.position.y = 0.04; g.add(cr); const cr2 = cr.clone(); cr2.rotation.y = Math.PI / 2; g.add(cr2); }
+  else { const b = new THREE.Mesh(IM_G.cyl, std({ color: 0x20c8d8, roughness: 0.3, metalness: 0.5, emissive: 0x084048 })); b.scale.set(0.055, 0.17, 0.055); g.add(b); const s2 = new THREE.Mesh(IM_G.box, std({ color: 0xf0f0f0 })); s2.scale.set(0.115, 0.04, 0.02); s2.rotation.z = 0.5; s2.position.z = 0.05; g.add(s2); }
+  const gl = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX.soft, color: type === 'bat' ? 0xffd040 : type === 'pill' ? 0xff8080 : 0x40e0f0, transparent: true, opacity: 0.4, depthWrite: false })); gl.scale.set(0.55, 0.55, 1); g.add(gl);
+  addMesh(g); return g;
+}
+function monsSpawnPicks(n) {
+  const used = MONS.pickups.map((p) => p.x + ',' + p.z), pts = PICK_PTS.filter((p) => !used.includes(p[0] + ',' + p[1])).sort(() => Math.random() - 0.5);
+  for (let i = 0; i < n && i < pts.length; i++) { const [x, z, y] = pts[i], type = pick(['bat', 'bat', 'pill', 'pill', 'energy']); MONS.pickups.push({ type, x, z, y, g: monsMkPickup(type, x, z, y), ph: rand(0, 6) }); }
+}
+function monsUse(it) {
+  const M = MONS; if (M.dead || !M.on) return;
+  if (it === 'pill') { if (M.items.pill <= 0) return toast('💊 Таблеток нет — поищите в доме'); M.items.pill--; M.calmT = 14; M.heart = Math.min(M.heart, 85); try { Sound.pills(); } catch (e) {} toast('💊 Сердце успокаивается…'); }
+  else if (it === 'energy') { if (M.items.energy <= 0) return toast('⚡ Энергетиков нет'); M.items.energy--; M.braveT = 18; M.breath = 100; Sound.chime(); toast('⚡ Прилив смелости: дыхание держится дольше'); }
+  else if (it === 'flash') { if (M.flash.bat <= 0) { M.flash.on = false; return toast('🔦 Батарея села — найдите батарейку'); } M.flash.on = !M.flash.on; Sound.thud(0.2); if (M.flash.on && M.hide) toast('⚠ Свет в укрытии выдаёт вас!'); }
+  monsUiSync();
+}
+const _fdir = new V3();
+function monsNightTick(dt) {
+  const M = MONS, u = monsUi(), now = performance.now() / 1000;
+  // flashlight follows the view
+  if (M.flashL) { const on = M.flash.on && M.flash.bat > 0 && state === 'play' && !M.dead; M.flashL.intensity = on ? 75 : 0; if (on) { camera.getWorldDirection(_fdir); M.flashL.position.copy(camera.position).addScaledVector(_fdir, 0.25); M.flashT.position.copy(camera.position).addScaledVector(_fdir, 7); M.flash.bat = Math.max(0, M.flash.bat - dt * 1.05); if (M.flash.bat <= 0) { M.flash.on = false; toast('🔦 Батарея села'); monsUiSync(); } } }
+  // pickups bob and spin
+  for (const p of M.pickups) { p.g.rotation.y += dt * 1.6; p.g.position.y = p.y + Math.sin(now * 2 + p.ph) * 0.05 + 0.06; }
+  // heart, breath, vignette
+  if (M.on && state === 'play') monsFearUpd(dt);
+  const vig = clamp((M.heart - 95) / 95, 0, 0.75) + (M.gasp > 0 ? 0.2 : 0);
+  u.g.style.opacity = M.on ? (vig * (0.75 + 0.25 * Math.sin(now * M.heart / 9.55))).toFixed(2) : 0;
+  u.r.style.display = M.on && state === 'play' ? 'block' : 'none';
+  if (M.on) { const k = 1 + 0.1 * Math.max(0, Math.sin(now * M.heart / 9.55)); u.r.style.transform = `scale(${k.toFixed(3)})`; u.r.innerHTML = `❤️ ${Math.round(M.heart)}`; u.r.style.color = M.heart > 140 ? '#ff5a5a' : M.heart > 110 ? '#ffb06a' : '#fff'; }
+  // breath button and bar
+  const showB = M.on && state === 'play' && M.hide; u.w.style.display = showB ? 'block' : 'none';
+  if (showB) { u.wb.style.width = M.breath.toFixed(0) + '%'; u.w.classList.toggle('on', M.holdBreath); const sn = M.inside && M.inside.st === 'sniff'; u.w.style.boxShadow = sn ? '0 0 24px rgba(255,40,40,.9)' : '0 0 10px rgba(80,160,255,.4)'; }
+  // the breaker channel
+  if (M.fixT > 0) { const pp = player.pos; if (Math.hypot(pp.x - 17.5, pp.z - -11.5) > 2.6) { M.fixT = 0; toast('⚡ Вы отошли от рубильника'); } else { M.fixT -= dt; shake = Math.max(shake, 0.04); if (M.fixT <= 0) monsPowerOn(); } }
+  if (M.power && M.breakerM) M.breakerM.material.emissive.setHex(Math.floor(now * 3) % 2 ? 0x601010 : 0x100404);
+}
+function monsFearUpd(dt) {
+  const M = MONS, pp = player.pos; let tgt = 68, near = 99;
+  for (const m of M.monsters) { const d = Math.hypot(m.x - pp.x, m.z - pp.z); if (d < near) near = d; }
+  if (M.alert) tgt += 12; if (M.ev && M.ev.type === 'lurk' && M.ev.ph === 'act') tgt += 8;
+  if (M.inside) tgt += near < 7 ? 15 + 45 * (1 - near / 7) : 10;
+  if (M.outT > 0) tgt += 42; if (M.power) tgt += 8;
+  const sn = M.inside && M.inside.st === 'sniff'; if (sn) tgt += 55;
+  if (M.hide && M.flash.on && M.inside) tgt += 25;
+  if (M.holdBreath) tgt += 13;
+  if (M.braveT > 0) { M.braveT -= dt; tgt = Math.min(tgt, 96); }
+  if (M.calmT > 0) { M.calmT -= dt; tgt = Math.min(tgt, 88); }
+  M.heart += (clamp(tgt, 60, 185) - M.heart) * Math.min(1, dt * (tgt > M.heart ? 0.85 : 0.4));
+  if (M.holdBreath) { M.breath -= dt * (M.braveT > 0 ? 7.5 : 13); if (M.breath <= 0) { M.breath = 0; M.holdBreath = false; M.gasp = 1.4; M.heart = Math.min(185, M.heart + 28); toast('😮‍💨 Воздух кончился — вы громко вдохнули!'); if (sn) { monsCut('found'); return; } } }
+  else M.breath = Math.min(100, M.breath + dt * 15);
+  if (M.gasp > 0) M.gasp -= dt;
+  M.beatT -= dt; if ((M.heart > 100 || (M.hide && M.inside)) && M.beatT <= 0) { M.beatT = 60 / Math.max(62, M.heart); try { Sound.heartbeat(); } catch (e) {} }
+}
+/* the power cut: lights die, the breaker in the shed brings them back */
+function monsPowerOut() {
+  const M = MONS; M.powerDone = true; M.power = { t: 0 }; M.tvOn = false;
+  if (scene.environment) { M._env = scene.environment; scene.environment = null; }
+  lamps.forEach((l) => l.intensity = 0); hemi.intensity = 0.05;
+  banner('⚡ ЭЛЕКТРИЧЕСТВО ОТКЛЮЧИЛОСЬ', 'рубильник — в сарае во дворе'); Sound.boom(); Sound.zap(1); Sound.droneLoop(0.3);
+  toast('🔦 Включите фонарь и доберитесь до сарая');
+}
+function monsPowerOn() {
+  const M = MONS; if (!M.power) return; M.power = null; M.fixT = 0;
+  if (M._env) { scene.environment = M._env; M._env = null; }
+  lamps.forEach((l) => l.intensity = MAPS.house.lamp[1]); hemi.intensity = MAPS.house.hemi;
+  if (M.breakerM) M.breakerM.material.emissive.setHex(0x082008);
+  banner('💡 СВЕТ ВКЛЮЧИЛСЯ', 'возвращайтесь в дом'); Sound.chime(); Sound.zap(0.4); Sound.droneLoop(0.12); M.scared++;
+}
+/* the monster sniffs at the hiding spot: hold your breath, calm your heart, lights off */
+function monsSniffUpdate(m, dt) {
+  const M = MONS, s = M.hide, u = m.g.userData;
+  m.insT += dt;
+  if (!s || M.dead) { m.st = 'inside'; if (u.drool) u.drool.visible = false; return; }
+  m.sn.t += dt; monsFace(m, s.x, s.z); monsWalkAnim(m.g, dt, 0);
+  u.spine.rotation.x = 0.7 + Math.sin(m.sn.t * 7) * 0.05; u.neck.rotation.x = 0.95; u.head.rotation.y = Math.sin(m.sn.t * 3) * 0.2;
+  if (u.jaw) u.jaw.rotation.x = 0.4 + Math.sin(m.sn.t * 9) * 0.22; if (u.drool) u.drool.visible = true;
+  aimArmW(m.g, 'L', new V3(s.x, 1.35, s.z)); aimArmW(m.g, 'R', new V3(s.x, 0.75, s.z));
+  m.snf = (m.snf || 0) - dt; if (m.snf <= 0) { m.snf = 0.8; Sound.ghostVoice(0.2); shake = Math.max(shake, 0.05); if (s.doors) s.anim = Math.max(s.anim, 0.45); }
+  const grace = m.sn.t > 1.0;
+  if (grace && (!M.holdBreath || M.heart >= 150 || M.flash.on)) { monsCut('found'); return; }
+  if (m.sn.t >= m.sn.dur) { m.st = 'inside'; m.sp = null; m.spT = 0; m.insT = Math.min(m.insT, 16); M.sniffCd = 8; if (u.drool) u.drool.visible = false; toast('…он отошёл. Выдохните 😮‍💨'); }
+}
+/* 06:00: the sun rises, the monsters flee into the woods */
+function monsSunrise() {
+  const M = MONS; if (M.sunrise || M.dead) return; M.sunrise = true; M.on = false; monsUiOff(); story.ride = null; if (M.flashL) M.flashL.intensity = 0;
+  const sun = new THREE.Mesh(IM_G.sph, new THREE.MeshBasicMaterial({ color: 0xffd9a0, fog: false })); sun.scale.setScalar(6.5); sun.position.set(-6, 0, -52); addMesh(sun);
+  const halo = new THREE.Mesh(IM_G.sph, new THREE.MeshBasicMaterial({ color: 0xffb060, transparent: true, opacity: 0.35, fog: false, depthWrite: false })); halo.scale.setScalar(13); addMesh(halo);
+  const f1 = new THREE.Color(0x8fa8c8), b1 = new THREE.Color(0xa8bcd8), f0 = scene.fog.color.clone(), b0 = scene.background.clone(), d0 = scene.fog.density;
+  Sound.droneLoop(0.08);
+  runCut([[0.6, () => { banner('06:00', 'рассвет…'); Sound.chime(); }], [5.5, () => { try { Sound.heal(); } catch (e) {} }], [7.8, () => Sound.droneLoop(0)]],
+    (t, dt) => { const k = clamp(t / 8, 0, 1);
+      scene.fog.color.copy(f0).lerp(f1, k); scene.background.copy(b0).lerp(b1, k); scene.fog.density = Math.max(0.0022, d0 * (1 - k * 0.95)); hemi.intensity = 0.13 + k * 0.85; sun.position.set(-6, -2 + k * 20, -52); halo.position.copy(sun.position);
+      camera.position.set(-12 + t * 0.7, 2.9 + t * 0.3, 18.5 - t * 0.25); camera.lookAt(-2, 3.4, -9);
+      for (const m of M.monsters) { const dx = m.x || 1, dz = m.z || 1, dd = Math.hypot(dx, dz); monsMove(m, dx / dd * 70, dz / dd * 70, 4.5, dt); }
+    }, 9.5, () => { scene.fog.color.copy(f0); scene.background.copy(b0); scene.fog.density = d0; hemi.intensity = MAPS.house.hemi; monsOver(true); });
+}
+/* the death «found in the hiding spot»: doors burst, grabbed and bitten */
+function monsDeath5() {
+  const S = stageBegin(0x17110d), mon = mkMonster(0.62, MONS.lastKind || 'sniffer'), mu = mon.userData;
+  const back = new THREE.Mesh(IM_G.box, std({ color: 0x3e3028, roughness: 0.95 })); back.position.set(0, 1.6, -1.1); back.scale.set(8, 3.2, 0.2); S.add(back);
+  const wood = std({ color: 0x8a6a50, roughness: 0.8 });
+  const wb = new THREE.Mesh(IM_G.box, wood); wb.position.set(0, 1.21, -0.45); wb.scale.set(1.5, 2.3, 0.9); S.add(wb);
+  const top = new THREE.Mesh(IM_G.box, std({ color: 0x3a2416 })); top.position.set(0, 2.4, -0.45); top.scale.set(1.6, 0.08, 0.96); S.add(top);
+  const doors = []; for (const sgn of [-1, 1]) { const pv = new THREE.Group(); pv.position.set(sgn * 0.72, 1.21, 0.02); S.add(pv); const dr = new THREE.Mesh(IM_G.box, std({ color: 0xa07a58, roughness: 0.7 })); dr.position.set(-sgn * 0.36, 0, 0); dr.scale.set(0.73, 2.1, 0.05); pv.add(dr); doors.push({ pv, sgn }); }
+  const P = mkPerson(), j = P.j; P.root.position.set(0, 0.07, -0.42); P.root.rotation.y = 0; P.root.scale.setScalar(0.92);
+  mon.position.set(-1.5, 0, 1.6); mon.rotation.y = Math.PI + 0.8; S.add(mon);
+  let burst = false, out = false, bit = false, sp = null, poolM = null;
+  return { dur: 9.6, steps: [[0.5, () => Sound.ghostVoice(0.35)], [1.4, () => Sound.ghostVoice(0.3)], [2.6, () => { Sound.crunch(1); Sound.thud(1); Sound.tink(0.6); }], [3.2, () => Sound.ghostVoice(1.3)], [5.9, () => { Sound.crunch(1); Sound.splat(1); }], [8.4, () => Sound.thud(0.8)]],
+    upd(t, dt) {
+      cam(0.5, 1.55, 3.2, -0.45, 1.3, -0.15); spotAt(0.4, 3.4, 2.4, -0.2, 1.2, -0.3, 32); piecesUpd(dt);
+      const hand = () => handOf(mon, 'R');
+      if (t < 2.6) { // creeps up and sniffs at the doors
+        const k = seg(t, 0, 0.9); mon.position.set(lerpc(-1.5, -0.3, k), 0, lerpc(1.6, 0.85, k)); mon.rotation.y = lerpc(Math.PI + 0.8, Math.PI + 0.15, k);
+        mu.spine.rotation.x = 0.55 + Math.sin(t * 7) * 0.06; mu.neck.rotation.x = 0.95; if (mu.jaw) mu.jaw.rotation.x = 0.35 + Math.sin(t * 9) * 0.2; if (mu.drool) mu.drool.visible = true;
+        aimArm(mon, 'L', new V3(-0.35, 1.45, 0.12)); aimArm(mon, 'R', new V3(0.35, 0.95, 0.12));
+        doors.forEach((d2) => d2.pv.rotation.y = -d2.sgn * Math.max(0, Math.sin(t * 22)) * 0.03);
+        pose(P, { uArmL: [-0.4, 0, 0.5], lArmL: [-0.9, 0, 0], uArmR: [-0.4, 0, -0.5], lArmR: [-0.9, 0, 0], head: [0.15, 0, 0] });
+        return;
+      }
+      if (!burst) { burst = true; doors.forEach((d2) => rip(d2.pv, d2.sgn * 2.8, 1.8, 2.6, 6)); if (mu.drool) mu.drool.visible = false; }
+      if (t < 3.3) { const h = at(P, j.head, 0, 0.1, 0), k = seg(t, 2.65, 3.15); aimArm(mon, 'R', new V3(lerpc(0.3, h.x, k), lerpc(1.4, h.y, k), lerpc(0.6, h.z, k))); aimArm(mon, 'L', new V3(-0.3, 1.2, 0.5)); pose(P, { uArmL: [-2.2, 0, 0.5], uArmR: [-2.0, 0, -0.5], head: [-0.2, 0, 0] }); scream(P, true); return; }
+      if (t < 4.6) { // drags him out of the wardrobe by the head
+        const k = seg(t, 3.3, 4.5); aimArm(mon, 'R', new V3(lerpc(0, 0.1, k), lerpc(1.5, 2.2, k), lerpc(0, 0.9, k))); mu.spine.rotation.x = lerpc(0.55, 0.15, k);
+        const f = Math.sin(t * 16); pose(P, { uArmL: [-2.4 + f * 0.3, 0, 0.5], uArmR: [-2.2 - f * 0.3, 0, -0.5], uLegL: [-0.6 * f, 0, 0], uLegR: [0.6 * f, 0, 0], lLegL: [0.7, 0, 0], lLegR: [0.7, 0, 0] });
+        holdBy(P, j.head, new V3(0, 0.12, 0), hand()); P.root.rotation.y = lerpc(0, -0.5, k); scream(P, true); return;
+      }
+      if (t < 5.9) { // holds him up, looks at him, jaw opening
+        aimArm(mon, 'R', new V3(0.1, 2.3, 0.9)); mu.neck.rotation.x = 0.7; if (mu.jaw) mu.jaw.rotation.x = seg(t, 5.0, 5.85) * 0.75;
+        const f = Math.sin(t * 13); pose(P, { uArmL: [-2.3 + f * 0.25, 0, 0.5], uArmR: [-2.1 - f * 0.25, 0, -0.5], uLegL: [-0.4 * f, 0, 0], uLegR: [0.4 * f, 0, 0], lLegL: [0.6, 0, 0], lLegR: [0.6, 0, 0] });
+        holdBy(P, j.head, new V3(0, 0.12, 0), hand()); scream(P, true); return;
+      }
+      if (!bit) { bit = true; S.attach(j.head); sp = spine(S); const c = at(P, j.torso, 0, 0.45, 0); bleed(c.x, c.y, c.z, 0, 1.2, 1, 20); bleed(c.x, c.y, c.z, -0.6, 0.6, 0.8, 10); poolM = pool(0.3, 0.6, 0.05); scream(P, false); }
+      // the head stays at the monster's jaw; the body hangs by nothing and drops at 8.4
+      const jb = mu.jaw.getWorldPosition ? (() => { mon.updateMatrixWorld(true); const w = mu.jaw.localToWorld(new V3(0, -0.02, 0.1)); return DS.g.worldToLocal(w); })() : hand();
+      j.head.position.copy(jb); j.head.rotation.set(0.3, 0, Math.sin(t * 2) * 0.1);
+      if (sp) { sp.position.copy(j.head.position).add(new V3(0, -0.1, 0.02)); sp.rotation.z = Math.sin(t * 2.2) * 0.12; }
+      mu.neck.rotation.x = 1.0; aimArm(mon, 'R', new V3(0.12, 2.05, 0.75)); aimArm(mon, 'L', new V3(-0.25, 1.3, 0.6));
+      if (t < 8.4) { holdBy(P, j.torso, new V3(0, 0.5, 0), new V3(0.12, lerpc(1.9, 1.55, seg(t, 5.9, 8.4)), 0.78)); pose(P, { uArmL: [0, 0, 0.35], uArmR: [0, 0, -0.35], uLegL: [0.1, 0, 0.05], uLegR: [0.1, 0, -0.05] }); if (Math.random() < dt * 9) { const c = at(P, j.torso, 0, 0.48, 0); bleed(c.x, c.y, c.z, 0, -0.5, 0.5, 3); } }
+      else if (!P.dropped) { P.dropped = true; rip(j.torso, 0.4, 0.3, 1.2, 2); }
+      if (poolM) poolM.scale.setScalar(Math.min(1.0, poolM.scale.x + dt * 0.2));
+    } };
+}
+const MONS_DEATHS = { window: monsDeath1, door: monsDeath2, out: monsDeath3, inside: monsDeath4, found: monsDeath5 };
 function monsCut(kind) {
-  if (MONS.dead) return; MONS.dead = true; { const b = document.getElementById('monsAct'); if (b) b.style.display = 'none'; const h = document.getElementById('monsHide'); if (h) h.style.display = 'none'; } story.ride = null; MONS.hide = null;
+  if (MONS.dead) return; MONS.dead = true; MONS.lastKind = (MONS.inside && MONS.inside.g.userData.kind) || (MONS.ev && MONS.ev.m && MONS.ev.m.g.userData.kind) || MONS.lastKind; if (MONS.hide) MONS.hide.occ = null; MONS.holdBreath = false; MONS.flash.on = false; if (MONS.flashL) MONS.flashL.intensity = 0; { const b = document.getElementById('monsAct'); if (b) b.style.display = 'none'; const h = document.getElementById('monsHide'); if (h) h.style.display = 'none'; } story.ride = null; MONS.hide = null;
   const D = MONS_DEATHS[kind](); Sound.droneLoop(0.4); runCut(D.steps || [], (t, dt) => D.upd(t, dt), D.dur, () => { Sound.droneLoop(0); stageEnd(); monsOver(false, kind); });
 }
 /* ===== menus ===== */
@@ -17628,14 +17817,20 @@ function serversMenu() {
   d.style.display = 'block'; d.querySelector('#svIdeas').onclick = () => { d.style.display = 'none'; ideasMenu(); }; d.querySelector('#svMons').onclick = () => monsMenu(); d.querySelector('[data-k="x"]').onclick = () => { d.style.display = 'none'; };
 }
 function monsMenu() {
-  const d = c2Ui(); d.style.borderColor = '#ff5a3a'; let sel = 1, comp = false;
+  const d = c2Ui(); d.style.borderColor = '#ff5a3a'; let sel = 1, comp = false, mt = 'all', df = 'classic';
   const draw = () => {
     const mk = (a, b) => { let h = ''; for (let i = a; i <= b; i++) h += `<button class="chip${i === sel ? ' on' : ''}" data-n="${i}" style="min-width:42px">${i}</button>`; return h; };
-    d.innerHTML = '<small style="letter-spacing:.18em;color:#ff8a6a">НЕ ОТКРЫВАЙ</small><div style="font-size:12px;margin:8px 0;line-height:1.4;text-align:left">Ночью по телевизору объявляют: на улицу пробрались монстры-аномалии. Закройте дверь, не стойте у окон, прячьтесь в шкафу или под кроватью. Остальные игроки — боты: они пугают монстров и занимают укрытия. Настоящего онлайна нет.</div>'
-      + '<div style="font:700 12px var(--ui);text-align:left;margin-top:6px">Сколько игроков?</div><div class="chips" style="margin:6px 0">' + mk(1, 4) + `<button class="chip${comp ? ' on' : ''}" data-k="comp">👥 Компания</button></div>` + (comp ? '<div class="chips" style="margin:6px 0">' + mk(5, 12) + '</div>' : '')
-      + '<button class="btn primary" data-k="go" style="width:100%;margin-top:6px">Начать · ' + sel + ' ' + (sel === 1 ? 'игрок' : sel < 5 ? 'игрока' : 'игроков') + '</button><button class="btn" data-k="x" style="width:100%;margin-top:4px">Назад</button>';
+    const mkK = () => `<button class="chip${mt === 'all' ? ' on' : ''}" data-m="all">🎲 Все</button>` + Object.values(MON_KINDS).map((k) => `<button class="chip${mt === k.id ? ' on' : ''}" data-m="${k.id}">${k.emoji} ${k.name}</button>`).join('');
+    const mkD = () => Object.entries(MONS_DIFF).map(([id, q]) => `<button class="chip${df === id ? ' on' : ''}" data-d="${id}">${q.name}</button>`).join('');
+    d.innerHTML = '<small style="letter-spacing:.18em;color:#ff8a6a">НЕ ОТКРЫВАЙ</small><div style="font-size:12px;margin:7px 0;line-height:1.4;text-align:left">Ночь с <b>00:00 до 06:00</b>. Закройте дверь, не стойте у окон, спугивайте монстров, прячьтесь и <b>не дышите</b>, когда он нюхает укрытие. Ищите фонарь, батарейки и таблетки. В 2 часа ночи отключат свет — рубильник в сарае.</div>'
+      + '<div style="font:700 12px var(--ui);text-align:left">Сколько игроков?</div><div class="chips" style="margin:5px 0">' + mk(1, 4) + `<button class="chip${comp ? ' on' : ''}" data-k="comp">👥 Компания</button></div>` + (comp ? '<div class="chips" style="margin:5px 0">' + mk(5, 12) + '</div>' : '')
+      + '<div style="font:700 12px var(--ui);text-align:left;margin-top:4px">Монстры этой ночи</div><div class="chips" style="margin:5px 0">' + mkK() + '</div>'
+      + (mt !== 'all' ? `<div style="font-size:11px;color:#f99;text-align:left;margin:2px 0">${MON_KINDS[mt].emoji} ${MON_KINDS[mt].name}: ${MON_KINDS[mt].desc}</div>` : '')
+      + '<div style="font:700 12px var(--ui);text-align:left;margin-top:4px">Сложность</div><div class="chips" style="margin:5px 0">' + mkD() + '</div>'
+      + '<button class="btn primary" data-k="go" style="width:100%;margin-top:6px">Начать ночь · ' + sel + ' ' + (sel === 1 ? 'игрок' : sel < 5 ? 'игрока' : 'игроков') + '</button><button class="btn" data-k="x" style="width:100%;margin-top:4px">Назад</button>';
     d.querySelectorAll('[data-n]').forEach((b) => b.onclick = () => { sel = +b.dataset.n; draw(); }); d.querySelector('[data-k="comp"]').onclick = () => { comp = !comp; if (!comp && sel > 4) sel = 4; draw(); };
-    d.querySelector('[data-k="go"]').onclick = () => { d.style.display = 'none'; monsStart(sel); }; d.querySelector('[data-k="x"]').onclick = () => serversMenu();
+    d.querySelectorAll('[data-m]').forEach((b) => b.onclick = () => { mt = b.dataset.m; draw(); }); d.querySelectorAll('[data-d]').forEach((b) => b.onclick = () => { df = b.dataset.d; draw(); });
+    d.querySelector('[data-k="go"]').onclick = () => { d.style.display = 'none'; monsStart(sel, mt, df); }; d.querySelector('[data-k="x"]').onclick = () => serversMenu();
   };
   draw(); d.style.display = 'block';
 }
@@ -17643,18 +17838,29 @@ function monsMenu() {
 function monsUi() {
   let h = document.getElementById('monsHud'); if (!h) { h = document.createElement('div'); h.id = 'monsHud'; h.style.cssText = 'position:fixed;left:50%;top:calc(6px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:38;font:800 12px var(--ui);color:#fff;text-shadow:0 0 4px #000;white-space:nowrap;pointer-events:none;display:none;text-align:center'; document.body.appendChild(h); }
   let b = document.getElementById('monsAct'); if (!b) { b = document.createElement('button'); b.id = 'monsAct'; b.className = 'btn primary'; b.style.cssText = 'position:fixed;left:50%;bottom:calc(20% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:49;display:none;font:900 16px var(--ui);padding:10px 22px;pointer-events:auto;box-shadow:0 0 20px rgba(255,90,60,.6)'; ['touchstart', 'pointerdown', 'mousedown'].forEach((e) => b.addEventListener(e, (ev) => ev.stopPropagation())); b.onclick = () => monsAction(); document.body.appendChild(b); }
-  let v = document.getElementById('monsHide'); if (!v) { v = document.createElement('div'); v.id = 'monsHide'; v.style.cssText = 'position:fixed;inset:0;z-index:36;pointer-events:none;display:none;background:radial-gradient(ellipse 34% 7% at 50% 48%,transparent 0,transparent 98%,rgba(0,0,0,.97) 100%),rgba(0,0,0,.93)'; document.body.appendChild(v); }
-  return { h, b, v };
+  let v = document.getElementById('monsHide'); if (!v) { v = document.createElement('div'); v.id = 'monsHide'; v.style.cssText = 'position:fixed;inset:0;z-index:36;pointer-events:none;display:none'; document.body.appendChild(v); }
+  let g = document.getElementById('monsVig'); if (!g) { g = document.createElement('div'); g.id = 'monsVig'; g.style.cssText = 'position:fixed;inset:0;z-index:35;pointer-events:none;opacity:0;box-shadow:inset 0 0 130px 55px rgba(170,10,10,.85);transition:opacity .2s'; document.body.appendChild(g); }
+  let r = document.getElementById('monsHeart'); if (!r) { r = document.createElement('div'); r.id = 'monsHeart'; r.style.cssText = 'position:fixed;left:14px;bottom:calc(34% + env(safe-area-inset-bottom,0px));z-index:40;font:900 20px var(--ui);color:#fff;text-shadow:0 0 8px #000;pointer-events:none;display:none'; document.body.appendChild(r); }
+  let i = document.getElementById('monsItems'); if (!i) { i = document.createElement('div'); i.id = 'monsItems'; i.style.cssText = 'position:fixed;right:10px;top:calc(34% + env(safe-area-inset-top,0px));z-index:40;display:none;flex-direction:column;gap:7px'; ['touchstart', 'pointerdown', 'mousedown'].forEach((e) => i.addEventListener(e, (ev) => ev.stopPropagation()));
+    const mk = (id, txt) => { const btn = document.createElement('button'); btn.id = id; btn.className = 'btn'; btn.style.cssText = 'font:800 12px var(--ui);padding:7px 10px;pointer-events:auto;text-align:left'; btn.innerHTML = txt; i.appendChild(btn); return btn; };
+    mk('monsFlash', '🔦 100%').onclick = () => monsUse('flash'); mk('monsPill', '💊 ×0').onclick = () => monsUse('pill'); mk('monsEner', '⚡ ×0').onclick = () => monsUse('energy'); document.body.appendChild(i); }
+  let w = document.getElementById('monsBreath'); if (!w) { w = document.createElement('button'); w.id = 'monsBreath'; w.className = 'btn'; w.style.cssText = 'position:fixed;left:50%;bottom:calc(32% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:49;display:none;font:900 14px var(--ui);padding:12px 20px;pointer-events:auto;overflow:hidden;border:2px solid #4a90d8';
+    w.innerHTML = '<div id="monsBreathBar" style="position:absolute;left:0;top:0;bottom:0;width:100%;background:rgba(70,140,220,.35);z-index:-1"></div>🫁 ДЕРЖАТЬ — НЕ ДЫШАТЬ';
+    const on = (ev) => { ev.stopPropagation(); ev.preventDefault(); MONS.holdBreath = true; }; const off = (ev) => { ev && ev.stopPropagation(); MONS.holdBreath = false; };
+    ['touchstart', 'pointerdown', 'mousedown'].forEach((e) => w.addEventListener(e, on, { passive: false })); ['touchend', 'touchcancel', 'pointerup', 'pointerleave', 'mouseup', 'mouseleave'].forEach((e) => w.addEventListener(e, off)); document.body.appendChild(w); }
+  return { h, b, v, g, r, i, w, wb: document.getElementById('monsBreathBar') };
 }
-function monsUiOff() { const u = monsUi(); u.h.style.display = 'none'; u.b.style.display = 'none'; u.v.style.display = 'none'; }
+function monsUiSync() { const M = MONS, f = document.getElementById('monsFlash'), p = document.getElementById('monsPill'), e = document.getElementById('monsEner'); if (f) { f.innerHTML = '🔦 ' + (M.flash.on ? 'ВЫКЛ · ' : '') + Math.round(M.flash.bat) + '%'; f.style.borderColor = M.flash.on ? '#ffd04a' : ''; } if (p) p.innerHTML = '💊 ×' + M.items.pill; if (e) e.innerHTML = '⚡ ×' + M.items.energy; }
+function monsUiOff() { const u = monsUi(); u.h.style.display = 'none'; u.b.style.display = 'none'; u.v.style.display = 'none'; u.g.style.opacity = 0; u.r.style.display = 'none'; u.i.style.display = 'none'; u.w.style.display = 'none'; MONS.holdBreath = false; }
 /* ===== start, intro ===== */
-function monsStart(players) {
+function monsStart(players, mtype, diff) {
   { const q = document.getElementById('c2q'); if (q) q.style.display = 'none'; }
   Sound.init(); tryLandscape(); storyReset(); overReset(); mode = 'mons'; resetStats(); setMadness(false); madness.amt = 0; slow = false; $('slowmo').hidden = true; $('resumeBtn').hidden = true; startGame.fromWaves = true;
   IDEA.on = false; IDEA.cut = false; IDEA.asking = false; { const u = document.getElementById('ideaUi'); if (u) u.style.display = 'none'; const q = document.getElementById('ideaAsk'); if (q) q.style.display = 'none'; } ideaCard('');
   story.gun = false; W.fireHeld = false; loadMap('house'); clearAll(); respawnPlayer(); invReset(); { const fi = WEAPONS.findIndex((w) => w.id === 'fists'); if (fi >= 0) selectWeapon(fi); W.switchT = 0; }
   for (const m of MONS.monsters) { if (m.g && m.g.parent) m.g.parent.remove(m.g); }
-  Object.assign(MONS, { on: false, players, bots: [], monsters: [], wave: 0, evT: 15, t: 0, hide: null, alert: null, ev: null, dead: false, win: false, stare: 0, inside: null, scared: 0, hudT: 0, act: null, over: false, outT: 0, tvOn: false });
+  Object.assign(MONS, { on: false, players, bots: [], monsters: [], wave: 0, evT: 15, t: 0, hour: 0, hide: null, alert: null, ev: null, dead: false, win: false, stare: 0, inside: null, scared: 0, hudT: 0, act: null, over: false, outT: 0, tvOn: false, mtype: mtype || 'all', diff: diff || 'classic', heart: 70, breath: 100, holdBreath: false, calmT: 0, braveT: 0, gasp: 0, beatT: 0, items: { bat: 0, pill: 1, energy: 0 }, flash: { on: false, bat: 100 }, pickups: [], power: null, powerDone: false, restocked: false, fixT: 0, sniffCd: 0, sunrise: false });
+  MONS.diffD = MONS_DIFF[MONS.diff] || MONS_DIFF.classic; MONS.hLen = MONS.diffD.hLen; if (MONS._env) { scene.environment = MONS._env; MONS._env = null; }
   MONS.doorAng = 1.4; monsDoorSet(true, true); for (const s of MONS.spots) { s.occ = null; s.anim = 0; } for (const w of MONS.wins) { w.open = false; w.tgt = 0; w.ang = 0; w.fast = false; }
   const names = IDEA_NAMES.slice().sort(() => Math.random() - 0.5), slots = [[-9.6, -6.0], [-3.4, -6.0], [-10.3, -5.0], [-2.7, -5.0], [-9.6, -4.0], [-3.4, -4.0], [-10.3, -3.0], [-2.7, -3.0], [-9.6, -2.0], [-3.4, -2.0], [-10.3, -1.0]];
   for (let i = 0; i < players - 1; i++) { const [x, z] = slots[i]; const n = mkNpc(undefined, x, z, Math.PI, 'human'); n.scripted = true; ideaTag(n, names[i]); MONS.bots.push({ n, name: names[i], dead: false, hid: null, spot: null, role: null, wp: null, t: rand(0, 3), hidT: 0, i, path: null, pathT: 0 }); }
@@ -17686,8 +17892,10 @@ function monsIntro() {
 const ROOM_PTS = [[-10, -3], [-4, -2], [1, -2.5], [-11, 0.5], [9, -6], [10.5, -2.5], [8, 6.5], [7, 2], [-1, 6], [1.5, 7.5], [-9.5, 6.2], [-4, 5.5]];
 function monsBegin() {
   const bots = MONS.bots; bots.forEach((b) => { const n = b.n; n.pose = 'stand'; n.poseDur = 0; const p = pick(ROOM_PTS.slice(0, 4)); n.pos.set(p[0] + rand(-0.8, 0.8), 0, p[1] + rand(-0.8, 0.8)); pushOutAABBs(n.pos, 0.3, 0); n.root.position.copy(n.pos); });
-  player.pos.set(-6.5, 0, -4.0); player.yaw = 0; player.pitch = 0; MONS.on = true; MONS.t = 0; const u = monsUi(); u.h.style.display = 'block';
-  resume(); Music.stop(); banner('НОЧЬ', 'закройте дверь · не стойте у окон · на улицу — опасно'); Sound.droneLoop(0.12);
+  player.pos.set(-6.5, 0, -4.0); player.yaw = 0; player.pitch = 0; MONS.on = true; MONS.t = 0; MONS.hour = 0; const u = monsUi(); u.h.style.display = 'block'; u.i.style.display = 'flex';
+  if (!MONS.flashL) { const L2 = new THREE.SpotLight(0xfff0cc, 0, 13, 0.46, 0.45, 1.6), T2 = new THREE.Object3D(); scene.add(L2); scene.add(T2); L2.target = T2; MONS.flashL = L2; MONS.flashT = T2; } MONS.flashL.intensity = 0;
+  monsSpawnPicks(6); monsUiSync();
+  resume(); Music.stop(); banner('00:00 · НОЧЬ НАЧАЛАСЬ', 'доживите до 06:00 · закройте дверь · ищите припасы'); Sound.droneLoop(0.12);
   if (bots.length) { bots[0].role = 'door'; bots[0].tDoor = rand(6, 11); }
 }
 /* ===== navigation: rooms joined through doorways, plus a path around the house outside ===== */
@@ -17714,15 +17922,19 @@ const PATROL = [[-19, -14], [19, -14], [19, 16], [-19, 16]];
 function winOut(i) { const [x, z, o] = MON_WIN[i]; return { x: x + (o === 'w' ? -1.4 : o === 'e' ? 1.4 : 0), z: z + (o === 'n' ? -1.4 : o === 's' ? 1.4 : 0) }; }
 function winIn(i) { const [x, z, o] = MON_WIN[i]; return { x: x + (o === 'w' ? 1.0 : o === 'e' ? -1.0 : 0), z: z + (o === 'n' ? 1.0 : o === 's' ? -1.0 : 0) }; }
 const MON_SC = 0.72;
-function monsSpawn(x, z) { const g = mkMonster(MON_SC); g.position.set(x, 0, z); scene.add(g); mapObjs.push(g); const m = { g, st: 'patrol', x, z, yaw: 0, pi: randi(4), ph: 0, path: null, pathT: 0 }; MONS.monsters.push(m); return m; }
+function monsSpawn(x, z) { const kind = MONS.mtype && MONS.mtype !== 'all' ? MONS.mtype : pick(['lanky', 'lanky', 'sniffer', 'runner']); const g = mkMonster(MON_KINDS[kind].sc, kind); g.position.set(x, 0, z); scene.add(g); mapObjs.push(g); const m = { g, st: 'patrol', x, z, yaw: 0, pi: randi(4), ph: 0, path: null, pathT: 0 }; MONS.monsters.push(m); return m; }
 /* a creepy gait: hunched, long arms swinging late, the head rolling; standing still it breathes and twitches */
 function monsWalkAnim(m, dt, spd) {
-  const u = m.userData; m.ph = (m.ph || 0) + dt * Math.max(0.6, spd) * 2.0; const mv = Math.min(1, spd / 1.5), s = Math.sin(m.ph) * mv, c = Math.cos(m.ph);
+  const u = m.userData, d = u.def || MON_KINDS.lanky, now = performance.now() / 1000;
+  m.ph = (m.ph || 0) + dt * Math.max(0.6, spd) * 2.0 * d.freq; const mv = Math.min(1, spd / 1.5), s = Math.sin(m.ph) * mv, c = Math.cos(m.ph);
   u.legL.rotation.set(s * 0.55, 0, 0.04); u.legR.rotation.set(-s * 0.55, 0, -0.04); u.kneeL.rotation.x = (Math.max(0, -s) * 0.9 + 0.08) * (mv > 0.05 ? 1 : 0.3); u.kneeR.rotation.x = (Math.max(0, s) * 0.9 + 0.08) * (mv > 0.05 ? 1 : 0.3);
-  u.hips.position.y = 1.55 - Math.abs(c) * 0.06 * mv - 0.04; u.hips.rotation.y = s * 0.12;
-  u.spine.rotation.set(0.22 + 0.05 * Math.sin(m.ph * 2) * mv + (1 - mv) * 0.04 * Math.sin(performance.now() / 700), -s * 0.15, 0);
-  u.shL.rotation.set(-Math.sin(m.ph - 0.6) * 0.35 * mv + 0.05, 0, 0.12); u.shR.rotation.set(Math.sin(m.ph - 0.6) * 0.35 * mv + 0.05, 0, -0.12); u.elL.rotation.set(-0.25 - Math.max(0, Math.sin(m.ph - 1)) * 0.3 * mv, 0, 0); u.elR.rotation.set(-0.25 - Math.max(0, -Math.sin(m.ph - 1)) * 0.3 * mv, 0, 0);
-  u.neck.rotation.set(0.45, 0, Math.sin(m.ph * 0.5) * 0.12 + (Math.random() < 0.01 ? rand(-0.4, 0.4) : 0)); u.head.rotation.set(0, Math.sin(m.ph * 0.3) * 0.2, 0);
+  u.hips.position.y = 1.55 - Math.abs(c) * (0.06 + (d.id === 'runner' ? 0.05 : 0)) * mv - 0.04 - d.hunch * 0.1; u.hips.rotation.y = s * 0.12;
+  u.spine.rotation.set(0.22 + d.hunch + 0.05 * Math.sin(m.ph * 2) * mv + (1 - mv) * 0.05 * Math.sin(now * 1.4), -s * 0.15, 0);
+  const sw = 0.35 + (d.id === 'runner' ? 0.25 : 0);
+  u.shL.rotation.set(-Math.sin(m.ph - 0.6) * sw * mv + 0.05, 0, 0.12); u.shR.rotation.set(Math.sin(m.ph - 0.6) * sw * mv + 0.05, 0, -0.12); u.elL.rotation.set(-0.25 - Math.max(0, Math.sin(m.ph - 1)) * 0.3 * mv, 0, 0); u.elR.rotation.set(-0.25 - Math.max(0, -Math.sin(m.ph - 1)) * 0.3 * mv, 0, 0);
+  const low = d.id === 'sniffer' ? 0.5 : 0;
+  u.neck.rotation.set(0.45 + low, 0, Math.sin(m.ph * 0.5) * (0.12 + low * 0.4) + (Math.random() < 0.012 ? rand(-0.5, 0.5) : 0)); u.head.rotation.set(low * -0.4, Math.sin(m.ph * 0.3) * (0.2 + low), 0);
+  if (u.jaw) u.jaw.rotation.x = 0.12 + Math.max(0, Math.sin(now * 1.1 + m.ph * 0.2)) * 0.12;
 }
 /* the IK from the cutscenes, in world space: point a monster hand at a world point */
 function aimArmW(mon, side, w, lift = 0) {
@@ -17732,7 +17944,7 @@ function aimArmW(mon, side, w, lift = 0) {
   const q = new THREE.Quaternion().setFromUnitVectors(new V3(0, -1, 0), d.normalize()); sh.quaternion.copy(q).multiply(new THREE.Quaternion().setFromAxisAngle(new V3(0, -1, 0), lift)).multiply(new THREE.Quaternion().setFromAxisAngle(new V3(1, 0, 0), a)); el.rotation.set(-bend, 0, 0);
 }
 function monsMove(m, tx, tz, sp, dt) { const dx = tx - m.x, dz = tz - m.z, d = Math.hypot(dx, dz); if (d < 0.12) { monsWalkAnim(m.g, dt, 0); return 0; } const s = Math.min(d, sp * dt); m.x += dx / d * s; m.z += dz / d * s; const ty = Math.atan2(dx, dz); let dy = ty - m.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); m.yaw += dy * Math.min(1, dt * 8); m.g.position.set(m.x, 0, m.z); m.g.rotation.y = m.yaw; monsWalkAnim(m.g, dt, sp); m.stepT = (m.stepT || 0) - dt; if (m.stepT <= 0) { m.stepT = 0.55; const dd = Math.hypot(m.x - player.pos.x, m.z - player.pos.z); if (dd < 14) Sound.step(clamp(0.5 - dd / 30, 0.05, 0.5)); } return d - s; }
-function monsGo(m, tx, tz, sp, dt) { const p = pathStep(m, m.x, m.z, tx, tz, dt); monsMove(m, p[0], p[1], sp, dt); /* duck under the door frame */ const indoor = roomOf(m.x, m.z) !== 'O'; m.g.userData.spine.rotation.x += indoor ? 0.25 : 0; return Math.hypot(tx - m.x, tz - m.z); }
+function monsGo(m, tx, tz, sp, dt) { sp *= (m.g.userData.def ? m.g.userData.def.speed : 1) * (MONS.power ? 1.22 : 1); const p = pathStep(m, m.x, m.z, tx, tz, dt); monsMove(m, p[0], p[1], sp, dt); /* duck under the door frame */ const indoor = roomOf(m.x, m.z) !== 'O'; m.g.userData.spine.rotation.x += indoor ? 0.25 : 0; return Math.hypot(tx - m.x, tz - m.z); }
 function monsFace(m, tx, tz) { m.yaw = Math.atan2(tx - m.x, tz - m.z); m.g.rotation.y = m.yaw; }
 function monsAlive() { return MONS.bots.filter((b) => !b.dead).length + 1; }
 function monsPickEvent() {
@@ -17766,7 +17978,7 @@ function monsEvUpdate(dt) {
       const hit = ev.knockT > 1.15; aimArmW(m.g, 'R', new V3(0.25, 1.55, HD + (hit ? 0.12 : 0.45)));
       if (ev.knockT <= 0) { ev.knockT = 1.5; Sound.thud(0.9); MONS.doorRattle = 0.12; toast('тук… тук… тук…'); } if (ev.t > 16) monsEvEnd(); } }
   else { const door = ev.type === 'breachD', tg = door ? { x: 0.1, z: HD + 1.3 } : winOut(ev.win);
-    if (ev.ph === 'go') { if (monsGo(m, tg.x, tg.z, 2.6, dt) < 0.3) { ev.ph = 'act'; ev.t = 0; const inn = door ? { x: 0, z: HD - 1.0 } : winIn(ev.win), wOpen = !door && MONS.wins[ev.win].open; MONS.alert = { x: inn.x, z: inn.z, T: door ? (MONS.doorOpen ? 3.8 : 8.5) : wOpen ? 4 : 9.5, t: 0, scared: false, door, win: ev.win, shout: false };
+    if (ev.ph === 'go') { if (monsGo(m, tg.x, tg.z, 2.6, dt) < 0.3) { ev.ph = 'act'; ev.t = 0; const inn = door ? { x: 0, z: HD - 1.0 } : winIn(ev.win), wOpen = !door && MONS.wins[ev.win].open; MONS.alert = { x: inn.x, z: inn.z, T: Math.max(2.6, (door ? (MONS.doorOpen ? 3.8 : 8.5) : wOpen ? 4 : 9.5) * (ev.m.g.userData.def ? ev.m.g.userData.def.breachK : 1) * (MONS.diffD ? MONS.diffD.tK : 1) - MONS.hour * 0.4), t: 0, scared: false, door, win: ev.win, shout: false };
         for (const b of MONS.bots.filter((q) => !q.dead && !q.hid).sort((a, c) => Math.hypot(a.n.pos.x - inn.x, a.n.pos.z - inn.z) - Math.hypot(c.n.pos.x - inn.x, c.n.pos.z - inn.z)).slice(0, 2)) { b.role = 'scare'; b.succ = Math.random() < 0.5; b.rolled = false; b.path = null; }
         banner(door ? (MONS.doorOpen ? 'ДВЕРЬ ОТКРЫТА!' : 'ДВЕРЬ ДЁРГАЮТ!') : 'ОКНО ВЗЛАМЫВАЮТ! (' + WIN_NAME[ev.win] + ')', 'подбегите и нажмите «Спугнуть»'); } }
     else { const al = MONS.alert; if (!al) return; const W = door ? [0, HD, 's'] : MON_WIN[al.win]; monsFace(m, W[0], W[1]); monsWalkAnim(m.g, dt, 0); al.t += dt; ev.rattleT -= dt;
@@ -17786,6 +17998,7 @@ function monsMonUpdate(dt) {
     else if (m.st === 'leave') { if (roomOf(m.x, m.z) !== 'O') monsGo(m, NAV.P[0], NAV.P[1] + 1.5, 2.6, dt); else { const p = PATROL[m.pi]; if (monsGo(m, p[0], p[1], 2.2, dt) < 0.6) { m.st = 'patrol'; m.path = null; } } }
     else if (m.st === 'enter') monsEnterUpdate(m, dt);
     else if (m.st === 'inside') monsInsideUpdate(m, dt);
+    else if (m.st === 'sniff') monsSniffUpdate(m, dt);
   }
 }
 function monsInsideUpdate(m, dt) {
@@ -17794,8 +18007,11 @@ function monsInsideUpdate(m, dt) {
   for (const b of MONS.bots) if (!b.dead && !b.hid && Math.hypot(b.n.pos.x - m.x, b.n.pos.z - m.z) < 1.2 && m.insT > 1.5) monsBotKill(b, 'схвачен монстром');
   const u = m.g.userData;
   if (!hidden) { monsGo(m, pp.x, pp.z, m.insT < 2.2 ? 0.9 : 2.5, dt); const d = Math.hypot(pp.x - m.x, pp.z - m.z); if (d < 3) { aimArmW(m.g, 'R', new V3(pp.x, 1.5, pp.z)); } if (d < 1.3 && m.insT > 1.2) monsCut('inside'); }
-  else { if (!m.sp || m.spT <= 0) { m.sp = pick(MONS.spots); m.spT = 6; } const d = monsGo(m, m.sp.ex, m.sp.ez, 1.7, dt);
-    if (d < 0.35) { m.spT -= dt; monsFace(m, m.sp.x, m.sp.z); u.spine.rotation.x = 0.6 + Math.sin(m.insT * 2) * 0.1; aimArmW(m.g, 'R', new V3(m.sp.x, m.sp.camY + 0.3, m.sp.z)); if (m.spT < 4.4 && !m.checked) { m.checked = true; if (m.sp.doors) { m.sp.anim = 1.1; Sound.thud(0.4); } if (m.sp.occ && m.sp.occ !== 'player' && Math.random() < 0.35) { const b = m.sp.occ; monsBotKill(b, 'найден в укрытии'); } else if (m.sp.occ === 'player') { MONS.fear = 1; Sound.heartbeat && Sound.heartbeat(); } } }
+  else { if (!m.sp || m.spT <= 0) { const def = m.g.userData.def || MON_KINDS.lanky; m.sp = (MONS.hide && MONS.sniffCd <= 0 && Math.random() < def.sniffP) ? MONS.hide : pick(MONS.spots); m.spT = 6; }
+    const d = monsGo(m, m.sp.ex, m.sp.ez, 1.7, dt);
+    if (d < 0.4) { m.spT -= dt; monsFace(m, m.sp.x, m.sp.z); u.spine.rotation.x = 0.6 + Math.sin(m.insT * 2) * 0.1; aimArmW(m.g, 'R', new V3(m.sp.x, m.sp.camY + 0.3, m.sp.z));
+      if (m.sp === MONS.hide && m.sp.occ === 'player' && MONS.sniffCd <= 0) { const def = m.g.userData.def || MON_KINDS.lanky; m.st = 'sniff'; m.sn = { t: 0, dur: def.sniffDur }; Sound.ghostVoice(0.5); toast('👃 Он прямо рядом… задержите дыхание!'); shake = Math.max(shake, 0.2); return; }
+      if (m.spT < 4.4 && !m.checked) { m.checked = true; if (m.sp.doors) { m.sp.anim = 1.1; Sound.thud(0.4); } if (m.sp.occ && m.sp.occ !== 'player' && Math.random() < 0.35) { const b = m.sp.occ; monsBotKill(b, 'найден в укрытии'); } } }
     else m.checked = false; if (m.spT <= 0) m.checked = false; }
   u.neck.rotation.z = Math.sin(m.insT * 2) * 0.25;
 }
@@ -17822,12 +18038,17 @@ function monsHideIn(s) {
   if (s.occ || MONS.hide || MONS.dead) return; s.occ = 'player'; MONS.hide = s; player.vel.set(0, 0, 0); player.pos.set(s.x, 0, s.z); player.pitch = 0; if (s.doors) s.anim = 1.1;
   const yaw = Math.atan2(s.x - s.ex, s.z - s.ez); player.yaw = yaw;
   story.ride = () => { player.vel.set(0, 0, 0); player.pos.set(s.x, 0, s.z); eye.position.set(s.x, s.camY, s.z); eye.rotation.set(0, yaw, 0); };
-  monsUi().v.style.display = 'block'; Sound.thud(0.4); toast('🤫 Вы спрятались: ' + s.name);
+  const vv = monsUi().v, V = s.view || 'slats';
+  vv.style.background = V === 'slats' ? 'linear-gradient(180deg, rgba(0,0,0,.97) 0 7%, transparent 7% 90%, rgba(0,0,0,.97) 90%), repeating-linear-gradient(90deg, rgba(4,3,2,.97) 0 11vw, rgba(20,14,8,.25) 11vw 14vw)'
+    : V === 'bed' ? 'linear-gradient(180deg, rgba(0,0,0,.99) 0 55%, rgba(8,6,4,.3) 62% 86%, rgba(0,0,0,.97) 92%)'
+    : 'linear-gradient(180deg, rgba(0,0,0,.9) 0 6%, rgba(190,210,220,.26) 10% 92%, rgba(0,0,0,.9) 96%), repeating-linear-gradient(90deg, rgba(210,225,235,.14) 0 3vw, rgba(160,180,195,.02) 3vw 6vw)';
+  vv.style.display = 'block'; Sound.thud(0.4); toast('🤫 Вы спрятались: ' + s.name + '. Следите за ❤️ и дыханием');
 }
 function monsUnhide() { const s = MONS.hide; if (!s) return; if (MONS.inside || MONS.alert) { toast('Ещё рано, сидите тихо'); return; } s.occ = null; MONS.hide = null; story.ride = null; if (s.doors) s.anim = 1.1; player.pos.set(s.ex, 0, s.ez); monsUi().v.style.display = 'none'; }
 function monsAction() {
   const a = MONS.act; if (!a || MONS.dead) return;
   if (a.type === 'lock') { const ev = MONS.ev; if (MONS.doorOpen === false && ev && ev.type === 'knock' && ev.ph === 'act') { monsDoorSet(true); monsCut('door'); return; } monsDoorSet(!MONS.doorOpen); }
+  else if (a.type === 'fix') { MONS.fixT = 2.4; Sound.zap(0.3); toast('⚡ Чиним… не отходите'); }
   else if (a.type === 'win') { const w = MONS.wins[a.i]; w.open = false; w.tgt = 0; Sound.thud(0.4); toast('🪟 Окно закрыто'); }
   else if (a.type === 'scare') { if (MONS.alert) { MONS.alert.scared = true; Sound.zap(0.5); shake = 0.3; toast('📢 Кыш!'); } }
   else if (a.type === 'hide') monsHideIn(a.spot);
@@ -17835,23 +18056,31 @@ function monsAction() {
 }
 /* ===== the end ===== */
 function monsOver(win, kind) {
-  if (MONS.over) return; MONS.over = true; MONS.on = false; monsUiOff(); story.ride = null; story.cut = null; Sound.droneLoop(0); subOff(); const sec = Math.round(MONS.t), alive = MONS.bots.filter((b) => !b.dead).length;
+  if (MONS.over) return; if (MONS._env) { scene.environment = MONS._env; MONS._env = null; } MONS.over = true; MONS.on = false; monsUiOff(); story.ride = null; story.cut = null; Sound.droneLoop(0); subOff(); const sec = Math.round(MONS.t), alive = MONS.bots.filter((b) => !b.dead).length;
   document.body.classList.remove('playing'); state = 'over';
-  const T = { window: 'Вы слишком долго стояли у окна', door: 'Вы подошли к двери, когда постучали', out: 'Вы вышли на улицу', inside: 'Монстр пробрался, а вы не успели спрятаться' };
+  const T = { window: 'Вы слишком долго стояли у окна', door: 'Вы подошли к двери, когда постучали', out: 'Вы вышли на улицу', inside: 'Монстр пробрался, а вы не успели спрятаться', found: 'Вас нашли в укрытии — вы дышали слишком громко' };
   document.querySelector('#over .eyebrow').textContent = 'Сервер · Не открывай'; $('overTitle').textContent = win ? '🌅 Вы пережили ночь' : '☠ ' + (T[kind] || 'Вы погибли');
   $('overStats').innerHTML = [['Игроков', MONS.players], ['Время', Math.floor(sec / 60) + ' мин ' + (sec % 60) + ' с'], ['Событий пережито', Math.max(0, MONS.wave - (win ? 0 : 1))], ['Монстров спугнули', MONS.scared], ['Ботов выжило', `${alive} из ${MONS.players - 1}`]].map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join('');
   $('againBtn').innerHTML = 'Ещё раз<small>новая ночь</small>'; $('over').hidden = false; $('hud').hidden = true; $('touch').hidden = true; if (win) { Sound.chime(); Sound.heal(); }
 }
 /* ===== the frame hook ===== */
 function updMons(dt) {
-  if (mode !== 'mons') { if (MONS.uiShown) { MONS.uiShown = false; monsUiOff(); } return; } MONS.uiShown = true;
-  monsHouseTick(dt);
+  if (mode !== 'mons') { if (MONS.uiShown) { MONS.uiShown = false; monsUiOff(); if (MONS.flashL) MONS.flashL.intensity = 0; } return; } MONS.uiShown = true;
+  monsHouseTick(dt); monsNightTick(dt);
   if (!MONS.on || MONS.dead || state !== 'play') { if (state !== 'play' && MONS.on) { monsUi().b.style.display = 'none'; } return; }
-  MONS.t += dt; const u = monsUi(), pp = player.pos;
+  MONS.t += dt; MONS.hour = MONS.t / MONS.hLen; MONS.sniffCd = Math.max(0, MONS.sniffCd - dt);
+  const u = monsUi(), pp = player.pos;
+  if (MONS.hour >= 6) { monsSunrise(); return; }
   if (MONS.monsters.length === 0) { for (const [x, z] of [[-19, -14], [19, 16], [0, -15]]) monsSpawn(x, z); }
-  if (MONS.monsters.length < 4 && MONS.wave >= 3) monsSpawn(19, -14);
-  if (!MONS.ev && !MONS.inside) { MONS.evT -= dt; if (MONS.evT <= 0) { if (MONS.wave >= MONS.WAVES) { monsOver(true); return; } monsPickEvent(); } }
+  const want = Math.min(5, 3 + MONS.diffD.extra + Math.floor(MONS.hour / 2) + (MONS.power ? 1 : 0));
+  if (MONS.monsters.length < want) { const p = pick([[19, -14], [-19, 16], [19, 16], [-19, -14]]); monsSpawn(p[0], p[1]); }
+  if (!MONS.powerDone && MONS.hour >= 2.25 && !MONS.ev && !MONS.inside) monsPowerOut();
+  if (MONS.power) MONS.power.t += dt;
+  if (!MONS.restocked && MONS.hour >= 3.2) { MONS.restocked = true; monsSpawnPicks(3); toast('📦 В доме появились новые припасы'); }
+  if (!MONS.ev && !MONS.inside) { MONS.evT -= dt; if (MONS.evT <= 0) monsPickEvent(); }
   monsEvUpdate(dt); monsMonUpdate(dt); monsBotsUpdate(dt);
+  // pickups: walk over to collect
+  for (let i = MONS.pickups.length - 1; i >= 0; i--) { const p = MONS.pickups[i]; if (Math.hypot(pp.x - p.x, pp.z - p.z) < 1.05 && !MONS.hide) { MONS.pickups.splice(i, 1); scene.remove(p.g); const mi = mapObjs.indexOf(p.g); if (mi >= 0) mapObjs.splice(mi, 1); if (p.type === 'bat') { MONS.flash.bat = Math.min(100, MONS.flash.bat + 45); } else MONS.items[p.type]++; toast(MONS_IT[p.type].e + ' ' + MONS_IT[p.type].n); Sound.chime(); monsUiSync(); } }
   // outside: you may go out, but the monsters smell you and run at you
   const outside = roomOf(pp.x, pp.z) === 'O' && !MONS.hide; MONS.outT = outside ? MONS.outT + dt : 0;
   if (outside) for (const m of MONS.monsters) if ((m.st === 'hunt' || m.st === 'patrol' || m.st === 'ev') && Math.hypot(m.x - pp.x, m.z - pp.z) < 1.6) { monsCut('out'); return; }
@@ -17861,16 +18090,22 @@ function updMons(dt) {
   // death 2: going to the door while someone is knocking
   if (ev && ev.type === 'knock' && ev.ph === 'act' && ev.t > 0.8 && !MONS.hide && Math.abs(pp.x) < 2.2 && pp.z > HD - 1.9 && pp.z < HD + 3) { monsCut('door'); return; }
   if (ev && ev.type === 'knock' && ev.ph === 'act') warn = ' · <b style="color:#ffb06a">🚪 стучат, не подходите</b>';
-  if (MONS.alert) warn = ' · <b style="color:#ff6a6a">⚠ СПУГНИТЕ (' + (MONS.alert.door ? 'дверь' : WIN_NAME[MONS.alert.win]) + '): ' + Math.max(0, Math.ceil(MONS.alert.T - MONS.alert.t)) + ' с</b>'; if (MONS.inside) warn = ' · <b style="color:#ff3a3a">☠ МОНСТР В ДОМЕ</b>'; if (outside) warn = ' · <b style="color:#ff3a3a">☠ ВЫ НА УЛИЦЕ — ВАС УЧУЯЛИ, БЕГИТЕ В ДОМ</b>'; if (MONS.hide) warn += ' · 🤫 вы в укрытии';
+  if (MONS.alert) warn = ' · <b style="color:#ff6a6a">⚠ СПУГНИТЕ (' + (MONS.alert.door ? 'дверь' : WIN_NAME[MONS.alert.win]) + '): ' + Math.max(0, Math.ceil(MONS.alert.T - MONS.alert.t)) + ' с</b>';
+  if (MONS.inside) warn = MONS.inside.st === 'sniff' ? ' · <b style="color:#ff3a3a">👃 ОН НЮХАЕТ ВАШЕ УКРЫТИЕ — НЕ ДЫШИТЕ</b>' : ' · <b style="color:#ff3a3a">☠ МОНСТР В ДОМЕ</b>';
+  if (MONS.power && !MONS.inside) warn += ' · <b style="color:#ffd04a">⚡ НЕТ СВЕТА — рубильник в сарае</b>';
+  if (MONS.fixT > 0) warn = ' · <b style="color:#ffd04a">⚡ ЧИНИМ… ' + Math.ceil(MONS.fixT * 10) / 10 + '</b>';
+  if (outside) warn += ' · <b style="color:#ff3a3a">☠ ВЫ НА УЛИЦЕ — ВАС УЧУЯЛИ</b>'; if (MONS.hide) warn += ' · 🤫 вы в укрытии';
   // the context button
   let act = null; const near = (x, z, r) => Math.hypot(pp.x - x, pp.z - z) < r; const nearDoor = Math.abs(pp.x) < 1.6 && Math.abs(pp.z - HD) < 1.9;
+  const scR = MONS.flash.on && MONS.flash.bat > 0 ? 5.2 : 2.8;
   if (MONS.hide) act = (!MONS.inside && !MONS.alert) ? { type: 'unhide', t: '⬆ ВЫЛЕЗТИ' } : null;
-  else if (MONS.alert && near(MONS.alert.x, MONS.alert.z, 2.8)) act = { type: 'scare', t: '📢 СПУГНУТЬ' };
+  else if (MONS.power && near(17.5, -11.5, 2.2) && MONS.fixT <= 0) act = { type: 'fix', t: '⚡ ВКЛЮЧИТЬ РУБИЛЬНИК' };
+  else if (MONS.alert && near(MONS.alert.x, MONS.alert.z, scR)) act = { type: 'scare', t: '📢 СПУГНУТЬ' + (scR > 3 ? ' (фонарь помогает)' : '') };
   else if (nearDoor) act = { type: 'lock', t: MONS.doorOpen ? '🔒 ЗАКРЫТЬ НА ЗАМОК' : '🚪 ОТКРЫТЬ ДВЕРЬ' };
   else { const w = MONS.wins.find((q) => q.open && near(winIn(q.i).x, winIn(q.i).z, 1.8) && !(MONS.alert && MONS.alert.win === q.i)); const s = MONS.spots.filter((q) => near(q.ex, q.ez, 1.6) || near(q.x, q.z, 1.9)).sort((a, c) => Math.hypot(pp.x - a.ex, pp.z - a.ez) - Math.hypot(pp.x - c.ex, pp.z - c.ez))[0];
     if (w) act = { type: 'win', i: w.i, t: '🪟 ЗАКРЫТЬ ОКНО' }; else if (s) act = s.occ ? { type: 'none', t: '✖ ' + s.name + ': занято' } : { type: 'hide', spot: s, t: '🫥 СПРЯТАТЬСЯ · ' + s.name }; }
   MONS.act = act && act.type !== 'none' ? act : null; if (act) { u.b.style.display = 'block'; u.b.textContent = act.t; u.b.disabled = act.type === 'none'; } else u.b.style.display = 'none';
-  MONS.hudT -= dt; if (MONS.hudT <= 0) { MONS.hudT = 0.25; u.h.innerHTML = `🌙 событие <b>${MONS.wave}</b>/${MONS.WAVES} · 👥 живых <b>${monsAlive()}</b>/${MONS.players} · 🚪 ${MONS.doorOpen ? '<b style="color:#ff9a6a">открыта</b>' : 'закрыта'}` + warn; }
+  MONS.hudT -= dt; if (MONS.hudT <= 0) { MONS.hudT = 0.25; const hh = Math.floor(MONS.hour), mm = String(Math.floor((MONS.hour % 1) * 60)).padStart(2, '0'); u.h.innerHTML = `⏰ <b>0${hh}:${mm}</b> · 👥 <b>${monsAlive()}</b>/${MONS.players} · 🚪 ${MONS.doorOpen ? '<b style="color:#ff9a6a">открыта</b>' : 'закрыта'}` + warn; }
 }
 document.getElementById('srvBtn').onclick = () => { Sound.init(); serversMenu(); };
 /* ----- the final screen of location 3 ----- */
@@ -18576,7 +18811,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { get cutT() { return story.cut ? story.cut.t : -1; }, set cutT(v) { if (story.cut) story.cut.t = v; }, MONS, MON_WIN, winIn, winOut, roomOf, anyPath, monsBreach, monsStart, monsBegin, monsCut, monsOver, monsDoorSet, monsHideIn, monsAction, monsPickEvent, mkNoob, mkMonster, loadMap, resume, openSpawn, get spc() { return spc; }, spRender, wpBuildSample, spawnAtAim, get state() { return state; }, DACHA, dachaBlast, applyNewLook, spawnNPC, D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { get cutT() { return story.cut ? story.cut.t : -1; }, set cutT(v) { if (story.cut) story.cut.t = v; }, MONS, MON_WIN, MON_KINDS, winIn, winOut, roomOf, anyPath, monsBreach, monsSunrise, monsUse, monsSpawnPicks, monsPowerOut, monsPowerOn, monsStart, monsBegin, monsCut, monsOver, monsDoorSet, monsHideIn, monsAction, monsPickEvent, mkNoob, mkMonster, loadMap, resume, openSpawn, get spc() { return spc; }, spRender, wpBuildSample, spawnAtAim, get state() { return state; }, DACHA, dachaBlast, applyNewLook, spawnNPC, D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
