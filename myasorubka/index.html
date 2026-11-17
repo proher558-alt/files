@@ -18667,7 +18667,10 @@ function updLobby(dt) {
   LOB.chatT -= dt; if (LOB.chatT <= 0) { LOB.chatT = rand(3, 7); const b = pick(LOB.bots); if (b) lobSay(b, pick(LOB_SAY)); }
   LOB.online += (Math.random() < dt * 0.5 ? randi(7) - 3 : 0);
   // stations: the nearest ring under you
-  const u = lobUi(); let near = null; for (const s of LOB.st) if (Math.hypot(pp.x - s.ex, pp.z - s.ez) < 1.6) near = s; LOB.near = near;
+  const u = lobUi(); let near = null; for (const s of LOB.st) if (Math.hypot(pp.x - s.ex, pp.z - s.ez) < 1.6) near = s; const prev = LOB.near; LOB.near = near;
+  if (near !== prev) { if (prev && LOB.autoOpen === prev.id) { LOB.autoOpen = null; if (prev.id !== 'mirror') { const q = document.getElementById('c2q'); if (q) q.style.display = 'none'; } }
+    if (near) { const q = document.getElementById('c2q'); if (!(q && q.style.display === 'block') && $('wardOv').hidden && !LOB.spin) { LOB.autoOpen = near.id; lobAction(); } } }
+  if (!near && LOB.autoOpen && LOB.autoOpen !== 'mirror') { LOB.autoOpen = null; const q = document.getElementById('c2q'); if (q) q.style.display = 'none'; }
   if (near) { u.b.style.display = 'block'; u.b.textContent = near.icon + ' ' + (near.id === 'ach' ? 'ДОСТИЖЕНИЯ' : near.id === 'bus' ? 'НАЙТИ НОЧЬ' : near.id === 'mirror' ? 'ПЕРЕОДЕТЬСЯ' : near.id === 'spin' ? 'КРУТИТЬ РУЛЕТКУ' : near.id === 'tasks' ? 'ОТКРЫТЬ ЗАДАНИЯ' : near.id === 'board' ? 'СМОТРЕТЬ РЕКОРДЫ' : 'ОТКРЫТЬ КЛАССЫ'); } else u.b.style.display = 'none';
   LOB.hudT -= dt; if (LOB.hudT <= 0) { LOB.hudT = 0.5; const cls = MONS_CLS[MONS_META.cls] || MONS_CLS.none; u.h.innerHTML = `🟢 Онлайн: <b>${LOB.online.toLocaleString('ru')}</b> · в лагере: <b>${LOB.bots.length + 1}</b> · 🪙 <b>${MONS_META.coins}</b> · ${cls.e} ${cls.name}` + (LOB.party.length ? ` · 👥 группа: <b>${LOB.party.length + 1}</b>` : ''); }
 }
@@ -18770,7 +18773,7 @@ function chatUi() {
   const bar = document.createElement('div'); bar.id = 'chatBar'; bar.style.cssText = 'position:fixed;left:50%;top:calc(16% + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:60;width:min(94vw,440px);background:rgba(12,10,10,.94);border:1px solid #8fd0ff;border-radius:12px;padding:8px;display:none;font-family:var(--ui)';
   bar.innerHTML = '<div style="display:flex;gap:6px"><input id="chatIn" maxlength="140" placeholder="Напишите ботам… (можно по имени)" style="flex:1;min-width:0;background:#1a1616;color:#fff;border:1px solid #444;border-radius:8px;padding:8px;font:600 14px var(--ui)"><button class="btn primary" id="chatGo" style="padding:6px 12px">➤</button><button class="btn" id="chatX" style="padding:6px 10px">✕</button></div><div id="chatChips" class="chips" style="margin-top:6px;flex-wrap:wrap;display:flex;gap:5px"></div>';
   document.body.appendChild(btn); document.body.appendChild(bar);
-  const stop = (e) => e.stopPropagation(); ['touchstart', 'pointerdown', 'mousedown', 'keydown', 'keyup', 'keypress'].forEach((e) => { bar.addEventListener(e, stop); }); ['touchstart', 'pointerdown', 'mousedown'].forEach((e) => btn.addEventListener(e, (ev) => { ev.stopPropagation(); ev.preventDefault(); chatToggle(); }, { passive: false }));
+  const stop = (e) => e.stopPropagation(); ['touchstart', 'pointerdown', 'mousedown', 'keydown', 'keyup', 'keypress'].forEach((e) => { bar.addEventListener(e, stop); }); btn.style.touchAction = 'manipulation'; { let lastT = 0; const hit = (ev) => { ev.stopPropagation(); ev.preventDefault(); const n = performance.now(); if (n - lastT < 400) return; lastT = n; chatToggle(); }; ['pointerdown', 'touchstart', 'mousedown', 'click'].forEach((e) => btn.addEventListener(e, hit, { passive: false })); }
   const inp = bar.querySelector('#chatIn'); const send = () => { chatSend(inp.value); inp.value = ''; }; bar.querySelector('#chatGo').onclick = send; inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); }); bar.querySelector('#chatX').onclick = () => chatToggle(false);
   return { btn, bar };
 }
