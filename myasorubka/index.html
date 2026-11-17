@@ -15428,11 +15428,11 @@ function vehPartHit(C, p, k, dirW) {
 function vehDamage(C, wx, wz, nx, nz, k, hy) {
   if (k <= 0 || C.burnt) return; C.crashT = 0.4;
   const lp = vehToLocal(C, wx - C.x, wz - C.z, new V3()); lp.y = hy ?? (C.S.cl + C.S.bh) / 2; const ld = vehToLocal(C, nx, nz, new V3()); ld.y = rand(-0.2, 0.1); ld.normalize();
-  const R = clamp(0.5 + k * 0.08, 0.5, 1.6), depth = Math.min(0.34, k * 0.04);
+  const R = clamp(0.5 + k * 0.1, 0.5, 1.9), depth = Math.min(0.5, k * 0.05);
   C.root.updateMatrixWorld(true);
   const wp = C.root.localToWorld(lp.clone()), wd = ld.clone().applyQuaternion(C.root.quaternion);
   for (const m of C.deform) { if (!m.parent || !m.visible) continue; const g = m.geometry, pa = g.attributes.position.array, o = g.userData.o; const mp = m.worldToLocal(wp.clone()); m.getWorldQuaternion(_vQ); const md = wd.clone().applyQuaternion(_vQ.invert()); const sc = m.getWorldScale(_vC); let ch = false;
-    for (let i = 0; i < pa.length; i += 3) { const dx = pa[i] - mp.x, dy = pa[i + 1] - mp.y, dz2 = pa[i + 2] - mp.z, d = Math.sqrt(dx * dx + dy * dy + dz2 * dz2); if (d > R) continue; const f = (1 - d / R) ** 2 * depth / Math.max(0.5, sc.x); pa[i] += md.x * f; pa[i + 1] += md.y * f; pa[i + 2] += md.z * f; const ox = pa[i] - o[i], oy = pa[i + 1] - o[i + 1], oz = pa[i + 2] - o[i + 2], od = Math.sqrt(ox * ox + oy * oy + oz * oz); if (od > 0.5) { pa[i] = o[i] + ox / od * 0.5; pa[i + 1] = o[i + 1] + oy / od * 0.5; pa[i + 2] = o[i + 2] + oz / od * 0.5; } ch = true; }
+    for (let i = 0; i < pa.length; i += 3) { const dx = pa[i] - mp.x, dy = pa[i + 1] - mp.y, dz2 = pa[i + 2] - mp.z, d = Math.sqrt(dx * dx + dy * dy + dz2 * dz2); if (d > R) continue; const f = (1 - d / R) ** 2 * depth / Math.max(0.5, sc.x); pa[i] += md.x * f; pa[i + 1] += md.y * f; pa[i + 2] += md.z * f; const ox = pa[i] - o[i], oy = pa[i + 1] - o[i + 1], oz = pa[i + 2] - o[i + 2], od = Math.sqrt(ox * ox + oy * oy + oz * oz); if (od > 0.8) { pa[i] = o[i] + ox / od * 0.8; pa[i + 1] = o[i + 1] + oy / od * 0.8; pa[i + 2] = o[i + 2] + oz / od * 0.8; } ch = true; }
     if (ch) { g.attributes.position.needsUpdate = true; g.computeVertexNormals(); } }
   for (const p of C.parts) { if (p.gone) continue; const d = p.c.distanceTo(lp); if (d < R + p.r) vehPartHit(C, p, k * 0.55 * (1 - d / (R + p.r) * 0.6), new V3(nx, 0, nz)); }
   C.hp -= k * (lp.z > C.S.L * 0.25 ? 3.4 : 1.8); if (C.hp < 0) C.hp = 0;
@@ -15485,9 +15485,19 @@ function vehPhys(C, dt) {
         if (imp > 3.5) { Sound.thud(Math.min(1, imp * 0.09) * dv(_vA.set(C.x, 0, C.z))); sparks(_vA.set(C.x, 0.15, C.z), 6, UP, 4); if (C === VEH.in) shake = Math.max(shake, Math.min(0.6, imp * 0.05)); }
         if (imp > 9) vehDamage(C, C.x, C.z, 0, 0, (imp - 9) * 0.6, 0.2); if (C === VEH.in && C.airT > 0.6) toast('🛬 Полёт ' + C.airT.toFixed(1) + ' с!'); }
       C.yaw += C.w * h; C.x += C.vx * h; C.z += C.vz * h; continue; }
+    // roll: gravity brings a tipped car back, or tips it over the edge onto its side or roof
+    const rl = C.roll || 0; if (Math.abs(rl) > 0.002 || Math.abs(C.rollV || 0) > 0.002) { const a = Math.abs(rl), sg = Math.sign(rl) || 1, Ir = (P.tw * P.tw + P.h * P.h) * 1.15; let tq;
+      if (a < Math.PI / 2 - 0.22) tq = -sg * VG * (P.tw * Math.cos(a) - P.h * Math.sin(a)); else if (a < Math.PI / 2 + 0.3) tq = -sg * VG * (a - Math.PI / 2) * 2.2; else tq = sg * VG * 0.7;
+      C.rollV += tq / Ir * h; C.rollV *= Math.exp(-h * (a > 0.35 ? 1.4 : 3.2)); C.roll = rl + C.rollV * h;
+      if (Math.abs(C.roll) < 0.03 && Math.abs(C.rollV) < 0.3) { if (Math.abs(C.rollV) > 0.1 || a > 0.1) { C.heaveV -= 1.2; } C.roll = 0; C.rollV = 0; }
+      if (Math.abs(C.roll) >= Math.PI) { C.roll = Math.PI * sg; if (Math.abs(C.rollV) > 0.6) { Sound.crunch(0.7); sparks(_vA.set(C.x, 0.4, C.z), 8, UP, 3); } C.rollV *= -0.2; if (Math.abs(C.rollV) < 0.5) C.rollV = 0; }
+      if (Math.abs(Math.abs(C.roll) - Math.PI / 2) < 0.06 && Math.abs(C.rollV) < 0.6) C.rollV *= 0.5; }
+    const tk = clamp(1 - (Math.abs(C.roll || 0) - 0.14) / 0.3, 0, 1);
+    if (tk < 1) { const fr = (1 - tk) * 0.55 * VG, vv = Math.hypot(C.vx, C.vz); if (vv > 0.01) { const dv2 = Math.min(vv, fr * h); C.vx -= C.vx / vv * dv2; C.vz -= C.vz / vv * dv2; } C.w *= Math.exp(-h * 2.5 * (1 - tk)); if (vv > 3 && Math.random() < h * 30) sparks(_vA.set(C.x + rand(-1, 1), 0.2, C.z + rand(-1, 1)), 2, UP, 3); }
+    if (tk <= 0) { C.yaw += C.w * h; C.x += C.vx * h; C.z += C.vz * h; continue; }
     // weight transfer from the last accelerations, aero downforce
     const dfz = P.df * sp * sp, dLong = P.m * C.ax * P.h / P.L / 2, dLat = P.m * C.ay * P.h / (P.tw * 2) / 2;
-    const delta = -C.steer * P.steer / (1 + Math.abs(u) / P.fade);
+    const delta = -C.steer * P.steer / (1 + Math.abs(u) / P.fade) + (C.pull || 0) * Math.min(1, Math.abs(u) / 6);
     let assist = 0; C.beta = sp > 3 ? Math.atan2(s, Math.abs(u) + 0.1) : 0; if (Math.abs(C.beta) > 0.07 && u > 2) assist = clamp(C.beta * (isAI ? 0.9 : 0.65), -0.5, 0.5);
     // engine force (power limited), shift cut, nitro
     let Fe = 0; const pM = (C.nOn ? 1.65 : 1) * eng;
@@ -15496,7 +15506,7 @@ function vehPhys(C, dt) {
     const nd = P.drive === 'awd' ? 4 : 2; let Fx = 0, Fy = 0, Tq = 0, maxSlip = 0;
     for (let i = 0; i < 4; i++) {
       const Wd = P.W[i], lost = C.lost[i], front = Wd.f === 1, lx = Wd.lx, lz = Wd.lz;
-      let Fz = Math.max(0, Wd.s + dfz / 4 + (front ? -dLong : dLong) + (lx < 0 ? dLat : -dLat)); if (lost) Fz *= 0.15;
+      let Fz = Math.max(0, Wd.s + dfz / 4 + (front ? -dLong : dLong) + (lx < 0 ? dLat : -dLat)) * tk; if (lost) Fz *= 0.15;
       const d = front ? delta + (front ? assist : 0) : 0, cd2 = Math.cos(d), sd = Math.sin(d);
       const vu = u - C.w * lx, vs = s + C.w * lz, vLong = vs * sd + vu * cd2, vLat = vs * cd2 - vu * sd;
       const mu = P.mu * (isAI ? 1.12 : front ? 1 : 1.07) * (lost ? 0.35 : 1), Fmx = mu * Fz, mS = P.m / 4;
@@ -15534,7 +15544,7 @@ function vehPhys(C, dt) {
     else if (C.driftT > 0) { C.driftT -= dt; if (C.driftT <= 0 && C.drift > 30) { const pts = Math.round(C.drift); if (pts > C.driftBest) C.driftBest = pts; toast('🏁 Дрифт: +' + pts + ' очков' + (pts >= C.driftBest ? ' · рекорд!' : '')); C.drift = 0; C.driftK = 1; } else if (C.driftT <= 0) { C.drift = 0; C.driftK = 1; } } }
 }
 function vehVis(C, dt) {
-  const S = C.S, P = vehSpec(C); C.root.position.set(C.x, C.y || 0, C.z); C.root.rotation.set(C.gPitch || 0, C.yaw, 0, 'YXZ');
+  const S = C.S, P = vehSpec(C); const rl2 = C.roll || 0, lift = S.W / 2 * Math.abs(Math.sin(rl2)) - Math.min(0, S.ch * Math.cos(rl2)); C.root.position.set(C.x, (C.y || 0) + lift, C.z); C.root.rotation.set(C.gPitch || 0, C.yaw, rl2, 'YXZ');
   const spinK = C.in.th && P.drive !== 'fwd' && (C.slip[2] > 0.4 || C.slip[3] > 0.4) ? 1.8 : 1, lockR = C.in.hb && !C.air;
   C.spin += (C.vf || 0) * dt / S.wr * spinK; C.spinF = (C.spinF || 0) + (C.vf || 0) * dt / S.wr * (C.in.th && P.drive !== 'rwd' && (C.slip[0] > 0.4 || C.slip[1] > 0.4) ? 1.8 : 1);
   const dVis = -C.steer * P.steer / (1 + Math.abs(C.vf || 0) / P.fade);
@@ -15569,7 +15579,6 @@ function vehBoom(C) {
   C.paint.color.setHex(0x1a1716); C.paint.metalness = 0.1; C.paint.roughness = 1; for (const p of C.parts) { if (p.kind === 'glass') vehShatter(C, p); if (p.kind === 'light') { p.hp = 0; vehPartHit(C, p, 1, _vA); } if ((p.kind === 'hood' || p.kind === 'trunk' || p.kind === 'door') && Math.random() < 0.6) vehPartHit(C, p, 99, _vA.set(rand(-1, 1), 0, rand(-1, 1))); }
   C.vx += rand(-2, 2); C.vz += rand(-2, 2); if (C === VEH.in && !player.dead) { damagePlayer(200); vehExit(true); }
 }
-/* ----- collisions: walls, other cars, people, props ----- */
 function vehWall(x, z, r) {
   const T = VEH.track, R = VEH.road, AR = VEH.arena;
   if (AR) { const h = AR.half - r; if (x > h) return [-1, 0, x - h]; if (x < -h) return [1, 0, -h - x]; if (z > h) return [0, -1, z - h]; if (z < -h) return [0, 1, -h - z]; return null; }
@@ -15577,20 +15586,57 @@ function vehWall(x, z, r) {
   if (T) { let best = 1e9, bi = 0; for (let i = 0; i < T.N; i++) { const p = T.p[i], d = (p.x - x) ** 2 + (p.z - z) ** 2; if (d < best) { best = d; bi = i; } } const p = T.p[bi], d = Math.sqrt(best), lim = T.wall - r; if (d > lim) return [(p.x - x) / d, (p.z - z) / d, d - lim]; return null; }
   return null;
 }
+/* ----- collisions: real car shapes (oriented boxes), crumpling metal instead of bouncing, scraping friction, side impacts that spin and roll ----- */
+function vehBox(C) {
+  const S = C.S, sy = Math.sin(C.yaw), cy = Math.cos(C.yaw), fL = S.L / 2 - (C.crushF || 0), rL = S.L / 2 - (C.crushR || 0), off = (fL - rL) / 2;
+  return { cx: C.x + sy * off, cz: C.z + cy * off, fx: sy, fz: cy, lx: cy, lz: -sy, hl: (fL + rL) / 2, hw: S.W / 2 - (C.crushS || 0) };
+}
+const BOXC = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+function boxCorners(X) { return BOXC.map(([a, b]) => [X.cx + X.fx * X.hl * a + X.lx * X.hw * b, X.cz + X.fz * X.hl * a + X.lz * X.hw * b]); }
+function obbHit(A, B) {
+  const axes = [[A.fx, A.fz], [A.lx, A.lz], [B.fx, B.fz], [B.lx, B.lz]], dx = A.cx - B.cx, dz = A.cz - B.cz; let best = 1e9, nx = 0, nz = 0, bi = -1;
+  for (let i = 0; i < 4; i++) { const [ax, az] = axes[i]; const rA = A.hl * Math.abs(A.fx * ax + A.fz * az) + A.hw * Math.abs(A.lx * ax + A.lz * az), rB = B.hl * Math.abs(B.fx * ax + B.fz * az) + B.hw * Math.abs(B.lx * ax + B.lz * az), d = dx * ax + dz * az, o = rA + rB - Math.abs(d); if (o <= 0) return null; if (o < best) { best = o; nx = d < 0 ? -ax : ax; nz = d < 0 ? -az : az; bi = i; } }
+  // the contact: the deepest corner(s) of the incident box, averaged (edge-to-edge gives two corners)
+  const inc = bi < 2 ? B : A, cs = boxCorners(inc), sgn = bi < 2 ? 1 : -1; let mx = -1e9; const pr = cs.map(([x, z]) => (x * nx + z * nz) * sgn); for (const p of pr) mx = Math.max(mx, p);
+  let px = 0, pz = 0, k = 0; cs.forEach(([x, z], i) => { if (pr[i] > mx - 0.08) { px += x; pz += z; k++; } }); px /= k; pz /= k;
+  return { nx, nz, pen: best, px: px - nx * best * 0.5 * sgn, pz: pz - nz * best * 0.5 * sgn };
+}
+const crs2 = (rx, rz, x, z) => rz * x - rx * z;
+function vehImpulse(A, B, px, pz, nx, nz, e, mu) {
+  const rax = px - A.x, raz = pz - A.z, vax = A.vx + A.w * raz, vaz = A.vz - A.w * rax; let rbx = 0, rbz = 0, vbx = 0, vbz = 0; if (B) { rbx = px - B.x; rbz = pz - B.z; vbx = B.vx + B.w * rbz; vbz = B.vz - B.w * rbx; }
+  const rvx = vax - vbx, rvz = vaz - vbz, vn = rvx * nx + rvz * nz; if (vn >= 0) return null;
+  const ra = crs2(rax, raz, nx, nz), rb = B ? crs2(rbx, rbz, nx, nz) : 0, kn = 1 / A.m + ra * ra / A.I + (B ? 1 / B.m + rb * rb / B.I : 0), j = -(1 + e) * vn / kn;
+  const tx = -nz, tz = nx, vt = rvx * tx + rvz * tz, rat = crs2(rax, raz, tx, tz), rbt = B ? crs2(rbx, rbz, tx, tz) : 0, kt = 1 / A.m + rat * rat / A.I + (B ? 1 / B.m + rbt * rbt / B.I : 0), jt = clamp(-vt / kt, -mu * j, mu * j);
+  const Jx = nx * j + tx * jt, Jz = nz * j + tz * jt;
+  A.vx += Jx / A.m; A.vz += Jz / A.m; A.w += crs2(rax, raz, Jx, Jz) / A.I;
+  if (B) { B.vx -= Jx / B.m; B.vz -= Jz / B.m; B.w -= crs2(rbx, rbz, Jx, Jz) / B.I; }
+  return { j, vn, vt, Jx, Jz };
+}
+/* a sideways shove at body height tips the car: the top follows the push, gravity decides if it comes back */
+function vehTip(C, Jx, Jz, k) { if (C.air) return; const P = vehSpec(C), dl = (Jx * Math.cos(C.yaw) - Jz * Math.sin(C.yaw)) / C.m; C.rollV = (C.rollV || 0) - dl * 0.3 * k * P.h / P.tw; }
+/* crumple zones: the hit end gets physically shorter, the car keeps the scar */
+function vehCrush(C, px, pz, k) { const lp = vehToLocal(C, px - C.x, pz - C.z, _vC), L = C.S.L; if (k < 1.5) return; const d = Math.min(0.06 * k, 0.5); if (lp.z > L * 0.22) C.crushF = Math.min(L * 0.22, (C.crushF || 0) + d * 0.5); else if (lp.z < -L * 0.22) C.crushR = Math.min(L * 0.2, (C.crushR || 0) + d * 0.45); else C.crushS = Math.min(C.S.W * 0.15, (C.crushS || 0) + d * 0.25); if (lp.z > L * 0.22 && k > 4) C.pull = clamp((C.pull || 0) + (lp.x > 0 ? 1 : -1) * k * 0.012, -0.18, 0.18); }
+function vehScrape(C, px, pz, vt) { C.scrT = (C.scrT || 0) - 1; if (Math.abs(vt) < 3.5) return; if (Math.random() < 0.6) sparks(_vA.set(px, 0.35, pz), 3, UP, 3 + Math.abs(vt) * 0.2); if (C.scrT <= 0) { C.scrT = 8; Sound.crunch(Math.min(0.35, 0.08 + Math.abs(vt) * 0.012) * dv(_vA)); if (C === VEH.in) shake = Math.max(shake, 0.08); } }
+function vehCrashCam(k) { if (k < 7.5 || VEH.slowT) return; VEH.slowT = 1; worldTs = 0.3; story.fov = (story.fov || 70) - 6; flashScreen && flashScreen('#ffffff', 120); setTimeout(() => { if (worldTs === 0.3) worldTs = 1; VEH.slowT = 0; }, 750); }
 function vehCollide(dt) {
-  const L = VEH.list, crossY = (rx, rz, fx, fz) => rz * fx - rx * fz;
+  const L = VEH.list;
+  // walls: test the four corners and the middle of each side
   for (const C of L) {
-    if (C.far) continue; const sy = Math.sin(C.yaw), cy = Math.cos(C.yaw);
-    for (const oz of C.circ) { const cx = C.x + sy * oz, cz = C.z + cy * oz, h = vehWall(cx, cz, C.r); if (h) { const [nx, nz, pen] = h; C.x += nx * pen; C.z += nz * pen; const rx = sy * oz, rz = cy * oz, pvx = C.vx + C.w * rz, pvz = C.vz - C.w * rx, vn = pvx * nx + pvz * nz; if (vn < 0) { const rn = crossY(rx, rz, nx, nz), j = -(1.25) * vn / (1 / C.m + rn * rn / C.I); C.vx += nx * j / C.m; C.vz += nz * j / C.m; C.w += rn * j / C.I; const tx = -nz, tz = nx, vt = pvx * tx + pvz * tz; C.vx -= tx * vt * 0.12; C.vz -= tz * vt * 0.12; if (-vn > 3.2) vehDamage(C, cx - nx * C.r, cz - nz * C.r, nx, nz, (-vn - 3.2) * 0.8); else if (Math.abs(vt) > 4 && Math.random() < dt * 20) sparks(_vA.set(cx - nx * C.r, 0.4, cz - nz * C.r), 3, UP, 3); } } }
+    if (C.far) continue; const B = vehBox(C), pts = boxCorners(B); pts.push([B.cx + B.lx * B.hw, B.cz + B.lz * B.hw], [B.cx - B.lx * B.hw, B.cz - B.lz * B.hw], [B.cx + B.fx * B.hl, B.cz + B.fz * B.hl], [B.cx - B.fx * B.hl, B.cz - B.fz * B.hl]);
+    for (const [px, pz] of pts) { const h = vehWall(px, pz, 0.08); if (!h) continue; const [nx, nz, pen] = h; C.x += nx * pen; C.z += nz * pen;
+      const r = vehImpulse(C, null, px, pz, nx, nz, 0.08, 0.35); if (!r) continue; const s = -r.vn; vehScrape(C, px, pz, r.vt);
+      if (s > 3.2) { const k = (s - 3.2) * 0.8; vehDamage(C, px, pz, nx, nz, k); vehCrush(C, px, pz, k); vehTip(C, r.Jx, r.Jz, Math.abs(C.vl || 0) > 7 ? 1.6 : 0.8); if (C === VEH.in) vehCrashCam(k); } }
   }
+  // car against car: separating axis test on the real boxes, impulse at the contact point with friction
   for (let a = 0; a < L.length; a++) for (let b = a + 1; b < L.length; b++) {
-    const A = L[a], B = L[b]; if (A.far || B.far) continue; const dd = (A.x - B.x) ** 2 + (A.z - B.z) ** 2, lim = (A.S.L + B.S.L) / 2 + 1; if (dd > lim * lim) continue;
-    const sa = Math.sin(A.yaw), ca = Math.cos(A.yaw), sb = Math.sin(B.yaw), cb = Math.cos(B.yaw);
-    for (const oa of A.circ) for (const ob of B.circ) { const ax = A.x + sa * oa, az = A.z + ca * oa, bx = B.x + sb * ob, bz = B.z + cb * ob, dx = ax - bx, dz = az - bz, d = Math.hypot(dx, dz), rr = A.r + B.r; if (d >= rr || d < 1e-4) continue;
-      const nx = dx / d, nz = dz / d, pen = rr - d, im = A.m + B.m; A.x += nx * pen * B.m / im; A.z += nz * pen * B.m / im; B.x -= nx * pen * A.m / im; B.z -= nz * pen * A.m / im;
-      const rax = ax - nx * A.r - A.x, raz = az - nz * A.r - A.z, rbx = ax - nx * A.r - B.x, rbz = az - nz * A.r - B.z, vax = A.vx + A.w * raz, vaz = A.vz - A.w * rax, vbx = B.vx + B.w * rbz, vbz = B.vz - B.w * rbx, vn = (vax - vbx) * nx + (vaz - vbz) * nz;
-      if (vn < 0) { const rna = crossY(rax, raz, nx, nz), rnb = crossY(rbx, rbz, nx, nz), j = -1.2 * vn / (1 / A.m + 1 / B.m + rna * rna / A.I + rnb * rnb / B.I); A.vx += nx * j / A.m; A.vz += nz * j / A.m; A.w += rna * j / A.I; B.vx -= nx * j / B.m; B.vz -= nz * j / B.m; B.w -= rnb * j / B.I;
-        const s = -vn; if (s > 3) { const cx = ax - nx * A.r, cz = az - nz * A.r; vehDamage(A, cx, cz, nx, nz, (s - 3) * 0.85 * Math.sqrt(Math.min(3, B.m / A.m))); vehDamage(B, cx, cz, -nx, -nz, (s - 3) * 0.85 * Math.sqrt(Math.min(3, A.m / B.m))); } } }
+    const A = L[a], B2 = L[b]; if (A.far || B2.far) continue; const dd = (A.x - B2.x) ** 2 + (A.z - B2.z) ** 2, lim = (A.S.L + B2.S.L) / 2 + 0.5; if (dd > lim * lim) continue; if (Math.abs((A.y || 0) - (B2.y || 0)) > 1.4) continue;
+    const hit = obbHit(vehBox(A), vehBox(B2)); if (!hit) continue; const { nx, nz, pen, px, pz } = hit, im = A.m + B2.m;
+    A.x += nx * pen * B2.m / im; A.z += nz * pen * B2.m / im; B2.x -= nx * pen * A.m / im; B2.z -= nz * pen * A.m / im;
+    const r = vehImpulse(A, B2, px, pz, nx, nz, 0.12, 0.45); if (!r) continue; const s = -r.vn; vehScrape(A, px, pz, r.vt);
+    if (s > 2.5) { const kA = (s - 2.5) * 0.9 * Math.sqrt(clamp(B2.m / A.m, 0.3, 3)), kB = (s - 2.5) * 0.9 * Math.sqrt(clamp(A.m / B2.m, 0.3, 3));
+      vehDamage(A, px, pz, nx, nz, kA); vehDamage(B2, px, pz, -nx, -nz, kB); vehCrush(A, px, pz, kA); vehCrush(B2, px, pz, kB);
+      vehTip(A, r.Jx, r.Jz, clamp(B2.m / A.m, 0.5, 3)); vehTip(B2, -r.Jx, -r.Jz, clamp(A.m / B2.m, 0.5, 3));
+      if (A === VEH.in) vehCrashCam(kA); if (B2 === VEH.in) vehCrashCam(kB); }
   }
   // people and props in the way
   for (const C of L) {
@@ -15704,9 +15750,11 @@ function vehTouch(act, down) {
   if (act === 'fire') { if (down) vehHorn(); return true; }
   if (act === 'next') { if (down) vehGarage(); return true; }
   if (act === 'alt') { VEH.nitroBtn = down; return true; }
-  if (act === 'reload' || act === 'kill' || act === 'fall') return true;
+  if (act === 'fall') { if (down && VEH.in && Math.abs(VEH.in.roll || 0) > 0.5) vehFlip(VEH.in); return true; }
+  if (act === 'reload' || act === 'kill') return true;
   return false;
 }
+function vehFlip(C) { C.flipT = 0.9; C.rollV = 0; Sound.thud(0.6); toast('🔄 Переворачиваем машину…'); }
 function vehAct() { if (VEH.in) { vehExit(false); return true; } const C = vehNearest(); if (C && mode !== 'story') { vehEnter(C); return true; } return false; }
 function vehClear() { for (const d of VEH.debris) scene.remove(d.o); Object.assign(VEH, { list: [], in: null, debris: [], track: null, road: null, arena: null, race: null, started: false, mine: null, ramps: [], nitroBtn: false }); story.ride = null; story.rideCam = null; vehHud(false); vehAudioSet(0, 0, 0); const b = document.getElementById('vehBtn'); if (b) b.style.display = 'none'; }
 function updVeh(dt) {
@@ -15718,7 +15766,10 @@ function updVeh(dt) {
   const C0 = VEH.in;
   if (C0) { const I = C0.in, jy = touch.moveId !== null ? touch.jy : 0, jx = touch.moveId !== null ? touch.jx : 0; I.th = clamp(-jy * 1.25, 0, 1); I.br = clamp(jy * 1.25, 0, 1); I.st = clamp(jx * 1.15, -1, 1); I.hb = VEH.hb ? 1 : 0; if (VEH.race && VEH.race.state === 'count') { I.th = 0; I.br = 0; I.hb = 1; } }
   if (VEH.race && VEH.race.state === 'count') { const R = VEH.race, p = Math.ceil(R.t); R.t -= dt; if (Math.ceil(R.t) !== p && R.t > 0) { Sound.click(800, 0.5); banner(String(Math.ceil(R.t)), 'приготовьтесь'); } if (R.t <= 0) { R.state = 'go'; R.start = R.lapT = performance.now(); banner('СТАРТ!', 'вперёд'); Sound.click(1600, 0.6); } }
-  for (const C of VEH.list) { C.far = C.ai && C !== VEH.in && Math.hypot(C.x - player.pos.x, C.z - player.pos.z) > 150; if (C.ai) vehAI(C, dt); if (C.far) { C.x += C.vx * dt; C.z += C.vz * dt; C.root.position.set(C.x, 0, C.z); continue; } vehPhys(C, dt); }
+  for (const C of VEH.list) { if (C.flipT > 0) { C.flipT -= dt; C.roll = (C.roll || 0) * Math.exp(-dt * 7); C.y = (C.y || 0) + Math.sin(C.flipT * 3.5) * dt * 1.5; if (C.flipT <= 0) { C.roll = 0; C.rollV = 0; C.y = 0; } }
+    if (C.ai && Math.abs(C.roll || 0) > 1) C.ai.stop = true;
+    if (C === VEH.in && Math.abs(C.roll || 0) > 1 && Math.hypot(C.vx, C.vz) < 1.5) { VEH.flipHint = (VEH.flipHint || 0) + dt; if (VEH.flipHint > 1.2 && VEH.flipHint < 1.25) toast('🔄 Машина перевернулась — нажмите «Упасть», чтобы поставить её на колёса'); } else if (C === VEH.in) VEH.flipHint = 0;
+    C.far = C.ai && C !== VEH.in && Math.hypot(C.x - player.pos.x, C.z - player.pos.z) > 150; if (C.ai) vehAI(C, dt); if (C.far) { C.x += C.vx * dt; C.z += C.vz * dt; C.root.position.set(C.x, 0, C.z); continue; } vehPhys(C, dt); }
   vehCollide(dt); vehTraffic(dt);
   for (const C of VEH.list) { if (C.far) continue; vehVis(C, dt); if (VEH.track) vehTrackIdx(C);
     if (!C.air && C.P && Math.hypot(C.vx, C.vz) > 1.5) { C.skT = (C.skT || 0) - dt; if (C.skT <= 0) { C.skT = 0.035; const cy2 = Math.cos(C.yaw), sy2 = Math.sin(C.yaw); for (let i = 0; i < 4; i++) { const sl = C.slip[i] || 0; if (sl < 0.22 || C.lost[i]) continue; const Wd = C.P.W[i], wx = C.x + Wd.lx * cy2 + Wd.lz * sy2, wz = C.z - Wd.lx * sy2 + Wd.lz * cy2; VEH_SKID.add(_vB.set(wx, 0.012 + vehGround(wx, wz), wz), UP, _vC.set(C.vx, 0, C.vz).normalize(), 0.24, Math.min(0.75, 0.3 + sl * 0.5)); if (Math.random() < 0.12 + sl * 0.4) spawnSprite(TEX.smoke, _vB, { color: 0xc8c8c8, size: 0.45, grow: 2.6, life: 1.2, opacity: 0.22 + sl * 0.25, vel: new V3(rand(-0.4, 0.4), 0.5, rand(-0.4, 0.4)) }); } } }
@@ -17458,7 +17509,7 @@ function monsBoardWin(w) {
   const pk = new THREE.Mesh(IM_G.box, std({ color: 0x9a7248, roughness: 0.9 })); pk.scale.set(1.9, 0.17, 0.05); pk.position.set(rand(-0.06, 0.06), -0.52 + (w.boards - 1) * 0.5 + rand(-0.04, 0.04), 0.24); pk.rotation.z = rand(-0.09, 0.09); w.g.add(pk); w.planks.push(pk);
   for (const nx of [-0.8, 0.8]) { const nl = new THREE.Mesh(IM_G.cyl, std({ color: 0x30302e, metalness: 0.7 })); nl.scale.set(0.015, 0.03, 0.015); nl.rotation.x = Math.PI / 2; nl.position.set(nx, pk.position.y, 0.27); w.g.add(nl); w.planks.push(nl); }
   Sound.thud(0.8); setTimeout(() => Sound.thud(0.6), 140); setTimeout(() => Sound.thud(0.7), 300); shake = Math.max(shake, 0.08);
-  toast('🔨 Доска прибита (' + w.boards + '/3)'); monsTaskInc && monsTaskInc('board'); monsUiSync();
+  toast('🔨 Доска прибита (' + w.boards + '/3)'); monsTaskInc('board'); monsCnt('board'); monsUiSync();
 }
 function monsDoorSet(open, silent, slam) {
   MONS.doorOpen = open; MONS.doorTgt = open ? 1.4 : 0; MONS.doorSpd = slam ? 16 : 3.2;
@@ -17477,7 +17528,9 @@ function monsHouseTick(dt) {
   // red digital clocks tick once a game-minute
   if (fx.digi) { const mn = Math.floor(MONS.hour * 60); if (mn !== fx.digi.last) { fx.digi.last = mn; monsDigitalDraw(); } }
   // while he is inside the lamps dim and flicker
-  if (!MONS.power) { const base = MAPS.house.lamp[1], tgt = MONS.inside ? base * (0.3 + (Math.random() < 0.06 ? 0.25 : 0)) : base; lamps.forEach((l) => l.intensity += (tgt - l.intensity) * Math.min(1, dt * 5)); }
+  { const base = MAPS.house.lamp[1]; let k = MONS.power ? 0 : MONS.inside ? 0.3 + (Math.random() < 0.06 ? 0.3 : 0) : 1; if (MONS.flickT > 0) { MONS.flickT -= dt; if (Math.random() < 0.5) k *= 0.12; }
+    const lk = MONS.lampK ?? 1; MONS.lampK = lk + (k - lk) * Math.min(1, dt * (k < lk ? 10 : 4)); lamps.forEach((l) => { l.intensity = base * MONS.lampK; });
+    if (MONS.power) hemi.intensity = 0.05; if (MONS.lightning > 0) { MONS.lightning -= dt; const f = MONS.lightning > 0.45 || (MONS.lightning < 0.32 && MONS.lightning > 0.22) ? 1 : 0; hemi.intensity += f * 1.7; sun.intensity = f * 2.6; } }
   // the door swings, rattles when something pulls it, and is solid only while it is shut
   MONS.doorAng += (MONS.doorTgt - MONS.doorAng) * Math.min(1, dt * MONS.doorSpd); MONS.doorRattle = Math.max(0, MONS.doorRattle - dt);
   const rt = MONS.doorRattle > 0 ? Math.sin(now * 55) * 0.035 * Math.min(1, MONS.doorRattle * 3) : 0; pv.rotation.y = MONS.doorAng + rt; if (MONS.doorKnob) MONS.doorKnob.rotation.z = MONS.doorRattle > 0 ? Math.sin(now * 30) * 0.5 : 0;
@@ -17569,6 +17622,7 @@ function mkMonster(sc = 1, kind = 'lanky') {
     straw(elL, -0.84 * L); straw(elR, -0.84 * L); straw(neck, 0.05); straw(kneeL, -0.72); straw(kneeR, -0.72);
     const plaid = cvTex(64, 64, (c) => { c.fillStyle = '#7a1a14'; c.fillRect(0, 0, 64, 64); c.fillStyle = 'rgba(10,10,10,.55)'; for (let i = 0; i < 64; i += 16) { c.fillRect(i, 0, 6, 64); c.fillRect(0, i, 64, 6); } }); plaid.wrapS = plaid.wrapT = THREE.RepeatWrapping; plaid.repeat.set(2, 3);
     const pm = std({ map: plaid, roughness: 1 }); tor.material = pm; shL.children[0].material = pm; shR.children[0].material = pm; }
+  { const em = new THREE.MeshBasicMaterial({ color: d.id === 'scare' ? 0xffa040 : d.id === 'mimic' ? 0xe8f0ff : 0xff2a1a }); for (const s2 of [-1, 1]) { const ey = new THREE.Mesh(IM_G.sph, em); ey.scale.setScalar(0.024); ey.position.set(s2 * 0.1, (d.id === 'scare' ? 0.04 : 0.07) * d.headK, (d.id === 'sniffer' ? 0.3 : 0.262)); head.add(ey); } }
   g.userData = { hips, legL, legR, kneeL, kneeR, spine, neck, head, shL, shR, elL, elR, jaw, drool, kind: d.id, def: d, armL: L };
   g.scale.setScalar(sc);
   return g;
@@ -17815,6 +17869,45 @@ function monsTaskInc(id, n = 1) {
   t.cnt = Math.min(t.goal, t.cnt + n); if (t.cnt >= t.goal) { toast('✅ Задание дня выполнено: ' + t.n + ' — награда в меню!'); Sound.chime(); } monsMetaSave();
 }
 function monsCoins(n, why) { MONS_META.coins = Math.max(0, MONS_META.coins + n); monsMetaSave(); if (n > 0) toast('🪙 +' + n + (why ? ' · ' + why : '')); }
+/* ===== achievements ===== */
+const MONS_ACH = [
+  { id: 'night1', n: 'Первая ночь', d: 'Дожить до 06:00', r: 100, e: '🌅' }, { id: 'night5', n: 'Ветеран', d: 'Пережить 5 ночей', r: 250, e: '🎖' },
+  { id: 'nightmare', n: 'Кошмар позади', d: 'Пережить ночь на «Кошмаре»', r: 300, e: '💀' }, { id: 'endless8', n: 'Бессонница', d: 'Дожить до 08:00 в бесконечной ночи', r: 250, e: '∞' },
+  { id: 'trap3', n: 'Охотник', d: 'Поймать 3 монстров в капканы', r: 150, e: '🪤' }, { id: 'board15', n: 'Плотник года', d: 'Прибить 15 досок', r: 120, e: '🔨' },
+  { id: 'sniff5', n: 'Не дыши', d: 'Пережить 5 обнюхиваний', r: 200, e: '🫁' }, { id: 'mimic', n: 'Не верь голосам', d: 'Не открыть дверь Двойнику', r: 150, e: '🎭' },
+  { id: 'stare', n: 'Гляделки', d: 'Смотреть на Пугало 8 секунд, пока оно в доме', r: 150, e: '🌾' }, { id: 'fix3', n: 'Электрик от бога', d: 'Починить рубильник 3 раза', r: 100, e: '⚡' },
+  { id: 'cmd5', n: 'Командир', d: 'Отдать ботам 5 команд в чате', r: 60, e: '💬' }, { id: 'phone', n: 'Алло?', d: 'Ответить на ночной звонок', r: 80, e: '📞' }
+];
+function monsAchGive(id) { MONS_META.ach = MONS_META.ach || {}; if (MONS_META.ach[id]) return; const a = MONS_ACH.find((q) => q.id === id); if (!a) return; MONS_META.ach[id] = 1; monsMetaSave(); monsCoins(a.r, ''); banner('🏅 ' + a.e + ' ' + a.n, a.d + ' · +' + a.r + ' 🪙'); Sound.chime(); monsChat('Сервер', '🏅 Достижение: ' + a.n + ' (+' + a.r + ' 🪙)', '#ffd04a'); }
+function monsAchCheck() { const c = MONS_META.cnt || {}; if ((c.trap || 0) >= 3) monsAchGive('trap3'); if ((c.board || 0) >= 15) monsAchGive('board15'); if ((c.sniff || 0) >= 5) monsAchGive('sniff5'); if ((c.fix || 0) >= 3) monsAchGive('fix3'); if ((c.cmd || 0) >= 5) monsAchGive('cmd5'); if ((MONS_META.wins || 0) >= 5) monsAchGive('night5'); }
+function monsCnt(k, n = 1) { MONS_META.cnt = MONS_META.cnt || {}; MONS_META.cnt[k] = (MONS_META.cnt[k] || 0) + n; monsMetaSave(); monsAchCheck(); }
+/* ===== the storm: rain outside, lightning that shows them at the windows, thunder ===== */
+function monsStormTick(dt) {
+  const S = MONS.storm; if (!S) return; if (!S.on) { if (MONS.rain) MONS.rain.im.visible = false; return; }
+  if (!MONS.rain) { const N = 650, im = new THREE.InstancedMesh(new THREE.BoxGeometry(0.014, 0.6, 0.014), new THREE.MeshBasicMaterial({ color: 0x9ab4cc, transparent: true, opacity: 0.42, depthWrite: false }), N); im.frustumCulled = false; addMesh(im); MONS.rain = { im, N, p: Array.from({ length: N }, () => [rand(-18, 18), rand(0, 10), rand(-18, 18)]) }; }
+  const R = MONS.rain, cx = camera.position.x, cz = camera.position.z, cy = camera.position.y; R.im.visible = true;
+  for (let i = 0; i < R.N; i++) { const p = R.p[i]; p[1] -= dt * 17; if (p[1] < 0) { p[0] = cx + rand(-18, 18); p[2] = cz + rand(-18, 18); p[1] = cy + rand(3, 10); } const ins = Math.abs(p[0]) < HW + 0.4 && Math.abs(p[2]) < HD + 0.4; _hm4.makeTranslation(p[0], ins ? -60 : p[1], p[2]); R.im.setMatrixAt(i, _hm4); }
+  R.im.instanceMatrix.needsUpdate = true; windExtra = Math.max(windExtra, 0.4);
+  S.lt -= dt; if (S.lt <= 0) { S.lt = rand(12, 34); MONS.lightning = 0.6; const delay = rand(500, 2400); setTimeout(() => { try { Sound.boom(); } catch (e) {} }, delay); if (MONS.monsters.some((m) => roomOf(m.x, m.z) === 'O' && Math.hypot(m.x - player.pos.x, m.z - player.pos.z) < 16)) { MONS.heart = Math.min(185, MONS.heart + 10); } }
+}
+/* ===== scripted scares: the TV wakes up, the phone rings, a shadow passes the window, something knocks inside a wardrobe ===== */
+function monsTvShow(lines, sec) {
+  const scr = MONS.tvScreen; if (!scr) return; const cv = makeCanvas(512, 288), g = cv.getContext('2d'), tex = new THREE.CanvasTexture(cv); scr.material = new THREE.MeshBasicMaterial({ map: tex }); MONS.tvOn = true;
+  let t = 0; const draw = () => { g.fillStyle = '#060606'; g.fillRect(0, 0, 512, 288); for (let i = 0; i < 900; i++) { const v = randi(200); g.fillStyle = `rgb(${v},${v},${v})`; g.fillRect(randi(512), randi(288), 3, 2); } if (t > 0.6) { g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(0, 100, 512, 90); g.fillStyle = '#ff2a2a'; g.font = '900 34px sans-serif'; g.textAlign = 'center'; lines.forEach((l, i) => g.fillText(l, 256, 140 + i * 38)); } tex.needsUpdate = true; };
+  const iv = setInterval(() => { t += 0.1; draw(); if (t > sec) { clearInterval(iv); scr.material = new THREE.MeshBasicMaterial({ color: 0x08080a }); MONS.tvOn = false; } }, 100); Sound.zap(0.8);
+}
+function monsPhoneEnsure() { if (MONS.phone && MONS.phone.g.parent) return MONS.phone; const g = new THREE.Group(); g.position.set(2.3, 0.62, HD - 0.3); const base = new THREE.Mesh(IM_G.box, std({ color: 0x5a1a14, roughness: 0.4 })); base.scale.set(0.24, 0.07, 0.18); base.position.y = 0.035; g.add(base); const hs = new THREE.Mesh(IM_G.box, std({ color: 0x4a140e, roughness: 0.4 })); hs.scale.set(0.26, 0.05, 0.06); hs.position.y = 0.1; g.add(hs); addMesh(g); MONS.phone = { g, hs, ring: 0 }; return MONS.phone; }
+function monsScareTick(dt) {
+  const M = MONS; if (!M.scares || M.dead || M.ghost) return;
+  if (M.phone && M.phone.ring > 0) { const P = M.phone; P.ring -= dt; P.hs.position.y = 0.1 + Math.abs(Math.sin(performance.now() / 40)) * 0.03; P.rt = (P.rt || 0) - dt; if (P.rt <= 0 && P.ring > 0) { P.rt = 1.4; try { Sound.ring(0.9); } catch (e) {} } if (P.ring <= 0) { P.hs.position.y = 0.1; monsChat('Сервер', '📞 Звонок оборвался…', '#9ab'); } }
+  M.scareT -= dt; if (M.scareT > 0 || M.inside || M.alert || M.hide || state !== 'play') return; M.scareT = rand(45, 85);
+  const pool = ['tv', 'phone', 'shadow', 'closet', 'flick'].filter((o) => !M.scares.includes(o) || o === 'flick'); const k = pick(pool); M.scares.push(k); const pp = player.pos;
+  if (k === 'tv' && !M.power) { monsTvShow(pick([['ОНИ ЗНАЮТ,', 'ГДЕ ВЫ'], ['НЕ СПИТЕ'], ['ОДИН ИЗ ВАС', 'УЖЕ НЕ ВЫ']]), 5); M.heart = Math.min(185, M.heart + 15); const al = M.bots.filter((q) => !q.dead); if (al.length) setTimeout(() => monsChat(pick(al).name, pick(['телик сам включился?!', 'кто трогал пульт??', 'выключите это 😨'])), 1500); }
+  else if (k === 'phone') { const P = monsPhoneEnsure(); P.ring = 9; P.rt = 0; toast('📞 В прихожей звонит телефон…'); }
+  else if (k === 'shadow') { const cand = MON_WIN.map((w, i) => ({ w, i, d: Math.hypot(w[0] - pp.x, w[1] - pp.z) })).filter((q) => q.d < 9).sort((a, b) => a.d - b.d)[0]; if (cand) { const o = winOut(cand.i), W = cand.w, along = W[2] === 'n' || W[2] === 's' ? [1, 0] : [0, 1]; const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 2.3), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false })); sh.position.set(o.x - along[0] * 2, 1.25, o.z - along[1] * 2); sh.rotation.y = W[2] === 'n' || W[2] === 's' ? 0 : Math.PI / 2; addMesh(sh); let t = 0; const iv = setInterval(() => { t += 0.05; sh.position.x += along[0] * 0.22; sh.position.z += along[1] * 0.22; if (t > 0.95) { clearInterval(iv); if (sh.parent) sh.parent.remove(sh); } }, 50); Sound.ghostVoice(0.5); M.heart = Math.min(185, M.heart + 20); } }
+  else if (k === 'closet') { const s = pick(M.spots.filter((q) => q.doors && !q.occ)); if (s) { let n = 0; const iv = setInterval(() => { s.anim = 0.4; Sound.thud(0.5); if (++n >= 3) clearInterval(iv); }, 380); M.heart = Math.min(185, M.heart + 12); const al = M.bots.filter((q) => !q.dead); if (al.length) setTimeout(() => monsChat(pick(al).name, pick(['вы слышали?? в шкафу кто-то', 'это не я стучал…', 'не открывайте шкаф 😰'])), 1300); } }
+  else { M.flickT = 2.6; Sound.zap(0.5); }
+}
 const MONS_DIFF = { easy: { name: 'Новичок', hLen: 48, tK: 1.5, extra: 0 }, classic: { name: 'Классика', hLen: 55, tK: 1.0, extra: 0 }, nightmare: { name: 'Кошмар', hLen: 62, tK: 0.72, extra: 1 } };
 const PICK_PTS = [[-6.5, -7.6, 0.56], [9, -4.6, 0.9], [7.0, -9.1, 1.06], [13.4, 1.9, 0.68], [12.4, 9.2, 0.9], [1.9, 9.6, 0.64], [-11.6, 4.6, 0.97], [0.3, -5.6, 0.86], [17.5, -11.3, 0.35], [-16.6, -6, 0.35], [-13.2, 13.2, 1.15], [2.6, -8.9, 0.35]];
 const MONS_IT = { bat: { n: 'Батарейка (+45% фонаря)', e: '🔋' }, pill: { n: 'Таблетки для сердца', e: '💊' }, energy: { n: 'Энергетик', e: '⚡' }, trap: { n: 'Капкан', e: '🪤' }, board: { n: 'Доска', e: '🪵' } };
@@ -17896,24 +17989,23 @@ function monsPlaceTrap() {
 function monsTrapsUpd(dt) {
   for (const t of MONS.traps) { if (!t.armed) continue; for (const m of MONS.monsters) { if (m.stun > 0) continue; if (Math.hypot(m.x - t.x, m.z - t.z) < 0.6) {
     t.armed = false; t.g.scale.y = 0.3; t.g.children.forEach((c, i) => { if (i > 0) c.rotation.x *= 0.2; });
-    m.stun = 5.5; Sound.crunch(1); Sound.zap(0.7); try { Sound.ghostVoice(1.3); } catch (e) {} shake = Math.max(shake, 0.4); toast('🪤 Монстр попал в капкан!'); MONS.scared++; monsTaskInc && monsTaskInc('trap');
+    m.stun = 5.5; Sound.crunch(1); Sound.zap(0.7); try { Sound.ghostVoice(1.3); } catch (e) {} shake = Math.max(shake, 0.4); toast('🪤 Монстр попал в капкан!'); MONS.scared++; monsTaskInc('trap'); monsCnt('trap');
     setTimeout(() => { if (t.g.parent) { t.g.parent.remove(t.g); const mi = mapObjs.indexOf(t.g); if (mi >= 0) mapObjs.splice(mi, 1); } }, 7000);
   } } }
 }
 /* the power cut: lights die, the breaker in the shed brings them back */
 function monsPowerOut() {
-  const M = MONS; M.powerDone = true; M.power = { t: 0 }; M.tvOn = false;
+  const M = MONS; M.powerDone = true; M.power = { t: 0 }; M.tvOn = false; M.flickT = 1.4;
   if (scene.environment) { M._env = scene.environment; scene.environment = null; }
-  lamps.forEach((l) => l.intensity = 0); hemi.intensity = 0.05;
   banner('⚡ ЭЛЕКТРИЧЕСТВО ОТКЛЮЧИЛОСЬ', 'рубильник — в сарае во дворе'); Sound.boom(); Sound.zap(1); Sound.droneLoop(0.3);
   toast('🔦 Включите фонарь и доберитесь до сарая');
 }
 function monsPowerOn() {
   const M = MONS; if (!M.power) return; M.power = null; M.fixT = 0;
   if (M._env) { scene.environment = M._env; M._env = null; }
-  lamps.forEach((l) => l.intensity = MAPS.house.lamp[1]); hemi.intensity = MAPS.house.hemi;
+  M.flickT = 0.8;
   if (M.breakerM) M.breakerM.material.emissive.setHex(0x082008);
-  banner('💡 СВЕТ ВКЛЮЧИЛСЯ', 'возвращайтесь в дом'); Sound.chime(); Sound.zap(0.4); Sound.droneLoop(0.12); M.scared++; monsTaskInc('fix');
+  banner('💡 СВЕТ ВКЛЮЧИЛСЯ', 'возвращайтесь в дом'); Sound.chime(); Sound.zap(0.4); Sound.droneLoop(0.12); M.scared++; monsTaskInc('fix'); monsCnt('fix');
 }
 /* the monster sniffs at the hiding spot: hold your breath, calm your heart, lights off */
 function monsSniffUpdate(m, dt) {
@@ -17927,7 +18019,7 @@ function monsSniffUpdate(m, dt) {
   m.snf = (m.snf || 0) - dt; if (m.snf <= 0) { m.snf = 0.8; Sound.ghostVoice(0.2); shake = Math.max(shake, 0.05); if (s.doors) s.anim = Math.max(s.anim, 0.45); }
   const grace = m.sn.t > 1.0;
   if (grace && (!M.holdBreath || M.heart >= 150 || M.flash.on)) { monsCut('found'); return; }
-  if (m.sn.t >= m.sn.dur) { m.st = 'inside'; m.sp = null; m.spT = 0; m.insT = Math.min(m.insT, 16); M.sniffCd = 8; if (u.drool) u.drool.visible = false; toast('…он отошёл. Выдохните 😮‍💨'); }
+  if (m.sn.t >= m.sn.dur) { m.st = 'inside'; m.sp = null; m.spT = 0; m.insT = Math.min(m.insT, 16); M.sniffCd = 8; if (u.drool) u.drool.visible = false; toast('…он отошёл. Выдохните 😮‍💨'); monsCnt('sniff'); }
 }
 /* 06:00: the sun rises, the monsters flee into the woods */
 function monsSunrise() {
@@ -18004,7 +18096,7 @@ function serversMenu() {
   d.style.display = 'block'; d.querySelector('#svIdeas').onclick = () => { d.style.display = 'none'; ideasMenu(); }; d.querySelector('#svMons').onclick = () => { d.style.display = 'none'; lobbyStart(); }; d.querySelector('[data-k="x"]').onclick = () => { d.style.display = 'none'; };
 }
 function monsMenu() {
-  monsDailyEnsure(); const d = c2Ui(); d.style.borderColor = '#ff5a3a'; let sel = 1, comp = false, mi = 0, df = 'classic', md = 'classic';
+  monsDailyEnsure(); const d = c2Ui(); d.style.borderColor = '#ff5a3a'; let sel = LOB.on && LOB.party.length ? Math.min(12, LOB.party.length + 1) : 1, comp = sel > 4, mi = 0, df = 'classic', md = 'classic';
   const MS = ['all', 'lanky', 'sniffer', 'runner', 'mimic', 'scare'];
   const draw = () => {
     const cur = MS[mi], K = cur === 'all' ? { emoji: '🎲', name: 'Все монстры', desc: 'каждую ночь приходят разные' } : MON_KINDS[cur];
@@ -18027,7 +18119,7 @@ function monsMenu() {
     d.querySelectorAll('[data-md]').forEach((b) => b.onclick = () => { md = b.dataset.md; draw(); }); d.querySelectorAll('[data-d]').forEach((b) => b.onclick = () => { df = b.dataset.d; draw(); });
     d.querySelectorAll('[data-cl]').forEach((b) => b.onclick = () => { MONS_META.claimed.push(b.dataset.cl); monsCoins(40, 'задание дня'); draw(); });
     d.querySelector('[data-k="cls"]').onclick = () => monsClsMenu(() => { draw(); });
-    d.querySelector('[data-k="go"]').onclick = () => { d.style.display = 'none'; if (LOB.on) lobBusGo(() => monsStart(sel, MS[mi], df, md)); else monsStart(sel, MS[mi], df, md); }; d.querySelector('[data-k="x"]').onclick = () => { if (LOB.on) d.style.display = 'none'; else serversMenu(); };
+    d.querySelector('[data-k="go"]').onclick = () => { d.style.display = 'none'; if (LOB.on) { window.MONS_PARTY = LOB.party.map((q) => q.name).slice(0, sel - 1); lobBusGo(() => monsStart(sel, MS[mi], df, md)); } else monsStart(sel, MS[mi], df, md); }; d.querySelector('[data-k="x"]').onclick = () => { if (LOB.on) d.style.display = 'none'; else serversMenu(); };
   };
   draw(); d.style.display = 'block';
 }
@@ -18063,7 +18155,8 @@ function monsUi() {
   return { h, b, v, g, r, i, w, n, e, wb: document.getElementById('monsBreathBar') };
 }
 function monsUiSync() { const M = MONS, f = document.getElementById('monsFlash'), p = document.getElementById('monsPill'), e = document.getElementById('monsEner'), t = document.getElementById('monsTrap'), b2 = document.getElementById('monsBoard'); if (f) { f.innerHTML = '🔦 ' + (M.flash.on ? 'ВЫКЛ · ' : '') + Math.round(M.flash.bat) + '%'; f.style.borderColor = M.flash.on ? '#ffd04a' : ''; } if (p) p.innerHTML = '💊 ×' + M.items.pill; if (e) e.innerHTML = '⚡ ×' + M.items.energy; if (t) t.innerHTML = '🪤 ×' + M.items.trap; if (b2) b2.innerHTML = '🪵 ×' + M.items.board; }
-function monsUiOff() { const u = monsUi(); u.h.style.display = 'none'; u.b.style.display = 'none'; u.v.style.display = 'none'; u.g.style.opacity = 0; u.r.style.display = 'none'; u.i.style.display = 'none'; u.w.style.display = 'none'; u.n.style.display = 'none'; u.e.style.display = 'none'; MONS.holdBreath = false; if (!LOB.on) monsChatUi().style.display = 'none'; }
+function monsUiOffChat() { try { chatToggle(false); } catch (e) {} }
+function monsUiOff() { monsUiOffChat(); const u = monsUi(); u.h.style.display = 'none'; u.b.style.display = 'none'; u.v.style.display = 'none'; u.g.style.opacity = 0; u.r.style.display = 'none'; u.i.style.display = 'none'; u.w.style.display = 'none'; u.n.style.display = 'none'; u.e.style.display = 'none'; MONS.holdBreath = false; if (!LOB.on) monsChatUi().style.display = 'none'; }
 /* ===== start, intro ===== */
 function monsStart(players, mtype, diff, nmode) { window.MONS_MODE = nmode || 'classic'; if (LOB.on) lobbyLeaveTo();
   { const q = document.getElementById('c2q'); if (q) q.style.display = 'none'; }
@@ -18072,12 +18165,12 @@ function monsStart(players, mtype, diff, nmode) { window.MONS_MODE = nmode || 'c
   story.gun = false; W.fireHeld = false; loadMap('house'); clearAll(); respawnPlayer(); invReset(); { const fi = WEAPONS.findIndex((w) => w.id === 'fists'); if (fi >= 0) selectWeapon(fi); W.switchT = 0; }
   for (const m of MONS.monsters) { if (m.g && m.g.parent) m.g.parent.remove(m.g); }
   Object.assign(MONS, { on: false, players, bots: [], monsters: [], wave: 0, evT: 15, t: 0, hour: 0, hide: null, alert: null, ev: null, dead: false, win: false, stare: 0, inside: null, scared: 0, hudT: 0, act: null, over: false, outT: 0, tvOn: false, mtype: mtype || 'all', diff: diff || 'classic', heart: 70, breath: 100, holdBreath: false, calmT: 0, braveT: 0, gasp: 0, beatT: 0, items: { bat: 0, pill: 1, energy: 0, trap: 0, board: 0 }, flash: { on: false, bat: 100 }, pickups: [], traps: [], power: null, powerDone: false, restocked: false, fixT: 0, sniffCd: 0, sunrise: false, noise: 0, noiseSpike: 0, hideT: 0, creak: false, chase: false, endless: !!(window.MONS_MODE === 'endless'), ghost: null, revived: false });
-  MONS.diffD = MONS_DIFF[MONS.diff] || MONS_DIFF.classic; MONS.hLen = MONS.diffD.hLen; if (MONS._env) { scene.environment = MONS._env; MONS._env = null; }
+  MONS.diffD = MONS_DIFF[MONS.diff] || MONS_DIFF.classic; MONS.hLen = MONS.diffD.hLen; MONS.rain = null; MONS.phone = null; MONS.lightning = 0; MONS.flickT = 0; MONS.lampK = 1; MONS.storm = { on: false, at: Math.random() < 0.65 ? rand(0.4, 2.2) : 99, lt: 5 }; MONS.scares = []; MONS.scareT = rand(40, 70); MONS.callT = 0; MONS.mimicKnock = false; if (MONS._env) { scene.environment = MONS._env; MONS._env = null; }
   monsGhostEnd(); monsDailyEnsure(); MONS.cls = MONS_META.cls;
   if (MONS.cls === 'trapper') MONS.items.trap += 2; if (MONS.cls === 'carpenter') MONS.items.board += 4; if (MONS.cls === 'medic') MONS.items.pill += 2;
   { const B = MONS_META.bonus; if (B && (B.trap || B.board || B.bat || B.pill)) { MONS.items.trap += B.trap; MONS.items.board += B.board; MONS.items.bat += B.bat; MONS.items.pill += B.pill; MONS_META.bonus = { trap: 0, board: 0, bat: 0, pill: 0 }; monsMetaSave(); later(1.5, () => toast('🎁 Бонусы рулетки уже в рюкзаке!')); } }
   MONS.doorAng = 1.4; monsDoorSet(true, true); for (const s of MONS.spots) { s.occ = null; s.anim = 0; } for (const w of MONS.wins) { w.open = false; w.tgt = 0; w.ang = 0; w.fast = false; w.boards = 0; for (const pl of w.planks || []) if (pl.parent) pl.parent.remove(pl); w.planks = []; }
-  const names = IDEA_NAMES.slice().sort(() => Math.random() - 0.5), slots = [[-9.6, -6.0], [-3.4, -6.0], [-10.3, -5.0], [-2.7, -5.0], [-9.6, -4.0], [-3.4, -4.0], [-10.3, -3.0], [-2.7, -3.0], [-9.6, -2.0], [-3.4, -2.0], [-10.3, -1.0]];
+  const party = (window.MONS_PARTY || []).slice(); window.MONS_PARTY = null; const names = party.concat(IDEA_NAMES.filter((q) => !party.includes(q)).sort(() => Math.random() - 0.5)), slots = [[-9.6, -6.0], [-3.4, -6.0], [-10.3, -5.0], [-2.7, -5.0], [-9.6, -4.0], [-3.4, -4.0], [-10.3, -3.0], [-2.7, -3.0], [-9.6, -2.0], [-3.4, -2.0], [-10.3, -1.0]];
   for (let i = 0; i < players - 1; i++) { const [x, z] = slots[i]; const n = mkNpc(undefined, x, z, Math.PI, 'human'); n.scripted = true; ideaTag(n, names[i]); MONS.bots.push({ n, name: names[i], dead: false, hid: null, spot: null, role: null, wp: null, t: rand(0, 3), hidT: 0, i, path: null, pathT: 0 }); }
   monsIntro();
 }
@@ -18166,7 +18259,7 @@ function monsSeen(m) {
   camera.getWorldDirection(_sv); const dx = m.x - camera.position.x, dz = m.z - camera.position.z, L2 = Math.hypot(dx, dz) || 1; return (_sv.x * dx + _sv.z * dz) / L2 > Math.cos((camera.fov * 0.5 + 6) * Math.PI / 180) * 0.92 || (MONS.flash.on && (_sv.x * dx + _sv.z * dz) / L2 > 0.9);
 }
 function monsGo(m, tx, tz, sp, dt) {
-  if (m.g.userData.kind === 'scare') { m.seen = monsSeen(m); if (m.seen) { m.frozenT = (m.frozenT || 0) + dt; if (!m.creakT || m.creakT < 0) { m.creakT = 2.5; if (Math.hypot(m.x - player.pos.x, m.z - player.pos.z) < 10) Sound.crunch(0.12); } m.creakT -= dt; return Math.hypot(tx - m.x, tz - m.z); } m.frozenT = 0; }
+  if (m.g.userData.kind === 'scare') { m.seen = monsSeen(m); if (m.seen) { m.frozenT = (m.frozenT || 0) + dt; if (MONS.inside === m && m.frozenT > 8) monsAchGive('stare'); if (!m.creakT || m.creakT < 0) { m.creakT = 2.5; if (Math.hypot(m.x - player.pos.x, m.z - player.pos.z) < 10) Sound.crunch(0.12); } m.creakT -= dt; return Math.hypot(tx - m.x, tz - m.z); } m.frozenT = 0; }
   sp *= (m.g.userData.def ? m.g.userData.def.speed : 1) * (MONS.power ? 1.22 : 1); const p = pathStep(m, m.x, m.z, tx, tz, dt); monsMove(m, p[0], p[1], sp, dt); /* duck under the door frame */ const indoor = roomOf(m.x, m.z) !== 'O'; m.g.userData.spine.rotation.x += indoor ? 0.25 : 0; return Math.hypot(tx - m.x, tz - m.z); }
 function monsFace(m, tx, tz) { m.yaw = Math.atan2(tx - m.x, tz - m.z); m.g.rotation.y = m.yaw; }
 function monsAlive() { return MONS.bots.filter((b) => !b.dead).length + 1; }
@@ -18178,7 +18271,7 @@ function monsPickEvent() {
   banner(type === 'lurk' ? 'ТИХО…' : type === 'knock' ? 'ТИХО… КТО-ТО ИДЁТ' : 'ЧТО-ТО ПРОБУЕТ ОТКРЫТЬ', MONS.cls === 'lookout' ? '🔭 ' + plc : type === 'lurk' ? 'за окнами кто-то ходит' : type === 'knock' ? 'не подходите к двери' : 'спугните его'); Sound.ghostVoice(0.6);
   if (MONS.cls === 'lookout') { const tgp = type === 'knock' || type === 'breachD' ? { x: 0, z: HD } : { x: MON_WIN[MONS.ev.win][0], z: MON_WIN[MONS.ev.win][1] }; const mark = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX.soft, color: 0xffd040, transparent: true, depthTest: false })); mark.scale.set(0.9, 0.9, 1); mark.position.set(tgp.x, 2.6, tgp.z); addMesh(mark); setTimeout(() => { if (mark.parent) mark.parent.remove(mark); }, 6500); }
 }
-function monsEvEnd() { const ev = MONS.ev; if (ev && ev.m.st === 'ev') ev.m.st = 'patrol'; if (ev) monsTaskInc('ev'); MONS.ev = null; MONS.alert = null; MONS.evT = rand(9, 14); for (const b of MONS.bots) { if (b.role === 'scare') { b.role = null; b.rolled = false; } } }
+function monsEvEnd() { const ev = MONS.ev; if (ev && ev.m.st === 'ev') ev.m.st = 'patrol'; if (ev) monsTaskInc('ev'); if (ev && ev.type === 'knock' && ev.m.g.userData.kind === 'mimic' && !MONS.dead) monsAchGive('mimic'); MONS.ev = null; MONS.alert = null; MONS.evT = rand(9, 14); for (const b of MONS.bots) { if (b.role === 'scare') { b.role = null; b.rolled = false; } } }
 function monsBreach() {
   const al = MONS.alert, ev = MONS.ev; MONS.alert = null; if (!ev) return; const m = ev.m; MONS.ev = null; MONS.evT = 99;
   if (al.door) { if (!MONS.doorOpen) monsDoorSet(true, false, true); else Sound.thud(0.8); m.st = 'enter'; m.enter = { door: true, t: 0 }; for (let i = 0; i < 14; i++) spawnSprite(TEX.soft, new V3(rand(-0.8, 0.8), rand(0.3, 2.2), HD - 0.3), { color: 0x6a4a30, size: rand(0.05, 0.12), life: rand(0.5, 1.2), vel: new V3(rand(-2, 2), rand(0, 2), rand(-4, -1)) }); }
@@ -18207,7 +18300,7 @@ function monsEvUpdate(dt) {
   else { const door = ev.type === 'breachD', tg = door ? { x: 0.1, z: HD + 1.3 } : winOut(ev.win);
     if (ev.ph === 'go') { if (monsGo(m, tg.x, tg.z, 2.6, dt) < 0.3) { ev.ph = 'act'; ev.t = 0; const inn = door ? { x: 0, z: HD - 1.0 } : winIn(ev.win), wOpen = !door && MONS.wins[ev.win].open, wBoards = !door ? MONS.wins[ev.win].boards : 0; MONS.alert = { x: inn.x, z: inn.z, T: Math.max(2.6, (door ? (MONS.doorOpen ? 3.8 : 8.5) : wOpen ? 4 : 9.5) * (ev.m.g.userData.def ? ev.m.g.userData.def.breachK : 1) * (MONS.diffD ? MONS.diffD.tK : 1) - MONS.hour * 0.4) + wBoards * 2.4, t: 0, scared: false, door, win: ev.win, shout: false, nextRip: 1.2 };
         for (const b of MONS.bots.filter((q) => !q.dead && !q.hid).sort((a, c) => Math.hypot(a.n.pos.x - inn.x, a.n.pos.z - inn.z) - Math.hypot(c.n.pos.x - inn.x, c.n.pos.z - inn.z)).slice(0, 2)) { b.role = 'scare'; b.succ = Math.random() < 0.5; b.rolled = false; b.path = null; }
-        banner(door ? (MONS.doorOpen ? 'ДВЕРЬ ОТКРЫТА!' : 'ДВЕРЬ ДЁРГАЮТ!') : 'ОКНО ВЗЛАМЫВАЮТ! (' + WIN_NAME[ev.win] + ')', 'подбегите и нажмите «Спугнуть»'); } }
+        banner(door ? (MONS.doorOpen ? 'ДВЕРЬ ОТКРЫТА!' : 'ДВЕРЬ ДЁРГАЮТ!') : 'ОКНО ВЗЛАМЫВАЮТ! (' + WIN_NAME[ev.win] + ')', 'подбегите и нажмите «Спугнуть»'); MONS.flickT = 1.2; } }
     else { const al = MONS.alert; if (!al) return; const W = door ? [0, HD, 's'] : MON_WIN[al.win]; monsFace(m, W[0], W[1]); monsWalkAnim(m.g, dt, 0); al.t += dt; ev.rattleT -= dt;
       // the hands pull the handle / pry the sashes; the leaf and the sashes shake
       const j = Math.sin(al.t * 24) * 0.04; if (door) { aimArmW(m.g, 'R', new V3(0.65 + j, 1.08, HD + 0.15)); aimArmW(m.g, 'L', new V3(-0.4, 1.5 + j, HD + 0.2)); MONS.doorRattle = 0.3; }
@@ -18258,10 +18351,12 @@ function monsBotsUpdate(dt) {
   const al = MONS.alert, ins = MONS.inside;
   for (const b of MONS.bots) {
     if (b.dead) continue; const n = b.n; if (n.state !== 'alive') { b.dead = true; if (b.spot) b.spot.occ = null; continue; }
-    if (b.hid) { n.root.visible = false; b.hidT += dt; if (!ins && !al && b.hidT > 4) monsBotLeave(b); continue; }
+    b.forceHide = Math.max(0, (b.forceHide || 0) - dt);
+    if (b.hid) { n.root.visible = false; b.hidT += dt; if (!ins && !al && b.hidT > 4 && !(b.forceHide > 0)) monsBotLeave(b); continue; }
     if (b.role === 'door' && MONS.doorOpen && MONS.t > b.tDoor && !al && !ins) { if (botGo(b, 0, HD - 1.0, 2.5, dt) < 0.9) { monsDoorSet(false); toast('🔒 ' + b.name + ' закрыл дверь'); b.role = null; } continue; }
     if (al && b.role === 'scare') { if (botGo(b, al.x, al.z, 3.0, dt) < 1.7 && !b.rolled) { b.rolled = true; toast('📢 ' + b.name + ': «Кыш отсюда!»'); if (b.succ) al.scared = true; } continue; }
-    if (al || ins) { if (!b.spot) { const free = MONS.spots.filter((s) => !s.occ).sort((a, c) => Math.hypot(a.x - n.pos.x, a.z - n.pos.z) - Math.hypot(c.x - n.pos.x, c.z - n.pos.z))[0]; if (free) { free.occ = b; b.spot = free; b.path = null; } }
+    if (b.follow > 0 && !al && !ins && !(b.forceHide > 0)) { b.follow -= dt; const pp = player.pos, d = Math.hypot(n.pos.x - pp.x, n.pos.z - pp.z); if (d > 1.6) botGo(b, pp.x + 0.7, pp.z + 0.7, d > 5 ? 3.2 : 2.2, dt); else n.speed = 0; continue; }
+    if (al || ins || b.forceHide > 0) { if (!b.spot) { const free = MONS.spots.filter((s) => !s.occ).sort((a, c) => Math.hypot(a.x - n.pos.x, a.z - n.pos.z) - Math.hypot(c.x - n.pos.x, c.z - n.pos.z))[0]; if (free) { free.occ = b; b.spot = free; b.path = null; } }
       if (b.spot) { if (botGo(b, b.spot.ex, b.spot.ez, 3.0, dt) < 0.6) { b.hid = b.spot; b.hidT = 0; if (b.spot.doors) b.spot.anim = 1.1; n.pos.set(b.spot.x, 0, b.spot.z); n.root.visible = false; } continue; }
       if (ins) { const dx = n.pos.x - ins.x, dz = n.pos.z - ins.z, d = Math.hypot(dx, dz) || 1; botGo(b, clamp(n.pos.x + dx / d * 3, -HW + 1, HW - 1), clamp(n.pos.z + dz / d * 3, -HD + 1, HD - 1), 3.2, dt); continue; } }
     if (b.spot) { b.spot.occ = null; b.spot = null; }
@@ -18284,6 +18379,7 @@ function monsUnhide() { const s = MONS.hide; if (!s) return; MONS.hideT = 0; MON
 function monsAction() {
   const a = MONS.act; if (!a || MONS.dead) return;
   if (a.type === 'lock') { MONS.noiseSpike = 1.1; const ev = MONS.ev; if (MONS.doorOpen === false && ev && ev.type === 'knock' && ev.ph === 'act') { monsDoorSet(true); monsCut('door'); return; } monsDoorSet(!MONS.doorOpen); }
+  else if (a.type === 'phone') { const P = MONS.phone; if (!P) return; P.ring = 0; P.hs.position.y = 0.1; const line = pick(['Я вижу тебя в прихожей…', 'Открой дверь. Это мама.', 'Ты следующий.', 'Почему ты не спишь?']); sub('ТЕЛЕФОН', line); try { speakRU(line); } catch (e) {} setTimeout(() => { try { subOff(); } catch (e) {} }, 3500); MONS.heart = Math.min(185, MONS.heart + 25); monsAchGive('phone'); }
   else if (a.type === 'fix') { MONS.fixT = MONS.cls === 'electric' ? 0.25 : 2.4; Sound.zap(0.3); toast('⚡ Чиним… не отходите'); }
   else if (a.type === 'win') { const w = MONS.wins[a.i]; w.open = false; w.tgt = 0; Sound.thud(0.4); toast('🪟 Окно закрыто'); }
   else if (a.type === 'board') monsBoardWin(MONS.wins[a.i]);
@@ -18346,7 +18442,7 @@ function monsOver(win, kind) {
   const hh2 = Math.floor(MONS.hour), mm2 = String(Math.floor((MONS.hour % 1) * 60)).padStart(2, '0');
   const kMul = MONS.diff === 'nightmare' ? 1.5 : MONS.diff === 'easy' ? 0.7 : 1;
   const reward = Math.round((win ? (wasGhost ? 25 : 45) + MONS.wave * 6 : MONS.wave * 4 + (kind === 'all' ? 10 : 0)) * kMul) + (MONS.endless ? Math.max(0, Math.floor((MONS.hour - 6) * 12)) : 0);
-  monsCoins(reward, 'за ночь'); MONS_META.best = Math.max(MONS_META.best || 0, Math.min(MONS.hour, 12)); if (win && !wasGhost) MONS_META.wins = (MONS_META.wins || 0) + 1; monsMetaSave();
+  monsCoins(reward, 'за ночь'); MONS_META.best = Math.max(MONS_META.best || 0, Math.min(MONS.hour, 12)); if (win && !wasGhost) { MONS_META.wins = (MONS_META.wins || 0) + 1; monsAchGive('night1'); if (MONS.diff === 'nightmare') monsAchGive('nightmare'); } monsMetaSave(); monsAchCheck();
   { let lb = document.getElementById('toLobbyBtn'); if (!lb) { lb = document.createElement('button'); lb.id = 'toLobbyBtn'; lb.className = 'btn'; lb.innerHTML = '🏕 В лагерь<small>к ботам и станциям</small>'; lb.onclick = () => { $('over').hidden = true; lobbyStart(); }; $('againBtn').parentNode.appendChild(lb); } lb.style.display = ''; }
   document.querySelector('#over .eyebrow').textContent = 'Сервер · Не открывай' + (MONS.endless ? ' · ∞' : ''); $('overTitle').textContent = win ? (wasGhost ? '🌅 Боты пережили ночь без вас' : '🌅 Вы пережили ночь') : kind === 'all' ? '🌑 ' + T.all : '☠ ' + (T[kind] || 'Вы погибли');
   $('overStats').innerHTML = [['Дожили до', '0' + hh2 + ':' + mm2], ['Игроков', MONS.players], ['Событий пережито', Math.max(0, MONS.wave - (win ? 0 : 1))], ['Монстров спугнули', MONS.scared], ['Ботов выжило', `${alive} из ${MONS.players - 1}`], ['🪙 Награда', '+' + reward + ' (всего ' + MONS_META.coins + ')']].map(([a, b]) => `<span>${a}</span><b>${b}</b>`).join('');
@@ -18354,6 +18450,7 @@ function monsOver(win, kind) {
 }
 /* ===== the frame hook ===== */
 function updMons(dt) {
+  chatTick();
   if (mode === 'mlobby') { updLobby(dt); return; }
   if (mode !== 'mons') { if (MONS.uiShown) { MONS.uiShown = false; monsUiOff(); if (MONS.flashL) MONS.flashL.intensity = 0; } return; } MONS.uiShown = true;
   monsHouseTick(dt); monsNightTick(dt);
@@ -18366,6 +18463,9 @@ function updMons(dt) {
   if (MONS.monsters.length < want) { const p = pick([[19, -14], [-19, 16], [19, 16], [-19, -14]]); monsSpawn(p[0], p[1]); }
   if (!MONS.powerDone && MONS.hour >= 2.25 && !MONS.ev && !MONS.inside) monsPowerOut();
   if (MONS.power) MONS.power.t += dt;
+  if (!MONS.storm.on && MONS.hour >= MONS.storm.at && !MONS.ghost) { MONS.storm.on = true; banner('⛈ НАЧАЛАСЬ ГРОЗА', 'вспышки молний выдают их за окнами'); const al = MONS.bots.filter((q) => !q.dead); if (al.length) setTimeout(() => monsChat(pick(al).name, pick(['ещё и гроза… 😰', 'слышите гром?', 'в молнию видно их во дворе!'])), 1600); }
+  monsStormTick(dt); monsScareTick(dt); if (MONS.endless && MONS.hour >= 8) monsAchGive('endless8');
+  if (MONS.inside && MONS.callT <= 0) { const m = MONS.inside, rm = roomOf(m.x, m.z), sp = MONS.bots.find((q) => !q.dead && !q.hid && roomOf(q.n.pos.x, q.n.pos.z) === rm); if (sp) { MONS.callT = 7; monsChat(sp.name, pick(['он ' + ROOM_RU[rm] + '!!', ROOM_RU[rm] + ' он, бегите!', 'вижу его ' + ROOM_RU[rm] + ' 😱'])); } } MONS.callT -= dt;
   if (MONS.hour >= 3 && !MONS.live3) { MONS.live3 = true; if (!MONS.ghost) monsTaskInc('live'); }
   if (!MONS.restocked && MONS.hour >= 3.2) { MONS.restocked = true; monsSpawnPicks(3); toast('📦 В доме появились новые припасы'); }
   if (!MONS.ev && !MONS.inside) { MONS.evT -= dt; if (MONS.evT <= 0) monsPickEvent(); }
@@ -18393,6 +18493,7 @@ function updMons(dt) {
   const scR = MONS.flash.on && MONS.flash.bat > 0 ? 5.2 : 2.8;
   if (MONS.hide) act = (!MONS.inside && !MONS.alert) ? { type: 'unhide', t: '⬆ ВЫЛЕЗТИ' } : null;
   else if (MONS.power && near(17.5, -11.5, 2.2) && MONS.fixT <= 0) act = { type: 'fix', t: '⚡ ВКЛЮЧИТЬ РУБИЛЬНИК' };
+  else if (MONS.phone && MONS.phone.ring > 0 && near(2.3, HD - 0.3, 1.8)) act = { type: 'phone', t: '📞 ОТВЕТИТЬ' };
   else if (MONS.alert && near(MONS.alert.x, MONS.alert.z, scR)) act = { type: 'scare', t: '📢 СПУГНУТЬ' + (scR > 3 ? ' (фонарь помогает)' : '') };
   else if (nearDoor) act = { type: 'lock', t: MONS.doorOpen ? '🔒 ЗАКРЫТЬ НА ЗАМОК' : '🚪 ОТКРЫТЬ ДВЕРЬ' };
   else { const w = MONS.wins.find((q) => q.open && near(winIn(q.i).x, winIn(q.i).z, 1.8) && !(MONS.alert && MONS.alert.win === q.i)); const s = MONS.spots.filter((q) => near(q.ex, q.ez, 1.6) || near(q.x, q.z, 1.9)).sort((a, c) => Math.hypot(pp.x - a.ex, pp.z - a.ez) - Math.hypot(pp.x - c.ex, pp.z - c.ez))[0];
@@ -18402,7 +18503,7 @@ function updMons(dt) {
 }
 document.getElementById('srvBtn').onclick = () => { Sound.init(); serversMenu(); };
 /* ===================== «Лагерь выживших»: a walk-around lobby for «Не открывай», full of bot players ===================== */
-const LOB = { on: false, bots: [], st: [], fx: {}, chatT: 4, arriveT: 10, leaveT: 18, hudT: 0, near: null, online: 1200 + randi(300), bub: [], spin: null };
+const LOB = { on: false, bots: [], party: [], st: [], fx: {}, chatT: 4, arriveT: 10, leaveT: 18, hudT: 0, near: null, online: 1200 + randi(300), bub: [], spin: null };
 const LOB_SAY = ['кто в кошмар?', 'го в ночь со мной', 'у меня 3 капкана 😎', 'ищейка жесть…', 'бегун меня догнал 💀', 'я дожил до 6!!', 'кто знает где рубильник?', 'задания дня сделал', 'купил плотника 🔨', 'НЕ ОТКРЫВАЙТЕ ДВЕРЬ', 'кто в бесконечную?', 'лол', 'гг', 'он нюхал мой шкаф 😱', 'фонарь сел на 3 часу', 'доски — топ', 'привет всем 👋', 'иду в автобус', 'двойник стучал моим голосом', 'пугало двигается когда не смотришь', 'ваще не страшно (страшно)', 'дайте монет 🙏', 'рулетка дала 200 🪙', 'кто дозорный?', 'медик имба', 'электрик лучший класс', 'капкан спас мне жизнь', 'не дышите в шкафу!', 'я призраком досмотрел', 'возродился за 60 и опять умер 😂'];
 MAPS.mlobby = { name: 'Лагерь выживших', desc: '', story: true, hx: 44, hz: 44, h: 24, spawn: [0, 8, 0], fog: 0x080a14, fogD: 0.026, bg: 0x05060d, sun: 0.08, hemi: 0.36, lamp: [0xffc080, 15, 17], lamps: [[-8.5, 3.6, 1], [8.5, 3.6, 1], [0, 3.8, -11], [4, 3.6, 10]], red: [[0, 3, 0], 0xff3a2a, 0], build: buildLobby, npcs: { human: 0, zombie: 0, soldier: 0 }, props: [], pills: [] };
 function lobIcon(e) { const t = cvTex(128, 128, (g) => { g.clearRect(0, 0, 128, 128); g.font = '96px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(e, 64, 70); }); const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false })); return s; }
@@ -18437,6 +18538,7 @@ function buildLobby() {
   station('spin', 'РУЛЕТКА УДАЧИ', '🎁', -11, 7, Math.PI / 2 - 0.35, 0xff7ad8, (g) => { const st2 = new THREE.Mesh(IM_G.box, dark); st2.position.y = 0.8; st2.scale.set(0.3, 1.6, 0.3); g.add(st2); const wh = new THREE.Group(); wh.position.set(0, 1.9, 0.2); g.add(wh); const tx = cvTex(256, 256, (c) => { const cl = ['#ff5a5a', '#ffd04a', '#7ae07a', '#5aa0ff', '#ff7ad8', '#ffa040', '#a07aff', '#40e0d0']; for (let i = 0; i < 8; i++) { c.fillStyle = cl[i]; c.beginPath(); c.moveTo(128, 128); c.arc(128, 128, 124, i / 8 * 6.283, (i + 1) / 8 * 6.283); c.fill(); } c.fillStyle = '#222'; c.beginPath(); c.arc(128, 128, 18, 0, 6.283); c.fill(); }); const disk = new THREE.Mesh(new THREE.CircleGeometry(1.0, 32), new THREE.MeshBasicMaterial({ map: tx })); wh.add(disk); LOB.fx.wheel = wh; const ptr = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.3, 3), std({ color: 0xffffff, emissive: 0x606060 })); ptr.position.set(0, 3.0, 0.25); ptr.rotation.x = Math.PI; g.add(ptr); solid(-11, 1, 7, 1.2, 2, 1.2); });
   station('mirror', 'ЗЕРКАЛО · ГАРДЕРОБ', '🪞', 11, 7, -Math.PI / 2 + 0.35, 0x7ad0ff, (g) => { const fr = new THREE.Mesh(IM_G.box, std({ color: 0x5a3a24, roughness: 0.6 })); fr.position.y = 1.2; fr.scale.set(1.3, 2.3, 0.12); g.add(fr); const mi = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 2.1), std({ color: 0xc8d8e8, metalness: 0.95, roughness: 0.05 })); mi.position.set(0, 1.2, 0.07); g.add(mi); const hg = new THREE.Mesh(IM_G.cyl, dark); hg.position.set(1.2, 1.0, 0); hg.scale.set(0.05, 2.0, 0.05); g.add(hg); for (let i = 0; i < 3; i++) { const co = new THREE.Mesh(IM_G.box, std({ color: [0x8a2a2a, 0x2a4a8a, 0x3a6a3a][i], roughness: 1 })); co.position.set(1.5, 1.4, -0.3 + i * 0.3); co.scale.set(0.12, 0.9, 0.35); g.add(co); } solid(11, 1.2, 7, 1.2, 2.4, 1.2); });
   station('board', 'ЛУЧШИЕ НОЧИ', '🏆', 6, 13, -2.71, 0xffa040, (g) => { const bd = new THREE.Mesh(IM_G.box, dark); bd.position.y = 1.7; bd.scale.set(3.4, 2.0, 0.14); g.add(bd); const tex = cvTex(512, 300, (c) => lobBoardDraw(c)); const pl = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.85), new THREE.MeshBasicMaterial({ map: tex })); pl.position.set(0, 1.7, 0.08); g.add(pl); LOB.fx.boardTex = tex; for (const s of [-1, 1]) { const p = new THREE.Mesh(IM_G.box, dark); p.position.set(s * 1.6, 0.8, 0); p.scale.set(0.14, 1.6, 0.14); g.add(p); } solid(6, 1.5, 13, 3.0, 3, 3.0); });
+  station('ach', 'ДОСТИЖЕНИЯ', '🏅', -6, 13, 2.71, 0xffd04a, (g) => { const ped = new THREE.Mesh(IM_G.cyl, texM(T.stone, 1, 1, { color: 0x9a9690 })); ped.position.y = 0.6; ped.scale.set(1.1, 1.2, 1.1); g.add(ped); const gold = std({ color: 0xffc840, metalness: 0.9, roughness: 0.25, emissive: 0x3a2800 }); const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.18, 0.6, 16), gold); cup.position.y = 1.65; g.add(cup); const st3 = new THREE.Mesh(IM_G.cyl, gold); st3.position.y = 1.3; st3.scale.set(0.1, 0.25, 0.1); g.add(st3); for (const s4 of [-1, 1]) { const h = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.035, 6, 14), gold); h.position.set(s4 * 0.45, 1.7, 0); h.rotation.y = Math.PI / 2; g.add(h); } solid(-6, 1, 13, 1.3, 2, 1.3); });
   // the night bus: walk to its door to choose a night
   station('bus', 'АВТОБУС В НОЧЬ', '🚌', 0, -15.5, 0, 0xff4a3a, (g) => { const body = std({ color: 0x8a6a1a, roughness: 0.5, metalness: 0.3 }); const b = new THREE.Mesh(IM_G.box, body); b.position.set(0, 1.6, -1.2); b.scale.set(9.5, 2.6, 2.6); b.rotation.y = Math.PI / 2; g.add(b);
     const wn = std({ color: 0x1a2028, emissive: 0x3a3020, roughness: 0.2 }); for (let i = 0; i < 5; i++) for (const s of [-1, 1]) { const w = new THREE.Mesh(IM_G.box, wn); w.position.set(s * 1.31, 2.1, -4.6 + i * 1.7); w.scale.set(0.02, 0.8, 1.3); g.add(w); }
@@ -18464,7 +18566,7 @@ function lobbyStart() {
   Sound.init(); storyReset(); overReset(); mode = 'mlobby'; resetStats(); story.gun = false; W.fireHeld = false; MONS.on = false; monsGhostEnd(); monsUiOff();
   loadMap('mlobby'); clearAll(); respawnPlayer(); invReset(); { const fi = WEAPONS.findIndex((w) => w.id === 'fists'); if (fi >= 0) selectWeapon(fi); }
   monsDailyEnsure(); lobTop(); if (LOB.fx.boardTex) { const c = LOB.fx.boardTex.image.getContext('2d'); lobBoardDraw(c); LOB.fx.boardTex.needsUpdate = true; }
-  LOB.on = true; LOB.bots = []; LOB.bub = []; LOB.chatT = 3; LOB.arriveT = 8; LOB.leaveT = 14; for (const s of LOB.seats) s.occ = null;
+  LOB.on = true; LOB.bots = []; LOB.party = []; LOB.bub = []; LOB.chatT = 3; LOB.arriveT = 8; LOB.leaveT = 14; for (const s of LOB.seats) s.occ = null;
   for (let i = 0; i < 13; i++) lobBotAdd(i < 5 ? 'sit' : i < 9 ? 'browse' : 'wander');
   player.pos.set(0, 0, 8); player.yaw = 0; player.pitch = -0.05; resume(); Music.stop(); Sound.droneLoop(0.05);
   lobUi().h.style.display = 'block'; monsChatUi().style.display = 'block'; banner('ЛАГЕРЬ ВЫЖИВШИХ', 'подходите к станциям · автобус увезёт в ночь');
@@ -18481,15 +18583,13 @@ function lobBotAdd(kind) {
   return b;
 }
 function lobBotRemove(b) { const i = LOB.bots.indexOf(b); if (i >= 0) LOB.bots.splice(i, 1); if (b.seat) b.seat.occ = null; try { b.n.dispose(); } catch (e) {} const k = npcs.indexOf(b.n); if (k >= 0) npcs.splice(k, 1); }
-function lobSay(b, txt) {
-  if (b.bub) { b.n.root.remove(b.bub.s); } const s = lobSprite(txt, 2.2, 0.55, 'rgba(255,255,255,.9)', '#111', 44); s.position.y = 2.55; b.n.root.add(s); b.bub = { s, t: 3.2 };
-  monsChat(b.name, txt);
-}
+function lobBubble(b, txt) { if (!b.n || !b.n.root) return; if (b.bub) { b.n.root.remove(b.bub.s); } const s = lobSprite(txt.length > 34 ? txt.slice(0, 32) + '…' : txt, 2.4, 0.6, 'rgba(255,255,255,.9)', '#111', 40); s.position.y = 2.55; b.n.root.add(s); b.bub = { s, t: 3.6 }; }
+function lobSay(b, txt) { lobBubble(b, txt); monsChat(b.name, txt); }
 /* ----- the chat feed (lobby and nights) ----- */
 function monsChatUi() { let c = document.getElementById('monsChat'); if (!c) { c = document.createElement('div'); c.id = 'monsChat'; c.style.cssText = 'position:fixed;left:10px;bottom:calc(46% + env(safe-area-inset-bottom,0px));z-index:39;width:min(56vw,300px);font:600 11px var(--ui);color:#fff;text-shadow:0 0 4px #000;pointer-events:none;display:none'; document.body.appendChild(c); } return c; }
 function monsChat(who, txt, col) {
   const c = monsChatUi(), d = document.createElement('div'); d.style.cssText = 'margin-top:2px;background:rgba(0,0,0,.35);border-radius:6px;padding:2px 6px;transition:opacity .6s'; d.innerHTML = `<b style="color:${col || '#8fd0ff'}">${who}:</b> ${txt}`; c.appendChild(d);
-  while (c.children.length > 5) c.removeChild(c.firstChild); setTimeout(() => { d.style.opacity = 0; }, 9000); setTimeout(() => { if (d.parentNode) d.parentNode.removeChild(d); }, 9700);
+  while (c.children.length > 6) c.removeChild(c.firstChild); setTimeout(() => { d.style.opacity = 0; }, 11000); setTimeout(() => { if (d.parentNode) d.parentNode.removeChild(d); }, 11700); return d;
 }
 /* ----- the lobby HUD ----- */
 function lobUi() {
@@ -18506,6 +18606,15 @@ function lobAction() {
   else if (s.id === 'mirror') { ward.open = true; wpBuild(); syncWard(); markWard(); $('wardOv').hidden = false; }
   else if (s.id === 'board') { lobTop(); const c = LOB.fx.boardTex.image.getContext('2d'); lobBoardDraw(c); LOB.fx.boardTex.needsUpdate = true; toast('🏆 Ваш рекорд: ' + (MONS_META.best ? '0' + Math.floor(MONS_META.best) + ':' + String(Math.floor((MONS_META.best % 1) * 60)).padStart(2, '0') : 'ещё нет') + ' · ночей пережито: ' + (MONS_META.wins || 0)); }
   else if (s.id === 'bus') monsMenu();
+  else if (s.id === 'ach') lobAchMenu();
+}
+function lobAchMenu() {
+  const d = c2Ui(); d.style.borderColor = '#ffd04a'; const A = MONS_META.ach || {}, c = MONS_META.cnt || {}, got = MONS_ACH.filter((a) => A[a.id]).length;
+  const prog = { trap3: [c.trap, 3], board15: [c.board, 15], sniff5: [c.sniff, 5], fix3: [c.fix, 3], cmd5: [c.cmd, 5], night5: [MONS_META.wins, 5] };
+  d.innerHTML = `<div style="display:flex;justify-content:space-between"><small style="letter-spacing:.18em;color:#ffd04a">ДОСТИЖЕНИЯ · ${got}/${MONS_ACH.length}</small><b style="color:#ffd04a">🪙 ${MONS_META.coins}</b></div><div style="max-height:52vh;overflow:auto;margin:6px 0">`
+    + MONS_ACH.map((a) => { const ok = !!A[a.id], p = prog[a.id]; return `<div style="display:flex;align-items:center;gap:8px;border:1px solid ${ok ? '#ffd04a' : '#444'};border-radius:10px;padding:6px 9px;margin:5px 0;text-align:left;${ok ? '' : 'opacity:.75'}"><div style="font-size:20px">${ok ? a.e : '🔒'}</div><div style="flex:1"><b style="font-size:13px">${a.n}</b><div style="font-size:10px;opacity:.8">${a.d}${p && !ok ? ` · ${Math.min(p[0] || 0, p[1])}/${p[1]}` : ''}</div></div><b style="font-size:11px;color:#ffd04a">${ok ? '✅' : '+' + a.r + '🪙'}</b></div>`; }).join('')
+    + '</div><button class="btn" data-k="x" style="width:100%">Закрыть</button>';
+  d.style.display = 'block'; d.querySelector('[data-k="x"]').onclick = () => { d.style.display = 'none'; };
 }
 function lobTasksMenu() {
   monsDailyEnsure(); const d = c2Ui(); d.style.borderColor = '#7ae07a';
@@ -18546,26 +18655,130 @@ function updLobby(dt) {
   if (state !== 'play') return;
   // bots
   for (const b of LOB.bots.slice()) { const n = b.n; if (b.bub) { b.bub.t -= dt; if (b.bub.t <= 0) { n.root.remove(b.bub.s); b.bub = null; } }
+    if (b.kind === 'party') { const k = LOB.party.indexOf(b), nP = LOB.party.length, bx = Math.sin(player.yaw), bz = Math.cos(player.yaw), sx = Math.cos(player.yaw), sz = -Math.sin(player.yaw), side = (k - (nP - 1) / 2) * 1.2, tx = pp.x + bx * 1.9 + sx * side, tz = pp.z + bz * 1.9 + sz * side, d = Math.hypot(n.pos.x - tx, n.pos.z - tz); if (d > 0.5) walkNpc(n, tx, tz, d > 4 ? 3.4 : 2.2, dt); else { n.speed = 0; faceNpc(n, pp.x, pp.z); } pushOutAABBs(n.pos, 0.3, 0); n.pos.y = 0; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; continue; }
     if (b.kind === 'sit') { b.t -= dt; if (b.t <= 0) { b.t = rand(8, 18); if (Math.random() < 0.35) { if (b.seat) b.seat.occ = null; b.seat = null; n.pose = 'stand'; n.poseDur = 0; b.kind = 'wander'; b.goal = null; } } continue; }
     if (b.kind === 'leave') { if (walkNpc(n, b.goal.x, b.goal.z, 2.2, dt)) { monsChat('Сервер', b.name + ' уехал в ночь 🚌', '#9ab'); lobBotRemove(b); continue; } }
     else if (b.goal) { if (walkNpc(n, b.goal.x, b.goal.z, b.kind === 'arrive' ? 1.8 : 1.5, dt)) { n.speed = 0; if (b.kind === 'browse' && b.st) faceNpc(n, b.st.x, b.st.z); b.goal = null; b.t = rand(4, 10); if (b.kind === 'arrive') b.kind = 'wander'; } }
     else { b.t -= dt; if (b.t <= 0) { const r = Math.random(); if (r < 0.35) { b.kind = 'browse'; b.st = pick(LOB.st); b.goal = { x: b.st.ex + rand(-0.7, 0.7), z: b.st.ez + rand(-0.7, 0.7) }; } else if (r < 0.55) { const s = LOB.seats.find((q) => !q.occ); if (s) { s.occ = b; b.seat = s; b.kind = 'sit'; b.t = rand(10, 20); seatNpc(n, s.x, s.z, Math.atan2(-s.x, -s.z), 'sit'); n.scripted = true; } } else { b.kind = 'wander'; const a = rand(0, 6.283), R = rand(4.5, 12); b.goal = { x: Math.cos(a) * R, z: Math.sin(a) * R }; } } }
     pushOutAABBs(n.pos, 0.3, 0); n.pos.y = 0; n.root.position.copy(n.pos); n.root.rotation.y = n.yaw; }
   // traffic of players: someone leaves on the bus, someone arrives from the road
-  LOB.leaveT -= dt; if (LOB.leaveT <= 0) { LOB.leaveT = rand(14, 26); const c = LOB.bots.filter((b) => b.kind !== 'leave'); if (c.length > 8) { const b = pick(c); if (b.seat) { b.seat.occ = null; b.seat = null; b.n.pose = 'stand'; b.n.poseDur = 0; } b.kind = 'leave'; b.goal = { x: 2.4, z: -13.2 }; if (Math.random() < 0.6) lobSay(b, pick(['иду в ночь', 'всем пока 👋', 'го кто со мной', 'в кошмар!'])); } }
+  LOB.leaveT -= dt; if (LOB.leaveT <= 0) { LOB.leaveT = rand(14, 26); const c = LOB.bots.filter((b) => b.kind !== 'leave' && b.kind !== 'party'); if (c.length > 8) { const b = pick(c); if (b.seat) { b.seat.occ = null; b.seat = null; b.n.pose = 'stand'; b.n.poseDur = 0; } b.kind = 'leave'; b.goal = { x: 2.4, z: -13.2 }; if (Math.random() < 0.6) lobSay(b, pick(['иду в ночь', 'всем пока 👋', 'го кто со мной', 'в кошмар!'])); } }
   LOB.arriveT -= dt; if (LOB.arriveT <= 0) { LOB.arriveT = rand(12, 22); if (LOB.bots.length < 15) lobBotAdd('arrive'); }
   LOB.chatT -= dt; if (LOB.chatT <= 0) { LOB.chatT = rand(3, 7); const b = pick(LOB.bots); if (b) lobSay(b, pick(LOB_SAY)); }
   LOB.online += (Math.random() < dt * 0.5 ? randi(7) - 3 : 0);
   // stations: the nearest ring under you
   const u = lobUi(); let near = null; for (const s of LOB.st) if (Math.hypot(pp.x - s.ex, pp.z - s.ez) < 1.6) near = s; LOB.near = near;
-  if (near) { u.b.style.display = 'block'; u.b.textContent = near.icon + ' ' + (near.id === 'bus' ? 'НАЙТИ НОЧЬ' : near.id === 'mirror' ? 'ПЕРЕОДЕТЬСЯ' : near.id === 'spin' ? 'КРУТИТЬ РУЛЕТКУ' : near.id === 'tasks' ? 'ОТКРЫТЬ ЗАДАНИЯ' : near.id === 'board' ? 'СМОТРЕТЬ РЕКОРДЫ' : 'ОТКРЫТЬ КЛАССЫ'); } else u.b.style.display = 'none';
-  LOB.hudT -= dt; if (LOB.hudT <= 0) { LOB.hudT = 0.5; const cls = MONS_CLS[MONS_META.cls] || MONS_CLS.none; u.h.innerHTML = `🟢 Онлайн: <b>${LOB.online.toLocaleString('ru')}</b> · в лагере: <b>${LOB.bots.length + 1}</b> · 🪙 <b>${MONS_META.coins}</b> · ${cls.e} ${cls.name}`; }
+  if (near) { u.b.style.display = 'block'; u.b.textContent = near.icon + ' ' + (near.id === 'ach' ? 'ДОСТИЖЕНИЯ' : near.id === 'bus' ? 'НАЙТИ НОЧЬ' : near.id === 'mirror' ? 'ПЕРЕОДЕТЬСЯ' : near.id === 'spin' ? 'КРУТИТЬ РУЛЕТКУ' : near.id === 'tasks' ? 'ОТКРЫТЬ ЗАДАНИЯ' : near.id === 'board' ? 'СМОТРЕТЬ РЕКОРДЫ' : 'ОТКРЫТЬ КЛАССЫ'); } else u.b.style.display = 'none';
+  LOB.hudT -= dt; if (LOB.hudT <= 0) { LOB.hudT = 0.5; const cls = MONS_CLS[MONS_META.cls] || MONS_CLS.none; u.h.innerHTML = `🟢 Онлайн: <b>${LOB.online.toLocaleString('ru')}</b> · в лагере: <b>${LOB.bots.length + 1}</b> · 🪙 <b>${MONS_META.coins}</b> · ${cls.e} ${cls.name}` + (LOB.party.length ? ` · 👥 группа: <b>${LOB.party.length + 1}</b>` : ''); }
 }
 function lobBusGo(then) {
   const bl = $('black'); bl.classList.add('on'); Sound.thud(0.6); later(0.3, () => { Sound.droneLoop(0.2); }); banner('🚌 АВТОБУС УВОЗИТ ВАС В НОЧЬ…', 'дом уже ждёт');
   later(1.6, () => { then(); later(0.4, () => bl.classList.remove('on')); });
 }
 function lobbyLeaveTo() { LOB.on = false; lobUiOff(); for (const b of LOB.bots.slice()) { if (b.bub) b.n.root.remove(b.bub.s); } LOB.bots = []; }
+/* ===================== talking to the bots: type or tap a quick phrase, they answer by meaning; at night they also follow orders ===================== */
+const escHtml = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function chatNorm(t) { return ' ' + String(t).toLowerCase().replace(/ё/g, 'е').replace(/[.,!?;:()"'«»…\-–—]+/g, ' ').replace(/\s+/g, ' ').trim() + ' '; }
+const ROOM_RU = { L1: 'в гостиной у камина', L2: 'в гостиной у стола', K: 'на кухне', B: 'в спальне', H: 'в прихожей', W: 'в ванной', O: 'на улице' };
+function monsWhere() { const M = MONS; if (M.inside) return 'он в доме — ' + ROOM_RU[roomOf(M.inside.x, M.inside.z)] + '!'; if (M.ev) { const e = M.ev; if (e.type === 'knock' || e.type === 'breachD') return 'он у входной двери!'; return 'у окна: ' + WIN_NAME[e.win] + ' 👀'; } return pick(['бродят во дворе, у окон пока чисто', 'не вижу… тихо пока', 'где-то за забором ходят']); }
+function monsTimeStr() { const h = Math.floor(MONS.hour), m = Math.floor((MONS.hour % 1) * 60); return '0' + h + ':' + String(m).padStart(2, '0'); }
+const CHAT_TIPS = ['закрой дверь на замок сразу, как начнётся ночь 🔒', 'если стучат — к двери не подходи', 'у окна не стой, когда кто-то смотрит снаружи', 'когда он нюхает шкаф — держи кнопку «не дышать» 🫁', 'в одном укрытии долго не сиди — заскрипит', 'капкан ставь там, где он ходит 🪤', 'окна заколачивай досками 🔨', 'в 2 часа гаснет свет — рубильник в сарае ⚡', 'фонарь в шкафу выключай!', 'ходи медленно, когда он в доме — шум выдаёт', 'на Пугало смотри, не отворачивайся 🌾', 'Двойнику не верь, даже если голос знакомый 🎭'];
+const CHAT_JOKES = ['Почему Пугало не ходит в кино? Там все смотрят на экран, а не на него 🌾', 'Ищейка открыла шкаф, а там я. Конец анекдота 💀', 'Двойник позвонил маме. Мама открыла. Больше шуток нет 😶', 'Тощий так долго стоял у окна, что получил прописку 🪟', 'Бегун прибежал первым — на свою собственную ловушку 🪤', 'Что сказал фонарь в 4 утра? «Я устал, батарейка всё» 🔦'];
+/* each rule: [test regex on normalized text, answer(bot, ctx) → string, optional action] */
+const CHAT_RULES = [
+  [/ (привет|прив |хай |здравств|здаров|салам|ку |хелло|hello|hi |йоу|добрый день|добрый вечер|доброй ночи)/, (b) => pick(['привет! 👋', 'хай!', 'здарова 😎', 'привет-привет 🙂', 'о, привет! в ночь пойдёшь?', 'приветик 🙌', `привет, я ${b.name}`])],
+  [/ (как дела|как ты |как сам|как жизнь|как настроение|че как|чо как|что нового|как поживаешь)/, () => pick(['норм, готовлюсь к ночи', 'страшновато, но держусь 😅', 'отлично! вчера дожил до 06:00', 'так себе — меня ищейка нашла в шкафу 💀', 'хорошо, коплю на электрика ⚡', 'лучше всех 😎 а у тебя?'])],
+  [/ (что делаешь|чем занят|че делаешь|чо делаешь)/, () => pick(['жду автобус 🚌', 'кручу рулетку 🎁', 'греюсь у костра 🔥', 'выбираю класс', 'читаю задания дня 📜'])],
+  [/ (как тебя зовут|ты кто|кто ты|твое имя|твой ник|как звать)/, (b) => pick([`я ${b.name}`, `${b.name}, приятно 🙂`, `зови меня ${b.name}`])],
+  [/ (ты бот|вы боты|ты живой|ты человек|ты реальн|ты ии |ты робот)/, () => pick(['да, я бот этого лагеря 🤖 но очень старательный', 'бот, ага. зато темноты почти не боюсь', 'бип-буп 🤖 бот, но с душой'])],
+  [/ (спасибо|спс|благодар|сенкс)/, () => pick(['пожалуйста 😊', 'обращайся!', 'всегда рад 🙌'])],
+  [/ (молодец|круто|лучший|красав|топ |имба|респект)/, () => pick(['спасибо 😊', 'ты тоже топ!', 'стараюсь 😎', 'хе-хе 😏'])],
+  [/ (дурак|тупой|тупая|тупиш|лох|нуб|идиот|дебил|глупый)/, () => pick(['сам такой 😤', 'обидно вообще-то…', 'посмотрим ночью, кто дольше проживёт 😏'])],
+  [/ (люблю|нравишься|обожаю)/, () => pick(['😳', 'мило… но у меня ночь', '❤️ по-дружески'])],
+  [/ (пока |бб |до свидания|увидимся|бай )/, () => pick(['пока! 👋', 'удачи ночью!', 'не открывай никому 😉'])],
+  [/ (шутк|анекдот|рассмеши|прикол|пошути)/, () => pick(CHAT_JOKES)],
+  [/ (как играть|что делать|правила|помоги|подскажи|как выжить|совет|гайд|туториал|научи)/, () => pick(CHAT_TIPS) + (Math.random() < 0.5 ? ' · ' + pick(CHAT_TIPS) : '')],
+  [/ (сколько времени|который час|скоро утро|сколько осталось|время )/, () => MONS.on || MONS.ghost ? 'сейчас ' + monsTimeStr() + ', до 06:00 ещё ' + Math.max(0, Math.ceil((6 - MONS.hour) * 60)) + ' игровых минут' : 'в лагере время не идёт 😄 ночь начнётся в автобусе'],
+  [/ (где он|где монстр|где они|где чудище|где тварь|он где|видишь его)/, () => MONS.on || MONS.ghost ? monsWhere() : 'тут их нет, в лагере безопасно 🔥'],
+  [/ (двойник|голос)/, () => 'двойник стучит голосом друзей — не открывай, даже если зовут по имени 🎭'],
+  [/ пугал/, () => 'пугало не двигается, пока на него смотришь. отвернулся — оно рядом 🌾'],
+  [/ (ищейк|нюха)/, () => 'ищейка чаще всех нюхает укрытия — держи дыхание и не свети фонарём 👃'],
+  [/ бегун/, () => 'бегун очень быстрый, но окна ломает хуже 🦴'],
+  [/ тощ/, () => 'тощий терпеливый: долго стоит у окна и смотрит 🩻'],
+  [/ (монстр|чудищ|чудовищ|кто там|кто они|аномали)/, () => pick(['их пять: тощий, ищейка, бегун, двойник и пугало', 'они пришли с улицы, когда сказали по телевизору…', 'самый страшный для меня — ищейка 😨'])],
+  [/ дозорн/, () => 'дозорный видит, где начинается событие — очень удобно 🔭'],
+  [/ плотник/, () => 'плотник: 4 доски сразу, и его доски срывают дольше 🔨'],
+  [/ капканщик/, () => 'капканщик берёт 2 капкана — монстр в капкане 5 секунд дёргается 🪤'],
+  [/ медик/, () => 'медик: сердце спокойнее и 2 таблетки 💊'],
+  [/ электрик/, () => 'электрик — фонарь живёт вдвое дольше и рубильник за секунду ⚡'],
+  [/ класс/, () => pick(['классы в палатке «Снаряжение»: дозорный, плотник, капканщик, медик, электрик', 'мне больше всех нравится медик 💊', 'для новичка — плотник, доски спасают'])],
+  [/ (рулетк|джекпот|приз)/, () => pick(['рулетка слева от костра 🎁 один бесплатный спин в день', 'мне выпало 150 вчера 😎', 'джекпот 300 монет — мечта'])],
+  [/ (монет|деньг|коин|заработ)/, () => pick(['монеты дают за ночь и за задания дня 🪙', 'чем дольше живёшь ночью — тем больше монет', 'в кошмаре награда больше'])],
+  [/ (задани|квест)/, () => 'доска заданий справа от костра 📜 за все три — бонус-спин'],
+  [/ (достижен|ачивк)/, () => 'достижения у кубка возле дороги 🏅 за них дают монеты'],
+  [/ (автобус|как начать|начать игру|старт )/, () => 'подойди к автобусу у края площади — там «Найти ночь» 🚌'],
+  [/ (фонар|батар)/, () => 'фонарь садится примерно за полторы минуты, батарейки ищи в доме 🔋'],
+  [/ (таблет|сердц|пульс)/, () => 'при пульсе 150 он тебя услышит. таблетки успокаивают сердце 💊'],
+  [/ (рубильник|свет погас|электричеств)/, () => 'в 2 часа ночи вырубают свет. рубильник — в сарае во дворе ⚡'],
+  [/ (гроз|молни|дожд)/, () => 'в грозу молния подсвечивает их за окнами… жуть ⛈'],
+  [/ (телефон|звонок|звонит)/, () => 'если ночью звонит телефон… можешь ответить. но я бы не стал 📞'],
+  [/ окн/, () => pick(['у окон не стой, когда кто-то смотрит', 'окно можно заколотить досками 🔨', 'открытое окно сразу закрывай'])],
+  [/ (шкаф|кроват|прятат|укрыт|ванн)/, () => pick(['в укрытии держи дыхание, когда он нюхает 🫁', 'долго в одном шкафу не сиди — заскрипит', 'под кроватью видно его ноги, жуть'])],
+  [/ двер/, () => pick(['дверь закрывай сразу 🔒', 'если стучат — не подходи!', 'двойник любит стучать…'])],
+  [/ (скучно|страшно|боюсь)/, () => pick(['мне тоже 😨', 'держись рядом, вместе не страшно', 'ничего, до утра продержимся'])],
+  [/^ (да|ага|ок|окей|угу|конечно|давай) $/, () => pick(['👍', 'отлично', 'ок 👌'])],
+  [/^ (нет|неа|не) $/, () => pick(['ну ладно', 'как скажешь'])]
+];
+function chatSend(raw) {
+  const txt = String(raw || '').trim().slice(0, 140); if (!txt) return; monsChat('Вы', escHtml(txt), '#7ae07a'); Sound.click(900, 0.15);
+  const t = chatNorm(txt), pool = LOB.on ? LOB.bots : MONS.bots.filter((q) => !q.dead);
+  if (!pool.length) { setTimeout(() => monsChat('Сервер', 'рядом никого нет 🤷', '#9ab'), 600); return; }
+  const named = pool.find((q) => t.includes(' ' + chatNorm(q.name).trim() + ' ') || t.includes(chatNorm(q.name).trim()));
+  let b = named; if (!b) { if (LOB.on) { const pp = player.pos; b = pool.slice().sort((x, y) => Math.hypot(x.n.pos.x - pp.x, x.n.pos.z - pp.z) - Math.hypot(y.n.pos.x - pp.x, y.n.pos.z - pp.z))[randi(Math.min(3, pool.length))]; } else b = pick(pool); }
+  const cmd = chatCommand(t, b, pool, !!named);
+  const ans = cmd ? cmd : chatAnswer(t, b);
+  const d = monsChat(b.name, '<i style="opacity:.6">печатает…</i>'); const delay = 700 + Math.min(1600, ans.length * 25);
+  setTimeout(() => { if (d) d.innerHTML = `<b style="color:#8fd0ff">${escHtml(b.name)}:</b> ${escHtml(ans)}`; if (LOB.on && b.n) lobBubble(b, ans); if (Math.random() < 0.18 && pool.length > 1 && !cmd) { const o = pick(pool.filter((q) => q !== b)); setTimeout(() => monsChat(o.name, escHtml(pick(['+', 'согласен', 'ахах', 'точно', 'ну да', '😂']))), 900); } }, delay);
+}
+function chatAnswer(t, b) { for (const [re, fn] of CHAT_RULES) if (re.test(t)) return fn(b); return pick(['не понял 😅', 'чего?', 'а?', 'хм…', 'давай лучше про ночь', 'ага', 'повтори?', 'интересно 🤔']); }
+/* orders that change something in the game; returns the answer text or null */
+function chatCommand(t, b, pool, named) {
+  const night = MONS.on && !MONS.dead && mode === 'mons', cnt = () => { MONS_META.cnt = MONS_META.cnt || {}; MONS_META.cnt.cmd = (MONS_META.cnt.cmd || 0) + 1; monsMetaSave(); monsAchCheck(); };
+  if (LOB.on) {
+    if (/ (го |пошли|пойдем|идем|айда|погнали|давай вместе|со мной|в пати|в группу|в команду|играть вместе|кто со мной|присоединяйся|вступай)/.test(t)) {
+      const free = named ? [b] : pool.filter((q) => !LOB.party.includes(q) && q.kind !== 'leave').sort(() => Math.random() - 0.5).slice(0, 1 + randi(2));
+      if (named && LOB.party.includes(b)) return 'я и так с тобой 😄'; if (LOB.party.length >= 11) return 'в группе уже нет мест';
+      for (const q of free) { if (LOB.party.includes(q)) continue; LOB.party.push(q); if (q.seat) { q.seat.occ = null; q.seat = null; } q.n.pose = 'stand'; q.n.poseDur = 0; q.kind = 'party'; q.goal = null; if (q !== b) setTimeout(() => monsChat(q.name, pick(['я тоже с вами!', 'беру меня 🙋', 'погнали'])), 1500); }
+      return pick(['го! 😎', 'я с тобой', 'погнали!', 'ок, иду за тобой']) + ' (в группе: ' + (LOB.party.length + 1) + ')';
+    }
+    if (/ (уходи|отстань|выйди из группы|покинь|не надо|отвали|кик )/.test(t) && LOB.party.includes(b)) { LOB.party.splice(LOB.party.indexOf(b), 1); b.kind = 'wander'; return pick(['ладно 😔', 'ок, я у костра буду']); }
+    return null;
+  }
+  if (!night) return null;
+  if (/ (открой|открыть|открывай)/.test(t) && / двер/.test(t)) { return 'НЕТ! никому не открываем 😠'; }
+  if (/ (закрой|запри|закрыть|запереть|закрывай)/.test(t) && / двер/.test(t)) { cnt(); if (!MONS.doorOpen) return 'уже закрыто 🔒'; b.role = 'door'; b.tDoor = 0; b.path = null; return 'иду закрывать! 🔒'; }
+  if (/ (прячь|спрячь|прячемся|прятаться|в шкаф|все в укрыт)/.test(t)) { cnt(); for (const q of pool) { q.forceHide = 20; q.wp = null; } return 'прячемся! 🤫'; }
+  if (/ (пугай|спугни|прогони|пугни|отгони|кыш)/.test(t)) { cnt(); const al = MONS.alert; if (!al) return 'пока некого пугать'; const nb = pool.slice().sort((x, y) => Math.hypot(x.n.pos.x - al.x, x.n.pos.z - al.z) - Math.hypot(y.n.pos.x - al.x, y.n.pos.z - al.z))[0]; nb.role = 'scare'; nb.succ = Math.random() < 0.72; nb.rolled = false; nb.path = null; if (nb !== b) setTimeout(() => monsChat(nb.name, 'бегу пугать! 📢'), 700); return nb === b ? 'бегу пугать! 📢' : 'ближе всех ' + nb.name + ', он побежал'; }
+  if (/ (за мной|иди сюда|следуй|ко мне|сюда иди|подойди)/.test(t)) { cnt(); b.follow = 25; b.path = null; return 'иду! 🏃'; }
+  if (/ (дай|поделись|одолжи|кинь)/.test(t) && / (батар|таблет|доск|капкан|энергет)/.test(t)) { cnt(); if (b.gave) return 'больше нет, прости 🙏'; b.gave = true; const it = /батар/.test(t) ? 'bat' : /таблет/.test(t) ? 'pill' : /доск/.test(t) ? 'board' : /капкан/.test(t) ? 'trap' : 'energy'; if (Math.random() < 0.25) { b.gave = false; return 'самому мало 😅'; } if (it === 'board') MONS.items.board += 2; else MONS.items[it]++; monsUiSync(); return { bat: 'держи батарейку 🔋', pill: 'держи таблетки 💊', board: 'держи 2 доски 🪵', trap: 'держи капкан 🪤', energy: 'держи энергетик ⚡' }[it]; }
+  return null;
+}
+/* the chat bar: a button, an input, quick phrases that change with the situation */
+function chatUi() {
+  let btn = document.getElementById('chatBtn'); if (btn) return { btn, bar: document.getElementById('chatBar') };
+  btn = document.createElement('div'); btn.id = 'chatBtn'; btn.textContent = '💬'; btn.style.cssText = 'position:fixed;left:calc(12px + env(safe-area-inset-left,0px));top:calc(186px + env(safe-area-inset-top,0px));z-index:45;width:44px;height:44px;border-radius:50%;background:rgba(20,16,12,.82);border:2px solid #8fd0ff;font-size:22px;display:none;align-items:center;justify-content:center;pointer-events:auto';
+  const bar = document.createElement('div'); bar.id = 'chatBar'; bar.style.cssText = 'position:fixed;left:50%;top:calc(16% + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:60;width:min(94vw,440px);background:rgba(12,10,10,.94);border:1px solid #8fd0ff;border-radius:12px;padding:8px;display:none;font-family:var(--ui)';
+  bar.innerHTML = '<div style="display:flex;gap:6px"><input id="chatIn" maxlength="140" placeholder="Напишите ботам… (можно по имени)" style="flex:1;min-width:0;background:#1a1616;color:#fff;border:1px solid #444;border-radius:8px;padding:8px;font:600 14px var(--ui)"><button class="btn primary" id="chatGo" style="padding:6px 12px">➤</button><button class="btn" id="chatX" style="padding:6px 10px">✕</button></div><div id="chatChips" class="chips" style="margin-top:6px;flex-wrap:wrap;display:flex;gap:5px"></div>';
+  document.body.appendChild(btn); document.body.appendChild(bar);
+  const stop = (e) => e.stopPropagation(); ['touchstart', 'pointerdown', 'mousedown', 'keydown', 'keyup', 'keypress'].forEach((e) => { bar.addEventListener(e, stop); }); ['touchstart', 'pointerdown', 'mousedown'].forEach((e) => btn.addEventListener(e, (ev) => { ev.stopPropagation(); ev.preventDefault(); chatToggle(); }, { passive: false }));
+  const inp = bar.querySelector('#chatIn'); const send = () => { chatSend(inp.value); inp.value = ''; }; bar.querySelector('#chatGo').onclick = send; inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); }); bar.querySelector('#chatX').onclick = () => chatToggle(false);
+  return { btn, bar };
+}
+function chatChips() { const c = document.getElementById('chatChips'); if (!c) return; const night = MONS.on && mode === 'mons';
+  const L = LOB.on ? ['Привет!', 'Как дела?', 'Го в ночь со мной', 'Как выжить?', 'Какой класс лучше?', 'Расскажи шутку', 'Ты бот?'] : night ? ['Где монстр?', 'Закрой дверь!', 'Прячьтесь!', 'Пугай его!', 'За мной', 'Дай батарейку', 'Сколько времени?'] : ['Привет!'];
+  c.innerHTML = L.map((q) => `<button class="chip" data-q="${escHtml(q)}">${escHtml(q)}</button>`).join(''); c.querySelectorAll('[data-q]').forEach((b) => b.onclick = () => chatSend(b.dataset.q)); }
+function chatToggle(on) { const { bar } = chatUi(); const show = on === undefined ? bar.style.display === 'none' : on; bar.style.display = show ? 'block' : 'none'; if (show) { chatChips(); setTimeout(() => { const i = document.getElementById('chatIn'); if (i && !isTouch) i.focus(); }, 50); } }
+function chatTick() { const { btn, bar } = chatUi(); const show = state === 'play' && (LOB.on || (mode === 'mons' && (MONS.on || MONS.ghost))); btn.style.display = show ? 'flex' : 'none'; if (!show && bar.style.display !== 'none') bar.style.display = 'none'; }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
@@ -19217,7 +19430,7 @@ function frame(now) {
   const ts = (slow ? 0.25 : 1) * worldTs * fallFx.ts * (player.dead && state === 'play' && !(player.lastFall > 0) ? 0.4 : 1), dt = rdt * ts;
   const running = state === 'play' || state === 'spawn' || state === 'menu' || state === 'over' || state === 'cutscene' || state === 'sui' || state === 'story';
   if (running) {
-    if (state === 'play') { updatePlayer(rdt); W.cd -= rdt; if (W.fireHeld && curW().auto) tryFire(false); updateGrab(rdt); updateCat(rdt); updateMelTalk(rdt); updateMelNotes(rdt); updTimeMachine(rdt); updWW2(rdt); updBson(rdt); updVeh(rdt); }
+    if (state === 'play') { updatePlayer(rdt); W.cd -= rdt; if (W.fireHeld && curW().auto) tryFire(false); updateGrab(rdt); updateCat(rdt); updateMelTalk(rdt); updateMelNotes(rdt); updTimeMachine(rdt); updWW2(rdt); updBson(rdt); updVeh(rdt * worldTs); }
     else if (state === 'cutscene') { updatePlayer(rdt); updateCutscene(rawDt); }
     else if (state === 'sui') { updateSuicide(rawDt); }
     else if (state === 'story') updateStoryCut(rawDt);
@@ -19269,7 +19482,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { get cutT() { return story.cut ? story.cut.t : -1; }, set cutT(v) { if (story.cut) story.cut.t = v; }, MONS, LOB, lobbyStart, lobAction, lobBotAdd, monsChat, lobSpinMenu, lobTasksMenu, MON_WIN, MON_KINDS, winIn, winOut, roomOf, anyPath, monsBreach, monsSunrise, monsUse, monsSpawnPicks, monsPowerOut, monsPowerOn, MONS_META, MONS_CLS, monsTaskInc, monsCoins, monsPlaceTrap, monsBoardWin, monsGhostStart, monsRevive, monsMenu, monsClsMenu, monsStart, monsBegin, monsCut, monsOver, monsDoorSet, monsHideIn, monsAction, monsPickEvent, mkNoob, mkMonster, loadMap, resume, openSpawn, get spc() { return spc; }, spRender, wpBuildSample, spawnAtAim, get state() { return state; }, DACHA, dachaBlast, applyNewLook, spawnNPC, D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, vehPlaceRamp, vehSpec, vehGround, vehPhys, makeCar, vehRemove, vehAI, vehCollide, vehTrackIdx, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { get cutT() { return story.cut ? story.cut.t : -1; }, set cutT(v) { if (story.cut) story.cut.t = v; }, MONS, LOB, lobbyStart, lobAction, lobBotAdd, monsChat, chatSend, chatToggle, chatNorm, MONS_ACH, monsAchGive, monsCnt, monsTvShow, monsScareTick, monsStormTick, monsPhoneEnsure, lobSpinMenu, lobTasksMenu, MON_WIN, MON_KINDS, winIn, winOut, roomOf, anyPath, monsBreach, monsSunrise, monsUse, monsSpawnPicks, monsPowerOut, monsPowerOn, MONS_META, MONS_CLS, monsTaskInc, monsCoins, monsPlaceTrap, monsBoardWin, monsGhostStart, monsRevive, monsMenu, monsClsMenu, monsStart, monsBegin, monsCut, monsOver, monsDoorSet, monsHideIn, monsAction, monsPickEvent, mkNoob, mkMonster, loadMap, resume, openSpawn, get spc() { return spc; }, spRender, wpBuildSample, spawnAtAim, get state() { return state; }, DACHA, dachaBlast, applyNewLook, spawnNPC, D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, vehPlaceRamp, vehSpec, vehGround, vehPhys, makeCar, vehRemove, vehAI, vehCollide, vehTrackIdx, vehBox, obbHit, vehFlip, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
