@@ -17469,8 +17469,8 @@ function furnishHouse(T) {
   for (let k = 0; k < 3; k++) picture(-3.6 + k * 0.7, 1.8 + (k % 2) * 0.15, 2.88, Math.PI, 0.45, 0.55, (g) => { g.fillStyle = ['#c8b090', '#a0b8c8', '#c8a0a0'][k]; g.fillRect(0, 0, 128, 128); g.fillStyle = '#3a2a20'; for (let p = 0; p < 2 + k; p++) { g.beginPath(); g.arc(30 + p * 30, 60, 11, 0, 6.283); g.fill(); g.fillRect(20 + p * 30, 74, 20, 50); } });
   im('piano', 1.9, -HD + 0.5, 0, 1.0, [1.6, 1.2, 0.7]);
   // the dining table with chairs (a hiding place under it)
-  { const t = new THREE.Group(); t.position.set(0, 0.06, -5.8); addMesh(t); const top = new THREE.Mesh(IM_G.box, texM(T.wood, 1, 0.5, { color: 0x7a5232 })); top.position.y = 0.76; top.scale.set(2.2, 0.07, 1.2); top.castShadow = true; t.add(top); const cloth = new THREE.Mesh(IM_G.box, std({ color: 0xe8e0d0, roughness: 1 })); cloth.position.y = 0.6; cloth.scale.set(2.3, 0.34, 1.3); t.add(cloth); for (const [x, z] of [[-1, -0.5], [1, -0.5], [-1, 0.5], [1, 0.5]]) { const l = new THREE.Mesh(IM_G.box, wd(0x4a3018)); l.position.set(x, 0.38, z); l.scale.set(0.07, 0.76, 0.07); t.add(l); } const cand = new THREE.Mesh(IM_G.cyl, std({ color: 0xf0e8d0, emissive: 0x403020 })); cand.position.set(0, 0.92, 0); cand.scale.set(0.06, 0.25, 0.06); t.add(cand); }
-  for (const [x, z, r] of [[-0.6, -6.9, 0], [0.6, -6.9, 0], [-0.6, -4.7, Math.PI], [0.6, -4.7, Math.PI]]) im('chair', x, z, r, 1.1);
+  { const t = new THREE.Group(); t.position.set(0, 0.06, -5.8); addMesh(t); MONS.fx.table = t; const top = new THREE.Mesh(IM_G.box, texM(T.wood, 1, 0.5, { color: 0x7a5232 })); top.position.y = 0.76; top.scale.set(2.2, 0.07, 1.2); top.castShadow = true; t.add(top); const cloth = new THREE.Mesh(IM_G.box, std({ color: 0xe8e0d0, roughness: 1 })); cloth.position.y = 0.6; cloth.scale.set(2.3, 0.34, 1.3); t.add(cloth); for (const [x, z] of [[-1, -0.5], [1, -0.5], [-1, 0.5], [1, 0.5]]) { const l = new THREE.Mesh(IM_G.box, wd(0x4a3018)); l.position.set(x, 0.38, z); l.scale.set(0.07, 0.76, 0.07); t.add(l); } const cand = new THREE.Mesh(IM_G.cyl, std({ color: 0xf0e8d0, emissive: 0x403020 })); cand.position.set(0, 0.92, 0); cand.scale.set(0.06, 0.25, 0.06); t.add(cand); }
+  MONS.fx.chairs = [[-0.6, -6.9, 0], [0.6, -6.9, 0], [-0.6, -4.7, Math.PI], [0.6, -4.7, Math.PI]].map(([x, z, r]) => im('chair', x, z, r, 1.1));
   spot('tbl', 'под обеденным столом', 0, -5.8, 0, -4.2, 0.4, null);
   // ---- the kitchen ----
   { const cab = texM(T.wood, 2, 0.5, { color: 0xb8c0b0 }); hbox(8.6, -HD + 0.5, 7.2, 0.9, 0.7, 0, { mat: cab, y0: 0.06 }); const top = new THREE.Mesh(IM_G.box, std({ color: 0x2a2a2e, roughness: 0.35 })); top.position.set(8.6, 0.99, -HD + 0.5); top.scale.set(7.3, 0.05, 0.75); addMesh(top);
@@ -17538,7 +17538,7 @@ function monsHouseTick(dt) {
   // windows: sashes swing, rattle, curtains breathe when a window is open
   for (const w of MONS.wins) { w.ang += (w.tgt - w.ang) * Math.min(1, dt * (w.fast ? 14 : 3)); w.rattle = Math.max(0, w.rattle - dt); const r = w.rattle > 0 ? Math.sin(now * 48 + w.i) * 0.05 : 0; w.sL.rotation.y = -(w.ang + r); w.sR.rotation.y = w.ang + r; const wind = w.ang > 0.3 ? 0.25 : 0.04; w.cs.forEach((c, k) => { c.rotation.x = -Math.abs(Math.sin(now * (1.3 + k * 0.4) + w.i)) * wind; c.position.z = 0.3 + Math.abs(Math.sin(now * 1.1 + k)) * wind * 0.5; }); }
   // wardrobe doors open and close when someone hides
-  for (const s of MONS.spots) if (s.doors) { s.anim = Math.max(0, s.anim - dt); const k = s.anim > 0 ? Math.sin((1 - s.anim / 1.1) * Math.PI) : 0; s.doors.forEach((d) => { d.pv.rotation.y = -d.s * k * 1.4; }); }
+  for (const s of MONS.spots) if (s.doors) { if (s.cutOpen !== undefined) { s.doors.forEach((d) => { d.pv.rotation.y = -d.s * s.cutOpen; }); continue; } s.anim = Math.max(0, s.anim - dt); const k = s.anim > 0 ? Math.sin((1 - s.anim / 1.1) * Math.PI) : 0; s.doors.forEach((d) => { d.pv.rotation.y = -d.s * k * 1.4; }); }
   // fire, lamps, clock, swing, shower curtain
   fx.fire.forEach((f, k) => { const s = 0.8 + Math.sin(now * (9 + k) + k * 2) * 0.25 + Math.random() * 0.1; f.scale.set(0.14 * s, 0.42 * s, 0.14 * s); f.position.y = 0.3 + 0.2 * s; }); if (fx.fireL) fx.fireL.intensity = 4 + Math.sin(now * 13) * 0.8 + Math.random() * 0.8;
   if (fx.porch) { const fl = Math.random() < 0.015 ? 0.15 : 1; fx.porch.L.intensity = 6 * fl; fx.porch.lb.material.emissive.setHex(fl < 1 ? 0x201000 : 0xffc060); }
@@ -17632,15 +17632,18 @@ function strandBetween(m, a, b) { const d = new V3().subVectors(b, a), L = d.len
 const DS = { g: null, pieces: [], lightSave: null, people: [] };
 const lerpc = (a, b, t) => a + (b - a) * clamp(t, 0, 1), seg = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
 function stageBegin(col) {
-  const g = new THREE.Group(); g.position.set(ST.x, 0, ST.z); scene.add(g); DS.g = g; DS.pieces = []; DS.people = [];
+  const g = new THREE.Group(); g.position.set(ST.x, 0, ST.z); scene.add(g); g.updateMatrixWorld(true); DS.g = g; DS.pieces = []; DS.people = []; DS.inPlace = false;
   const fl = new THREE.Mesh(new THREE.CylinderGeometry(9, 9, 0.1, 40), std({ color: col, roughness: 0.95 })); fl.position.y = -0.05; g.add(fl);
   const M = MAPS.house; DS.lightSave = { hemi: M.hemi, l: M.lamp[1], ang: gSpot.angle, pen: gSpot.penumbra, dist: gSpot.distance }; M.hemi = 0.11; M.lamp[1] = 0; gSpot.angle = 0.95; gSpot.penumbra = 1; gSpot.distance = 22; story.fov = 52;
   return g;
 }
-function stageEnd() { story.fov = 0; for (const n of DS.people) { try { n.dispose(); } catch (e) {} } DS.people = []; if (DS.g) { scene.remove(DS.g); DS.g = null; } const M = MAPS.house; if (DS.lightSave) { M.hemi = DS.lightSave.hemi; M.lamp[1] = DS.lightSave.l; } gSpot.intensity = 0; if (DS.lightSave) { gSpot.angle = DS.lightSave.ang; gSpot.penumbra = DS.lightSave.pen; gSpot.distance = DS.lightSave.dist; } DS.pieces = []; }
-function sw(x, y, z) { return new V3(ST.x + x, y, ST.z + z); }
-function spotAt(px, py, pz, tx, ty, tz, I = 90) { gSpot.position.set(ST.x + px, py, ST.z + pz); gSpot.target.position.set(ST.x + tx, ty, ST.z + tz); gSpot.target.updateMatrixWorld(); gSpot.intensity = I; }
-function cam(cx, cy, cz, lx, ly, lz) { camera.position.set(ST.x + cx, cy, ST.z + cz); camera.lookAt(ST.x + lx, ly, ST.z + lz); }
+function stageEnd() { story.fov = 0; for (const n of DS.people) { try { n.dispose(); } catch (e) {} } DS.people = []; if (DS.g) { scene.remove(DS.g); DS.g = null; } gSpot.intensity = 0;
+  if (DS.lightSave) { if (!DS.lightSave.inPlace) { const M = MAPS.house; M.hemi = DS.lightSave.hemi; M.lamp[1] = DS.lightSave.l; } gSpot.angle = DS.lightSave.ang; gSpot.penumbra = DS.lightSave.pen; gSpot.distance = DS.lightSave.dist; DS.lightSave = null; }
+  if (DS.inPlace) { for (const o of DS.hidden || []) o.visible = true; for (const f of DS.restore || []) { try { f(); } catch (e) {} } DS.hidden = []; DS.restore = []; DS.inPlace = false; setTimeout(() => $('black').classList.remove('on'), 350); }
+  DS.pieces = []; }
+function sw(x, y, z) { return DS.g ? DS.g.localToWorld(new V3(x, y, z)) : new V3(ST.x + x, y, ST.z + z); }
+function spotAt(px, py, pz, tx, ty, tz, I = 90) { gSpot.position.copy(sw(px, py, pz)); gSpot.target.position.copy(sw(tx, ty, tz)); gSpot.target.updateMatrixWorld(); gSpot.intensity = I; }
+function cam(cx, cy, cz, lx, ly, lz) { camera.position.copy(sw(cx, cy, cz)); const q = sw(lx, ly, lz); camera.lookAt(q.x, q.y, q.z); }
 function bleed(x, y, z, dx, dy, dz, n = 10) { try { bloodSpray(sw(x, y, z), new V3(dx, dy, dz), n, 0.5, 1.5, 4, 0.004, 0.01); } catch (e) {} for (let i = 0; i < 4; i++) spawnSprite(TEX.soft, sw(x + rand(-0.05, 0.05), y, z), { color: 0xa01010, size: rand(0.08, 0.16), grow: 0.3, life: rand(0.5, 1), vel: new V3(dx + rand(-1, 1), dy + rand(0, 1.5), dz + rand(-1, 1)) }); }
 function redTube(par, col = 0x9a1218) { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1, 6), std({ color: col, roughness: 0.5, emissive: 0x2a0204 })); par.add(m); return m; }
 function rip(part, vx, vy, vz, spin = 4) { DS.g.attach(part); DS.pieces.push({ p: part, v: new V3(vx, vy, vz), s: new V3(rand(-spin, spin), rand(-spin, spin), rand(-spin, spin)), rest: false }); }
@@ -17810,6 +17813,46 @@ function monsDeath3() {
 
 /* 4: inside (7.6 s). A punch to the face, the hand in the chest, the arm torn off and thrown away, a step back,
    the head grabbed, the second lunge tears the top of the head off, the body sinks to its knees */
+function dxOut() {
+  const pp0 = MONS.deathPos || { x: player.pos.x, z: player.pos.z }, kp = MONS.killerPos || { x: pp0.x - 1.0, z: pp0.z }; let ux = pp0.x - kp.x, uz = pp0.z - kp.z; const ul = Math.hypot(ux, uz) || 1; ux /= ul; uz /= ul;
+  const S = dxBegin(pp0.x - ux * 0.35, pp0.z - uz * 0.35, Math.atan2(-uz, ux)), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData;
+  const camO = dxPickCam([[0.15, 1.75, 4.1, -0.05, 1.65, 0], [0.15, 1.75, -4.1, -0.05, 1.65, 0], [3.4, 2.0, 2.4, -0.05, 1.6, 0], [3.4, 2.0, -2.4, -0.05, 1.6, 0], [-3.0, 2.2, 3.0, -0.05, 1.6, 0]]);
+  const P = mkPerson(), j = P.j; P.root.position.set(0.35, 0, 0.2); P.root.rotation.y = -1.45; mon.position.set(-0.55, 0, 0.1); mon.rotation.y = 1.5; S.add(mon);
+  let legL = false, armR = false, pelv = false, tor = false, hole = null, poolM = null, T = null; const guts = gutBunch(S, 7, 0.75); guts.forEach((g) => g.m.visible = false); const sp = spine(S); sp.visible = false;
+  const HX = -0.55; // monster x
+  return dxWithReveal({ dur: 18, steps: [[0.6, () => Sound.ghostVoice(0.8)], [2.7, () => { Sound.crunch(1); Sound.splat(1); }], [5.5, () => { Sound.crunch(1); Sound.splat(1); }], [7.8, () => { Sound.crunch(1); Sound.splat(1); }], [9.9, () => { Sound.crunch(1); Sound.splat(1); }], [14.4, () => { Sound.crunch(1); Sound.splat(1); Sound.boom(); }], [16.6, () => Sound.thud(0.6)]],
+    upd(t, dt) {
+      cam(...camO); spotAt(-0.4, 4.4, camO[2] * 0.6, -0.1, 1.3, 0, 36); piecesUpd(dt);
+      mu.hips.rotation.x = 0.06; mu.neck.rotation.x = 0.5; mu.spine.rotation.x = 0.12; mu.shL.rotation.set(-0.1, 0, -0.6); mu.elL.rotation.set(0, 0, 1.9); // the left hand on the hip, like in the video
+      const F = Math.sin(t * 15);
+      if (t < 0.6) { pose(P, { uArmL: [0, 0, 0.1], uArmR: [0, 0, -0.1] }); aimArm(mon, 'R', new V3(HX + 0.25, 0.9, 0.2)); return; }
+      if (t < 1.3) { const h = at(P, j.head, 0, 0.12, 0), k = seg(t, 0.6, 1.1); aimArm(mon, 'R', new V3(lerpc(HX + 0.3, h.x, k), lerpc(0.95, h.y, k), lerpc(0.2, h.z, k))); pose(P, { uArmL: [-1.4, 0, 0.4], lArmL: [-0.8, 0, 0], uArmR: [-1.2, 0, -0.4], lArmR: [-0.9, 0, 0], torso: [-0.2, 0, 0] }); scream(P, true); return; }
+      // lifted by the head, up next to the monster's head, kicking
+      if (t < 2.6) { const k = seg(t, 1.3, 2.2), tg = new V3(lerpc(0.2, 0.0, k), lerpc(1.75, 2.45, k), 0.18); aimArm(mon, 'R', tg); P.root.rotation.set(0, -1.45, 0); pose(P, { uArmL: [-2.2 + F * 0.4, 0, 0.5], uArmR: [-2.0 - F * 0.4, 0, -0.5], uLegL: [-0.5 * F, 0, 0], uLegR: [0.5 * F, 0, 0], lLegL: [0.6, 0, 0], lLegR: [0.6, 0, 0] }); holdBy(P, j.head, new V3(0, 0.12, 0), handOf(mon, 'R')); return; }
+      // the bite into the chest
+      if (t < 3.4) { const tg = new V3(-0.15, 2.5, 0.18); aimArm(mon, 'R', tg); mu.neck.rotation.x = 0.9 + 0.2 * Math.sin(t * 20); P.root.rotation.set(0, -1.45, 0.15); pose(P, { uArmL: [-1.0 + F * 0.3, 0, 0.6], uArmR: [-1.2 - F * 0.3, 0, -0.6] }); scream(P, true); holdBy(P, j.head, new V3(0, 0.12, 0), handOf(mon, 'R')); if (!hole) hole = wound(j.torso, 0, 0.25, 0.13, 0.15); if (Math.random() < dt * 14) { const c = at(P, j.torso, 0, 0.25, 0.13); bleed(c.x, c.y, c.z, rand(-1, 1), 0.5, 1, 4); } return; }
+      // swung by the leg, horizontal
+      if (t < 5.5) { const sw = Math.sin((t - 3.4) * 3); aimArm(mon, 'R', new V3(0.05 + sw * 0.15, 1.85 + sw * 0.15, 0.2)); P.root.rotation.set(0, -1.45, Math.PI / 2 + 0.2 + sw * 0.25); pose(P, { uArmL: [0, 0, 1.3 + sw * 0.3], uArmR: [0, 0, -1.3 - sw * 0.3], head: [0, 0, 0.3] }); scream(P, false); holdBy(P, j.lLegL, new V3(0, -0.4, 0), handOf(mon, 'R')); return; }
+      if (!legL) { legL = true; const c = at(P, j.pelvis); rip(j.uLegR, 1.6, 2.2, 1.4); bleed(c.x, c.y, c.z, 0, 1, 1, 14); poolM = pool(0.25, 0.3, 0.05); }
+      // hung upside down by the leg, blood dripping; then the right arm is torn off
+      if (t < 8.4) { aimArm(mon, 'R', new V3(0.1, 2.25, 0.2)); P.root.rotation.set(0, -1.45 + Math.sin(t) * 0.2, Math.PI); pose(P, { uArmL: [0, 0, 0.3 + Math.sin(t * 2) * 0.15], uArmR: [0, 0, -0.3 - Math.sin(t * 2) * 0.15] }); holdBy(P, j.lLegL, new V3(0, -0.4, 0), handOf(mon, 'R'));
+        if (Math.random() < dt * 9) { const c = at(P, j.pelvis); bleed(c.x, c.y, c.z, 0, -1, 0, 2); }
+        if (t > 7.4 && t < 7.8) { const a = at(P, j.uArmR); aimArm(mon, 'L', a); }
+        if (t > 7.8 && !armR) { armR = true; const c = at(P, j.uArmR); rip(j.uArmR, 1.2, 2.5, 1.8); bleed(c.x, c.y, c.z, 1, 0.5, 1, 12); }
+        if (poolM) poolM.scale.setScalar(Math.min(1.1, poolM.scale.x + dt * 0.15)); return; }
+      // flipped and held by the head; the pelvis with the last leg is torn off; the guts hang
+      if (t < 14.4) { aimArm(mon, 'R', new V3(0.1, lerpc(2.25, 2.45, seg(t, 8.4, 9.2)), 0.2)); P.root.rotation.set(0, -1.4, Math.sin(t * 1.5) * 0.08); pose(P, { uArmL: [0, 0, 0.2], head: [0.2, 0, 0] }); holdBy(P, j.head, new V3(0, 0.12, 0), handOf(mon, 'R'));
+        if (t > 9.4 && t < 9.9) aimArm(mon, 'L', at(P, j.pelvis));
+        if (t > 9.9 && !pelv) { pelv = true; T = j.torso; S.attach(T); const c = at(P, T); rip(j.pelvis, 0.8, 1.5, 1.5); bleed(c.x, c.y, c.z, 0, -0.5, 1, 18); guts.forEach((g) => g.m.visible = true); }
+        if (T) { T.updateMatrixWorld(true); const hw = at(P, j.head, 0, 0.12, 0); T.position.add(handOf(mon, 'R').sub(hw)); T.rotation.set(0, -1.4, Math.sin(t * 1.5) * 0.08); const bot = at(P, T, 0, 0.0, 0); gutsUpd(guts, bot, t, seg(t, 9.9, 11), 0.05); if (Math.random() < dt * 6) bleed(bot.x, bot.y, bot.z, 0, -1, 0, 2); }
+        return; }
+      // the torso is torn from the head with a burst; the head is held up with the spine hanging
+      if (!tor) { tor = true; S.attach(j.head); if (T) rip(T, 1.0, 1.0, 1.4, 3); guts.forEach((g) => g.m.visible = false); sp.visible = true; const c = j.head.position; bleed(c.x, c.y, c.z, 0, -1, 1, 22); bleed(c.x, c.y, c.z, -1, 1, 0.5, 12); }
+      const up = seg(t, 14.6, 15.6), down = seg(t, 16.6, 17.6); aimArm(mon, 'R', new V3(lerpc(0.1, -0.1, up), lerpc(2.3, 2.75, up) - down * 1.2, lerpc(0.2, 0.3, down)));
+      const H = j.head; H.position.copy(handOf(mon, 'R')).add(new V3(0, -0.08, 0)); H.rotation.set(0, -1.4, Math.sin(t * 2) * 0.08); sp.position.copy(H.position).add(new V3(0, -0.12, 0)); sp.rotation.set(0, 0, Math.sin(t * 2) * 0.1);
+      if (down > 0.95 && !P.dropped) { P.dropped = true; rip(H, 0.5, 0.3, 0.6); rip(sp, 0.5, 0.3, 0.6); }
+    } }, mon, 1.2);
+}
 function monsDeath4() {
   const S = stageBegin(0x2a2018), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData;
   const back = new THREE.Mesh(IM_G.box, std({ color: 0x2e241c, roughness: 0.95 })); back.position.set(0, 1.6, -1.4); back.scale.set(9, 3.2, 0.2); S.add(back);
@@ -17859,6 +17902,38 @@ const MONS_TASKS = [
 ];
 let MONS_META = { coins: 0, cls: 'none', owned: ['none'], day: '', tasks: [], claimed: [] };
 try { const m0 = JSON.parse(localStorage.getItem('monsMeta2') || 'null'); if (m0 && m0.owned) MONS_META = m0; } catch (e) {}
+function dxInside() {
+  const pp0 = MONS.deathPos || { x: player.pos.x, z: player.pos.z }, kp = MONS.killerPos || { x: pp0.x - 1.1, z: pp0.z }; let ux = pp0.x - kp.x, uz = pp0.z - kp.z; const ul = Math.hypot(ux, uz) || 1; ux /= ul; uz /= ul;
+  const S = dxBegin(pp0.x - ux * 0.4, pp0.z - uz * 0.4, Math.atan2(-uz, ux)), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData;
+  const camA = dxPickCam([[0.2, 1.4, 2.9, -0.1, 1.3, 0], [0.2, 1.4, -2.9, -0.1, 1.3, 0], [2.6, 1.6, 1.7, -0.1, 1.3, 0], [2.6, 1.6, -1.7, -0.1, 1.3, 0], [-0.3, 1.9, 3.3, -0.1, 1.2, 0], [-0.3, 1.9, -3.3, -0.1, 1.2, 0]]);
+  const P = mkPerson(), j = P.j; P.root.position.set(0.4, 0, 0.0); P.root.rotation.y = -1.3; mon.position.set(-0.7, 0, -0.05); mon.rotation.y = 1.5; S.add(mon);
+  let armOff = false, top = false, poolM = null; const MX = -0.7;
+  return dxWithReveal({ dur: 7.8, steps: [[0.2, () => { Sound.thud(0.9); Sound.crunch(0.4); }], [1.6, () => { Sound.crunch(1); Sound.splat(1); }], [5.4, () => { Sound.crunch(1); Sound.splat(1); }], [6.6, () => Sound.thud(0.7)]],
+    upd(t, dt) {
+      cam(...camA); spotAt(camA[0] * 0.5, 3.0, camA[2] * 0.7, 0, 1.2, 0, 30); piecesUpd(dt); mu.neck.rotation.x = 0.5;
+      const lean = (a, b) => Math.sin(seg(t, a, b) * Math.PI);
+      mon.position.x = MX + 0.22 * lean(0, 0.7) + 0.3 * lean(3.2, 4.6) + 0.35 * lean(5.0, 6.1) - 0.2 * seg(t, 6.2, 7.4); mu.spine.rotation.x = 0.15 + 0.35 * lean(3.2, 4.6) + 0.4 * lean(5.0, 6.1);
+      mu.legL.rotation.x = -0.3 * lean(3.2, 4.6) - 0.3 * lean(5.0, 6.1); mu.kneeL.rotation.x = 0.4 * lean(3.2, 4.6); mu.legR.rotation.x = 0.25 * lean(0, 0.7);
+      const face = at(P, j.head, 0, 0.05, 0.1), chest = at(P, j.torso, 0, 0.25, 0.1), shL = at(P, j.uArmL, 0, -0.05, 0);
+      // the monster's right hand: punch -> chest -> the arm -> back -> the head -> the top of the head
+      if (t < 0.7) aimArm(mon, 'R', face.clone().lerp(new V3(MX + 0.3, 1.0, 0.2), 1 - Math.sin(seg(t, 0, 0.7) * Math.PI)));
+      else if (t < 1.6) aimArm(mon, 'R', chest.clone().lerp(shL, seg(t, 1.0, 1.5)));
+      else if (t < 2.4) aimArm(mon, 'R', new V3(lerpc(shL.x, MX - 0.1, seg(t, 1.6, 2.2)), lerpc(shL.y, 1.7, seg(t, 1.6, 2.2)), 0.35));
+      else if (t < 3.2) aimArm(mon, 'R', new V3(MX + 0.2, lerpc(1.6, 1.0, seg(t, 2.4, 3.0)), 0.25));
+      else if (t < 5.4) aimArm(mon, 'R', face.clone().add(new V3(0, 0.1, 0)));
+      else aimArm(mon, 'R', new V3(lerpc(face.x, MX + 0.1, seg(t, 5.4, 6.0)), lerpc(face.y + 0.15, 2.2, seg(t, 5.4, 6.0)), 0.2));
+      if (t > 3.3 && t < 5.4) aimArm(mon, 'L', face.clone().add(new V3(-0.05, 0.05, 0.1))); else if (t < 5.4) { mu.shL.rotation.set(-0.2, 0, 0.1); mu.elL.rotation.set(-0.2, 0, 0); } else aimArm(mon, 'L', new V3(MX + 0.3, 1.0 + seg(t, 5.4, 6.0) * 0.6, 0.3));
+      // the victim
+      if (t < 0.7) { const k = seg(t, 0.15, 0.35); pose(P, { head: [-0.35 * k, 0.2 * k, 0], uArmL: [-1.6 * k, 0, 0.3], lArmL: [-1.3 * k, 0, 0], uArmR: [-1.4 * k, 0, -0.3], lArmR: [-1.4 * k, 0, 0], torso: [-0.15 * k, 0, 0] }); scream(P, true); }
+      else if (t < 1.6) pose(P, { uArmL: [-1.0, 0, 0.6], lArmL: [-0.6, 0, 0], uArmR: [-0.8, 0, -0.2], lArmR: [-1.2, 0, 0], head: [0.05, 0, 0] });
+      if (t >= 1.6 && !armOff) { armOff = true; const c = at(P, j.uArmL); S.attach(j.uArmL); P.held = j.uArmL; bleed(c.x, c.y, c.z, -1, 0.5, 0.5, 14); wound(j.torso, 0.24, 0.4, 0, 0.1); }
+      if (P.held) { if (t < 2.3) { P.held.position.copy(handOf(mon, 'R')); P.held.rotation.set(0.3, 0, 2.6); } else { rip(P.held, -2.6, 0.6, 0.8, 5); P.held = null; } }
+      if (t >= 1.6 && t < 5.4) { const k = Math.sin(t * 3); pose(P, { uArmR: [-0.9 - 0.3 * k, 0, -0.3], lArmR: [-0.9, 0, 0], head: [0.1, 0.1 * k, 0], torso: [0.05, 0, 0] }); scream(P, t > 3.3); if (Math.random() < dt * 5) { const c = at(P, j.torso, 0.24, 0.4, 0); bleed(c.x, c.y, c.z, 0, -0.5, 0.3, 2); } if (t > 4 && Math.random() < dt * 4) bleed(face.x, face.y + 0.1, face.z, 0, 0.2, 0.2, 2); }
+      if (t >= 5.4 && !top) { top = true; const H = j.head; wound(H, 0, 0.12, 0, 0.13); const cap = new THREE.Mesh(IM_G.sph, std({ color: 0x3a2618, roughness: 0.8 })); cap.scale.set(0.15, 0.06, 0.15); cap.position.copy(at(P, H, 0, 0.15, 0)); S.add(cap); P.cap = cap; H.traverse((o) => { if (o.userData && o.userData.hair) o.visible = false; }); const c = cap.position; bleed(c.x, c.y, c.z, 0, 1.5, 0.3, 18); poolM = pool(0.45, 0.15, 0.05); }
+      if (P.cap) { if (t < 6.1) P.cap.position.copy(handOf(mon, 'R')); else if (!P.capDrop) { P.capDrop = true; rip(P.cap, -1.2, 0.3, 0.4); } }
+      if (t >= 5.4) { const k = seg(t, 6.0, 6.9), k2 = seg(t, 6.9, 7.6); pose(P, { uLegL: [-1.5 * k, 0, 0.05], lLegL: [2.2 * k, 0, 0], uLegR: [-1.5 * k, 0, -0.05], lLegR: [2.2 * k, 0, 0], uArmR: [lerpc(-0.9, 0.2, k), 0, -0.3], torso: [0.35 * k + 0.4 * k2, 0, 0], head: [0.4 * k + 0.3 * k2, 0, 0.1] }); j.pelvis.position.y = lerpc(P.pelY ?? (P.pelY = j.pelvis.position.y), P.pelY * 0.55, k); scream(P, false); if (Math.random() < dt * 10 && t < 6.6) { const c = at(P, j.head, 0, 0.12, 0); bleed(c.x, c.y, c.z, rand(-0.5, 0.5), 1.2, 0.3, 3); } if (poolM) poolM.scale.setScalar(Math.min(0.8, poolM.scale.x + dt * 0.2)); }
+    } }, mon, 1.2);
+}
 function monsMetaSave() { try { localStorage.setItem('monsMeta2', JSON.stringify(MONS_META)); } catch (e) {} }
 function monsDailyEnsure() {
   const day = new Date().toDateString();
@@ -17956,7 +18031,10 @@ function monsNightTick(dt) {
   if (u.e) { const ins = M.on && state === 'play' && !M.ghost && (M.inside || M.chase); u.e.style.display = ins ? 'block' : 'none'; if (ins) { u.e.textContent = M.chase ? 'ОН УВИДЕЛ ВАС — БЕГИТЕ!' : M.inside && M.inside.st === 'sniff' ? 'НЕ ДЫШИТЕ…' : 'ОН В ДОМЕ'; u.e.style.opacity = 0.65 + 0.35 * Math.sin(now * 7); } }
   // breath button and bar
   const showB = M.on && state === 'play' && M.hide; u.w.style.display = showB ? 'block' : 'none';
-  if (showB) { u.wb.style.width = M.breath.toFixed(0) + '%'; u.w.classList.toggle('on', M.holdBreath); const sn = M.inside && M.inside.st === 'sniff'; u.w.style.boxShadow = sn ? '0 0 24px rgba(255,40,40,.9)' : '0 0 10px rgba(80,160,255,.4)'; }
+  if (showB) { u.wb.style.width = M.breath.toFixed(0) + '%'; u.w.classList.toggle('on', M.holdBreath); const sn = M.inside && M.inside.st === 'sniff'; u.w.style.boxShadow = sn ? '0 0 24px rgba(255,40,40,.9)' : '0 0 10px rgba(80,160,255,.4)';
+    let sb = document.getElementById('monsSus'); if (!sb) { sb = document.createElement('div'); sb.id = 'monsSus'; sb.style.cssText = 'position:fixed;left:50%;bottom:calc(32% + 58px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:49;width:min(64vw,260px);text-align:center;font:800 12px var(--ui);color:#fff;text-shadow:0 0 4px #000;pointer-events:none'; sb.innerHTML = '<div id="monsSusT">👂 Он прислушивается…</div><div style="height:8px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden;margin-top:3px"><div id="monsSusB" style="height:100%;width:0;background:linear-gradient(90deg,#ffd04a,#ff3030)"></div></div>'; document.body.appendChild(sb); }
+    sb.style.display = sn ? 'block' : 'none'; if (sn) { document.getElementById('monsSusB').style.width = Math.round((M.sus || 0) * 100) + '%'; document.getElementById('monsSusT').textContent = M.holdBreath ? (M.heart > 140 ? '❤️ Сердце слишком громкое — успокойтесь!' : '🤫 Не дышите… он почти ничего не слышит') : '😮 Вас слышно — ДЕРЖИТЕ ДЫХАНИЕ!'; } }
+  else { const sb = document.getElementById('monsSus'); if (sb) sb.style.display = 'none'; }
   // the breaker channel
   if (M.fixT > 0) { const pp = player.pos; if (Math.hypot(pp.x - 17.5, pp.z - -11.5) > 2.6) { M.fixT = 0; toast('⚡ Вы отошли от рубильника'); } else { M.fixT -= dt; shake = Math.max(shake, 0.04); if (M.fixT <= 0) monsPowerOn(); } }
   if (M.power && M.breakerM) M.breakerM.material.emissive.setHex(Math.floor(now * 3) % 2 ? 0x601010 : 0x100404);
@@ -17967,13 +18045,13 @@ function monsFearUpd(dt) {
   if (M.alert) tgt += 12; if (M.ev && M.ev.type === 'lurk' && M.ev.ph === 'act') tgt += 8;
   if (M.inside) tgt += near < 7 ? 15 + 45 * (1 - near / 7) : 10;
   if (M.outT > 0) tgt += 42; if (M.power) tgt += 8;
-  const sn = M.inside && M.inside.st === 'sniff'; if (sn) tgt += 55;
+  const sn = M.inside && M.inside.st === 'sniff'; if (sn) tgt += 28;
   if (M.hide && M.flash.on && M.inside) tgt += 25;
-  if (M.holdBreath) tgt += 13;
+  if (M.holdBreath) tgt -= 32;
   if (M.braveT > 0) { M.braveT -= dt; tgt = Math.min(tgt, 96); }
   if (M.calmT > 0) { M.calmT -= dt; tgt = Math.min(tgt, 88); }
-  M.heart += (clamp(tgt, 60, 185) - M.heart) * Math.min(1, dt * (tgt > M.heart ? (M.cls === 'medic' ? 0.6 : 0.85) : 0.4));
-  if (M.holdBreath) { M.breath -= dt * (M.braveT > 0 ? 7.5 : 13); if (M.breath <= 0) { M.breath = 0; M.holdBreath = false; M.gasp = 1.4; M.heart = Math.min(185, M.heart + 28); toast('😮‍💨 Воздух кончился — вы громко вдохнули!'); if (sn) { monsCut('found'); return; } } }
+  M.heart += (clamp(tgt, 58, 185) - M.heart) * Math.min(1, dt * (tgt > M.heart ? (M.cls === 'medic' ? 0.6 : 0.85) : M.holdBreath ? 1.1 : 0.4));
+  if (M.holdBreath) { M.breath -= dt * (M.braveT > 0 ? 7.5 : 13); if (M.breath <= 0) { M.breath = 0; M.holdBreath = false; M.gasp = 1.4; M.heart = Math.min(185, M.heart + 22); toast('😮‍💨 Воздух кончился — вы громко вдохнули!'); } }
   else M.breath = Math.min(100, M.breath + dt * 15);
   if (M.gasp > 0) M.gasp -= dt;
   M.beatT -= dt; if ((M.heart > 100 || (M.hide && M.inside)) && M.beatT <= 0) { M.beatT = 60 / Math.max(62, M.heart); try { Sound.heartbeat(); } catch (e) {} }
@@ -18017,8 +18095,9 @@ function monsSniffUpdate(m, dt) {
   if (u.jaw) u.jaw.rotation.x = 0.4 + Math.sin(m.sn.t * 9) * 0.22; if (u.drool) u.drool.visible = true;
   aimArmW(m.g, 'L', new V3(s.x, 1.35, s.z)); aimArmW(m.g, 'R', new V3(s.x, 0.75, s.z));
   m.snf = (m.snf || 0) - dt; if (m.snf <= 0) { m.snf = 0.8; Sound.ghostVoice(0.2); shake = Math.max(shake, 0.05); if (s.doors) s.anim = Math.max(s.anim, 0.45); }
-  const grace = m.sn.t > 1.0;
-  if (grace && (!M.holdBreath || M.heart >= 150 || M.flash.on)) { monsCut('found'); return; }
+  // he listens: not breathing calms it down, a loud breath, a racing heart or a lit torch fill it up
+  let r = M.holdBreath ? -0.35 : 1.6; if (M.heart > 140) r += (M.heart - 140) / 30; if (M.flash.on) r += 2; if (M.gasp > 0) r += 3; if (m.sn.t < 0.7) r *= 0.5;
+  M.sus = clamp((M.sus || 0) + r * dt, 0, 1); if (M.sus >= 1) { monsCut('found'); return; }
   if (m.sn.t >= m.sn.dur) { m.st = 'inside'; m.sp = null; m.spT = 0; m.insT = Math.min(m.insT, 16); M.sniffCd = 8; if (u.drool) u.drool.visible = false; toast('…он отошёл. Выдохните 😮‍💨'); monsCnt('sniff'); }
 }
 /* 06:00: the sun rises, the monsters flee into the woods */
@@ -18081,9 +18160,236 @@ function monsDeath5() {
       if (poolM) poolM.scale.setScalar(Math.min(1.0, poolM.scale.x + dt * 0.2));
     } };
 }
-const MONS_DEATHS = { window: monsDeath1, door: monsDeath2, out: monsDeath3, inside: monsDeath4, found: monsDeath5 };
+/* ===================== deaths where they happen: the cutscene is anchored to the real spot in the house ===================== */
+function dxBegin(x, z, yaw) {
+  const inHouse = Math.abs(x) < HW + 0.3 && Math.abs(z) < HD + 0.3, g = new THREE.Group(); g.position.set(x, inHouse ? 0.05 : 0, z); g.rotation.y = yaw; scene.add(g); g.updateMatrixWorld(true);
+  DS.g = g; DS.pieces = []; DS.people = []; DS.hidden = []; DS.restore = []; DS.inPlace = true;
+  DS.lightSave = { ang: gSpot.angle, pen: gSpot.penumbra, dist: gSpot.distance, inPlace: true }; gSpot.angle = 0.75; gSpot.penumbra = 0.95; gSpot.distance = 14; story.fov = 52;
+  for (const m of MONS.monsters) if (m.g.visible && Math.hypot(m.x - x, m.z - z) < 8) { m.g.visible = false; DS.hidden.push(m.g); }
+  for (const b of MONS.bots) if (!b.dead && b.n.root.visible && Math.hypot(b.n.pos.x - x, b.n.pos.z - z) < 2.8) { b.n.root.visible = false; DS.hidden.push(b.n.root); }
+  return g;
+}
+/* is the line from the target to the camera free of walls and furniture? (the box the target sits in does not count) */
+function dxClear(a, b) {
+  for (const o of obstacles) { if (a.x > o.min.x - 0.05 && a.x < o.max.x + 0.05 && a.z > o.min.z - 0.05 && a.z < o.max.z + 0.05 && a.y > o.min.y - 0.05 && a.y < o.max.y + 0.05) continue;
+    let t0 = 0, t1 = 1, hit = true; const P0 = [a.x, a.y, a.z], D = [b.x - a.x, b.y - a.y, b.z - a.z], mn = [o.min.x - 0.12, o.min.y, o.min.z - 0.12], mx = [o.max.x + 0.12, o.max.y, o.max.z + 0.12];
+    for (let k = 0; k < 3; k++) { if (Math.abs(D[k]) < 1e-6) { if (P0[k] < mn[k] || P0[k] > mx[k]) { hit = false; break; } } else { let u0 = (mn[k] - P0[k]) / D[k], u1 = (mx[k] - P0[k]) / D[k]; if (u0 > u1) { const q = u0; u0 = u1; u1 = q; } t0 = Math.max(t0, u0); t1 = Math.min(t1, u1); if (t0 > t1) { hit = false; break; } } }
+    if (hit) return false; }
+  return true;
+}
+function dxPickCam(cands) {
+  for (const c of cands) { const a = sw(c[3], c[4], c[5]), b = sw(c[0], c[1], c[2]); const inH = Math.abs(a.x) < HW && Math.abs(a.z) < HD; if (inH && (Math.abs(b.x) > HW - 0.25 || Math.abs(b.z) > HD - 0.25 || b.y > HH - 0.15)) continue; if (dxClear(a, b)) return c; }
+  return cands[0];
+}
+/* a short close-up of the monster first: the face, the eyes, the jaw opening */
+function dxReveal(mon, t, dur) { const mu = mon.userData; mon.updateMatrixWorld(true); const hw = mu.head.localToWorld(new V3(0, 0.02, 0.1)), h = DS.g.worldToLocal(hw.clone()); const f = mon.rotation.y, k = seg(t, 0, dur); cam(h.x + Math.sin(f) * (1.15 - k * 0.35), h.y - 0.08, h.z + Math.cos(f) * (1.15 - k * 0.35), h.x, h.y, h.z); spotAt(h.x + Math.sin(f) * 1.5, h.y + 1.2, h.z + Math.cos(f) * 1.5, h.x, h.y, h.z, 22); if (mu.jaw) mu.jaw.rotation.x = seg(t, dur * 0.3, dur) * 0.75; mu.neck.rotation.x = 0.35 + Math.sin(t * 9) * 0.04; }
+/* the end of a found-death: on the floor, the monster crouches over you and bites */
+function dxFinisher(S, P, mon, o) {
+  const j = P.j, mu = mon.userData; let started = false, poolM = null;
+  return (t, dt) => {
+    if (!started) { started = true; P.root.position.set(o.x, 0.12, o.z); P.root.quaternion.setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)).premultiply(new THREE.Quaternion().setFromAxisAngle(new V3(0, 1, 0), o.yaw)); pose(P, { uArmL: [0, 0, 1.2], uArmR: [0, 0, -1.2], uLegL: [0, 0, 0.25], uLegR: [0, 0, -0.25], head: [0, 0.5, 0] }); scream(P, false); poolM = pool(o.x + Math.sin(o.yaw) * -0.9, o.z + Math.cos(o.yaw) * -0.9, 0.05); shake = Math.max(shake, 0.6); const c = at(P, j.torso, 0, 0.3, 0); bleed(c.x, c.y, c.z, 0, 1.4, 0, 16); Sound.thud(1); Sound.crunch(0.8);
+      mon.position.set(o.mx, 0, o.mz); mon.rotation.y = o.myaw; }
+    // crouched over the body, the head going down again and again
+    const bob = Math.max(0, Math.sin(t * 5)); mu.hips.position.y = 1.0; mu.kneeL.rotation.x = 1.6; mu.kneeR.rotation.x = 1.6; mu.legL.rotation.x = -1.0; mu.legR.rotation.x = -1.0; mu.spine.rotation.x = 1.05 + bob * 0.25; mu.neck.rotation.x = 0.6 + bob * 0.3; if (mu.jaw) mu.jaw.rotation.x = 0.3 + bob * 0.5;
+    const ch = at(P, j.torso, 0, 0.32, 0.12); aimArm(mon, 'R', ch.clone().add(new V3(0.15, 0.05, 0))); aimArm(mon, 'L', ch.clone().add(new V3(-0.2, 0.02, 0.1)));
+    if (bob > 0.92 && Math.random() < 0.5) { bleed(ch.x, ch.y + 0.1, ch.z, rand(-1, 1), 1.5, rand(-1, 1), 6); if (Math.random() < 0.3) Sound.splat(0.6); }
+    if (poolM) poolM.scale.setScalar(Math.min(1.1, poolM.scale.x + dt * 0.25));
+    pose(P, { uArmL: [0, 0, 1.2 + Math.sin(t * 13) * 0.08 * Math.max(0, 1 - t / 1.5)], uArmR: [0, 0, -1.2], head: [0, 0.5, 0], uLegL: [0, 0, 0.25], uLegR: [0, 0, -0.25] });
+    cam(...o.cam); spotAt((o.cam[0] + o.cam[3]) / 2, 2.8, (o.cam[2] + o.cam[5]) / 2, o.cam[3], 0.4, o.cam[5], 32);
+  };
+}
+function dxQuat(rx, ry) { return new THREE.Quaternion().setFromAxisAngle(new V3(0, 1, 0), ry).multiply(new THREE.Quaternion().setFromAxisAngle(new V3(1, 0, 0), rx)); }
+
+/* ---------- at the window: the real glass bursts, the head goes out through the frame ---------- */
+function dxWindow() {
+  const pp = MONS.deathPos || player.pos; let i = MONS.deathWin; if (i == null) { let bd = 1e9; MON_WIN.forEach((w, k) => { const d = Math.hypot(w[0] - pp.x, w[1] - pp.z); if (d < bd) { bd = d; i = k; } }); }
+  const W = MONS.wins[i], S = dxBegin(MON_WIN[i][0], MON_WIN[i][1], W.g.rotation.y), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData;
+  const panes = []; for (const sash of [W.sL, W.sR]) for (const c of sash.children) if (c.material && c.material.transparent) panes.push(c);
+  const shards = []; for (let k = 0; k < 30; k++) { const sh = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.2, 3), new THREE.MeshStandardMaterial({ color: 0xc8dcea, transparent: true, opacity: 0.65, roughness: 0.1 })); sh.position.set(rand(-0.75, 0.75), rand(1.0, 2.1), 0.05); sh.visible = false; S.add(sh); shards.push({ m: sh, v: new V3(rand(-1.2, 1.2), rand(0.4, 2.2), rand(1.5, 4.5)) }); }
+  const P = mkPerson(), j = P.j; P.root.position.set(0.05, 0, 0.62); P.root.rotation.y = Math.PI;
+  mon.position.set(-0.05, 0, -0.75); S.add(mon);
+  const sp = spine(j.head); sp.visible = false; const st = [redTube(S), redTube(S), redTube(S)]; st.forEach((q) => q.visible = false);
+  const side = dxPickCam([[1.9, 1.45, 2.1, -0.1, 1.55, 0.25], [-1.9, 1.45, 2.1, 0.1, 1.55, 0.25], [0.7, 1.6, 2.9, 0, 1.6, 0.1], [2.5, 1.8, 1.3, 0, 1.5, 0.3]]);
+  const back = dxPickCam([[0.75, 1.72, 2.1, -0.1, 1.75, -0.7], [-0.75, 1.72, 2.1, 0.1, 1.75, -0.7], side]);
+  let shat = false, hdDet = false, poolM = null;
+  DS.restore.push(() => { W.broken = true; W.open = true; W.tgt = 1.35; for (const pn of panes) pn.visible = false; });
+  return { dur: 10.6, steps: [[0.1, () => Sound.ghostVoice(0.6)], [1.2, () => { Sound.crunch(1); try { Sound.glass(1); } catch (e) {} Sound.tink(1); shake = 0.5; }], [1.6, () => Sound.ghostVoice(1.2)], [4.2, () => Sound.splat(0.8)], [5.3, () => Sound.crunch(0.9)], [7.6, () => { Sound.thud(0.9); Sound.splat(1); }], [10.0, () => $('black').classList.add('on')]],
+    upd(t, dt) {
+      cam(...(t < 4.5 ? back : side)); if (t < 1.3) spotAt(0.3, 2.4, 1.4, -0.05, 1.75, -0.75, 34); else spotAt(0.6, 2.9, 1.7, 0, 1.45, 0, 26); piecesUpd(dt);
+      mu.neck.rotation.x = 0.3; if (mu.jaw) mu.jaw.rotation.x = 0.1 + seg(t, 0.4, 1.1) * 0.65;
+      if (t < 1.2) { aimArm(mon, 'R', new V3(0.32, 1.75, -0.05)); aimArm(mon, 'L', new V3(-0.42, 1.55, -0.05)); pose(P, { uArmL: [-0.15, 0, 0.1], uArmR: [-0.15, 0, -0.1], head: [0.05 - seg(t, 0.6, 1.1) * 0.15, 0, 0] }); return; }
+      if (!shat) { shat = true; for (const pn of panes) pn.visible = false; for (const q of shards) q.m.visible = true; W.tgt = 1.35; W.fast = true; }
+      for (const q of shards) if (q.v && q.m.visible) { q.v.y -= 9 * dt; q.m.position.addScaledVector(q.v, dt); q.m.rotation.x += 7 * dt; if (q.m.position.y < 0.03) { q.m.position.y = 0.03; q.v = null; } }
+      const hd = at(P, j.head, 0, 0.1, -0.08); if (t < 7.4) aimArm(mon, 'R', new V3(0.3, 1.65, -0.2).lerp(hd, seg(t, 1.2, 1.5)));
+      if (t > 1.3 && t < 4.6) aimArm(mon, 'L', new V3(-0.3, 1.3, -0.3).lerp(at(P, j.torso, 0, 0.35, -0.1), seg(t, 1.3, 1.8)));
+      const pulled = seg(t, 1.4, 2.2);
+      if (t < 3.9) { const f = Math.sin(t * 17); pose(P, { uArmL: [-2.4 + f * 0.35, 0, 0.5], lArmL: [-0.6, 0, 0], uArmR: [-2.2 - f * 0.35, 0, -0.5], lArmR: [-0.7, 0, 0], uLegL: [-0.5 * f, 0, 0], uLegR: [0.5 * f, 0, 0], lLegL: [0.4, 0, 0], lLegR: [0.4, 0, 0], head: [0.1 * f, 0.2 * f, 0] }); scream(P, true); }
+      else if (t < 4.6) { const k = seg(t, 3.9, 4.6); pose(P, { uArmL: [lerpc(-2.4, -0.1, k), 0, 0.3], uArmR: [lerpc(-2.2, -0.1, k), 0, -0.3] }); if (Math.random() < dt * 10) { const c2 = at(P, j.head); bleed(c2.x, c2.y, c2.z, 0, 0.4, 0.6, 4); } }
+      else if (t < 7.4) { pose(P, { uArmL: [0, 0, 0.3], uArmR: [0, 0, -0.3] }); scream(P, true); }
+      if (t < 7.4) { P.root.position.set(0.05, lerpc(0, 0.12, pulled), lerpc(0.62, 0.3, pulled)); P.root.rotation.set(lerpc(0, 0.2, pulled), Math.PI, 0); }
+      if (t >= 4.6 && !hdDet) { sp.visible = true; st.forEach((q) => q.visible = true); const up = seg(t, 4.6, 7.3); if (P.rest.headY === undefined) P.rest.headY = j.head.position.y; j.head.position.y = P.rest.headY + up * 0.8; j.head.position.z = -up * 0.3;
+        if (Math.random() < dt * 9) { const c2 = at(P, j.head, 0, -0.1, 0); bleed(c2.x, c2.y, c2.z, rand(-0.4, 0.4), 1.0, -0.5, 4); }
+        const base = at(P, j.torso, 0, 0.46, 0), top = at(P, j.head); st.forEach((q, k) => strandBetween(q, base.clone().add(new V3((k - 1) * 0.05, 0, 0)), top.clone().add(new V3((k - 1) * 0.03, 0, 0)))); }
+      if (t >= 7.4) {
+        if (!hdDet) { hdDet = true; S.attach(j.head); st.forEach((q) => q.visible = false); poolM = pool(0.05, 0.55, 0.05); }
+        const heap = seg(t, 7.4, 8.0); P.root.position.set(0.05, lerpc(0.12, 0, heap), lerpc(0.3, 0.5, heap)); P.root.rotation.set(lerpc(0.2, -0.35, heap), Math.PI, 0);
+        pose(P, { uLegL: [-1.45 * heap, 0, 0.25], lLegL: [1.9 * heap, 0, 0], uLegR: [-1.4 * heap, 0, -0.25], lLegR: [1.85 * heap, 0, 0], uArmL: [0.3, 0, 0.6 * heap + 0.3], uArmR: [0.3, 0, -0.6 * heap - 0.3], torso: [0.5 * heap, 0, 0] });
+        if (poolM) poolM.scale.setScalar(Math.min(0.9, poolM.scale.x + dt * 0.25));
+        aimArm(mon, 'R', new V3(-0.1, lerpc(1.9, 2.45, seg(t, 7.4, 8.2)) - seg(t, 8.9, 9.7) * 0.45, lerpc(-0.3, -0.45, seg(t, 7.4, 8.2)))); const H = j.head; H.position.copy(handOf(mon, 'R')).add(new V3(0, -0.12, 0.05)); H.rotation.set(0, Math.PI + 0.3, Math.sin(t * 2.2) * 0.15); sp.rotation.z = Math.sin(t * 1.8) * 0.12; }
+    } };
+}
+
+/* ---------- at the front door: it bursts open, a long arm takes you out into the dark, the door slams, blood seeps under it ---------- */
+function dxDoor() {
+  const S = dxBegin(0, HD, Math.PI), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData; MONS.doorAng = 0; MONS.doorTgt = 0; MONS.doorOpen = false;
+  const P = mkPerson(), j = P.j; P.root.position.set(-0.45, 0, 1.35); P.root.rotation.y = Math.PI;
+  mon.position.set(0.1, 0, -1.0); mon.rotation.y = 0; mon.visible = false; S.add(mon);
+  const shotA = dxPickCam([[0.35, 1.75, 4.3, -0.1, 1.2, 0.2], [1.6, 1.5, 3.4, -0.2, 1.3, 0.4], [-1.9, 1.5, 3.3, -0.2, 1.3, 0.4]]), shotB = dxPickCam([[0.35, 1.4, 3.4, 0, 0.9, 0], [-0.4, 1.4, 3.4, 0, 0.9, 0]]);
+  let opened = false, closed = false, poolM = null; DS.restore.push(() => { MONS.doorRattle = 0; });
+  return { dur: 9.6, steps: [[0.15, () => Sound.thud(1)], [0.6, () => Sound.thud(1)], [1.05, () => Sound.thud(1)], [1.5, () => { monsDoorSet(true, true, true); Sound.boom(); shake = 0.8; Sound.ghostVoice(1.3); }], [3.7, () => { monsDoorSet(false, true, true); Sound.thud(1); shake = 0.6; }], [4.3, () => { Sound.crunch(1); Sound.splat(1); }], [5.0, () => Sound.crunch(0.8)], [8.3, () => Sound.thud(0.45)], [9.1, () => $('black').classList.add('on')]],
+    upd(t, dt) {
+      piecesUpd(dt);
+      if (t < 1.5) { MONS.doorRattle = 0.4; cam(-0.2, 1.6, 2.9, 0.1, 1.25, 0); spotAt(0.4, 2.8, 2.2, 0, 1.2, 0, 22); pose(P, { uArmL: [-0.3, 0, 0.25], uArmR: [-0.3, 0, -0.25], head: [0.1, 0, 0], torso: [-0.06, 0, 0] }); P.root.position.z = 1.35 + seg(t, 0, 1.4) * 0.2; return; }
+      if (!opened) { opened = true; mon.visible = true; }
+      if (t < 3.7) {
+        cam(...shotA); spotAt(0.4, 2.8, 2.2, 0, 1.2, 0.3, 26);
+        const lunge = seg(t, 1.5, 1.85), back2 = seg(t, 2.1, 3.5); mon.position.set(lerpc(0.1, -0.2, lunge), 0, lerpc(-1.0, 0.35, lunge) - back2 * 2.0); mu.spine.rotation.x = 0.55; if (mu.jaw) mu.jaw.rotation.x = 0.65;
+        const h = at(P, j.head, 0, 0.1, 0); aimArm(mon, 'L', new V3(-0.8, 1.3, mon.position.z + 0.3));
+        if (t < 2.1) { aimArm(mon, 'R', new V3(-0.1, 1.6, 0).lerp(h, seg(t, 1.6, 2.0))); pose(P, { uArmL: [-1.8, 0, 0.4], uArmR: [-1.6, 0, -0.4], head: [-0.25, 0, 0] }); scream(P, true); }
+        else { aimArm(mon, 'R', new V3(-0.2, 1.75, mon.position.z + 0.75)); const f = Math.sin(t * 16); P.root.rotation.set(-0.55, Math.PI, 0); pose(P, { uArmL: [-0.5 + f * 0.3, 0, 1.4], lArmL: [-0.3, 0, 0], uArmR: [-0.5 - f * 0.3, 0, -1.4], lArmR: [-0.3, 0, 0], uLegL: [-0.6 * f, 0, 0], uLegR: [0.6 * f, 0, 0], lLegL: [0.5, 0, 0], lLegR: [0.5, 0, 0] }); holdBy(P, j.head, new V3(0, 0.1, 0), handOf(mon, 'R')); scream(P, true); }
+        return; }
+      if (!closed) { closed = true; mon.visible = false; P.root.visible = false; poolM = pool(0.1, 0.32, 0.05); }
+      cam(...shotB); spotAt(0.3, 2.6, 1.8, 0, 0.3, 0.3, 20);
+      if (poolM) { poolM.scale.setScalar(Math.min(0.9, poolM.scale.x + dt * 0.14)); poolM.scale.z = poolM.scale.x * 0.55; }
+      MONS.doorRattle = t > 4.3 && t < 5.6 ? 0.25 : 0;
+    } };
+}
+
+/* ---------- found in a hiding place: the scene depends on where you were ---------- */
+function dxFound() { const s = MONS.deathSpot || MONS.spots.find((q) => q.id === 'wa'); if (s.id === 'bath') return dxBath(s); if (s.id === 'bed') return dxBed(s); if (s.id === 'tbl') return dxTable(s); return dxWardrobe(s); }
+function dxSpotYaw(s) { return Math.atan2(s.ex - s.x, s.ez - s.z); }
+
+/* the wardrobe: his eye at the gap, the doors fly open, dragged out by the head, lifted, bitten */
+function dxWardrobe(s) {
+  const S = dxBegin(s.x, s.z, dxSpotYaw(s)), mon = mkMonster(0.62, MONS.lastKind || 'sniffer'), mu = mon.userData;
+  const P = mkPerson(), j = P.j; P.root.position.set(-0.32, 0.02, -0.08); P.root.scale.setScalar(0.9);
+  mon.position.set(0.15, 0, 1.3); mon.rotation.y = Math.PI; S.add(mon);
+  const shotA = dxPickCam([[1.5, 1.5, 3.0, -0.1, 1.3, 0.5], [-1.5, 1.5, 3.0, 0.1, 1.3, 0.5], [0.2, 1.7, 3.6, 0, 1.3, 0.4], [2.4, 1.6, 2.2, 0, 1.3, 0.4]]);
+  let bit = false, sp = null, poolM = null; s.cutOpen = 0; DS.restore.push(() => { s.cutOpen = undefined; s.anim = 0; });
+  return { dur: 9.8, steps: [[0.3, () => Sound.ghostVoice(0.35)], [1.2, () => Sound.ghostVoice(0.3)], [2.2, () => { Sound.crunch(1); Sound.thud(1); shake = 0.5; }], [2.9, () => Sound.ghostVoice(1.3)], [5.9, () => { Sound.crunch(1); Sound.splat(1); }], [8.4, () => Sound.thud(0.8)], [9.3, () => $('black').classList.add('on')]],
+    upd(t, dt) {
+      piecesUpd(dt);
+      if (t < 2.2) { cam(0.06, 1.36, -0.22, 0.04, 1.5, 1.4); spotAt(0.3, 2.4, 2.4, 0.05, 1.6, 0.8, 26);
+        mon.position.set(lerpc(0.15, 0.05, seg(t, 0, 1.0)), 0, lerpc(1.3, 0.78, seg(t, 0, 1.0))); mu.spine.rotation.x = 0.55 + Math.sin(t * 7) * 0.06; mu.neck.rotation.x = 0.95; if (mu.jaw) mu.jaw.rotation.x = 0.35 + Math.sin(t * 9) * 0.2; if (mu.drool) mu.drool.visible = true;
+        aimArm(mon, 'L', new V3(-0.35, 1.45, 0.48)); aimArm(mon, 'R', new V3(0.35, 0.95, 0.48)); s.cutOpen = 0.55 + Math.max(0, Math.sin(t * 22)) * 0.06 + seg(t, 1.6, 2.1) * 0.2;
+        pose(P, { uArmL: [-0.5, 0, 0.5], lArmL: [-1.2, 0, 0], uArmR: [-0.5, 0, -0.5], lArmR: [-1.2, 0, 0], head: [0.2, 0, 0] }); return; }
+      s.cutOpen = Math.min(2.3, (s.cutOpen || 0) + dt * 14); if (mu.drool) mu.drool.visible = false;
+      if (t < 2.9) { cam(...shotA); spotAt(0.6, 2.8, 2.6, 0, 1.3, 0.3, 28); const h = at(P, j.head, 0, 0.1, 0), k = seg(t, 2.2, 2.7); aimArm(mon, 'R', new V3(0.3, 1.4, 0.6).lerp(h, k)); aimArm(mon, 'L', new V3(-0.3, 1.2, 0.6)); pose(P, { uArmL: [-2.2, 0, 0.5], uArmR: [-2.0, 0, -0.5], head: [-0.2, 0, 0] }); scream(P, true); return; }
+      if (t < 5.9) { cam(...shotA); spotAt(0.6, 2.8, 2.6, 0, 1.3, 0.3, 28); const k = seg(t, 2.9, 4.3); mon.position.z = lerpc(0.78, 1.25, k); mu.spine.rotation.x = lerpc(0.55, 0.15, k);
+        aimArm(mon, 'R', new V3(lerpc(0, 0.1, k), lerpc(1.45, 2.25, k), lerpc(0.15, 0.75, k))); if (mu.jaw) mu.jaw.rotation.x = seg(t, 5.0, 5.85) * 0.75; mu.neck.rotation.x = 0.7;
+        const f = Math.sin(t * 15); pose(P, { uArmL: [-2.4 + f * 0.3, 0, 0.5], uArmR: [-2.2 - f * 0.3, 0, -0.5], uLegL: [-0.6 * f, 0, 0], uLegR: [0.6 * f, 0, 0], lLegL: [0.7, 0, 0], lLegR: [0.7, 0, 0] }); holdBy(P, j.head, new V3(0, 0.12, 0), handOf(mon, 'R')); P.root.rotation.y = lerpc(0, -0.4, k); scream(P, true); return; }
+      if (!bit) { bit = true; S.attach(j.head); sp = spine(S); const c = at(P, j.torso, 0, 0.45, 0); bleed(c.x, c.y, c.z, 0, 1.2, 1, 20); bleed(c.x, c.y, c.z, -0.6, 0.6, 0.8, 10); poolM = pool(0.1, 0.9, 0.05); scream(P, false); }
+      cam(...shotA); spotAt(0.6, 2.8, 2.6, 0, 1.3, 0.3, 28);
+      mon.updateMatrixWorld(true); const jb = DS.g.worldToLocal(mu.jaw.localToWorld(new V3(0, -0.02, 0.1))); j.head.position.copy(jb); j.head.rotation.set(0.3, 0, Math.sin(t * 2) * 0.1);
+      if (sp) { sp.position.copy(j.head.position).add(new V3(0, -0.1, 0.02)); sp.rotation.z = Math.sin(t * 2.2) * 0.12; }
+      mu.neck.rotation.x = 1.0; aimArm(mon, 'R', new V3(0.12, 2.0, 0.65)); aimArm(mon, 'L', new V3(-0.25, 1.3, 0.55));
+      if (t < 8.4) { holdBy(P, j.torso, new V3(0, 0.5, 0), new V3(0.12, lerpc(1.85, 1.5, seg(t, 5.9, 8.4)), 0.68)); pose(P, { uArmL: [0, 0, 0.35], uArmR: [0, 0, -0.35] }); if (Math.random() < dt * 9) { const c = at(P, j.torso, 0, 0.48, 0); bleed(c.x, c.y, c.z, 0, -0.5, 0.5, 3); } }
+      else if (!P.dropped) { P.dropped = true; rip(j.torso, 0.3, 0.3, 1.1, 2); }
+      if (poolM) poolM.scale.setScalar(Math.min(1.0, poolM.scale.x + dt * 0.2));
+    } };
+}
+
+/* under the bed: his legs come up to the bed, a hand slides along the floor, takes your ankle, drags you out, lifts you upside down, slams you down */
+function dxBed(s) {
+  const S = dxBegin(s.x, s.z, dxSpotYaw(s)), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData;
+  const P = mkPerson(), j = P.j; const prone = dxQuat(-Math.PI / 2, 0).multiply(new THREE.Quaternion().setFromAxisAngle(new V3(0, 1, 0), Math.PI));
+  P.root.quaternion.copy(prone); P.root.position.set(0, 0.16, 0.95);
+  mon.position.set(0.2, 0, 3.2); mon.rotation.y = Math.PI; S.add(mon);
+  const shot2 = dxPickCam([[2.3, 0.95, 2.4, 0, 0.35, 1.6], [-2.3, 0.95, 2.4, 0, 0.35, 1.6], [0.4, 1.6, 4.4, 0, 0.5, 1.6]]), shot3 = dxPickCam([[2.0, 1.6, 4.4, 0, 1.2, 2.4], [-2.0, 1.6, 4.4, 0, 1.2, 2.4], [0, 1.8, 5.0, 0, 1.2, 2.4]]);
+  const fin = dxFinisher(S, P, mon, { x: 0.25, z: 3.4, yaw: Math.PI, mx: 0.75, mz: 2.3, myaw: -0.6, cam: dxPickCam([[2.2, 1.25, 4.6, 0.3, 0.45, 2.7], [-2.2, 1.25, 4.6, 0.3, 0.45, 2.7], [0.3, 1.5, 5.4, 0.3, 0.45, 2.7]]) });
+  return { dur: 10.2, steps: [[0.4, () => Sound.thud(0.5)], [1.0, () => Sound.thud(0.5)], [1.9, () => { Sound.ghostVoice(1.0); shake = 0.3; }], [2.3, () => Sound.ghostVoice(0.6)], [5.6, () => Sound.ghostVoice(1.3)], [9.6, () => $('black').classList.add('on')]],
+    upd(t, dt) {
+      piecesUpd(dt);
+      // shot 1: from under the bed, his feet stop at the edge, a hand slides along the floor
+      if (t < 1.9) { cam(0.35, 0.17, -0.55, 0, 0.15, 2.6); spotAt(0.3, 2.6, 3.2, 0, 0.2, 1.4, 22);
+        mon.position.z = lerpc(3.2, 1.75, seg(t, 0, 1.2)); monsWalkAnim(mon, dt, t < 1.2 ? 1.2 : 0); mu.spine.rotation.x = 0.2 + seg(t, 1.1, 1.9) * 1.1; mu.neck.rotation.x = 0.8;
+        aimArm(mon, 'R', new V3(0.05, 0.08, lerpc(1.5, 1.1, seg(t, 1.2, 1.9)))); pose(P, { uArmL: [-2.6, 0, 0.3], uArmR: [-2.6, 0, -0.3], head: [0.4, 0, 0] }); return; }
+      if (t < 5.4) {
+        cam(...(t < 3.9 ? shot2 : shot3)); spotAt(0.5, 2.8, 3.0, 0, 0.5, 1.8, 28);
+        if (t < 3.9) { // dragged out by the ankle, clawing at the floor
+          const k = seg(t, 2.0, 3.8), f = Math.sin(t * 14); P.root.position.set(0, 0.16, lerpc(0.95, 2.7, k)); mon.position.z = lerpc(1.75, 3.5, k); mu.spine.rotation.x = 0.9; monsWalkAnim(mon, dt, 0.8); mu.spine.rotation.x = 0.9;
+          aimArm(mon, 'R', at(P, j.lLegL, 0, -0.42, 0)); aimArm(mon, 'L', new V3(-0.3, 0.9, mon.position.z - 0.5));
+          pose(P, { uArmL: [-2.7 + f * 0.25, 0, 0.4], lArmL: [-0.4, 0, 0], uArmR: [-2.7 - f * 0.25, 0, -0.4], lArmR: [-0.4, 0, 0], head: [0.5, 0, 0], uLegR: [0.2 * f, 0, 0] }); scream(P, true);
+          if (Math.random() < dt * 4) { const c = at(P, j.lArmL, 0, -0.5, 0); spawnSprite(TEX.soft, sw(c.x, 0.05, c.z), { color: 0x5a4030, size: 0.06, life: 0.5, vel: new V3(0, 0.3, 0) }); } return; }
+        // lifted upside down by the leg, then swung over and slammed
+        const k = seg(t, 3.9, 4.7), sw2 = Math.sin((t - 4.7) * 6) * seg(t, 4.7, 5.0); mu.spine.rotation.x = lerpc(0.9, 0.2, k);
+        aimArm(mon, 'R', new V3(0, lerpc(0.4, 2.3, k), mon.position.z - lerpc(0.5, 0.7, k))); P.root.quaternion.copy(dxQuat(Math.PI + sw2 * 0.3, 0)); holdBy(P, j.lLegL, new V3(0, -0.42, 0), handOf(mon, 'R'));
+        const f = Math.sin(t * 13); pose(P, { uArmL: [0, 0, 0.5 + f * 0.4], uArmR: [0, 0, -0.5 - f * 0.4], uLegR: [-0.6, 0, -0.3], head: [0.2 * f, 0, 0] }); scream(P, true); return; }
+      fin(t - 5.4, dt);
+    } };
+}
+
+/* under the table: the cloth, his breath, the table flies away, you are taken by the head */
+function dxTable(s) {
+  const S = dxBegin(s.x, s.z, dxSpotYaw(s)), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData, T = MONS.fx.table, CH = MONS.fx.chairs || [];
+  const keep = [T, ...CH].filter(Boolean).map((o) => ({ o, p: o.position.clone(), r: o.rotation.clone() })); DS.restore.push(() => { for (const k of keep) { k.o.position.copy(k.p); k.o.rotation.copy(k.r); } });
+  const P = mkPerson(), j = P.j; P.root.position.set(0, 0, -0.1); P.root.scale.setScalar(0.92);
+  mon.position.set(0.1, 0, 2.4); mon.rotation.y = Math.PI; S.add(mon);
+  const shot2 = dxPickCam([[1.9, 1.5, 2.7, 0, 1.0, 0.3], [-1.9, 1.5, 2.7, 0, 1.0, 0.3], [0.3, 1.8, 3.4, 0, 1.0, 0.3]]);
+  const fin = dxFinisher(S, P, mon, { x: 0.1, z: 1.7, yaw: Math.PI / 2, mx: 0.8, mz: 1.1, myaw: -0.9, cam: dxPickCam([[2.3, 1.2, 3.2, 0.2, 0.45, 1.4], [-2.3, 1.2, 3.2, 0.2, 0.45, 1.4], [0.3, 1.5, 3.9, 0.2, 0.45, 1.4]]) });
+  let flipped = false;
+  return { dur: 9.6, steps: [[0.3, () => Sound.thud(0.5)], [0.9, () => Sound.ghostVoice(0.5)], [1.5, () => { Sound.boom(); Sound.thud(1); shake = 0.7; }], [2.0, () => Sound.ghostVoice(1.2)], [4.9, () => Sound.ghostVoice(1.3)], [9.0, () => $('black').classList.add('on')]],
+    upd(t, dt) {
+      piecesUpd(dt);
+      if (t < 1.5) { cam(0.5, 0.3, -0.2, 0.25, 0.4, 2.3); spotAt(0.4, 2.6, 2.8, 0, 0.6, 1.0, 22); mon.position.z = lerpc(2.4, 1.15, seg(t, 0, 1.0)); monsWalkAnim(mon, dt, t < 1 ? 1.2 : 0);
+        pose(P, { uLegL: [-1.6, 0, 0.1], lLegL: [2.3, 0, 0], uLegR: [-1.6, 0, -0.1], lLegR: [2.3, 0, 0], uArmL: [-1.2, 0, 0.3], lArmL: [-1.4, 0, 0], uArmR: [-1.2, 0, -0.3], lArmR: [-1.4, 0, 0], torso: [0.4, 0, 0], head: [0.2, 0, 0] }); j.pelvis.position.y = (P.pelY ?? (P.pelY = j.pelvis.position.y)) * 0.45;
+        if (t > 1.0) { aimArm(mon, 'R', new V3(0.6, 0.8, 0.62)); aimArm(mon, 'L', new V3(-0.6, 0.8, 0.62)); mu.spine.rotation.x = 0.7; } return; }
+      if (!flipped) { flipped = true; for (const c of CH) { c.userData.fv = new V3(rand(-3, 3), rand(1, 3), rand(-3, 1)); } }
+      if (T) { const k = seg(t, 1.5, 2.1), wp = sw(0, 0, -1.6 * k); T.position.set(wp.x, 0.06 + Math.sin(k * Math.PI) * 1.1, wp.z); T.rotation.set(-k * 2.6, 0, k * 0.4); }
+      for (const c of CH) if (c.userData.fv && t < 2.6) { c.userData.fv.y -= 9.8 * dt; c.position.addScaledVector(c.userData.fv, dt); if (c.position.y < 0.06) { c.position.y = 0.06; c.userData.fv.multiplyScalar(0.4); } c.rotation.z += dt * 4; }
+      if (t < 4.9) { cam(...shot2); spotAt(0.5, 2.8, 2.6, 0, 1.0, 0.4, 28);
+        const h = at(P, j.head, 0, 0.1, 0); if (t < 2.6) { aimArm(mon, 'R', new V3(0.3, 1.2, 0.6).lerp(h, seg(t, 2.0, 2.5))); pose(P, { uLegL: [-1.6, 0, 0.1], lLegL: [2.3, 0, 0], uLegR: [-1.6, 0, -0.1], lLegR: [2.3, 0, 0], uArmL: [-2.6, 0, 0.5], uArmR: [-2.4, 0, -0.5], torso: [0.3, 0, 0], head: [-0.4, 0, 0] }); scream(P, true); return; }
+        const k = seg(t, 2.6, 3.6), f = Math.sin(t * 15); j.pelvis.position.y = P.pelY; aimArm(mon, 'R', new V3(0.05, lerpc(1.2, 2.3, k), lerpc(0.4, 0.6, k))); mu.spine.rotation.x = lerpc(0.7, 0.2, k); if (mu.jaw) mu.jaw.rotation.x = seg(t, 3.8, 4.8) * 0.7;
+        pose(P, { uArmL: [-2.4 + f * 0.3, 0, 0.5], uArmR: [-2.2 - f * 0.3, 0, -0.5], uLegL: [-0.6 * f, 0, 0], uLegR: [0.6 * f, 0, 0], lLegL: [0.7, 0, 0], lLegR: [0.7, 0, 0] }); holdBy(P, j.head, new V3(0, 0.12, 0), handOf(mon, 'R')); P.root.rotation.y = Math.sin(t * 3) * 0.3; scream(P, true); return; }
+      fin(t - 4.9, dt);
+    } };
+}
+
+/* the bathtub: his shadow on the curtain, the curtain ripped down, a hand on your face, pulled out of the water over the rim, slammed on the tiles */
+function dxBath(s) {
+  const S = dxBegin(s.x, s.z, dxSpotYaw(s)), mon = mkMonster(0.62, MONS.lastKind || 'lanky'), mu = mon.userData, CU = MONS.fx.shower;
+  const cuKeep = CU ? { p: CU.position.clone(), r: CU.rotation.clone(), s: CU.scale.clone(), v: CU.visible } : null; DS.restore.push(() => { if (CU) { CU.position.copy(cuKeep.p); CU.rotation.copy(cuKeep.r); CU.scale.copy(cuKeep.s); CU.visible = cuKeep.v; } });
+  const P = mkPerson(), j = P.j; const lie = dxQuat(-Math.PI / 2, -Math.PI / 2); P.root.quaternion.copy(lie); P.root.position.set(-0.85, 0.6, 0.02);
+  mon.position.set(0.05, 0, 1.35); mon.rotation.y = Math.PI; S.add(mon);
+  const shot2 = dxPickCam([[1.8, 1.65, 2.5, 0, 0.95, 0.35], [-1.8, 1.65, 2.5, 0, 0.95, 0.35], [0.4, 2.0, 2.9, 0, 0.95, 0.35]]);
+  const fin = dxFinisher(S, P, mon, { x: -0.6, z: 1.35, yaw: -Math.PI / 2, mx: -0.1, mz: 2.2, myaw: Math.PI + 0.4, cam: dxPickCam([[1.6, 1.25, 3.1, -0.2, 0.45, 1.4], [-1.7, 1.25, 3.1, -0.2, 0.45, 1.4], [0.2, 1.5, 3.5, -0.2, 0.45, 1.4]]) });
+  let ripped = false, pulled = false;
+  return { dur: 9.8, steps: [[0.2, () => Sound.thud(0.4)], [0.9, () => Sound.ghostVoice(0.5)], [1.6, () => { try { Sound.whoosh(); } catch (e) {} Sound.ghostVoice(1.2); shake = 0.4; }], [2.3, () => { Sound.splat(1); }], [3.2, () => Sound.splat(0.8)], [4.6, () => { Sound.thud(1); Sound.crunch(0.7); }], [9.2, () => $('black').classList.add('on')]],
+    upd(t, dt) {
+      piecesUpd(dt);
+      // shot 1: lying in the water, looking up at the curtain; his silhouette, a hand pressing the cloth
+      if (t < 1.6) { cam(0.72, 0.98, -0.02, 0.0, 1.55, 0.62); spotAt(0.3, 2.6, 2.8, 0, 1.4, 0.45, 26); mon.position.z = lerpc(1.35, 0.95, seg(t, 0, 0.9)); mu.neck.rotation.x = 0.6; if (t > 0.9) aimArm(mon, 'R', new V3(0.2, 1.45, 0.55)); pose(P, { uArmL: [-0.6, 0, 0.4], uArmR: [-0.6, 0, -0.4], uLegL: [-0.6, 0, 0], lLegL: [1.0, 0, 0], uLegR: [-0.5, 0, 0], lLegR: [0.9, 0, 0], head: [-0.3, 0, 0] }); return; }
+      if (!ripped && CU) { ripped = true; }
+      if (CU && t < 2.4) { const k = seg(t, 1.6, 2.2); CU.rotation.x = -k * 1.3; CU.position.y = 1.3 - k * 0.7; if (t > 2.3) CU.visible = false; }
+      cam(...(t < 4.6 ? shot2 : shot2)); spotAt(0.4, 2.8, 2.4, 0, 0.9, 0.3, 28);
+      if (t < 2.4) { aimArm(mon, 'R', new V3(0.6, 1.2, 0.3)); aimArm(mon, 'L', new V3(-0.6, 1.2, 0.3)); mu.spine.rotation.x = 0.45; pose(P, { uArmL: [-2.2, 0, 0.4], uArmR: [-2.0, 0, -0.4], head: [-0.4, 0, 0] }); scream(P, true); return; }
+      if (t < 3.0) { // a hand over your face, the other on your chest, the water thrashing
+        mu.spine.rotation.x = 0.95; const h = at(P, j.head, 0, 0.08, 0.06), c = at(P, j.torso, 0, 0.3, 0.1); aimArm(mon, 'R', h); aimArm(mon, 'L', c); const f = Math.sin(t * 18);
+        pose(P, { uArmL: [-2.0 + f * 0.4, 0, 0.6], uArmR: [-1.8 - f * 0.4, 0, -0.6], uLegL: [-0.7 + f * 0.3, 0, 0], lLegL: [1.0, 0, 0], uLegR: [-0.7 - f * 0.3, 0, 0], lLegR: [1.0, 0, 0] }); scream(P, true);
+        if (Math.random() < dt * 18) spawnSprite(TEX.soft, sw(rand(-0.6, 0.6), 0.95, rand(-0.3, 0.3)), { color: 0xcfe8ff, size: rand(0.08, 0.16), life: 0.6, vel: new V3(rand(-1.2, 1.2), rand(1.5, 3), rand(-1.2, 1.2)) }); return; }
+      if (t < 4.6) { // pulled out over the rim, dripping
+        if (!pulled) { pulled = true; }
+        const k = seg(t, 3.0, 4.2); mu.spine.rotation.x = lerpc(0.95, 0.25, k); aimArm(mon, 'R', new V3(lerpc(0.4, 0.0, k), lerpc(1.1, 2.2, k), lerpc(0.15, 0.95, k))); aimArm(mon, 'L', new V3(-0.4, 1.4, 0.9));
+        P.root.quaternion.copy(lie).slerp(dxQuat(-0.4, Math.PI * 0.85), Math.min(1, k * 1.3)); holdBy(P, j.head, new V3(0, 0.12, 0), handOf(mon, 'R'));
+        const f = Math.sin(t * 14); pose(P, { uArmL: [-2.3 + f * 0.3, 0, 0.5], uArmR: [-2.1 - f * 0.3, 0, -0.5], uLegL: [-0.5 * f, 0, 0], uLegR: [0.5 * f, 0, 0], lLegL: [0.5, 0, 0], lLegR: [0.5, 0, 0] }); scream(P, true);
+        if (Math.random() < dt * 14) { const c = at(P, j.torso, 0, rand(-0.2, 0.4), 0); spawnSprite(TEX.soft, sw(c.x, c.y, c.z), { color: 0xbfe0ff, size: 0.05, life: 0.9, vel: new V3(0, -1.5, 0) }); } return; }
+      fin(t - 4.6, dt);
+    } };
+}
+function dxWithReveal(R, mon, rd) { return { dur: R.dur + rd + 0.6, steps: [[0.05, () => { Sound.ghostVoice(1.1); shake = 0.25; }], ...R.steps.map(([t, f]) => [t + rd, f]), [R.dur + rd + 0.1, () => $('black').classList.add('on')]], upd(t, dt) { if (t < rd) { dxReveal(mon, t, rd); return; } R.upd(Math.min(t - rd, R.dur), dt); } }; }
+const MONS_DEATHS = { window: dxWindow, door: dxDoor, out: dxOut, inside: dxInside, found: dxFound };
 function monsCut(kind) {
-  if (MONS.dead) return; MONS.dead = true; MONS.lastKind = (MONS.inside && MONS.inside.g.userData.kind) || (MONS.ev && MONS.ev.m && MONS.ev.m.g.userData.kind) || MONS.lastKind; if (MONS.hide) MONS.hide.occ = null; MONS.holdBreath = false; MONS.flash.on = false; if (MONS.flashL) MONS.flashL.intensity = 0; { const b = document.getElementById('monsAct'); if (b) b.style.display = 'none'; const h = document.getElementById('monsHide'); if (h) h.style.display = 'none'; } story.ride = null; MONS.hide = null;
+  if (MONS.dead) return; MONS.dead = true; { const pp = player.pos; MONS.deathSpot = MONS.hide; MONS.deathPos = { x: pp.x, z: pp.z }; let km = MONS.inside || (MONS.ev && MONS.ev.m); if (!km) { let bd = 1e9; for (const m of MONS.monsters) { const d = Math.hypot(m.x - pp.x, m.z - pp.z); if (d < bd) { bd = d; km = m; } } } MONS.killerPos = km ? { x: km.x, z: km.z } : null; MONS.deathWin = MONS.ev && (MONS.ev.type === 'lurk' || MONS.ev.type === 'breachW') ? MONS.ev.win : null; if (kind === 'found' && MONS.hide) { MONS.deathPos = { x: MONS.hide.x, z: MONS.hide.z }; } } MONS.lastKind = (MONS.inside && MONS.inside.g.userData.kind) || (MONS.ev && MONS.ev.m && MONS.ev.m.g.userData.kind) || MONS.lastKind; if (MONS.hide) MONS.hide.occ = null; MONS.holdBreath = false; MONS.flash.on = false; if (MONS.flashL) MONS.flashL.intensity = 0; { const b = document.getElementById('monsAct'); if (b) b.style.display = 'none'; const h = document.getElementById('monsHide'); if (h) h.style.display = 'none'; } story.ride = null; MONS.hide = null;
   const D = MONS_DEATHS[kind](); Sound.droneLoop(0.4); runCut(D.steps || [], (t, dt) => D.upd(t, dt), D.dur, () => { Sound.droneLoop(0); stageEnd(); monsOver(false, kind); });
 }
 /* ===== menus ===== */
@@ -18339,7 +18645,7 @@ function monsInsideUpdate(m, dt) {
   else { if (!m.sp || m.spT <= 0) { const def = m.g.userData.def || MON_KINDS.lanky; m.sp = (MONS.hide && MONS.sniffCd <= 0 && Math.random() < def.sniffP) ? MONS.hide : pick(MONS.spots); m.spT = 6; }
     const d = monsGo(m, m.sp.ex, m.sp.ez, 1.7, dt);
     if (d < 0.4) { m.spT -= dt; monsFace(m, m.sp.x, m.sp.z); u.spine.rotation.x = 0.6 + Math.sin(m.insT * 2) * 0.1; aimArmW(m.g, 'R', new V3(m.sp.x, m.sp.camY + 0.3, m.sp.z));
-      if (m.sp === MONS.hide && !MONS.ghost && m.sp.occ === 'player' && MONS.sniffCd <= 0) { const def = m.g.userData.def || MON_KINDS.lanky; m.st = 'sniff'; m.sn = { t: 0, dur: def.sniffDur }; Sound.ghostVoice(0.5); toast('👃 Он прямо рядом… задержите дыхание!'); shake = Math.max(shake, 0.2); return; }
+      if (m.sp === MONS.hide && !MONS.ghost && m.sp.occ === 'player' && MONS.sniffCd <= 0) { const def = m.g.userData.def || MON_KINDS.lanky; m.st = 'sniff'; m.sn = { t: 0, dur: def.sniffDur }; MONS.sus = 0; Sound.ghostVoice(0.5); toast('👃 Он прямо рядом… задержите дыхание!'); shake = Math.max(shake, 0.2); return; }
       if (m.spT < 4.4 && !m.checked) { m.checked = true; if (m.sp.doors) { m.sp.anim = 1.1; Sound.thud(0.4); } if (m.sp.occ && m.sp.occ !== 'player' && Math.random() < 0.35) { const b = m.sp.occ; monsBotKill(b, 'найден в укрытии'); } } }
     else m.checked = false; if (m.spT <= 0) m.checked = false; }
   u.neck.rotation.z = Math.sin(m.insT * 2) * 0.25;
