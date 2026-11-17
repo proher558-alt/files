@@ -12268,7 +12268,7 @@ const C2_FINAL = { q: 'Скажи ей в лицо: ты её любишь? От
   ['Стреляй, басист. Духу не хватит.', 9, null],
   ['Отпусти её — и я скажу всё, что хочешь.', 0, null]] };
 const C2_MAX = 8;
-function c2Ui() { let d = document.getElementById('c2q'); if (d) return d; d = document.createElement('div'); d.id = 'c2q'; d.style.cssText = 'position:fixed;left:50%;top:7%;transform:translateX(-50%);width:min(540px,88vw);z-index:60;background:rgba(14,10,12,.93);border:2px solid #c81830;border-radius:10px;padding:10px 14px;color:#f2e8e0;font-family:var(--ui);text-align:center;display:none'; ['pointerdown', 'touchstart', 'click'].forEach((e) => d.addEventListener(e, (ev) => ev.stopPropagation())); document.body.appendChild(d); return d; }
+function c2Ui() { let d = document.getElementById('c2q'); if (d) return d; d = document.createElement('div'); d.id = 'c2q'; d.style.cssText = 'position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(540px,88vw);max-height:calc(94vh - 30px);overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;z-index:60;background:rgba(14,10,12,.93);border:2px solid #c81830;border-radius:10px;padding:10px 14px;color:#f2e8e0;font-family:var(--ui);text-align:center;display:none'; ['pointerdown', 'touchstart', 'click'].forEach((e) => d.addEventListener(e, (ev) => ev.stopPropagation())); document.body.appendChild(d); return d; }
 function c2Ask(i) {
   const fin = i === 'final', Q = fin ? C2_FINAL : C2_Q[i], d = c2Ui(); C2.shot = fin ? 'two' : 'mark'; runCut([[0.1, () => markSay(Q.q)]], c2CamUpd, 99999, () => {});
   const r = Math.min(10, C2.rage), bar = '█'.repeat(r) + '░'.repeat(10 - r);
