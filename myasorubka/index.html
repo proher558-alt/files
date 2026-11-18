@@ -18212,7 +18212,7 @@ function monsTaskInc(id, n = 1) {
   monsDailyEnsure(); const t = MONS_META.tasks.find((q) => q.id === id); if (!t || t.cnt >= t.goal) return;
   t.cnt = Math.min(t.goal, t.cnt + n); if (t.cnt >= t.goal) { toast('✅ Задание дня выполнено: ' + t.n + ' — награда в меню!'); SFX.chime(); } monsMetaSave();
 }
-function monsCoins(n, why) { MONS_META.coins = Math.max(0, MONS_META.coins + n); monsMetaSave(); if (n > 0) toast('🪙 +' + n + (why ? ' · ' + why : '')); }
+function monsCoins(n, why) { MONS_META.coins = Math.max(0, MONS_META.coins + n); if (MONS_META.infCoins) { MONS_META.coins = 999999; if (n < 0) return; } monsMetaSave(); if (n > 0) toast('🪙 +' + n + (why ? ' · ' + why : '')); }
 /* ===== achievements ===== */
 const MONS_ACH = [
   { id: 'night1', n: 'Первая ночь', d: 'Дожить до 06:00', r: 100, e: '🌅' }, { id: 'night5', n: 'Ветеран', d: 'Пережить 5 ночей', r: 250, e: '🎖' },
@@ -20437,6 +20437,9 @@ function d3Adm() {
     { l: 'Крыша: воскрешение Мелоди и пуля', s: '«Прости», поцелуй, пуля между пальцев', f: () => { admClose(); D3_TOK++; d3Start('d3g'); setTimeout(() => { story.cut = null; d3RoofReturn(); }, 600); } },
     { l: 'Предыстория Сириуса', s: 'Записка Кровавого Джона, как в видео', f: () => { admClose(); D3_TOK++; d3Start('d3g'); setTimeout(() => { story.cut = null; d3Flash(); }, 600); } },
     { l: 'Объятия и финал', s: 'Мелоди плачет, пистолет падает, конец', f: () => { admClose(); D3_TOK++; d3Start('d3g'); setTimeout(() => { story.cut = null; d3Embrace(); }, 600); } },
+    { sec: 'Монеты и кристаллы' },
+    { l: MONS_META.infCoins ? '🪙 Бесконечные монеты: ВКЛ' : '🪙 Бесконечные монеты: выкл', s: 'Нажмите, чтобы переключить (в лагере и покупках)', f: () => { MONS_META.infCoins = !MONS_META.infCoins; MONS_META.coins = MONS_META.infCoins ? 999999 : Math.max(MONS_META.coins, 0); monsMetaSave(); toast(MONS_META.infCoins ? '🪙 Бесконечные монеты включены' : '🪙 Бесконечные монеты выключены'); admClose(); } },
+    { l: '💎 Кристаллы +500', s: 'Для сундука скинов', f: () => { crystalsAdd(500, 'админ'); } },
     { sec: 'Транспорт' },
     { l: 'Открыть Свити-кар', s: 'Эксклюзив за главу 1', f: () => { addUn('carSv'); toast('Свити-кар открыт'); } },
     { l: 'Открыть «Воскреситель и песни»', s: 'Эксклюзив за главу 2', f: () => { addUn('carGg'); toast('Машина «Воскреситель и песни» открыта'); } },
