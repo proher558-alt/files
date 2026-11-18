@@ -11609,6 +11609,12 @@ function admCh2() {
 function admItems(tab) {
   const u = getUn(), on = (v) => (v ? 'ВКЛ' : 'выкл');
   if (tab === 'ch2') return admCh2();
+  if (tab !== 'end' && tab !== 'cut' && tab !== 'gg') return [{ sec: 'Монеты и кристаллы' }, { l: MONS_META.infCoins ? '🪙 Бесконечные монеты: ВКЛ' : '🪙 Бесконечные монеты: выкл', s: 'Нажмите, чтобы переключить', f: () => { MONS_META.infCoins = !MONS_META.infCoins; MONS_META.coins = MONS_META.infCoins ? 999999 : Math.max(MONS_META.coins, 0); monsMetaSave(); toast(MONS_META.infCoins ? '🪙 Бесконечные монеты включены' : '🪙 Бесконечные монеты выключены'); admRender(); } }, { l: '💎 Кристаллы +500', s: 'Для сундука скинов', f: () => { crystalsAdd(500, 'админ'); } }, ...admItems2(tab)];
+  return admItems2(tab);
+}
+function admItems2(tab) {
+  const u = getUn(), on = (v) => (v ? 'ВКЛ' : 'выкл');
+  if (tab === 'ch2') return admCh2();
   if (tab === 'end') return [
     { sec: `Награды · хорошая ${u.good ? '✅' : '⬜'} · плохая ${u.bad ? '✅' : '⬜'} · правосудие ${u.justice ? '✅' : '⬜'} · пешка ${u.pawn ? '✅' : '⬜'}` },
     { l: 'Активировать хорошую', s: 'Отметить концовку пройденной', f: () => { addUn('good'); admUn(); } },
