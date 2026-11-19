@@ -15358,6 +15358,7 @@ function carTex(id) {
   return null;
 }
 function makeCar(id, x, z, yaw, o = {}) {
+  if (id === 'milk') yaw += Math.PI; // «Молочный хром» развёрнут на 180°: лицо смотрит назад
   vehMats(); const S = CARS[id], col = o.col ?? S.col, root = new THREE.Group(), body = new THREE.Group(); root.add(body); root.position.set(x, 0, z); root.rotation.y = yaw; addMesh(root);
   const paint = std({ color: col, roughness: id === 'gg' ? 0.55 : id === 'milk' ? 0.1 : 0.28, metalness: id === 'gg' ? 0.2 : id === 'milk' ? 1 : 0.65, envMapIntensity: id === 'milk' ? 1.1 : 1.1 }), trim = std({ color: 0x15161a, roughness: 0.6, metalness: 0.3 }), chrome = std({ color: 0xd8dce0, roughness: 0.15, metalness: 1, envMapIntensity: 1.3 });
   const C = { id, S, root, body, paint, parts: [], deform: [], wheels: [], x, z, yaw, vx: 0, vz: 0, w: 0, hp: 100, in: { th: 0, br: 0, st: 0, hb: 0 }, lost: [0, 0, 0, 0], burnT: 0, burnt: false, dead: false, ai: o.ai || null, steer: 0, spin: 0, pitchA: 0, rollA: 0, acc: 0, smoke: 0, crashT: 0, ti: 0, laps: 0 };
