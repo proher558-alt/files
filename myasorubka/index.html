@@ -15338,7 +15338,7 @@ const CARS = {
   truck: { name: 'Грузовик', ico: '🚚', col: 0xd8d8d0, heavy: 'truck', L: 7.2, W: 2.35, cl: 0.45, bh: 1.4, ch: 2.75, wr: 0.5, wbz: 2.3, mass: 6500, power: 4.2, top: 30, brake: 8, grip: 5, steer: 0.48, drag: 2, pitch: 0.6 },
   semi: { name: 'Фура', ico: '🚛', col: 0x1a4a9a, heavy: 'semi', L: 14.5, W: 2.5, cl: 0.5, bh: 1.5, ch: 3.0, wr: 0.52, wbz: 5.6, mass: 14000, power: 3.2, top: 27, brake: 6.5, grip: 4.5, steer: 0.42, drag: 2.6, pitch: 0.45 },
   svity: { name: 'Свити-кар', ico: '💖', col: 0xff5ab4, L: 4.3, W: 1.9, cl: 0.18, bh: 0.74, ch: 1.1, cz0: -0.6, cz1: 0.55, wr: 0.34, wbz: 1.3, mass: 1150, power: 11, top: 64, brake: 14, grip: 9, steer: 0.55, drag: 0.85, doors: 2, open: true, excl: 'svity', pitch: 1.4 },
-  milk: { name: 'Молочный хром', ico: '🥛', col: 0xa9b4c6, L: 4.4, W: 1.38, cl: 0.17, bh: 0.78, ch: 1.12, cz0: -0.6, cz1: 0.6, wr: 0.34, wbz: 1.34, mass: 1250, power: 12.5, top: 74, brake: 15, grip: 9.4, steer: 0.52, drag: 0.8, doors: 2, excl: 'milk', pitch: 1.2 },
+  milk: { name: 'Молочный хром', ico: '🥛', col: 0xa9b4c6, L: 4.4, W: 0.34, cl: 0.17, bh: 0.78, ch: 1.12, cz0: -0.6, cz1: 0.6, wr: 0.34, wbz: 1.34, mass: 1250, power: 12.5, top: 74, brake: 15, grip: 9.4, steer: 0.52, drag: 0.8, doors: 2, excl: 'milk', pitch: 1.2 },
   gg: { name: 'Воскреситель и песни', ico: '🎸', col: 0x0c0c10, L: 4.7, W: 1.95, cl: 0.2, bh: 0.8, ch: 1.26, cz0: -0.95, cz1: 0.5, wr: 0.38, wbz: 1.45, mass: 1500, power: 13, top: 76, brake: 15, grip: 9.2, steer: 0.52, drag: 0.85, doors: 2, excl: 'gg', pitch: 0.75 },
 };
 const CAR_ORDER = ['sedan', 'pickup', 'sport', 'truck', 'semi', 'svity', 'gg', 'milk'];
@@ -15376,8 +15376,8 @@ function makeCar(id, x, z, yaw, o = {}) {
       const blk = std({ color: 0x050508, roughness: 0.25, metalness: 0.2 }), ch2 = std({ color: 0xa9b4c6, roughness: 0.1, metalness: 1, envMapIntensity: 1.1 });
       const blob = (par, mat, rx, ry, rz, px, py, pz) => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 18), mat); m.scale.set(rx, ry, rz); m.position.set(px, py, pz); m.castShadow = true; par.add(m); return m; };
       for (const s of [-1, 1]) { blob(hood, ch2, 0.6, 0.5, 0.72, s * 0.4, 0.26, hl * 0.32); blob(hood, blk, 0.08, 0.06, 0.1, s * 0.46, 0.7, hl * 0.34); } // two big chrome «engine» lobes (heart from the front)
-      for (const s of [-1, 1]) { blob(body, blk, 0.27, 0.23, 0.05, s * 0.28, yb - 0.1, L / 2 + 0.04); blob(body, ch2, 0.12, 0.12, 0.03, s * 0.28, yb - 0.1, L / 2 + 0.06); } // the face: two black eyes
-      box(body, blk, 0.05, 0.26, 0.04, 0, yb - 0.12, L / 2 + 0.05); for (const s of [-1, 1]) { const sm = box(body, blk, 0.34, 0.045, 0.04, s * 0.19, y0 + 0.3, L / 2 + 0.05); sm.rotation.z = -s * 0.5; } // nose seam + smile
+      for (const s of [-1, 1]) { blob(body, blk, 0.27, 0.23, 0.05, s * 0.28, yb - 0.1, L / 2 + 0.1); blob(body, ch2, 0.12, 0.12, 0.03, s * 0.28, yb - 0.1, L / 2 + 0.12); } // the face: two black eyes
+      blob(body, ch2, 0.62, 0.34, 0.16, 0, yb - 0.1, L / 2 - 0.02); box(body, blk, 0.05, 0.26, 0.04, 0, yb - 0.12, L / 2 + 0.14); for (const s of [-1, 1]) { const sm = box(body, blk, 0.34, 0.045, 0.04, s * 0.19, y0 + 0.3, L / 2 + 0.14); sm.rotation.z = -s * 0.5; } // nose seam + smile
       blob(body, ch2, 0.5, 0.4, 0.4, 0, (y0 + yb) / 2 + 0.04, -L / 2 - 0.08); for (const [dx, dy] of [[-0.18, 0.1], [0.18, 0.1], [0, 0], [-0.1, -0.1], [0.1, -0.1]]) blob(body, blk, 0.06, 0.06, 0.03, dx, (y0 + yb) / 2 + 0.04 + dy, -L / 2 - 0.45); // tail cap with five black dots
     }
     if (id === 'gg') { const blow = box(hood, std({ color: 0x2a2a2e, roughness: 0.4, metalness: 0.8 }), 0.5, 0.16, 0.6, 0, 0.1, 0); for (let i = 0; i < 2; i++) box(blow, chrome, 0.12, 0.12, 0.12, -0.12 + i * 0.24, 0.12, 0.1); }
