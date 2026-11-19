@@ -15375,9 +15375,12 @@ function makeCar(id, x, z, yaw, o = {}) {
     if (id === 'milk') {
       const blk = std({ color: 0x050508, roughness: 0.25, metalness: 0.2 }), ch2 = std({ color: 0xa9b4c6, roughness: 0.1, metalness: 1, envMapIntensity: 1.1 });
       const blob = (par, mat, rx, ry, rz, px, py, pz) => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 18), mat); m.scale.set(rx, ry, rz); m.position.set(px, py, pz); m.castShadow = true; par.add(m); return m; };
-      for (const s of [-1, 1]) { blob(hood, ch2, 0.6, 0.5, 0.72, s * 0.4, 0.26, hl * 0.32); blob(hood, blk, 0.08, 0.06, 0.1, s * 0.46, 0.7, hl * 0.34); } // two big chrome «engine» lobes (heart from the front)
-      for (const s of [-1, 1]) { blob(body, blk, 0.27, 0.23, 0.05, s * 0.28, yb - 0.1, L / 2 + 0.1); blob(body, ch2, 0.12, 0.12, 0.03, s * 0.28, yb - 0.1, L / 2 + 0.12); } // the face: two black eyes
-      blob(body, ch2, 0.62, 0.34, 0.16, 0, yb - 0.1, L / 2 - 0.02); box(body, blk, 0.05, 0.26, 0.04, 0, yb - 0.12, L / 2 + 0.14); for (const s of [-1, 1]) { const sm = box(body, blk, 0.34, 0.045, 0.04, s * 0.19, y0 + 0.3, L / 2 + 0.14); sm.rotation.z = -s * 0.5; } // nose seam + smile
+      // поменяно местами: двигатели-лепестки спереди, лицо на капоте
+      for (const s of [-1, 1]) { blob(body, ch2, 0.6, 0.5, 0.72, s * 0.4, (y0 + yb) / 2, L / 2 + 0.02); blob(body, blk, 0.08, 0.06, 0.1, s * 0.46, (y0 + yb) / 2 + 0.3, L / 2 + 0.2); }
+      // лицо на капоте: крупное, выше поверхности, чтобы читалось с камеры
+      const fc = new THREE.Group(); fc.position.set(0, 0.42, hl * 0.42); fc.scale.setScalar(1.5); hood.add(fc); fc.rotation.x = -0.35; hood.add(fc);
+      for (const s of [-1, 1]) { blob(fc, blk, 0.27, 0.23, 0.05, s * 0.28, 0, 0); blob(fc, ch2, 0.12, 0.12, 0.03, s * 0.28, 0, 0.02); }
+      blob(fc, ch2, 0.62, 0.34, 0.16, 0, -0.04, -0.02); const nz = box(fc, blk, 0.05, 0.26, 0.04, 0, -0.06, 0.02); for (const s of [-1, 1]) { const sm = box(fc, blk, 0.34, 0.045, 0.04, s * 0.19, -0.2, 0.02); sm.rotation.z = -s * 0.5; }
       blob(body, ch2, 0.5, 0.4, 0.4, 0, (y0 + yb) / 2 + 0.04, -L / 2 - 0.08); for (const [dx, dy] of [[-0.18, 0.1], [0.18, 0.1], [0, 0], [-0.1, -0.1], [0.1, -0.1]]) blob(body, blk, 0.06, 0.06, 0.03, dx, (y0 + yb) / 2 + 0.04 + dy, -L / 2 - 0.45); // tail cap with five black dots
     }
     if (id === 'gg') { const blow = box(hood, std({ color: 0x2a2a2e, roughness: 0.4, metalness: 0.8 }), 0.5, 0.16, 0.6, 0, 0.1, 0); for (let i = 0; i < 2; i++) box(blow, chrome, 0.12, 0.12, 0.12, -0.12 + i * 0.24, 0.12, 0.1); }
