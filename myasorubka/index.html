@@ -15403,7 +15403,7 @@ function makeCar(id, x, z, yaw, o = {}) {
     if (!S.open) for (const s of [-1, 1]) { const mp = pivot(s * (hw + 0.1), yb + 0.12, S.cz1 - 0.1); box(mp, paint, 0.16, 0.1, 0.08, 0, 0, 0); part('mirror', mp, s * (hw + 0.1), yb + 0.12, S.cz1 - 0.1, 0.25, 1); }
     if (S.spoiler) { box(body, trim, W * 0.9, 0.04, 0.3, 0, yb + 0.3, -L / 2 + 0.25); for (const s of [-1, 1]) box(body, trim, 0.04, 0.26, 0.1, s * W * 0.35, yb + 0.14, -L / 2 + 0.25); }
     // the interior: dashboard, wheel, seats
-    box(body, trim, W * 0.9, 0.2, 0.25, 0, yb + 0.05, S.cz1 - 0.15); C.wheel = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.025, 6, 18), trim); C.wheel.position.set(W * 0.22, yb + 0.12, S.cz1 - 0.45); C.wheel.rotation.x = -0.35; body.add(C.wheel);
+    box(body, trim, W * 0.9, id === 'milk' ? 0.1 : 0.2, 0.25, 0, id === 'milk' ? yb - 0.1 : yb + 0.05, S.cz1 - 0.15); { const ey = new V3(W * 0.22, Math.min(yc - 0.08, yb + 0.58), S.cz1 - (S.cz1 - S.cz0) * 0.5); vehCockpit(C, body, trim, id, ey.x, ey.y - 0.26, Math.min(ey.z + 0.55, S.cz1 - 0.28), 0.38, 0.2); }
     for (const sx of [-1, 1]) { box(body, std({ color: id === 'svity' ? 0xff9ad0 : id === 'gg' ? 0x7a1a1a : 0x2a2a30, roughness: 0.9 }), W * 0.32, 0.5, 0.14, sx * W * 0.22, yb + 0.12, S.cz1 - (S.cz1 - S.cz0) * 0.62); }
     C.eye = new V3(W * 0.22, Math.min(yc - 0.08, yb + 0.58), S.cz1 - (S.cz1 - S.cz0) * 0.5);
   } else {
@@ -15420,7 +15420,7 @@ function makeCar(id, x, z, yaw, o = {}) {
     for (const [zz, front] of [[L / 2 + 0.04, true], [-L / 2 - 0.04, false]]) { const bp = pivot(hw, y0 + 0.2, zz); box(bp, trim, W * 1.02, 0.28, 0.2, -hw, 0, 0, [3, 1, 1]); part('bumper', bp, 0, y0 + 0.2, zz, 0.9, 4, { front }); }
     for (const s of [-1, 1]) { light(s * (hw - 0.3), yb - 0.1, L / 2 + 0.01, 0.34, 0.16, 0xfff4dc, true); light(s * (hw - 0.2), y0 + 0.5, -L / 2 - 0.01, 0.3, 0.12, 0xff1a0a, false); }
     box(body, chrome, W * 0.7, 0.5, 0.04, 0, yb - 0.35, L / 2 + 0.01);
-    C.wheel = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.03, 6, 18), trim); C.wheel.position.set(W * 0.24, yc - 1.2, cabZ1 - 0.7); C.wheel.rotation.x = -0.9; body.add(C.wheel); box(body, trim, W * 0.9, 0.3, 0.3, 0, yc - 1.35, cabZ1 - 0.25);
+    vehCockpit(C, body, trim, id, W * 0.24, yc - 1.05, cabZ1 - 0.4, 0.8, 0.24); box(body, trim, W * 0.9, 0.3, 0.3, 0, yc - 1.35, cabZ1 - 0.25);
     C.eye = new V3(W * 0.24, yc - 0.75, cabZ1 - 1.0);
   }
   // exclusive trims
@@ -15580,7 +15580,7 @@ function vehVis(C, dt) {
   C.spin += (C.vf || 0) * dt / S.wr * spinK; C.spinF = (C.spinF || 0) + (C.vf || 0) * dt / S.wr * (C.in.th && P.drive !== 'rwd' && (C.slip[0] > 0.4 || C.slip[1] > 0.4) ? 1.8 : 1);
   const dVis = -C.steer * P.steer / (1 + Math.abs(C.vf || 0) / P.fade);
   for (const w of C.wheels) { w.sp.rotation.x = w.front ? C.spinF : lockR ? w.sp.rotation.x : C.spin; if (w.front) w.g.rotation.y = dVis; w.g.position.y = S.wr + (C.air ? -0.08 : 0); }
-  if (C.wheel) C.wheel.rotation.z = C.steer * 2.2;
+  if (C.wheel) { C.wheel.rotation.z = C.steer * 2.2; vehCockpitUpd(C); }
   const sag = (C.lost[0] + C.lost[2]) * 0.06 - (C.lost[1] + C.lost[3]) * 0.06, sagP = (C.lost[0] + C.lost[1]) * -0.05 + (C.lost[2] + C.lost[3]) * 0.05;
   // the body sits on springs: it dives under braking, squats under power, rolls in corners and rocks after landings
   const tp = clamp(-(C.ax || 0) * 0.0075 * S.pitch, -0.085, 0.085), tr = clamp((C.ay || 0) * 0.0085 * S.pitch, -0.095, 0.095), kk = Math.min(dt, 1 / 30);
@@ -15683,8 +15683,50 @@ function vehCollide(dt) {
 }
 /* ----- entering, leaving, the camera ----- */
 function vehNearest(r = 3.2) { let best = null, bd = r; for (const C of VEH.list) { if (C.ai || C.burnt) continue; const d = Math.hypot(player.pos.x - C.x, player.pos.z - C.z) - C.S.W * 0.5; if (d < bd) { bd = d; best = C; } } return best; }
+
+/* ----- the cockpit: a real wheel with spokes, two hands that grip it and turn with it, forearms, gauges ----- */
+function vehCockpit(C, body, trim, id, wx, wy, wz, tilt, R) {
+  const leather = std({ color: id === 'svity' ? 0xff7ab8 : id === 'milk' ? 0xdfe6f2 : 0x1c1c20, roughness: id === 'milk' ? 0.12 : 0.6, metalness: id === 'milk' ? 1 : 0.1 }), chrome = std({ color: 0xc8ccd2, roughness: 0.2, metalness: 1 });
+  const skin = C.skinM = std({ color: 0xe0b48c, roughness: 0.55 }), sleeve = C.sleeveM = std({ color: 0x3a3f4a, roughness: 0.85 });
+  const w = C.wheel = new THREE.Group(); w.position.set(wx, wy, wz); w.rotation.x = tilt; body.add(w);
+  const B = new THREE.BoxGeometry(1, 1, 1), add = (par, g, m, x, y, z, sx, sy, sz, rz = 0) => { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.scale.set(sx, sy, sz); o.rotation.z = rz; o.castShadow = false; par.add(o); return o; };
+  add(w, new THREE.TorusGeometry(R, 0.027, 8, 28), leather, 0, 0, 0, 1, 1, 1);
+  for (let k = 0; k < 3; k++) { const a = k * 2.0944 + 1.5708; add(w, B, leather, Math.cos(a) * R * 0.5, Math.sin(a) * R * 0.5, 0.004, R * 0.95, 0.03, 0.014, a); }
+  add(w, new THREE.CylinderGeometry(0.052, 0.058, 0.04, 14), leather, 0, 0, 0.0, 1, 1, 1).rotation.x = Math.PI / 2; add(w, new THREE.CylinderGeometry(0.03, 0.03, 0.01, 12), chrome, 0, 0, -0.024, 1, 1, 1).rotation.x = Math.PI / 2;
+  // hands: palm behind the rim (driver side, −z), four fingers wrapped over the outside, thumb on the inside
+  C.hands = [];
+  for (const sg of [-1, 1]) {
+    const th = sg * 1.08, h = new THREE.Group(); h.position.set(Math.sin(th) * R, Math.cos(th) * R, 0); h.rotation.z = -th; w.add(h);
+    add(h, B, skin, 0, -0.004, -0.036, 0.086, 0.034, 0.028); add(h, B, skin, 0, 0.012, -0.026, 0.092, 0.02, 0.02);
+    for (let i = 0; i < 4; i++) { const x = (i - 1.5) * 0.021, L = 0.062 - Math.abs(i - 1.5) * 0.004; add(h, B, skin, x, 0.034, -0.002, 0.018, 0.015, L); add(h, B, skin, x, 0.016, 0.034, 0.017, 0.032, 0.014); }
+    add(h, B, skin, -sg * 0.038, -0.03, -0.03, 0.02, 0.016, 0.05).rotation.y = sg * 0.35; add(h, B, skin, -sg * 0.046, -0.026, -0.01, 0.017, 0.016, 0.03);
+    h.userData.sg = sg; C.hands.push(h);
+  }
+  // forearms: a sleeve from the elbow to the wrist, stretched every frame
+  C.arms = []; for (const sg of [-1, 1]) { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.05, 1, 8), sleeve); m.castShadow = false; body.add(m); const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.044, 0.044, 0.03, 8), skin); body.add(cuff); C.arms.push({ m, cuff, sg, elbow: new V3(wx + sg * (0.1 + C.S.W * 0.12), wy - 0.3, wz - 0.78) }); }
+  // gauges: a speedometer and a tachometer just ahead of the wheel, needles turn with the car
+  const cv = makeCanvas(256, 128), g = cv.getContext('2d'); g.fillStyle = '#0c0d10'; g.fillRect(0, 0, 256, 128);
+  for (const [cx, mx, lab] of [[64, 220, 'КМ/Ч'], [192, 8, 'ОБ']]) { g.strokeStyle = '#8a8f9a'; g.lineWidth = 3; g.beginPath(); g.arc(cx, 64, 52, 0, 6.283); g.stroke(); g.fillStyle = '#e8ecf4'; g.font = '700 11px sans-serif'; g.textAlign = 'center'; for (let i = 0; i <= 8; i++) { const a = Math.PI * 0.75 + i / 8 * Math.PI * 1.5, x1 = cx + Math.cos(a) * 44, y1 = 64 + Math.sin(a) * 44, x2 = cx + Math.cos(a) * 52, y2 = 64 + Math.sin(a) * 52; g.strokeStyle = i > 6 && lab === 'ОБ' ? '#ff4a3a' : '#e8ecf4'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); } g.fillText(lab, cx, 100); }
+  const gt = new THREE.CanvasTexture(cv); gt.colorSpace = THREE.SRGBColorSpace;
+  const gp = new THREE.Group(); gp.position.set(wx, wy + 0.075, wz + 0.2); gp.rotation.x = tilt - 0.1; body.add(gp); const pl = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.15), new THREE.MeshBasicMaterial({ map: gt })); pl.rotation.y = Math.PI; gp.add(pl);
+  C.needles = []; for (const [sx, k] of [[-0.075, 0], [0.075, 1]]) { const n = new THREE.Group(); n.position.set(-sx, 0.001 + 0, -0.004); gp.add(n); const nd = new THREE.Mesh(B, new THREE.MeshBasicMaterial({ color: 0xff5a3a })); nd.scale.set(0.045, 0.004, 0.002); nd.position.x = 0.0225; n.add(nd); C.needles.push(n); }
+  C.gaugeMax = 220;
+  vehCockpitUpd(C);
+}
+const _vkA = new V3(), _vkB = new V3(), _vkQ = new THREE.Quaternion(), _vkY = new V3(0, 1, 0);
+function vehCockpitUpd(C) {
+  if (!C.hands) return; C.wheel.updateMatrix();
+  for (const a of C.arms) { const h = C.hands[a.sg < 0 ? 0 : 1]; _vkA.set(0, -0.012, -0.03).applyMatrix4(h.matrix).applyMatrix4(C.wheel.matrix); _vkB.copy(a.elbow); const d = _vkA.clone().sub(_vkB), len = d.length() || 0.1;
+    a.m.position.copy(_vkB).addScaledVector(d, 0.5); a.m.scale.set(1, len, 1); a.m.quaternion.setFromUnitVectors(_vkY, d.multiplyScalar(1 / len)); a.cuff.position.copy(_vkA).addScaledVector(d, -0.015); a.cuff.quaternion.copy(a.m.quaternion); }
+  const sp = Math.abs(C.vf || 0) * 3.6, sa = Math.PI * 0.75 + clamp(sp / C.gaugeMax, 0, 1) * Math.PI * 1.5, ra = Math.PI * 0.75 + clamp(((C.rpm || 900) - 800) / 6200, 0, 1) * Math.PI * 1.5;
+  if (C.needles) { C.needles[0].rotation.z = -sa; C.needles[1].rotation.z = -ra; }
+}
+function vehHandsSkin(C) {
+  if (!C || !C.skinM) return; let L = null; try { L = typeof avatar !== 'undefined' && avatar && avatar.look ? avatar.look : null; } catch (e) {}
+  const sk = L && typeof L.skin === 'number' ? L.skin : 0xe0b48c; C.skinM.color.setHex(sk); C.sleeveM.color.setHex(L && L.sleeves === 'none' ? sk : L && typeof L.shirt === 'number' ? L.shirt : 0x3a3f4a); C.sleeveM.needsUpdate = C.skinM.needsUpdate = true;
+}
 function vehEnter(C) {
-  if (!C || C.burnt) return; VEH.in = C; VEH.baseYaw = player.yaw = 0; player.pitch = 0; VEH.camK = 0; story.ride = vehRide; story.rideCam = vehCam; W.fireHeld = false; Sound.click(500, 0.4); later(0.2, () => Sound.thud(0.4)); vehHud(true);
+  if (!C || C.burnt) return; vehHandsSkin(C); VEH.in = C; VEH.baseYaw = player.yaw = 0; player.pitch = 0; VEH.camK = 0; story.ride = vehRide; story.rideCam = vehCam; W.fireHeld = false; Sound.click(500, 0.4); later(0.2, () => Sound.thud(0.4)); vehHud(true);
   toast(view3() ? 'Вид сзади · «Вид» — из салона' : 'Вид из салона · «Вид» — сзади'); if (!VEH.tipT) { VEH.tipT = 1; later(1.5, () => toast('Джойстик: газ, тормоз (задний ход), руль · «Прыжок» — ручник для дрифта · «Бросок» — нитро · «Огонь» — гудок · «Инвентарь» — гараж')); }
 }
 function vehExit(force) {
@@ -15703,7 +15745,7 @@ function vehCam(dt) {
   const C = VEH.in; if (!C) return; const sp = Math.hypot(C.vx, C.vz), ly = player.yaw - VEH.baseYaw, lp = player.pitch;
   story.fov = 70 + Math.min(16, sp * 0.35) + (C.nOn ? 9 : 0); const sh = shake * 0.05, cy0 = C.y || 0;
   if (view3()) { const d = (C.S.heavy ? C.S.L + 7 : Math.max(5.5, C.S.L * 1.25)) + sp * 0.045, h = (C.S.heavy ? 5.6 : 1.8 + C.S.ch * 0.55) - lp * 3 + cy0 * 0.85, vh = sp > 4 ? Math.atan2(C.vx, C.vz) : C.yaw, a = C.yaw + angDiff(C.yaw, vh) * 0.4 + ly + Math.PI; VEH.camK = VEH.camK ? lerp(VEH.camK, a, Math.min(1, dt * 4)) : a; const ca = VEH.camK + angDiff(VEH.camK, a) * 0; _vA.set(C.x + Math.sin(ca) * d, h, C.z + Math.cos(ca) * d); camera.position.lerp(_vA, Math.min(1, dt * 6)); if (camera.position.distanceTo(_vA) > 12) camera.position.copy(_vA); camera.lookAt(C.x - Math.sin(ca) * 3, C.S.ch * 0.6 + 0.6 + cy0, C.z - Math.cos(ca) * 3); }
-  else { C.root.updateMatrixWorld(true); C.body.localToWorld(_vA.copy(C.eye)); camera.position.copy(_vA); camera.position.x += rand(-sh, sh); camera.position.y += rand(-sh, sh) + Math.sin(performance.now() / 40) * Math.min(0.004, sp * 0.0002); const a = C.yaw + ly; camera.lookAt(_vA.x + Math.sin(a) * 10, _vA.y + Math.sin(lp) * 10 - 0.6, _vA.z + Math.cos(a) * 10); }
+  else { C.root.updateMatrixWorld(true); C.body.localToWorld(_vA.copy(C.eye)); camera.position.copy(_vA); camera.position.x += rand(-sh, sh); camera.position.y += rand(-sh, sh) + Math.sin(performance.now() / 40) * Math.min(0.004, sp * 0.0002); const a = C.yaw + ly; camera.lookAt(_vA.x + Math.sin(a) * 10, _vA.y + Math.sin(lp) * 10 - 1.7, _vA.z + Math.cos(a) * 10); }
 }
 /* ----- sound ----- */
 function vehAudio() { if (!Sound.ok()) return null; if (VEH.au) return VEH.au; const c = Sound.ctx, g = c.createGain(); g.gain.value = 0; g.connect(Sound.master); const o1 = c.createOscillator(); o1.type = 'sawtooth'; const o2 = c.createOscillator(); o2.type = 'square'; const lp = Sound.filt('lowpass', 500, 3); o1.connect(lp); const g2 = c.createGain(); g2.gain.value = 0.4; o2.connect(g2); g2.connect(lp); lp.connect(g); o1.start(); o2.start(); const nb = c.createBufferSource(); nb.buffer = Sound.noiseBuf; nb.loop = true; const bp = Sound.filt('bandpass', 2400, 5), sg = c.createGain(); sg.gain.value = 0; nb.connect(bp); bp.connect(sg); sg.connect(Sound.master); nb.start(); return (VEH.au = { g, o1, o2, lp, sg }); }
