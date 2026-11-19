@@ -20848,6 +20848,7 @@ function buildScp() {
   // двери: кадр, красный/зелёный индикатор, логотип
   const doorFrame = (x, z, axis, ok) => { const g = new THREE.Group(); g.position.set(x, 0, z); if (axis === 'x') g.rotation.y = Math.PI / 2; const f = std({ color: 0x20302c, roughness: 0.6, metalness: 0.4 }); for (const s of [-1, 1]) { const p = new THREE.Mesh(IM_G.box, f); p.position.set(s * 1.7, 1.2, 0); p.scale.set(0.2, 2.4, 0.44); g.add(p); } const lt = new THREE.Mesh(IM_G.box, f); lt.position.set(0, 2.5, 0); lt.scale.set(3.6, 0.2, 0.44); g.add(lt); const pan = new THREE.Mesh(IM_G.box, ok ? grnP : redP); pan.position.set(1.95, 1.4, 0.2); pan.scale.set(0.12, 0.2, 0.06); g.add(pan); const lg = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.7), new THREE.MeshBasicMaterial({ map: cvTex(128, 128, (c) => { c.clearRect(0, 0, 128, 128); scpLogo(c, 128, '#8aa098'); }), transparent: true, opacity: 0.75 })); lg.position.set(0, 2.0, 0.232); g.add(lg); addMesh(g); return g; };
   doorFrame(0, -48, 'z', false); doorFrame(-2.5, -8.5, 'x', true); doorFrame(2.5, -25.5, 'x', true);
+  scpDecor();
   // красные «аварийные» огни перед камерой
   for (const [x, z] of [[-2, -45], [2, -45]]) { const m = new THREE.Mesh(IM_G.box, redP); m.position.set(x, 2.9, z); m.scale.set(0.3, 0.1, 0.3); addMesh(m); }
   // вывески-логотипы на стенах
@@ -20867,33 +20868,45 @@ function buildScp() {
   { const t = cvTex(128, 128, (g) => { g.clearRect(0, 0, 128, 128); g.fillStyle = 'rgba(70,10,10,.55)'; for (let i = 0; i < 6; i++) { g.beginPath(); g.ellipse(rand(30, 98), rand(30, 98), rand(8, 28), rand(6, 22), rand(0, 3), 0, 6.283); g.fill(); } }); const m = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.position.set(0, 0.02, -58); addMesh(m); }
 }
 function scpTermTex(done, txt) { return cvTex(256, 160, (g) => { g.fillStyle = done ? '#06260f' : '#06180c'; g.fillRect(0, 0, 256, 160); g.fillStyle = done ? '#58ff8a' : '#38d070'; g.font = '700 22px monospace'; g.fillText(done ? '✔ ДОСТУП ОТКРЫТ' : '> ТЕРМИНАЛ', 12, 44); g.font = '14px monospace'; g.fillText(done ? 'протокол снят' : 'нужна авторизация', 12, 78); g.fillText(done ? 'цель выполнена' : 'соедините числа…', 12, 100); for (let y = 0; y < 160; y += 3) { g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(0, y, 256, 1); } }); }
-/* ---------- модель SCP-096 ---------- */
+/* ---------- модель SCP-096 (v2: высокий, костлявый, рёбра, тёмные длиннопалые руки, огромная пасть) ---------- */
+function scpSkinTex(dark) { return cvTex(256, 256, (g) => { g.fillStyle = dark ? '#5e6762' : '#cfd3c6'; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 90; i++) { g.fillStyle = `rgba(${dark ? '20,30,26' : '120,140,120'},${rand(0.05, 0.16)})`; g.beginPath(); g.ellipse(rand(0, 256), rand(0, 256), rand(6, 30), rand(4, 20), rand(0, 3), 0, 6.283); g.fill(); } g.strokeStyle = dark ? 'rgba(10,20,16,.5)' : 'rgba(70,100,120,.32)'; g.lineWidth = 1.5; for (let i = 0; i < 22; i++) { g.beginPath(); let x = rand(0, 256), y = rand(0, 256); g.moveTo(x, y); for (let k = 0; k < 5; k++) { x += rand(-20, 20); y += rand(8, 26); g.lineTo(x, y); } g.stroke(); } for (let i = 0; i < 500; i++) { g.fillStyle = `rgba(0,0,0,${rand(0.02, 0.07)})`; g.fillRect(randi(256), randi(256), 2, 2); } }); }
 function scpBuild() {
-  const skin = std({ color: 0xcdd3c6, roughness: 0.65, emissive: 0x0a100c }), shadow = std({ color: 0x9aa298, roughness: 0.8 }), hand = std({ color: 0x6a726c, roughness: 0.7 }), mouthM = new THREE.MeshBasicMaterial({ color: 0x5a0a12 }), black = new THREE.MeshBasicMaterial({ color: 0x050808 });
-  const ribT = cvTex(128, 128, (g) => { g.fillStyle = '#cdd3c6'; g.fillRect(0, 0, 128, 128); for (let y = 8; y < 100; y += 14) { g.strokeStyle = 'rgba(40,50,44,.55)'; g.lineWidth = 3; g.beginPath(); g.moveTo(20, y); g.quadraticCurveTo(64, y + 10, 108, y); g.stroke(); } g.strokeStyle = 'rgba(40,50,44,.4)'; g.beginPath(); g.moveTo(64, 0); g.lineTo(64, 120); g.stroke(); }), torsoM = std({ color: 0xffffff, map: ribT, roughness: 0.65 });
-  const root = new THREE.Group(), A = {}; root.scale.setScalar(1.18); const mk = (geo, mat, par, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; par.add(m); return m; }, pv = (par, x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); par.add(g); return g; };
-  const cyl = (r0, r1, h) => new THREE.CylinderGeometry(r0, r1, h, 8);
-  A.hip = pv(root, 0, 1.28, 0);
-  for (const s of [-1, 1]) { const th = pv(A.hip, s * 0.11, 0, 0), kn = pv(th, 0, -0.66, 0); mk(cyl(0.075, 0.06, 0.66), skin, th, 0, -0.33, 0); mk(cyl(0.06, 0.045, 0.66), skin, kn, 0, -0.33, 0); const ft = pv(kn, 0, -0.66, 0); mk(IM_G.box, shadow, ft, 0, -0.03, 0.07).scale.set(0.09, 0.06, 0.26); (s < 0 ? (A.thL = th, A.knL = kn) : (A.thR = th, A.knR = kn)); }
-  A.sp = pv(A.hip, 0, 0.05, 0); mk(IM_G.box, shadow, A.sp, 0, 0.08, 0).scale.set(0.24, 0.16, 0.14);
-  A.chest = pv(A.sp, 0, 0.16, 0); mk(new THREE.CylinderGeometry(0.24, 0.17, 0.62, 10), torsoM, A.chest, 0, 0.3, 0); mk(IM_G.sph, skin, A.chest, 0, 0.6, 0).scale.set(0.34, 0.14, 0.2);
-  A.neck = pv(A.chest, 0, 0.66, 0); mk(cyl(0.055, 0.065, 0.22), skin, A.neck, 0, 0.1, 0);
-  A.head = pv(A.neck, 0, 0.22, 0.02); mk(IM_G.sph, skin, A.head, 0, 0.12, 0.0).scale.set(0.32, 0.42, 0.34);
-  A.jaw = pv(A.head, 0, 0.0, 0.04); mk(IM_G.box, skin, A.jaw, 0, -0.02, 0.04).scale.set(0.17, 0.07, 0.17);
-  A.mouth = mk(new THREE.PlaneGeometry(0.15, 0.2), mouthM, A.head, 0, 0.0, 0.158); A.mouth.scale.set(0.1, 0.1, 1);
-  for (const s of [-1, 1]) { const e = mk(IM_G.sph, black, A.head, s * 0.06, 0.15, 0.135); e.scale.set(0.05, 0.035, 0.03); }
-  for (const s of [-1, 1]) { const sh = pv(A.chest, s * 0.22, 0.56, 0), el = pv(sh, 0, -0.78, 0); mk(cyl(0.056, 0.045, 0.78), skin, sh, 0, -0.39, 0); mk(cyl(0.045, 0.036, 0.78), skin, el, 0, -0.39, 0); const hd = pv(el, 0, -0.78, 0); mk(IM_G.box, hand, hd, 0, -0.1, 0).scale.set(0.09, 0.2, 0.04); for (let i = 0; i < 4; i++) mk(IM_G.box, hand, hd, (i - 1.5) * 0.024, -0.3, 0).scale.set(0.014, 0.2, 0.014); (s < 0 ? (A.shL = sh, A.elL = el, A.hdL = hd) : (A.shR = sh, A.elR = el, A.hdR = hd)); }
-  root.traverse((o) => { if (o.isMesh) o.castShadow = true; }); root.userData.A = A; return root;
+  const skinT = scpSkinTex(false), darkT = scpSkinTex(true);
+  const skin = std({ color: 0xffffff, map: skinT, roughness: 0.5, emissive: 0x1a221c, emissiveIntensity: 0.6 }), bone = std({ color: 0xe2e6d8, roughness: 0.45, emissive: 0x1c2420 }), hand = std({ color: 0xffffff, map: darkT, roughness: 0.55, emissive: 0x0a100c }), mouthM = new THREE.MeshBasicMaterial({ color: 0x4a0610 }), tongue = new THREE.MeshBasicMaterial({ color: 0xa01a28 }), black = new THREE.MeshBasicMaterial({ color: 0x030505 }), teeth = std({ color: 0xe8e0c0, roughness: 0.4 });
+  const root = new THREE.Group(), A = {}; const mk = (geo, mat, par, x = 0, y = 0, z = 0, sx = 1, sy = 1, sz = 1) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = true; par.add(m); return m; }, pv = (par, x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); par.add(g); return g; };
+  const cyl = (r0, r1, h) => new THREE.CylinderGeometry(r0, r1, h, 10), sph = new THREE.SphereGeometry(1, 16, 12), box = IM_G.box;
+  A.hip = pv(root, 0, 1.4, 0);
+  for (const s of [-1, 1]) { const th = pv(A.hip, s * 0.12, -0.02, 0), kn = pv(th, 0, -0.72, 0); mk(cyl(0.078, 0.052, 0.72), skin, th, 0, -0.36, 0); mk(sph, skin, th, 0, -0.72, 0, 0.062, 0.062, 0.066); mk(cyl(0.052, 0.034, 0.74), skin, kn, 0, -0.37, 0); mk(sph, skin, kn, 0, -0.1, 0.01, 0.052, 0.12, 0.05); const ft = pv(kn, 0, -0.74, 0); mk(box, skin, ft, 0, -0.02, 0.1, 0.09, 0.05, 0.28); for (let t = 0; t < 4; t++) mk(box, skin, ft, (t - 1.5) * 0.02, -0.03, 0.27, 0.016, 0.02, 0.1); mk(sph, skin, ft, 0, 0.0, -0.04, 0.045, 0.05, 0.06); (s < 0 ? (A.thL = th, A.knL = kn) : (A.thR = th, A.knR = kn)); }
+  mk(sph, skin, A.hip, 0, 0.02, 0, 0.17, 0.1, 0.11);
+  A.sp = pv(A.hip, 0, 0.08, 0); mk(cyl(0.12, 0.15, 0.34), skin, A.sp, 0, 0.17, 0); for (let i = 0; i < 6; i++) mk(sph, bone, A.sp, 0, 0.06 + i * 0.05, -0.11, 0.018, 0.018, 0.018); // позвонки
+  A.chest = pv(A.sp, 0, 0.34, 0); mk(sph, skin, A.chest, 0, 0.3, 0, 0.24, 0.34, 0.15);
+  for (let i = 0; i < 7; i++) { const w = 0.205 - Math.abs(i - 2) * 0.012 - (i > 4 ? 0.03 : 0); const rb = new THREE.Mesh(new THREE.TorusGeometry(w, 0.011, 6, 16, Math.PI * 1.45), bone); rb.rotation.set(Math.PI / 2, 0, Math.PI * 1.275); rb.scale.set(1, 0.7, 1); rb.position.set(0, 0.05 + i * 0.075, 0.012); rb.castShadow = true; A.chest.add(rb); }
+  mk(box, bone, A.chest, 0, 0.62, 0.04, 0.58, 0.034, 0.05); mk(box, bone, A.chest, 0, 0.35, 0.145, 0.03, 0.4, 0.02); // ключицы, грудина
+  A.neck = pv(A.chest, 0, 0.66, 0.02); mk(cyl(0.05, 0.062, 0.26), skin, A.neck, 0, 0.12, 0); for (const s of [-1, 1]) mk(box, bone, A.neck, s * 0.045, 0.1, 0.045, 0.012, 0.18, 0.012);
+  A.head = pv(A.neck, 0, 0.26, 0.02); mk(sph, skin, A.head, 0, 0.14, 0.0, 0.17, 0.25, 0.2); mk(sph, skin, A.head, 0, 0.08, 0.1, 0.1, 0.1, 0.07); // череп, скулы
+  mk(sph, black, A.head, -0.065, 0.17, 0.155, 0.05, 0.04, 0.03); mk(sph, black, A.head, 0.065, 0.17, 0.155, 0.05, 0.04, 0.03); mk(sph, bone, A.head, -0.065, 0.165, 0.178, 0.011, 0.011, 0.006); mk(sph, bone, A.head, 0.065, 0.165, 0.178, 0.011, 0.011, 0.006);
+  mk(box, skin, A.head, 0, 0.1, 0.19, 0.03, 0.09, 0.03); for (const s of [-1, 1]) mk(sph, black, A.head, s * 0.1, 0.05, 0.12, 0.04, 0.07, 0.03); // нос, впалые щёки
+  A.mouthIn = mk(sph, mouthM, A.head, 0, 0.0, 0.1, 0.08, 0.02, 0.08); A.tongue = mk(sph, tongue, A.head, 0, -0.04, 0.12, 0.05, 0.015, 0.06);
+  A.jaw = pv(A.head, 0, 0.02, 0.0); mk(box, skin, A.jaw, 0, -0.045, 0.1, 0.17, 0.05, 0.17); mk(box, bone, A.jaw, 0, -0.015, 0.17, 0.12, 0.01, 0.015); mk(box, bone, A.jaw, 0, -0.1, 0.12, 0.1, 0.05, 0.04);
+  for (let t = 0; t < 8; t++) { mk(box, teeth, A.jaw, (t - 3.5) * 0.017, -0.012, 0.165, 0.011, 0.02, 0.01); mk(box, teeth, A.head, (t - 3.5) * 0.017, 0.016, 0.172, 0.011, 0.02, 0.01); }
+  for (const s of [-1, 1]) {
+    const sh = pv(A.chest, s * 0.3, 0.6, 0), el = pv(sh, 0, -0.95, 0); mk(sph, bone, sh, 0, 0, 0, 0.055, 0.055, 0.055); mk(cyl(0.05, 0.036, 0.95), skin, sh, 0, -0.475, 0); mk(sph, skin, el, 0, 0, 0, 0.048, 0.05, 0.048); mk(cyl(0.04, 0.026, 0.95), skin, el, 0, -0.475, 0);
+    const hd = pv(el, 0, -0.95, 0); mk(cyl(0.032, 0.03, 0.1), hand, hd, 0, -0.04, 0); mk(box, hand, hd, 0, -0.12, 0, 0.1, 0.12, 0.035); const fingers = [];
+    for (let f = 0; f < 5; f++) { const fx = (f - 2) * 0.022 * (f === 0 ? 1.4 : 1), fg = pv(hd, fx, -0.18, 0), len = [0.14, 0.22, 0.26, 0.24, 0.18][f]; mk(box, hand, fg, 0, -len / 2, 0, 0.014, len, 0.014); const f2 = pv(fg, 0, -len, 0); mk(box, hand, f2, 0, -len / 2.6, 0, 0.012, len / 1.3, 0.012); mk(new THREE.ConeGeometry(0.008, 0.04, 5), black, f2, 0, -len / 1.3 - 0.02, 0, 1, -1, 1); fingers.push(fg, f2); }
+    (s < 0 ? (A.shL = sh, A.elL = el, A.hdL = hd, A.fgL = fingers) : (A.shR = sh, A.elR = el, A.hdR = hd, A.fgR = fingers));
+  }
+  root.scale.setScalar(1.05); root.traverse((o) => { if (o.isMesh) o.castShadow = true; }); root.userData.A = A; return root;
 }
 function scpPose(K, dt) {
-  const A = K.g.userData.A, t = K.t, st = K.st; const lp = (o, k, v) => { o.rotation[k] = lerp(o.rotation[k], v, Math.min(1, dt * 9)); };
-  let hipY = 1.28, torso = 0, head = 0, jaw = 0, sL = [0, 0, 0], eL = 0, thL = 0, knL = 0, thR = 0, knR = 0, mouth = 0.2, shake = 0;
-  if (st === 'calm') { const b = Math.sin(t * 2.2) * 0.04, cry = Math.sin(t * 7) * 0.02 * (K.sob > 0 ? 1 : 0.3); hipY = 1.05; torso = 0.62 + b; head = 0.45; sL = [-1.25, -0.28, 0]; eL = -2.3 + cry * 6; thL = -0.55; knL = 1.0; thR = -0.45; knR = 0.9; mouth = 0.12; shake = cry; }
-  else if (st === 'wind') { const k = clamp(K.stT / 2.4, 0, 1); hipY = lerp(1.05, 1.3, Math.min(1, k * 3)); torso = lerp(0.62, -0.15, Math.min(1, k * 2)); head = lerp(0.45, -0.7, Math.min(1, k * 2)); sL = [lerp(-2.4, -0.2, Math.min(1, k * 2.5)), lerp(0.45, 1.25, Math.min(1, k * 2.5)), 0]; eL = lerp(-2.3, -0.2, Math.min(1, k * 2.5)); thL = -0.1; thR = 0.1; jaw = 0.5; mouth = 0.95; shake = Math.sin(t * 60) * 0.03; }
-  else if (st === 'run') { const w = t * 15; hipY = 1.18 + Math.abs(Math.sin(w)) * 0.06; torso = 0.5; head = -0.35; sL = [Math.sin(w) * 0.9 + 0.6, 0.35, 0]; eL = -0.7; thL = Math.sin(w) * 1.0; knL = Math.max(0, -Math.sin(w)) * 1.4 + 0.2; thR = -Math.sin(w) * 1.0; knR = Math.max(0, Math.sin(w)) * 1.4 + 0.2; jaw = 0.5; mouth = 0.9; shake = Math.sin(t * 50) * 0.02; }
-  else if (st === 'kill') { hipY = 1.3; torso = -0.1; head = -0.6; sL = [-0.3, 1.1, 0]; eL = -0.5; jaw = 0.55; mouth = 1; shake = Math.sin(t * 40) * 0.04; }
-  A.hip.position.y = lerp(A.hip.position.y, hipY, Math.min(1, dt * 8)); lp(A.sp, 'x', torso * 0.5); lp(A.chest, 'x', torso * 0.5); lp(A.head, 'x', head); lp(A.jaw, 'x', jaw); A.head.rotation.z = shake; A.mouth.scale.set(0.1 + mouth * 0.65, 0.1 + mouth * 1.0, 1); A.mouth.position.y = -0.03 - mouth * 0.04;
-  for (const [sh, el, sg] of [[A.shL, A.elL, -1], [A.shR, A.elR, 1]]) { lp(sh, 'x', sL[0]); lp(sh, 'z', sg * sL[1]); lp(sh, 'y', sg * sL[2]); lp(el, 'x', eL); }
+  const A = K.g.userData.A, t = K.t, st = K.st, k = Math.min(1, dt * 9); const lp = (o, a, v) => { o.rotation[a] = lerp(o.rotation[a], v, k); };
+  let hipY = 1.4, torso = 0, head = 0, jaw = 0, sh = [0, 0, 0], eL = 0, thL = 0, knL = 0, thR = 0, knR = 0, shake = 0, curl = 0.3, mouth = 0, tilt = 0, lean = 0;
+  if (st === 'calm') { const b = Math.sin(t * 2.2) * 0.03, sob = Math.sin(t * 7.5) * (K.sob > 0 ? 0.03 : 0.01); hipY = 1.12 + b * 0.5; torso = 0.78 + b; head = 0.35; sh = [-1.2, -0.42, 0]; eL = -2.45 + sob * 5; thL = -0.62; knL = 1.05; thR = -0.5; knR = 0.95; shake = sob * 1.2; curl = 0.9; tilt = Math.sin(t * 0.7) * 0.06; }
+  else if (st === 'wind') { const q = clamp(K.stT / 2.4, 0, 1), up = Math.min(1, q * 2.4), spread = clamp((q - 0.5) * 2.2, 0, 1); hipY = lerp(1.12, 1.46, up); torso = lerp(0.78, -0.18, up); head = lerp(0.35, -0.8, up); sh = [lerp(-1.2, -2.7, up) * (1 - spread) + lerp(0, -0.25, spread) * spread, lerp(-0.42, 0.7, up) * (1 - spread) + 1.45 * spread, 0]; eL = lerp(-2.45, -1.7, up) * (1 - spread) + (-0.3) * spread; thL = -0.18; thR = 0.12; knL = 0.2; jaw = 1.0 * up; mouth = up; shake = Math.sin(t * 55) * 0.035; curl = lerp(0.9, 0.3, spread); }
+  else if (st === 'run') { const w = t * 14; hipY = 1.3 + Math.abs(Math.sin(w)) * 0.09; torso = 0.62; head = -0.45; sh = [0.55 + Math.sin(w) * 0.9, 0.55, 0]; eL = -0.35 - Math.abs(Math.sin(w)) * 0.5; thL = Math.sin(w) * 1.15; knL = Math.max(0, -Math.sin(w)) * 1.5 + 0.15; thR = -Math.sin(w) * 1.15; knR = Math.max(0, Math.sin(w)) * 1.5 + 0.15; jaw = 1.0; mouth = 1; shake = Math.sin(t * 48) * 0.03; curl = 0.2; lean = Math.sin(w) * 0.1; }
+  else if (st === 'kill') { hipY = 1.44; torso = -0.05; head = -0.55; sh = [-1.5, 0.28, 0]; eL = -0.25; jaw = 1.0; mouth = 1; shake = Math.sin(t * 40) * 0.05; curl = 1.1; thL = -0.1; thR = 0.1; }
+  A.hip.position.y = lerp(A.hip.position.y, hipY, k); lp(A.sp, 'x', torso * 0.45); lp(A.chest, 'x', torso * 0.55); lp(A.head, 'x', head); A.head.rotation.z = shake + tilt; A.hip.rotation.z = lean; lp(A.jaw, 'x', jaw);
+  A.mouthIn.scale.set(0.08 + mouth * 0.02, 0.02 + mouth * 0.13, 0.08 + mouth * 0.02); A.mouthIn.position.y = -0.02 - mouth * 0.05; A.tongue.scale.set(0.05, 0.015 + mouth * 0.04, 0.06); A.tongue.position.y = -0.06 - mouth * 0.08;
+  for (const [shd, el, sg, fgs] of [[A.shL, A.elL, -1, A.fgL], [A.shR, A.elR, 1, A.fgR]]) { lp(shd, 'x', sh[0]); lp(shd, 'z', sg * sh[1]); lp(el, 'x', eL); fgs.forEach((f, i) => lp(f, 'x', -curl * (i % 2 ? 1.1 : 0.7) + Math.sin(t * 9 + i) * 0.05)); }
   lp(A.thL, 'x', thL); lp(A.knL, 'x', -knL); lp(A.thR, 'x', thR); lp(A.knR, 'x', -knR);
 }
 /* ---------- SCP-096: логика ---------- */
@@ -20926,7 +20939,7 @@ const SCP_COL = ['', '#ff4a5a', '#4aff7a', '#4af0ff', '#ff4aff', '#7a8aff', '#ff
 function scpUi(on) {
   scpCss(); let h = document.getElementById('scpHud');
   if (!h) {
-    h = document.createElement('div'); h.id = 'scpHud'; h.innerHTML = `<div class="x" data-k="x">✕ Выйти</div><div class="obj" id="scpObj"></div><div id="scpTrk"><div id="scpTrkT">целей: 3</div><div class="scr"><div class="rg"></div><div class="ar" id="scpAr"></div></div><div id="scpTrkN">терминал A</div><div id="scpTrkB">заряд 92%</div></div><div id="scpEyes">👁<span>ЗАКРЫТЬ ГЛАЗА</span></div><button id="scpUse">⌨ ВЗЛОМАТЬ ТЕРМИНАЛ</button>`; document.body.appendChild(h);
+    h = document.createElement('div'); h.id = 'scpHud'; h.innerHTML = `<div class="x" data-k="x">✕ Выйти</div><div class="obj" id="scpObj"></div><div id="scpTrk"><div id="scpTrkT">целей: 3</div><div class="scr"><div class="rg"></div><div class="ar" id="scpAr"></div></div><div id="scpTrkN">терминал A</div><div id="scpTrkB">заряд 92%</div></div><div id="scpStam" style="position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:5px;pointer-events:none"><i style="width:26px;height:7px;border-radius:3px"></i><i style="width:26px;height:7px;border-radius:3px"></i><i style="width:26px;height:7px;border-radius:3px"></i><i style="width:26px;height:7px;border-radius:3px"></i><i style="width:26px;height:7px;border-radius:3px"></i></div><div id="scpEyes">👁<span>ЗАКРЫТЬ ГЛАЗА</span></div><button id="scpUse">⌨ ВЗЛОМАТЬ ТЕРМИНАЛ</button>`; document.body.appendChild(h);
     for (const id of ['scpVig', 'scpBlind', 'scpWarn', 'scpMsg', 'scpPz', 'scpRes']) { const d = document.createElement('div'); d.id = id; document.body.appendChild(d); }
     ['touchstart', 'pointerdown', 'mousedown', 'click'].forEach((e) => [h, document.getElementById('scpPz'), document.getElementById('scpRes')].forEach((el) => el.addEventListener(e, (ev) => ev.stopPropagation())));
     h.querySelector('[data-k="x"]').onclick = () => scpExit(); const eyes = h.querySelector('#scpEyes'); const tog = (ev) => { ev.preventDefault(); SCP.eyes = !SCP.eyes; scpEyes(); }; eyes.addEventListener('pointerdown', tog); h.querySelector('#scpUse').addEventListener('pointerdown', (ev) => { ev.preventDefault(); scpUseTerm(); });
@@ -20948,14 +20961,14 @@ function scpStart() {
   const k = SCP.k = { g: scpBuild(), x: 0, z: -60, yaw: 0, st: 'calm', t: 0, stT: 0, sob: 1 }; k.g.position.set(k.x, 0, k.z); addMesh(k.g);
   Object.assign(SCP, { on: true, ph: 'intro', t: 0, eyes: false, look: 0, agit: 0, done: 0, chaseT: 0, alarm: false, exitOpen: false, near: null, puzzle: null, breach: 0, bat: 92, exitT: 0 });
   for (const o of SCP.obj) o.done = false; if (SCP.exitDoors) for (const d of SCP.exitDoors) d.position.x = d.userData.s * 0.55;
-  scpUi(true); scpEyes(); SCP.eyes = false; scpEyes(); story.ride = () => { player.vel.set(0, 0, 0); };
+  story.rideCam = null; SCP.stam = 1; SCP.tired = false; SCP.emerg = false; SCP.victims = 0; scpSpawnBots(); scpUi(true); scpEyes(); SCP.eyes = false; scpEyes(); story.ride = () => { player.vel.set(0, 0, 0); };
   scpIntro();
 }
 function scpIntro() {
   const r = document.getElementById('scpRes'); r.style.display = 'block'; r.innerHTML = `<div style="font:900 11px var(--ui);letter-spacing:.3em;color:#5aff9a">SCP FOUNDATION · УРОВЕНЬ 4</div><div style="font:900 22px var(--ui);margin:8px 0">SCP-096 «ЗАСТЕНЧИВЫЙ»</div><div style="text-align:left;font:600 13px/1.5 var(--ui);margin-bottom:12px">1. Взломайте <b>3 терминала</b> (трекер слева показывает путь).<br>2. <b style="color:#ff6a5a">Не смотрите ему в лицо.</b> Увидели — он бежит за вами.<br>3. Кнопка <b>👁 «Закрыть глаза»</b> — идите вслепую рядом с ним.<br>4. Не бегайте рядом с камерой: он слышит.<br>5. Когда все терминалы взломаны — бегите к выходу.</div><button class="btn primary" data-k="go" style="width:100%;background:linear-gradient(180deg,#2a9a68,#146a44);border-color:#9fffd0">▶ НАЧАТЬ</button>`;
-  r.querySelector('[data-k="go"]').onclick = () => { r.style.display = 'none'; SCP.ph = 'play'; story.ride = null; SCP.t0 = performance.now(); SFX.scpDoor(0.5); scpSay('…где…', 3000); };
+  r.querySelector('[data-k="go"]').onclick = () => { r.style.display = 'none'; SCP.ph = 'play'; story.ride = null; SCP.t0 = performance.now(); SFX.scpDoor(0.5); scpSay('…где…', 3000); scpPA('Внимание. Протокол удержания эс-си-пи ноль девяносто шесть активен. Не смотрите объекту в лицо.'); };
 }
-function scpExit() { SCP.on = false; SCP.ph = ''; scpUi(false); SFX.scpAlarm(false); SFX.loopsOff(); story.ride = null; story.rideCam = null; camera.far = 160; camera.updateProjectionMatrix(); if (SCP.view0 !== null) { settings.view = SCP.view0; SCP.view0 = null; } document.body.classList.remove('mons-ui', 'playing'); state = 'menu'; mode = 'sandbox'; $('menu').hidden = false; $('hud').hidden = false; $('resumeBtn').hidden = true; if (hemi) hemi.intensity = 0.55; }
+function scpExit() { SCP.on = false; SCP.ph = ''; scpUi(false); SFX.scpAlarm(false); SFX.loopsOff(); story.ride = null; story.rideCam = null; camera.far = 160; camera.updateProjectionMatrix(); if (SCP.view0 !== null) { settings.view = SCP.view0; SCP.view0 = null; } document.body.classList.remove('mons-ui', 'playing'); state = 'menu'; mode = 'sandbox'; $('menu').hidden = false; $('hud').hidden = false; $('resumeBtn').hidden = true; if (hemi) hemi.intensity = 0.55; try { scpEmerg(false); window.speechSynthesis && speechSynthesis.cancel(); } catch (e) {} }
 function scpResult(win) {
   SCP.ph = 'end'; const T = Math.round((performance.now() - SCP.t0) / 1000), r = document.getElementById('scpRes'); if (win) { SCP_META.escapes++; if (!SCP_META.best || T < SCP_META.best) SCP_META.best = T; } else SCP_META.deaths++; scpSave(); SFX.scpAlarm(false);
   r.style.display = 'block'; r.style.borderColor = win ? '#2a9a68' : '#8a2a22'; r.innerHTML = `<div style="font:900 26px var(--ui);color:${win ? '#5aff9a' : '#ff4a3a'}">${win ? '✔ ВЫ СБЕЖАЛИ' : '✖ ВЫ ПОГИБЛИ'}</div><div style="font-size:44px;margin:6px 0">${win ? '🛗' : '☠️'}</div><div style="font:600 13px/1.5 var(--ui);margin-bottom:10px">${win ? 'Лифт закрылся. SCP-096 остался в комплексе.' : 'Вы увидели его лицо… или он услышал вас.'}<br>Время: <b>${T} с</b> · терминалов: <b>${SCP.done}/3</b><br><small style="opacity:.7">побегов: ${SCP_META.escapes} · смертей: ${SCP_META.deaths}${SCP_META.best ? ' · рекорд ' + SCP_META.best + ' с' : ''}</small></div><div style="display:flex;gap:8px"><button class="btn primary" data-k="again" style="flex:1">↻ Ещё раз</button><button class="btn" data-k="menu" style="flex:1">В меню</button></div>`;
@@ -20965,9 +20978,9 @@ function scpResult(win) {
 function scpRage(why) {
   const K = SCP.k; if (!K || K.st !== 'calm' || SCP.ph === 'end') return; K.st = 'wind'; K.stT = 0; K.t = 0; SCP.ph = 'rage'; SCP.alarm = true; SCP.chaseT = 0; shake = Math.max(shake, 1.4); flashScreen('#ff2a1a', 500);
   scpWarn(why === 'noise' ? '☣ SCP-096 УСЛЫШАЛ ВАС' : '☣ SCP-096 ВИДЕЛ ЛИЦО — ОН ОБОЗЛЁН', 3200);
-  if (!Sound.clip('scp_rage', { vol: 1.3, wet: 0.12 })) SFX.scpRageSynth(1); SFX.scpAlarm(true);
+  if (!Sound.clip('scp_rage', { vol: 1.3, wet: 0.12 })) SFX.scpRageSynth(1); SFX.scpAlarm(true); scpEmerg(true); scpOpenCell();
 }
-function scpKillPlayer() { if (SCP.ph === 'end' || SCP.ph === 'dying') return; SCP.ph = 'dying'; SCP.k.st = 'kill'; SCP.k.t = 0; SFX.scpKill(1); SFX.scpAlarm(false); shake = 2; flashScreen('#a00', 900); try { playerRagdoll(0, 2, -4); } catch (e) {} story.ride = () => { player.vel.set(0, 0, 0); }; setTimeout(() => scpResult(false), 1800); }
+function scpKillPlayer() { if (SCP.ph === 'end' || SCP.ph === 'dying') return; SCP.ph = 'dying'; SCP.k.st = 'kill'; SCP.k.t = 0; SFX.scpKill(1); SFX.scpAlarm(false); shake = 2; flashScreen('#a00', 900); try { playerRagdoll(0, 2, -4); } catch (e) {} story.ride = () => { player.vel.set(0, 0, 0); }; const K = SCP.k, side = K.yaw + 1.3; story.rideCam = () => { const q = player.pos; SCP.kt = (SCP.kt || 0) + 0.016; camera.position.set(q.x + Math.sin(side + SCP.kt * 0.4) * 2.7, 1.25 + Math.sin(SCP.kt) * 0.1, q.z + Math.cos(side + SCP.kt * 0.4) * 2.7); camera.lookAt((q.x + K.x) / 2, 1.5, (q.z + K.z) / 2); }; SCP.kt = 0; { const bp = new V3(player.pos.x, 1.3, player.pos.z); bloodSpray(bp, new V3(Math.sin(K.yaw), 0.5, Math.cos(K.yaw)), 220, 1.4, 2, 10, 0.006, 0.022); try { bloodMist(bp, 1.6); } catch (e) {} } later(0.5, () => { try { const bp = new V3(player.pos.x, 1.0, player.pos.z); bloodSpray(bp, UP, 120, 1.3, 1, 6, 0.006, 0.02); } catch (e) {} }); setTimeout(() => scpResult(false), 2300); }
 function scpWin() { if (SCP.ph === 'end') return; SCP.ph = 'end'; SFX.scpAlarm(false); SFX.scpBeep(true); flashScreen('#cfffe8', 700); SCP.k.st = 'calm'; setTimeout(() => scpResult(true), 900); }
 function scpTick(dt) {
   const K = SCP.k, p = player.pos, now = performance.now() / 1000; SCP.t += dt; K.t += dt;
@@ -20990,12 +21003,12 @@ function scpTick(dt) {
   } else if (K.st === 'wind') {
     K.stT += dt; K.yaw = Math.atan2(dx, dz); shake = Math.max(shake, 0.7); if (K.stT >= 2.4) { K.st = 'run'; K.t = 0; K.stT = 0; scpWarn('БЕГИТЕ!', 1800); }
   } else if (K.st === 'run') {
-    SCP.chaseT += dt; const spd = Math.min(9.6, 5 + SCP.chaseT * 4.5); let tx = p.x, tz = p.z;
+    SCP.chaseT += dt; const spd = K.pause > 0 ? (K.pause -= dt, 0) : Math.min(9.6, 5 + SCP.chaseT * 4.5); let tx = p.x, tz = p.z;
     if (scpSeg(K.x, K.z, p.x, p.z)) { let best = null, bd = 1e9; for (const [wx, wz] of SCP_WP) { if (scpSeg(K.x, K.z, wx, wz)) continue; const d = Math.hypot(wx - p.x, wz - p.z) + Math.hypot(wx - K.x, wz - K.z) * 0.1; if (d < bd) { bd = d; best = [wx, wz]; } } if (best) { tx = best[0]; tz = best[1]; } }
     const ax = tx - K.x, az = tz - K.z, al = Math.hypot(ax, az) || 1; K.yaw = lerpAngle(K.yaw, Math.atan2(ax, az), Math.min(1, dt * 10)); K.x += ax / al * spd * dt; K.z += az / al * spd * dt; { const tv = _tp2.set(K.x, 0.5, K.z); pushOutAABBs(tv, 0.45, 0.2); K.x = tv.x; K.z = tv.z; }
     shake = Math.max(shake, clamp(1 - dist / 25, 0, 0.6)); if (Math.floor(K.t * 15 / Math.PI) !== Math.floor((K.t - dt) * 15 / Math.PI)) SFX.thump && 0;
     if (dist < 1.2) scpKillPlayer();
-    if (SCP.chaseT > 38 && SCP.ph === 'rage') { K.st = 'calm'; K.t = 0; SCP.ph = 'play'; SCP.alarm = false; SFX.scpAlarm(false); SCP.look = 0; SCP.agit = 0; scpWarn('SCP-096 успокоился', 2600); }
+    if (SCP.chaseT > 38 && SCP.ph === 'rage') { K.st = 'calm'; K.t = 0; SCP.ph = 'play'; SCP.alarm = false; SFX.scpAlarm(false); SCP.look = 0; SCP.agit = 0; scpEmerg(false); scpWarn('SCP-096 успокоился', 2600); }
   } else if (K.st === 'kill') { K.yaw = Math.atan2(dx, dz); }
   SCP.vig = clamp(SCP.look / 0.5, 0, 1); const v = document.getElementById('scpVig'); if (v) v.style.opacity = SCP.vig; if (SCP.vig > 0.15 && Math.random() < dt * 3) SFX.scpHeart(0.5);
   // терминалы и выход
@@ -21011,7 +21024,7 @@ function scpTick(dt) {
   const ob = document.getElementById('scpObj'); if (ob) ob.textContent = SCP.ph === 'rage' ? '☣ SCP-096 ПРЕСЛЕДУЕТ' : left ? 'Терминалы: ' + (3 - left) + '/3' : 'ВЫХОД ОТКРЫТ — БЕГИТЕ';
 }
 const _tp2 = new V3(), _tp3 = new V3(); function lerpAngle(a, b, t) { let d = b - a; while (d > Math.PI) d -= 6.2832; while (d < -Math.PI) d += 6.2832; return a + d * t; }
-function updScp(dt) { if (!SCP.on) return; if (SCP.ph === 'intro') { scpPose(SCP.k, dt); SCP.k.t += dt; SCP.k.g.position.set(SCP.k.x, 0, SCP.k.z); return; } scpTick(dt); }
+function updScp(dt) { if (!SCP.on) return; if (SCP.ph === 'intro') { scpPose(SCP.k, dt); SCP.k.t += dt; SCP.k.g.position.set(SCP.k.x, 0, SCP.k.z); return; } scpTick(dt); scpTick2(dt); }
 /* ---------- терминалы и головоломка ---------- */
 function scpGen(N, P) {
   for (let tries = 0; tries < 300; tries++) { const used = new Array(N * N).fill(0), pairs = []; let ok = true;
@@ -21042,10 +21055,73 @@ function scpPuzzle(o) {
 function scpClosePuzzle() { if (SCP.puzzle && SCP.puzzle.cleanup) SCP.puzzle.cleanup(); SCP.puzzle = null; const pz = document.getElementById('scpPz'); if (pz) { pz.style.display = 'none'; pz.innerHTML = ''; } if (SCP.ph !== 'end' && SCP.ph !== 'dying') story.ride = null; }
 function scpFinishTerm(o) {
   if (!SCP.puzzle) return; scpClosePuzzle(); o.done = true; SCP.done++; SCP_META.terms++; scpSave(); SFX.scpBeep(true); o.scr.map = scpTermTex(true); o.scr.needsUpdate = true; o.light.intensity = 1.2; banner('✔ ТЕРМИНАЛ ' + o.id + ' ВЗЛОМАН', SCP.done + '/3');
-  if (o.id === 'C' && SCP.k.st === 'calm' && SCP.ph !== 'rage') { scpWarn('⚠ НАРУШЕНИЕ ПРОТОКОЛА УДЕРЖАНИЯ', 3000); SCP.alarm = true; SFX.scpAlarm(true); SCP.breach = 2.5; SFX.scpDoor(0.9); }
-  if (SCP.obj.every((q) => q.done)) { SCP.exitOpen = true; if (SCP.exitLamp) { SCP.exitLamp.material.color.setHex(0x38ff6a); SCP.exitLamp.material.emissive.setHex(0x20ff50); } scpWarn('ВЫХОД ОТКРЫТ — К ЛИФТУ!', 3000); SFX.scpDoor(0.6); }
+  if (o.id === 'C' && SCP.k.st === 'calm' && SCP.ph !== 'rage') { scpWarn('⚠ НАРУШЕНИЕ ПРОТОКОЛА УДЕРЖАНИЯ', 3000); scpPA('Тревога. Нарушение удержания. Объект ноль девяносто шесть на свободе. Всему персоналу эвакуироваться.', 0.7, 1.0); SCP.alarm = true; SFX.scpAlarm(true); SCP.breach = 2.5; SFX.scpDoor(0.9); }
+  if (SCP.obj.every((q) => q.done)) { SCP.exitOpen = true; if (SCP.exitLamp) { SCP.exitLamp.material.color.setHex(0x38ff6a); SCP.exitLamp.material.emissive.setHex(0x20ff50); } scpWarn('ВЫХОД ОТКРЫТ — К ЛИФТУ!', 3000); SFX.scpDoor(0.6); if (SCP.k.st === 'calm') scpPA('Лифт эвакуации разблокирован.'); }
 }
 { const b = document.getElementById('scpBtn'); if (b) b.onclick = () => { Sound.init(); scpStart(); }; }
+/* ---------- SCP-096 v2: декор, двери, боты-учёные, выносливость, кинематика ---------- */
+function scpSign(txt, sub, w = 1.8, h = 0.5, col = '#c8ffe0') { const t = cvTex(512, Math.round(512 * h / w), (g) => { g.fillStyle = '#0a1612'; g.fillRect(0, 0, 512, 512); g.strokeStyle = '#2a6a54'; g.lineWidth = 6; g.strokeRect(4, 4, 504, Math.round(512 * h / w) - 8); g.fillStyle = col; g.textAlign = 'center'; g.font = '800 54px sans-serif'; g.fillText(txt, 256, sub ? 78 : 100); if (sub) { g.font = '600 30px sans-serif'; g.fillStyle = '#7ab8a0'; g.fillText(sub, 256, 130); } }); return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t })); }
+function scpDecor(H = 3.2) {
+  const metal = std({ color: 0x4a5a56, metalness: 0.7, roughness: 0.4 }), dark = std({ color: 0x16201d, roughness: 0.8 }), red = new THREE.MeshBasicMaterial({ color: 0xff1a0a }), yellow = std({ color: 0xd8b020, roughness: 0.7 }), steel = std({ color: 0x2c3834, metalness: 0.5, roughness: 0.5 });
+  const put = (m, x, y, z, ry = 0) => { m.position.set(x, y, z); m.rotation.y = ry; addMesh(m); return m; };
+  // трубы и кабельные лотки по потолку коридора, вентиляция
+  for (const [x, y, r] of [[-1.9, 2.95, 0.09], [-1.55, 3.0, 0.05], [1.9, 2.95, 0.1], [1.5, 3.02, 0.05]]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 49, 10), metal); p.rotation.x = Math.PI / 2; put(p, x, y, -23.5); }
+  for (let z = -45; z < 0; z += 6) { for (const x of [-1.9, 1.9]) { const b = new THREE.Mesh(IM_G.box, dark); put(b, x, 2.98, z); b.scale.set(0.26, 0.05, 0.12); } }
+  const tray = new THREE.Mesh(IM_G.box, steel); put(tray, 0, 3.12, -23.5); tray.scale.set(0.5, 0.06, 49);
+  for (const z of [-5, -17, -35, -44]) for (const s of [-1, 1]) { const v = new THREE.Mesh(IM_G.box, steel); put(v, s * 2.34, 2.5, z, s * Math.PI / 2); v.scale.set(0.7, 0.4, 0.05); for (let i = 0; i < 5; i++) { const sl = new THREE.Mesh(IM_G.box, dark); put(sl, s * 2.31, 2.38 + i * 0.07, z, s * Math.PI / 2); sl.scale.set(0.62, 0.02, 0.03); } }
+  // камеры наблюдения с мигающим красным диодом
+  SCP.leds = []; for (const [x, z, ry] of [[-2.2, -3, Math.PI / 2], [2.2, -20, -Math.PI / 2], [-2.2, -33, Math.PI / 2], [2.2, -45, -Math.PI / 2], [-10, -50, Math.PI / 2], [9, -74, -Math.PI / 2]]) { const g = new THREE.Group(); const body = new THREE.Mesh(IM_G.box, dark); body.scale.set(0.12, 0.12, 0.3); g.add(body); const arm = new THREE.Mesh(IM_G.box, metal); arm.scale.set(0.04, 0.2, 0.04); arm.position.set(0, 0.14, -0.1); g.add(arm); const led = new THREE.Mesh(IM_G.sph, red.clone()); led.scale.setScalar(0.022); led.position.set(0.04, 0.02, 0.15); g.add(led); SCP.leds.push(led); g.position.set(x, 2.8, z); g.rotation.y = ry; g.rotation.x = 0.35; addMesh(g); }
+  // вывески
+  put(scpSign('ЗОНА A', 'терминал · доступ 2'), -2.33, 2.65, -8.5, Math.PI / 2); put(scpSign('ЗОНА B', 'терминал · доступ 2'), 2.33, 2.65, -25.5, -Math.PI / 2);
+  put(scpSign('SCP-096', 'КАМЕРА УДЕРЖАНИЯ · ДОСТУП 4', 2.6, 0.62, '#ff6a5a'), 0, 2.75, -47.7); put(scpSign('ВЫХОД', 'лифт эвакуации', 1.8, 0.5), 0, 2.75, 15.4, Math.PI);
+  put(scpSign('НЕ СМОТРЕТЬ В ЛИЦО', '', 2.8, 0.38, '#ff4a3a'), 0, 2.25, -47.7); put(scpSign('СЕКТОР 4', 'персонал с допуском', 1.6, 0.45), 0, 2.4, 1.8);
+  // жёлто-чёрная разметка перед камерой, стрелки на полу
+  { const ct = cvTex(128, 128, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#d8b020'; for (let i = -4; i < 8; i++) { g.save(); g.translate(i * 32, 0); g.rotate(0.6); g.fillRect(0, -40, 16, 200); g.restore(); } }); const st = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.5), new THREE.MeshBasicMaterial({ map: ct })); st.rotation.x = -Math.PI / 2; put(st, 0, 0.025, -46.6); st.material.map.wrapS = THREE.RepeatWrapping; }
+  for (const z of [-4, -12, -28, -38]) { const ar = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.9), new THREE.MeshBasicMaterial({ map: cvTex(64, 64, (g) => { g.clearRect(0, 0, 64, 64); g.fillStyle = 'rgba(216,176,32,.55)'; g.beginPath(); g.moveTo(32, 6); g.lineTo(58, 40); g.lineTo(40, 40); g.lineTo(40, 60); g.lineTo(24, 60); g.lineTo(24, 40); g.lineTo(6, 40); g.closePath(); g.fill(); }), transparent: true, depthWrite: false })); ar.rotation.x = -Math.PI / 2; put(ar, 0, 0.026, z); }
+  // раздвижные двери: камера (с коллизией) и комнаты
+  const doorLeaf = (w) => { const g = new THREE.Group(); const m = new THREE.Mesh(IM_G.box, std({ color: 0x3a4844, metalness: 0.6, roughness: 0.4 })); m.scale.set(w, 2.4, 0.1); m.position.y = 1.2; g.add(m); const gl = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.6, 0.5), new THREE.MeshBasicMaterial({ color: 0x1a3a30, transparent: true, opacity: 0.55 })); gl.position.set(0, 1.85, 0.056); g.add(gl); const stripe = new THREE.Mesh(IM_G.box, yellow); stripe.scale.set(w, 0.08, 0.11); stripe.position.y = 0.3; g.add(stripe); return g; };
+  SCP.doors = []; const mkDoor = (x, z, axis, w, coll) => { const g = new THREE.Group(); g.position.set(x, 0, z); if (axis === 'x') g.rotation.y = Math.PI / 2; const a = doorLeaf(w / 2), b = doorLeaf(w / 2); g.add(a); g.add(b); addMesh(g); const D = { a, b, w, open: 0, tgt: 0, x, z, axis, obs: null }; if (coll) { D.obs = { min: new V3(x - w / 2, 0, z - 0.1), max: new V3(x + w / 2, 2.4, z + 0.1) }; obstacles.push(D.obs); } SCP.doors.push(D); return D; };
+  SCP.cell = mkDoor(0, -48, 'z', 3.2, true); mkDoor(-2.5, -8.5, 'x', 3.2, false); mkDoor(2.5, -25.5, 'x', 3.2, false);
+  // красный проблесковый свет и пыль
+  SCP.strobe = new THREE.PointLight(0xff2010, 0, 16); SCP.strobe.position.set(0, 2.6, -30); scene.add(SCP.strobe); mapObjs.push(SCP.strobe);
+  { const N = 260, geo = new THREE.BufferGeometry(), pos = new Float32Array(N * 3); for (let i = 0; i < N; i++) { pos[i * 3] = rand(-9, 9); pos[i * 3 + 1] = rand(0.2, 3); pos[i * 3 + 2] = rand(-9, 9); } geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); SCP.dust = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xbfe8d8, size: 0.035, transparent: true, opacity: 0.45, depthWrite: false })); SCP.dust.frustumCulled = false; scene.add(SCP.dust); mapObjs.push(SCP.dust); }
+  // лужи крови и разбросанные папки
+  for (const [x, z, s] of [[0.8, -20, 1.3], [-1, -37, 1.6], [0, -47, 2], [4, -54, 2.2], [-5, -60, 2]]) { const t = cvTex(128, 128, (g) => { g.clearRect(0, 0, 128, 128); g.fillStyle = 'rgba(80,6,8,.75)'; for (let i = 0; i < 9; i++) { g.beginPath(); g.ellipse(64 + rand(-24, 24), 64 + rand(-24, 24), rand(12, 34), rand(8, 26), rand(0, 3), 0, 6.283); g.fill(); } }); const m = new THREE.Mesh(new THREE.PlaneGeometry(s * 2, s * 2), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false })); m.rotation.x = -Math.PI / 2; put(m, x, 0.03, z); }
+}
+const SCP_COAT = ['torso', 'uArmL', 'uArmR', 'lArmL', 'lArmR'];
+function scpCoat(n, col = 0xe6ebe6) { for (const k of SCP_COAT) { const P = n.parts[k]; if (P && P.mat) { P.mat.color.setHex(col); if (P.baseColor) P.baseColor.setHex(col); P.mat.map = null; P.mat.needsUpdate = true; } } }
+function scpSpawnBots() {
+  SCP.bots = [];
+  for (const [x, z, yw] of [[-9.5, -8.5, 1.2], [1.3, -17, Math.PI], [9.5, -25.5, -1.5]]) { const n = spawnNPC('human', x, z, yw); if (!n) continue; scpCoat(n); n.scripted = true; n.speed = 0; n.pose = 'stand'; n.poseDur = Infinity; n.pos.set(x, 0, z); n.yaw = yw; SCP.bots.push({ n, st: 'work', t: rand(0, 6), x, z }); }
+  for (const [x, z, yw] of [[-1.3, -23, 0.4], [1.2, -38, 2.2], [-0.5, -45, 1], [3.8, -60, 0.3], [-5.5, -63, 2.4]]) { const n = spawnNPC('human', x, z, yw); if (n) { scpCoat(n); n.die('prop'); addPool(x, z, 1.6); } }
+}
+function scpPA(txt, pitch = 0.75, rate = 0.92) { try { speakAs(txt, pitch, rate); } catch (e) {} }
+function scpEmerg(on) {
+  if (SCP.emerg === on) return; SCP.emerg = on; if (hemi) { if (SCP.hemiC === undefined) SCP.hemiC = hemi.color.getHex(); hemi.color.setHex(on ? 0xff3a2a : SCP.hemiC); } scene.fog.color.setHex(on ? 0x240504 : 0x03100f); scene.background && scene.background.setHex && scene.background.setHex(on ? 0x120202 : 0x020a09);
+  for (const m of SCP.lights || []) { m.material.color.setHex(on ? 0xff5a4a : 0xcfffe8); m.material.emissive.setHex(on ? 0xff2010 : 0xaaffd8); }
+}
+function scpOpenCell() { if (SCP.cell && SCP.cell.tgt !== 1) { SCP.cell.tgt = 1; SFX.scpDoor(0.9); if (SCP.cell.obs) { const i = obstacles.indexOf(SCP.cell.obs); if (i >= 0) obstacles.splice(i, 1); SCP.cell.obs = null; } } }
+function scpTick2(dt) {
+  const K = SCP.k, p = player.pos, now = performance.now() / 1000;
+  // двери
+  for (const D of SCP.doors || []) { if (D !== SCP.cell) { const d = Math.hypot(p.x - D.x, p.z - D.z); D.tgt = d < 4.2 || SCP.ph === 'rage' ? 1 : 0; } D.open = lerp(D.open, D.tgt, Math.min(1, dt * 2.6)); const o = D.open * (D.w / 2); D.a.position.set(-D.w / 4 - o, 0, 0); D.b.position.set(D.w / 4 + o, 0, 0); }
+  if (SCP.cell && SCP.cell.tgt === 0 && Math.hypot(p.x, p.z + 48) < 4.6 && SCP.ph === 'play') { scpOpenCell(); scpSay('…кто здесь…', 2600); }
+  // выносливость (полоска внизу, как в видео)
+  const spd = Math.hypot(player.vel.x, player.vel.z); if (SCP.ph === 'play' || SCP.ph === 'rage') { if (spd > 6.2) SCP.stam = Math.max(0, SCP.stam - dt * 0.1); else if (spd < 5.2) SCP.stam = Math.min(1, SCP.stam + dt * 0.22); if (SCP.stam <= 0.001) SCP.tired = true; if (SCP.tired && SCP.stam > 0.3) SCP.tired = false; if (SCP.tired && spd > 4.7) { player.vel.x *= 4.7 / spd; player.vel.z *= 4.7 / spd; } }
+  const sb = document.getElementById('scpStam'); if (sb) { const f = Math.round(SCP.stam * 5 + 0.49); [...sb.children].forEach((c, i) => { c.style.background = i < f ? (SCP.tired ? '#ff6a3a' : '#9fffd0') : 'rgba(255,255,255,.12)'; }); }
+  // свет: проблесковый красный, светодиоды камер, пыль
+  if (SCP.strobe) SCP.strobe.intensity = SCP.alarm ? (Math.sin(now * 9) > 0 ? 18 : 2) : 0; if (SCP.strobe && SCP.alarm) SCP.strobe.position.set(Math.sin(now * 2) * 1.6, 2.6, p.z - 6 + Math.cos(now * 2) * 4);
+  for (const l of SCP.leds || []) l.visible = Math.sin(now * 3 + l.id) > -0.2; if (SCP.dust) { const a = SCP.dust.geometry.attributes.position; for (let i = 0; i < a.count; i++) { let x = a.getX(i) + Math.sin(now * 0.5 + i) * dt * 0.1, y = a.getY(i) + dt * 0.05, z = a.getZ(i); const dx = x - p.x, dz = z - p.z; if (Math.abs(dx) > 9) x = p.x - Math.sign(dx) * 8.9; if (Math.abs(dz) > 9) z = p.z - Math.sign(dz) * 8.9; if (y > 3.1) y = 0.2; a.setXYZ(i, x, y, z); } a.needsUpdate = true; }
+  // боты-учёные
+  const dead = SCP.ph === 'dying' || SCP.ph === 'end';
+  for (const B of SCP.bots || []) { const n = B.n; if (!n || B.st === 'dead' || B.st === 'gone') continue; B.t += dt; if (B.st === 'work') { n.yaw = B.yaw0 === undefined ? (B.yaw0 = n.yaw) : B.yaw0 + Math.sin(B.t * 0.6) * 0.6; n.speed = 0; if (K.st === 'wind' || K.st === 'run') { B.st = 'flee'; Sound.voice && Sound.voice('scream', 0.6); } }
+    else if (B.st === 'flee') { const tx = Math.abs(n.pos.x) > 2.2 ? (n.pos.z < -6 && n.pos.z > -11 || n.pos.z < -23 && n.pos.z > -28 ? (n.pos.x < 0 ? -2.5 : 2.5) : 0) : 0, tz = Math.abs(n.pos.x) > 2.2 ? n.pos.z : 15; let dx = (Math.abs(n.pos.x) > 2.2 ? (n.pos.x < 0 ? -1.2 : 1.2) : 0) - n.pos.x, dz = Math.abs(n.pos.x) > 2.2 ? 0 : 15 - n.pos.z; if (Math.abs(n.pos.x) > 2.2) { dx = (n.pos.x < 0 ? -1 : 1) * -1; dz = 0; } const l = Math.hypot(dx, dz) || 1; n.pos.x += dx / l * 6 * dt; n.pos.z += dz / l * 6 * dt; n.yaw = lerpAngle(n.yaw, Math.atan2(dx, dz), Math.min(1, dt * 10)); n.speed = 5.6; if (Math.abs(n.pos.x) < 2.2 && n.pos.x !== 0) n.pos.x = lerp(n.pos.x, 0.4 * Math.sign(n.pos.x), dt * 3); if (n.pos.z > 14.2) { if (SCP.exitOpen) { B.st = 'gone'; n.root.visible = false; } else { n.pos.z = 14.2; n.speed = 0; } } }
+    if (K.st === 'run' && (B.st === 'flee' || B.st === 'work') && Math.hypot(n.pos.x - K.x, n.pos.z - K.z) < 1.6) { B.st = 'dead'; n.scripted = false; n.speed = 0; const bp = new V3(n.pos.x, 1.2, n.pos.z); n.die('096'); bloodSpray(bp, new V3(Math.sin(K.yaw), 0.4, Math.cos(K.yaw)), 90, 1.2, 2, 9, 0.006, 0.02); try { bloodMist(bp, 1); } catch (e) {} addPool(n.pos.x, n.pos.z, 1.8); SFX.scpKill(0.7); shake = Math.max(shake, 0.9); K.pause = 0.55; SCP.victims = (SCP.victims || 0) + 1; }
+  }
+  // тяжёлые шаги 096 в погоне
+  if (K.st === 'run') { const ph = Math.floor(K.t * 14 / Math.PI), pr = Math.floor((K.t - dt) * 14 / Math.PI); if (ph !== pr) { const d = Math.hypot(p.x - K.x, p.z - K.z); SFX.scpStep(clamp(1 - d / 40, 0.15, 0.9)); shake = Math.max(shake, clamp(1 - d / 20, 0, 0.5)); } }
+}
+Object.assign(SFX, { scpStep(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.25); if (!o) return; this.tn(o, t, 'sine', 78, 38, 0.2, 0.9, 0.003); this.nz(o, t, 0.08, 'lowpass', 500, 0.8, 0.5, 0.002); } });
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
