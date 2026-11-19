@@ -15373,12 +15373,14 @@ function makeCar(id, x, z, yaw, o = {}) {
     box(body, paint, W, yb - y0, L * 0.98, 0, (y0 + yb) / 2, 0, [4, 2, 10]);
     const hl = L / 2 - S.cz1 - 0.06, hp = pivot(0, yb, S.cz1); const hood = box(hp, paint, W * 0.95, 0.06, hl, 0, 0.03, hl / 2, [3, 1, 5]); part('hood', hp, 0, yb, S.cz1 + hl / 2, 0.75, 4.5);
     if (id === 'milk') {
+      // декор развёрнут на 180°: лицо и двигатели сзади, «хвост» с точками спереди
+      const dec = new THREE.Group(); dec.rotation.y = Math.PI; body.add(dec);
       const blk = std({ color: 0x050508, roughness: 0.25, metalness: 0.2 }), ch2 = std({ color: 0xa9b4c6, roughness: 0.1, metalness: 1, envMapIntensity: 1.1 });
       const blob = (par, mat, rx, ry, rz, px, py, pz) => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 18), mat); m.scale.set(rx, ry, rz); m.position.set(px, py, pz); m.castShadow = true; par.add(m); return m; };
       // двигатели-лепестки по бокам от лица, лицо по центру на передней части
-      for (const s of [-1, 1]) { blob(body, ch2, 0.6, 0.5, 0.72, s * 0.85, (y0 + yb) / 2, L / 2 - 0.1); blob(body, blk, 0.08, 0.06, 0.1, s * 0.9, (y0 + yb) / 2 + 0.3, L / 2 + 0.05); }
-      for (const s of [-1, 1]) { blob(body, blk, 0.27, 0.23, 0.05, s * 0.28, yb - 0.1, L / 2 + 0.1); blob(body, ch2, 0.12, 0.12, 0.03, s * 0.28, yb - 0.1, L / 2 + 0.12); }
-      blob(body, ch2, 0.62, 0.34, 0.16, 0, yb - 0.1, L / 2 - 0.02); box(body, blk, 0.05, 0.26, 0.04, 0, yb - 0.12, L / 2 + 0.14); for (const s of [-1, 1]) { const sm = box(body, blk, 0.34, 0.045, 0.04, s * 0.19, y0 + 0.3, L / 2 + 0.14); sm.rotation.z = -s * 0.5; }
+      for (const s of [-1, 1]) { blob(dec, ch2, 0.6, 0.5, 0.72, s * 0.85, (y0 + yb) / 2, L / 2 - 0.1); blob(dec, blk, 0.08, 0.06, 0.1, s * 0.9, (y0 + yb) / 2 + 0.3, L / 2 + 0.05); }
+      for (const s of [-1, 1]) { blob(dec, blk, 0.27, 0.23, 0.05, s * 0.28, yb - 0.1, L / 2 + 0.1); blob(dec, ch2, 0.12, 0.12, 0.03, s * 0.28, yb - 0.1, L / 2 + 0.12); }
+      blob(dec, ch2, 0.62, 0.34, 0.16, 0, yb - 0.1, L / 2 - 0.02); box(dec, blk, 0.05, 0.26, 0.04, 0, yb - 0.12, L / 2 + 0.14); for (const s of [-1, 1]) { const sm = box(dec, blk, 0.34, 0.045, 0.04, s * 0.19, y0 + 0.3, L / 2 + 0.14); sm.rotation.z = -s * 0.5; }
     }
     if (id === 'gg') { const blow = box(hood, std({ color: 0x2a2a2e, roughness: 0.4, metalness: 0.8 }), 0.5, 0.16, 0.6, 0, 0.1, 0); for (let i = 0; i < 2; i++) box(blow, chrome, 0.12, 0.12, 0.12, -0.12 + i * 0.24, 0.12, 0.1); }
     if (S.bed) { const tl = pivot(0, y0 + 0.08, -L / 2 + 0.03); box(tl, paint, W * 0.94, yb - y0 + 0.25, 0.06, 0, (yb - y0 + 0.25) / 2, 0, [3, 2, 1]); part('trunk', tl, 0, yb, -L / 2 + 0.2, 0.8, 4, { gate: true }); for (const s of [-1, 1]) box(body, paint, 0.06, 0.32, -S.cz0 + L / 2 - 0.2, s * (hw - 0.05), yb + 0.16, (S.cz0 - L / 2) / 2 + 0.05); box(body, trim, W * 0.9, 0.02, -S.cz0 + L / 2 - 0.2, 0, yb + 0.01, (S.cz0 - L / 2) / 2 + 0.05); }
