@@ -21651,7 +21651,7 @@ function makChoice() { const C = MAK.cut; if (!C) return; const s = document.get
    Карта для проверки «реалистичных» систем: руки от первого лица реагируют на движение, приземление и воду;
    мягкий мат гасит падения; вода-бассейн с всплеском и плаванием; дверь с замком — ключ вставляется и поворачивается;
    жесты рук (клавиши 1–5). Пружинящая камера при приземлении, тряска при беге. */
-const TS = { on: false, rig: null, hid: [], prevVy: 0, wasGround: true, wasWater: false, dip: 0, dipV: 0, brace: 0, bob: 0, gest: null, gestT: 0, key: null, hasKey: false, keyAnim: null, door: null, keyMesh: null, pickup: null, pit: { x0: -6, x1: 6, z0: -14, z1: -2 }, mat: { x0: 10, x1: 16, z0: -8, z1: -2 }, hud: null, paddle: 0, swim: false, landT: 0, falls: 0 };
+const TS = { on: false, fogC: 0xcfe3f0, rig: null, hid: [], prevVy: 0, wasGround: true, wasWater: false, dip: 0, dipV: 0, brace: 0, bob: 0, gest: null, gestT: 0, key: null, hasKey: false, keyAnim: null, door: null, keyMesh: null, pickup: null, pit: { x0: -6, x1: 6, z0: -14, z1: -2 }, mat: { x0: 10, x1: 16, z0: -8, z1: -2 }, hud: null, paddle: 0, swim: false, landT: 0, falls: 0 };
 const TS_GEST = {
   wave: { R: [0.42, -0.12, -0.46], curl: 0.1, wrist: 0 },
   point: { R: [0.2, -0.2, -0.78], curl: 0, wrist: 0 },
@@ -21680,7 +21680,7 @@ function buildTestSite() {
   const wm = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, z1 - z0), water); wm.rotation.x = -Math.PI / 2; wm.position.set(0, -0.3, (z0 + z1) / 2); addMesh(wm); TS.waterM = wm;
   for (const [a, b, c, d] of [[x0, x1, z0 - 0.06, z0], [x0, x1, z1, z1 + 0.06], [x0 - 0.06, x0, z0, z1], [x1, x1 + 0.06, z0, z1]]) box(white, a, b, 0, 0.05, c, d, false);
   // мат (мягкий): плоский блок, на котором гасится приземление
-  const mt = TS.mat; box(std({ color: 0x2f6fd8, roughness: 0.9 }), mt.x0, mt.x1, 0, 0.3, mt.z0, mt.z1); addDeck(mt.x0, mt.x1, mt.z0, mt.z1, 0.3);
+  const mt = TS.mat; TS.matM = box(std({ color: 0x2f6fd8, roughness: 0.9 }), mt.x0, mt.x1, 0, 0.3, mt.z0, mt.z1); TS.matSag = 0; TS.matV = 0; addDeck(mt.x0, mt.x1, mt.z0, mt.z1, 0.3);
   // ступеньки на крышу (высота 1.2 / 2.4 / 3.6)
   for (const [xa, y] of [[16, 1.2], [20, 2.4], [24, 3.6]]) { box(wood, xa, xa + 4, 0, y, 4, 8); addDeck(xa, xa + 4, 4, 8, y); }
   // дверь с замком (петля у x=-10, поворот вокруг Y)
@@ -21726,6 +21726,7 @@ function tsSetArm(A, target, curl, wristRot, dt) {
 }
 function tsVM(dt) {
   if (!TS.on) return; const R = tsBuildRig(); const p = player.pos;
+  { let dy = player.yaw - (TS.lastYaw ?? player.yaw); if (dy > Math.PI) dy -= 2 * Math.PI; if (dy < -Math.PI) dy += 2 * Math.PI; TS.lastYaw = player.yaw; const k = Math.min(1, dt * 10); TS.swayX = lerp(TS.swayX || 0, -dy * 2.2, k); TS.swayX = clamp(TS.swayX, -0.09, 0.09); TS.swayY = lerp(TS.swayY || 0, clamp(-(player.pitch - (TS.lastPitch ?? player.pitch)) * 2, -0.05, 0.05), k); TS.lastPitch = player.pitch; }
   // спрятать оружие, показать руки
   if (!TS.hid.length) { for (const c of vmRoot.children) if (c !== R.R.sh && c !== R.L.sh && c !== R.key && c.visible && !c.userData.tsOwn) { TS.hid.push(c); c.visible = false; } }
   R.R.sh.visible = R.L.sh.visible = true;
@@ -21740,12 +21741,14 @@ function tsVM(dt) {
   if (TS.keyAnim) { const K = TS.keyAnim; K.t += dt; const kl = TS.door ? vmRoot.worldToLocal(TS.door.pivot.localToWorld(TS.door.kh.clone())) : new V3(0, -0.3, -0.5); const ease = (x) => x * x * (3 - 2 * x);
     if (K.t < 0.9) { const e = ease(K.t / 0.9); R_t = [lerp(TS_IDLE.R[0], kl.x, e), lerp(TS_IDLE.R[1], kl.y, e), lerp(TS_IDLE.R[2], kl.z + 0.1, e)]; curlR = 0.6; }
     else if (K.t < 1.3) { R_t = [kl.x, kl.y, kl.z + 0.05]; curlR = 0.9; wristR = lerp(0, -1.45, ease((K.t - 0.9) / 0.4)); if (!K.snd) { K.snd = 1; SFX.tsKey(0.6); } }
-    else if (K.t < 1.8) { R_t = [kl.x, kl.y, kl.z + 0.05]; curlR = 0.9; wristR = -1.45; if (!K.opened) { K.opened = 1; SFX.tsLock(0.7); TS.door.tgt = 1; TS.door.obs && obstacles.indexOf(TS.door.obs) >= 0 && obstacles.splice(obstacles.indexOf(TS.door.obs), 1); TS.door.locked = false; banner('🔓 ДВЕРЬ ОТКРЫТА', ''); } }
+    else if (K.t < 1.8) { R_t = [kl.x, kl.y, kl.z + 0.05]; curlR = 0.9; wristR = -1.45 + Math.sin((K.t - 1.3) * 40) * 0.03 * Math.max(0, 1 - (K.t - 1.3) * 2); if (!K.opened) { K.opened = 1; shake = Math.max(shake, 0.25); SFX.tsLock(0.7); TS.door.tgt = 1; TS.door.obs && obstacles.indexOf(TS.door.obs) >= 0 && obstacles.splice(obstacles.indexOf(TS.door.obs), 1); TS.door.locked = false; banner('🔓 ДВЕРЬ ОТКРЫТА', ''); } }
     else { wristR = lerp(-1.45, 0, ease(Math.min(1, (K.t - 1.8) / 0.5))); R_t = [lerp(kl.x, TS_IDLE.R[0], ease(Math.min(1, (K.t - 1.8) / 0.8))), lerp(kl.y, TS_IDLE.R[1], ease(Math.min(1, (K.t - 1.8) / 0.8))), lerp(kl.z, TS_IDLE.R[2], ease(Math.min(1, (K.t - 1.8) / 0.8)))]; if (K.t > 2.6) TS.keyAnim = null; }
   }
   for (const i of [0, 1, 2]) { R_t[i] = R_t[i]; L_t[i] = L_t[i]; }
   const d = TS.dip; R_t[1] -= d * 0.7 + brace * 0.08; L_t[1] -= d * 0.7 + brace * 0.08;
-  R_t[0] += sway; L_t[0] -= sway * 0.8; R_t[1] += bounce; L_t[1] += bounce * 0.8;
+  R_t[0] += sway + TS.swayX; L_t[0] -= sway * 0.8 - TS.swayX * 0.8; R_t[1] += bounce + TS.swayY; L_t[1] += bounce * 0.8 + TS.swayY * 0.8;
+  // пальцы: у каждой фаланги своё сгибание (хват реальнее, чем один кулак)
+  // шаги по дистанции, а не по времени — походка совпадает со скоростью
   if (!(TS.keyAnim && TS.keyAnim.t > 0.9 && TS.keyAnim.t < 1.8)) curlL = 0.25 + brace * 0.2;
   tsSetArm(R.R, [R_t[0] - 0.24 + 0.24, R_t[1] + 0.3, R_t[2]], curlR, wristR, dt);
   tsSetArm(R.L, [L_t[0] + 0.24 - 0.24, L_t[1] + 0.3, L_t[2]], curlL, wristL, dt);
@@ -21778,20 +21781,24 @@ function tsPost(dt) {
   if (inWater && !TS.wasWater) { SFX.tsSplash(clamp(TS.prevVy ? -TS.prevVy / 12 : 0.5, 0.3, 1)); shake = Math.max(shake, 0.5); flashScreen && 0; for (let i = 0; i < 26; i++) spawnSprite(TEX.soft, new V3(p.x + rand(-1, 1), -0.2, p.z + rand(-1, 1)), { color: 0xdff4ff, size: rand(0.25, 0.7), grow: 1.4, life: rand(0.6, 1.2), opacity: 0.8, vel: new V3(rand(-2, 2), rand(1, 4), rand(-2, 2)) }); banner('💦 ВСПЛЕСК', ''); }
   if (!inWater && TS.wasWater && p.y > -0.3) { SFX.tsStep(0.5); }
   TS.wasWater = inWater; TS.swim = inWater;
+  if (TS.rings) for (let i = TS.rings.length - 1; i >= 0; i--) { const r = TS.rings[i]; r.userData.life -= dt; const k = 1 - r.userData.life / 0.8; r.scale.setScalar(1 + k * 6); r.material.opacity = 0.6 * (1 - k); if (r.userData.life <= 0) { scene.remove(r); TS.rings.splice(i, 1); } }
+  if (inWater) { scene.fog.color.setHex(0x1a6a9a); scene.fog.density = 0.12; } else if (TS.wasSub) { scene.fog.color.setHex(TS.fogC || 0xcfe3f0); scene.fog.density = 0.006; } TS.wasSub = inWater;
   if (inWater) {
     TS.paddle += dt * (player.vel.x * player.vel.x + player.vel.z * player.vel.z > 0.5 ? 7 : 2);
-    const up = touch.jump ? 2.4 : 0, buoy = (-0.5 + up) - (p.y + 0.22) * 0.5; player.vel.y = lerp(player.vel.y, clamp(buoy * 3, -1.5, 3), Math.min(1, dt * 6)); player.vel.x *= Math.exp(-dt * 2.2); player.vel.z *= Math.exp(-dt * 2.2);
+    const up = touch.jump ? 2.4 : 0, buoy = (-0.5 + up) - (p.y + 0.22) * 0.5; player.vel.y = lerp(player.vel.y, clamp(buoy * 3, -1.5, 3), Math.min(1, dt * 3.5)); const drag = Math.exp(-dt * 3.4); player.vel.x *= drag; player.vel.z *= drag;
+    if (Math.hypot(player.vel.x, player.vel.z) > 1.2 && Math.random() < dt * 9) { const q = new V3(p.x + rand(-0.2, 0.2), -0.21, p.z + rand(-0.2, 0.2)); scene.add(new THREE.Mesh(new THREE.RingGeometry(0.02, 0.05, 16), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6, depthWrite: false, side: THREE.DoubleSide }))); const r = scene.children[scene.children.length - 1]; r.rotation.x = -Math.PI / 2; r.position.copy(q); r.userData.life = 0.8; TS.rings = TS.rings || []; TS.rings.push(r); }
     if (p.y > -0.2) { p.y = -0.2; if (player.vel.y > 0) player.vel.y = 0; }
     if (Math.random() < dt * 4) spawnSprite(TEX.soft, new V3(p.x + rand(-0.3, 0.3), -0.3, p.z + rand(-0.3, 0.3)), { color: 0xeaf8ff, size: rand(0.05, 0.12), grow: 1.3, life: 0.9, opacity: 0.8, vel: new V3(0, rand(0.5, 1.2), 0) });
     player.onGround = false;
     if (!TS.hudWater) TS.hudWater = 1; } else TS.hudWater = 0;
   // шаги
-  if (player.onGround && Math.hypot(player.vel.x, player.vel.z) > 2.5) { TS.stepT = (TS.stepT || 0) + dt * Math.hypot(player.vel.x, player.vel.z); if (TS.stepT > 3.2) { TS.stepT = 0; SFX.tsStep(0.25); } }
+  if (player.onGround) { const sp = Math.hypot(player.vel.x, player.vel.z); TS.dist = (TS.dist || 0) + sp * dt; if (sp > 1.2 && TS.dist > (sp > 6 ? 1.9 : 1.25)) { TS.dist = 0; SFX.tsStep(clamp(sp / 12, 0.15, 0.45)); TS.dipV += -(sp > 6 ? 1.6 : 0.8); } }
   // в воде поднимаем камеру над поверхностью не нужно — камера ниже воды: подводный туман
   const ut = document.getElementById('tsUnder'); if (ut) ut.style.opacity = p.y < -0.3 && inPit ? 1 : 0;
   TS.bobShake = Math.hypot(player.vel.x, player.vel.z) > 6 ? 1 : 0;
   if (TS.door && TS.door.open !== undefined) { const D = TS.door; D.open = lerp(D.open, D.tgt, Math.min(1, dt * 2.5)); D.pivot.rotation.y = -D.open * 1.7; }
   if (TS.pickup) TS.pickup.visible = !TS.hasKey;
+  if (TS.matM) { const onM = tsIn(TS.mat, p.x, p.z) && player.onGround; const tgt = onM ? 0.09 : 0; TS.matV += (-(TS.matSag - tgt) * 90 - TS.matV * 12) * dt; TS.matSag += TS.matV * dt; const sy = 0.3 - TS.matSag; TS.matM.scale.y = Math.max(0.05, sy); TS.matM.position.y = sy / 2; }
   if (TS.hudT === undefined || (TS.hudT -= dt) < 0) { TS.hudT = 0.2; tsHud(); }
 }
 function tsDoorNear() { const p = player.pos; return TS.door && Math.hypot(p.x - (-10.8), p.z - 6) < 2.2 && TS.door.tgt === 0; }
