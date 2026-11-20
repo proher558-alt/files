@@ -21818,9 +21818,11 @@ function tsUi(on) {
   if (!h) {
     const css = document.createElement('style'); css.textContent = `#tsHud{position:fixed;inset:0;z-index:48;pointer-events:none;font-family:var(--ui);color:#fff;display:none}
 #tsHud .x{position:absolute;left:calc(10px + env(safe-area-inset-left,0px));top:calc(8px + env(safe-area-inset-top,0px));pointer-events:auto;padding:7px 12px;border-radius:10px;background:rgba(10,20,30,.8);border:1px solid #4a8ab0;font:700 13px var(--ui)}
-#tsG{position:absolute;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,58px);gap:7px;pointer-events:auto}
+#tsG{position:absolute;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(130px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,58px);gap:7px;pointer-events:auto}
 #tsG b{width:58px;height:58px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:800 9px var(--ui);background:radial-gradient(circle,#2a5a7a,#0c2030);border:2px solid #8fe0ff;color:#fff;touch-action:none;user-select:none}#tsG b span{font-size:20px;line-height:22px}
 #tsK{position:absolute;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font:800 15px var(--ui);text-shadow:0 0 6px #000;white-space:nowrap}
+body.ts-ui #stats,body.ts-ui #health,body.ts-ui #slots,body.ts-ui #weapon,body.ts-ui #cross,body.ts-ui #madHud,body.ts-ui #touch .tb:not([data-act="jump"]){display:none!important}
+body.ts-ui #touch .tb[data-act="jump"]{right:calc(14px + env(safe-area-inset-right,0px))!important;bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;top:auto!important;left:auto!important}
 #tsUnder{position:fixed;inset:0;z-index:40;pointer-events:none;background:radial-gradient(ellipse at center,rgba(40,120,170,.25),rgba(10,60,110,.55));opacity:0;transition:opacity .25s}`; document.head.appendChild(css);
     const u = document.createElement('div'); u.id = 'tsUnder'; document.body.appendChild(u);
     h = document.createElement('div'); h.id = 'tsHud'; h.innerHTML = `<div class="x" data-k="x">✕ Выйти</div><div id="tsK"></div><div id="tsG"></div>`; document.body.appendChild(h);
@@ -21831,7 +21833,7 @@ function tsUi(on) {
     window.addEventListener('keydown', (e) => { if (!TS.on) return; const m = { Digit1: 'wave', Digit2: 'point', Digit3: 'thumb', Digit4: 'stop', Digit5: 'grab' }[e.code]; if (m) tsGest(m); if (e.code === 'KeyE') tsInteract(); });
     TS.hud = h;
   }
-  h.style.display = on ? 'block' : 'none';
+  h.style.display = on ? 'block' : 'none'; document.body.classList.toggle('ts-ui', !!on); // свой класс: прячем стандартный HUD и боевые кнопки
 }
 // запуск: при выборе карты testsite включаем систему; при смене карты — выключаем
 function tsSync() { const on = mapId === 'testsite' && state === 'play' && !VEH.in; if (on !== TS.on) { TS.on = on; if (on) { TS.wasGround = true; TS.dip = 0; TS.gest = null; TS.keyAnim = null; } else tsOff(); tsUi(on); } }
