@@ -433,6 +433,8 @@ body.touch #wAmmo{font-size:26px}
   <h1 style="font-size:clamp(34px,8vw,64px)">Настройки</h1>
   <div class="row"><span class="lbl">УЛЬТРА</span><div class="chips" id="ultraChips"><button class="chip" data-v="0">Выкл</button><button class="chip" data-v="1">ULTRA · до 888%</button></div></div>
   <div class="row"><span class="lbl">Оригинальные звуки</span><div class="chips" id="origChips"><button class="chip" data-v="1">Вкл</button><button class="chip" data-v="0">Выкл</button></div></div>
+  <div class="row"><span class="lbl">⚡ Ультра-оптимизация</span><div class="chips" id="ultraChips"><button class="chip" data-v="1">Вкл</button><button class="chip" data-v="0">Выкл</button></div></div>
+  <div class="row"><span class="lbl">⛶ Авто-полный экран</span><div class="chips" id="fsChips"><button class="chip" data-v="1">Вкл</button><button class="chip" data-v="0">Выкл</button></div></div>
   <p class="mapdesc">Записанные звуки: «Gotta get a grip» и смех воскресителя. Выключено — синтезированные.</p>
     <div class="row"><span class="lbl">Кровь</span>
       <div class="chips" id="bloodChips">
@@ -5538,7 +5540,7 @@ function madBurst(npc, p, dir) {
   shake = Math.max(shake, 0.35); toast(pick(['ВЗРЫВ МЯСА', 'ХЛОП!', 'В ФАРШ', 'КРАСНЫЙ ДОЖДЬ']));
 }
 function bloodSpray(p, dir, n, spread, vmin, vmax, smin, smax, base) {
-  const N = Math.min(madness.on ? 900 : 400, Math.round(n * settings.blood * madMul()));
+  const N = Math.min(madness.on ? 900 : 400, Math.round(n * settings.blood * madMul() * (settings.ultra ? 0.3 : 1)));
   for (let i = 0; i < N; i++) {
     randUnit(_e).multiplyScalar(spread).add(dir).normalize().multiplyScalar(rand(vmin, vmax));
     if (base) _e.add(base);
@@ -20938,10 +20940,10 @@ function scpCss() {
 #scpWarn{position:fixed;left:50%;top:26%;transform:translateX(-50%);z-index:49;pointer-events:none;font:900 22px var(--ui);color:#ff3a2a;text-shadow:0 0 14px #f00;letter-spacing:.14em;text-align:center;opacity:0;transition:opacity .2s}
 #scpMsg{position:fixed;left:50%;top:44%;transform:translateX(-50%);z-index:49;pointer-events:none;font:italic 400 17px Georgia,serif;color:rgba(220,230,224,.8);text-shadow:0 0 8px #000;opacity:0;transition:opacity .6s}
 #scpPz{position:fixed;inset:0;z-index:90;background:rgba(0,6,4,.82);display:none;align-items:center;justify-content:center;font-family:var(--ui);color:#7dffb0}
-#scpPz .p{width:min(94vw,400px);padding:14px;border-radius:14px;background:#06120d;border:2px solid #2a8a5a;box-shadow:0 0 30px rgba(60,255,150,.25);font:600 13px monospace}
+#scpPz .p{width:min(94vw,400px);max-height:calc(100vh - 12px);overflow-y:auto;padding:14px;border-radius:14px;background:#06120d;border:2px solid #2a8a5a;box-shadow:0 0 30px rgba(60,255,150,.25);font:600 13px monospace}
 #scpPz .g{display:grid;gap:3px;margin:10px auto;touch-action:none;width:fit-content}
 #scpPz .c{width:56px;height:56px;border-radius:6px;background:#0c1f17;border:1px solid #1a4a34;display:flex;align-items:center;justify-content:center;font:900 20px monospace;color:#000}
-#scpRes{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:95;width:min(92vw,380px);padding:20px;border-radius:14px;background:#050b09;border:2px solid #2a6a50;color:#b8ffd0;text-align:center;font-family:var(--ui);display:none;box-shadow:0 0 40px #000}`;
+#scpRes{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:95;width:min(92vw,380px);max-height:calc(100vh - 12px);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 18px;border-radius:14px;background:#050b09;border:2px solid #2a6a50;color:#b8ffd0;text-align:center;font-family:var(--ui);display:none;box-shadow:0 0 40px #000}`;
   document.head.appendChild(c);
 }
 const SCP_COL = ['', '#ff4a5a', '#4aff7a', '#4af0ff', '#ff4aff', '#7a8aff', '#ffee4a'];
@@ -20962,6 +20964,7 @@ function scpSay(txt, ms = 2600) { const m = document.getElementById('scpMsg'); i
 function scpWarn(txt, ms = 2400) { const w = document.getElementById('scpWarn'); if (!w) return; w.textContent = txt; w.style.opacity = 1; clearTimeout(SCP.warnT); SCP.warnT = setTimeout(() => { w.style.opacity = 0; }, ms); }
 /* ---------- старт / выход ---------- */
 function scpStart() {
+  try { if (typeof VEH !== 'undefined' && VEH.in) vehExit(true); } catch (e) {} try { milkUi(false); } catch (e) {} try { if (LOB.on) { LOB.on = false; lobUiOff(); } } catch (e) {} try { monsChatUi().style.display = 'none'; chatToggle(false); } catch (e) {} try { DREAM.on = false; } catch (e) {} try { $('excl').hidden = true; } catch (e) {}
   Sound.init(); scpLoadRage(); milkPage(false); { const q = document.getElementById('c2q'); if (q) q.style.display = 'none'; }
   storyReset(); overReset(); mode = 'scp'; resetStats(); story.gun = false; W.fireHeld = false; try { MONS.on = false; monsGhostEnd(); monsUiOff(); } catch (e) {}
   loadMap('scpsite'); clearAll(); respawnPlayer(); invReset(); { const fi = WEAPONS.findIndex((w) => w.id === 'fists'); if (fi >= 0) selectWeapon(fi); } camera.far = 160; camera.updateProjectionMatrix(); $('menu').hidden = true; $('over').hidden = true;
@@ -21037,7 +21040,7 @@ function scpTick(dt) {
   const ob = document.getElementById('scpObj'); if (ob) ob.textContent = SCP.ph === 'rage' ? '☣ SCP-096 ПРЕСЛЕДУЕТ' : left ? 'Терминалы: ' + (3 - left) + '/3' : 'ВЫХОД ОТКРЫТ — БЕГИТЕ';
 }
 const _tp2 = new V3(), _tp3 = new V3(); function lerpAngle(a, b, t) { let d = b - a; while (d > Math.PI) d -= 6.2832; while (d < -Math.PI) d += 6.2832; return a + d * t; }
-function updScp(dt) { if (!SCP.on) return; scpFxTick(dt); if (SCP.ph === 'dying') { scpDeathTick(dt); return; } if (SCP.ph === 'intro') { scpPose(SCP.k, dt); SCP.k.t += dt; SCP.k.g.position.set(SCP.k.x, 0, SCP.k.z); return; } if (SCP.role === 'monster') { if (SCP.ph !== 'end') scpMonTick(dt); return; } scpTick(dt); scpTick2(dt); scpLockTick(); }
+function updScp(dt) { if (!SCP.on) return; if ((SCP.ph === 'play' || SCP.ph === 'rage') && story.ride && !SCP.puzzle && !MC.qte) story.ride = null; if (SCP.role === 'monster' && SCP.ph === 'play' && !MC.qte && story.rideCam !== scpMonCam) story.rideCam = scpMonCam; if (SCP.ph === 'play' && state !== 'play' && state !== 'pause') state = 'play'; if (SCP.ph === 'play' && $('touch').hidden && isTouch) $('touch').hidden = false; scpFxTick(dt); if (SCP.ph === 'dying') { scpDeathTick(dt); return; } if (SCP.ph === 'intro') { scpPose(SCP.k, dt); SCP.k.t += dt; SCP.k.g.position.set(SCP.k.x, 0, SCP.k.z); return; } if (SCP.role === 'monster') { if (SCP.ph !== 'end') scpMonTick(dt); return; } scpTick(dt); scpTick2(dt); scpLockTick(); }
 /* ---------- терминалы и головоломка ---------- */
 function scpGen(N, P) {
   for (let tries = 0; tries < 300; tries++) { const used = new Array(N * N).fill(0), pairs = []; let ok = true;
@@ -21278,6 +21281,19 @@ function scpDeathTick(dt) { const D = SCP.dth; if (!D) return; const K = SCP.k, 
   if (T >= 3.9 && !D.black) { D.black = true; const b = scpOv('scpBlackOv', 'z-index:61;background:#000'); b.style.transition = 'opacity .7s'; b.style.opacity = 1; const tt = scpOv('scpTitle', 'z-index:62;inset:auto;left:0;right:0;bottom:16%;text-align:center;font:400 13px Georgia,serif;letter-spacing:.35em;color:#bfc6c2'); tt.textContent = 'S C P - 0 9 6'; tt.style.transition = 'opacity 1s'; setTimeout(() => { tt.style.opacity = 1; }, 400); }
   if (T >= 5.4 && !D.done) { D.done = true; scpResult(false); for (const id of ['scpBlackOv', 'scpTitle']) { const e = document.getElementById(id); if (e) { e.style.transition = 'opacity .5s'; e.style.opacity = 0; } } }
 }
+/* ===== ультра-оптимизация и авто-полный экран ===== */
+function goFs() { if (settings.autoFs === false) return; const d = document.documentElement; if (document.fullscreenElement || document.webkitFullscreenElement) return; const f = d.requestFullscreen || d.webkitRequestFullscreen; if (!f) return; try { const p = f.call(d, { navigationUI: 'hide' }); const lock = () => { try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); } catch (e) {} }; if (p && p.then) p.then(lock).catch(() => {}); else lock(); } catch (e) {} }
+document.addEventListener('click', (e) => { const t = e.target && e.target.closest && e.target.closest('#menu .btn, #scpBtn, #milkEvBtn, [data-k="play"], [data-k="doc"], [data-k="mon"], [data-k="again"], [data-k="go"], [data-g="again"], [data-g="menu"]'); if (t) goFs(); }, true);
+function applyUltra() {
+  const u = !!settings.ultra; renderer.shadowMap.enabled = !u; try { if (sun) sun.castShadow = !u; } catch (e) {}
+  if (u && settings.quality !== 'low') { settings.quality = 'low'; try { syncChips(); applyQuality(); } catch (e) {} }
+  scene.traverse((o) => { if (o.material) { (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { m.needsUpdate = true; }); } }); resize();
+}
+function syncOpt() { const s = (id, v) => { const e = document.getElementById(id); if (e) e.querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.v === '1') === v))); }; s('ultraChips', !!settings.ultra); s('fsChips', settings.autoFs !== false); }
+{ const u = document.getElementById('ultraChips'), f = document.getElementById('fsChips');
+  if (u) u.querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.ultra = b.dataset.v === '1'; saveSettings(); syncOpt(); applyUltra(); Sound.click(1000, 0.15); toast(settings.ultra ? '⚡ Ультра-оптимизация включена' : 'Ультра-оптимизация выключена'); });
+  if (f) f.querySelectorAll('.chip').forEach((b) => b.onclick = () => { settings.autoFs = b.dataset.v === '1'; saveSettings(); syncOpt(); Sound.click(1000, 0.15); if (settings.autoFs) goFs(); });
+  syncOpt(); if (settings.ultra) applyUltra(); }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
@@ -21877,7 +21893,7 @@ function bottleHitMelee() { if (BOTTLE.has) bottleCast(2.2); }
 function bottleThrow() { if (!BOTTLE.has) return; Sound.swoosh(); bottleCast(30); }
 function takeBottle() { if (BOTTLE.has) return; BOTTLE.has = true; syncMods(); selectWeapon(WEAPONS.findIndex((w) => w.id === 'bottle')); toast('Взяли бутылку «Чекушка»: ударьте или бросьте, один раз'); Sound.click(1200, 0.2); }
 /* ===================== main loop ===================== */
-function resize() { const w = innerWidth, h = innerHeight; renderer.setPixelRatio(settings.quality === 'high' ? Math.min(devicePixelRatio, 1.75) : Math.min(devicePixelRatio, 1)); renderer.setSize(w, h, false); camera.aspect = vmCamera.aspect = w / h; camera.updateProjectionMatrix(); vmCamera.updateProjectionMatrix(); screenBloodResize(); resizeFx(); }
+function resize() { const w = innerWidth, h = innerHeight; renderer.setPixelRatio(settings.ultra ? Math.min(devicePixelRatio, 0.6) : settings.quality === 'high' ? Math.min(devicePixelRatio, 1.75) : Math.min(devicePixelRatio, 1)); renderer.setSize(w, h, false); camera.aspect = vmCamera.aspect = w / h; camera.updateProjectionMatrix(); vmCamera.updateProjectionMatrix(); screenBloodResize(); resizeFx(); }
 addEventListener('resize', resize);
 applyQuality();
 updateSlots();
@@ -21972,7 +21988,7 @@ function frame(now) {
   fxStory.whip = fxStory.whip > 0.0006 ? fxStory.whip * Math.exp(-rdt * 8) : 0;
   cine.k = lerp(cine.k, state === 'story' && story.cut && !ULT.on ? 1 : 0, Math.min(1, rdt * 2.5)); if (cine.k < 0.004) cine.k = 0;
   { const want = state === 'story' || state === 'cutscene' || state === 'sui'; if (want !== cine.on) { cine.on = want; $('cine').classList.toggle('on', want); } }
-  if (madness.amt > 0.002 || deathFx > 0.002 || darkFx > 0.002 || pulseFx > 0.01 || fxStory.whip > 0.0006 || fxStory.grade > 0.01 || cine.k > 0.02) {
+  if (!settings.ultra && (madness.amt > 0.002 || deathFx > 0.002 || darkFx > 0.002 || pulseFx > 0.01 || fxStory.whip > 0.0006 || fxStory.grade > 0.01 || cine.k > 0.02)) {
     renderer.setRenderTarget(fxRT); renderer.clear(); renderWorld(); if (showVM) { renderer.clearDepth(); renderer.render(vmScene, vmCamera); }
     renderer.setRenderTarget(null); const u = fxMat.uniforms; u.uTime.value = now / 1000; u.uAmt.value = madness.amt; u.uBeat.value = madness.beat; u.uHue.value = madness.hue; u.uDeath.value = deathFx; u.uDark.value = darkFx; u.uPulse.value = pulseFx; u.uWhip.value = fxStory.whip; u.uGrade.value = Math.max(fxStory.grade, cine.k * 0.42);
     renderer.clear(); renderer.render(fxScene, fxCam);
