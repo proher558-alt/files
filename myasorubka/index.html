@@ -392,6 +392,7 @@ body.touch #wAmmo{font-size:26px}
     <div class="modes">
       <button class="btn" id="playSandbox">Песочница<small>Спавните людей, зомби и манекены. Делайте что хотите.</small></button>
       <button class="btn" id="playWaves">Зомби-волны<small>Выживите как можно дольше. Каждая волна злее.</small></button>
+      <button class="btn" id="playTest" style="background:linear-gradient(180deg,#2a6a8a,#0c2a3a);border-color:#8fe0ff">🧪 Тест-площадка<small>Руки от первого лица, мат, бассейн, дверь с ключом, жесты.</small></button>
     </div>
     <div class="row"><span class="lbl">Карта</span>
       <div class="chips" id="mapChips">
@@ -21834,6 +21835,9 @@ function tsUi(on) {
 }
 // запуск: при выборе карты testsite включаем систему; при смене карты — выключаем
 function tsSync() { const on = mapId === 'testsite' && state === 'play' && !VEH.in; if (on !== TS.on) { TS.on = on; if (on) { TS.wasGround = true; TS.dip = 0; TS.gest = null; TS.keyAnim = null; } else tsOff(); tsUi(on); } }
+
+// прямая кнопка в меню: выбирает карту и сразу запускает песочницу
+{ const b = document.getElementById('playTest'); if (b) b.onclick = () => { Sound.init(); const c = document.querySelector('#mapChips [data-v="testsite"]'); if (c) c.click(); document.getElementById('playSandbox').click(); }; }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
