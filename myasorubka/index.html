@@ -7564,6 +7564,7 @@ function updateAvatar(dt) {
   if (state === 'story') { setAvatarVis(story.showAvatar, true); return; }
   const vis = state === 'play' || state === 'pause' || state === 'spawn' || state === 'over';
   setAvatarVis(vis && !VEH.in && !(mode === 'scp' && SCP.role === 'monster') && !(mode === 'mak' && MAK.hero === 'makar') && (view3() || A.state !== 'alive'), view3() || !(A.parts.head.body && !A.parts.head.gone));
+  tsBody();
 }
 function playerRagdoll(vx = 0, vy = 0, vz = 0) {
   if (!avatar || avatar.state !== 'alive' || player.rag || player.dead || state !== 'play') return false;
@@ -7664,7 +7665,7 @@ function updatePlayer(dt) {
   if (!inputOn) { mx = 0; mz = 0; }
   const ml = Math.hypot(mx, mz); if (ml > 1) { mx /= ml; mz /= ml; }
   const sprint = touch.moveId !== null && ml > 0.92;
-  const sp = (sprint ? 7.2 : 4.6) * (madness.on ? 1.15 : 1) * (mode === 'ideas' ? IDEA.spd : 1) * (player.broken && player.broken.leg ? 0.5 : 1) * (ADR.t > 0 ? 1.3 : 1);
+  const sp = (sprint ? 7.2 : 4.6) * (madness.on ? 1.15 : 1) * (mode === 'ideas' ? IDEA.spd : 1) * (player.broken && player.broken.leg ? 0.5 : 1) * (ADR.t > 0 ? 1.3 : 1) * (mapId === 'testsite' && TS.on ? tsSpdK() : 1);
   const fwx = -Math.sin(player.yaw), fwz = -Math.cos(player.yaw), rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw);
   const wx = (fwx * -mz + rx * mx) * sp, wz = (fwz * -mz + rz * mx) * sp;
   const acc = player.onGround ? 12 : 2.5;
@@ -7687,7 +7688,7 @@ function updatePlayer(dt) {
   player.pitch = clamp(player.pitch, -1.5, 1.5);
   const bobY = Math.sin(player.bob * 2) * 0.035 * Math.min(1, hs / 4);
   if (mapId === 'testsite') tsPost(dt);
-  eye.position.set(player.pos.x, player.pos.y + player.eye + bobY - (player.landDip || 0), player.pos.z); eye.rotation.set(player.pitch, player.yaw, 0);
+  eye.position.set(player.pos.x, player.pos.y + player.eye + bobY - (player.landDip || 0), player.pos.z); eye.rotation.set(player.pitch, player.yaw, 0); if (mapId === 'testsite') tsCam();
   if (player.getup > 0 && avatar && avatar.state === 'alive') { avatar.root.updateMatrixWorld(true); const hp = avatar.parts.head.mesh.getWorldPosition(_a); eye.position.y = lerp(eye.position.y, hp.y + 0.05, clamp(player.getup / 0.8, 0, 1)); }
   eye.updateMatrixWorld();
 }
@@ -21660,7 +21661,7 @@ const TS_GEST = {
   stop: { R: [0.14, -0.1, -0.48], curl: 0, wrist: 1.4 },
   grab: { R: [0.32, -0.6, -0.5], curl: 1, wrist: -0.3 },
 };
-const TS_IDLE = { R: [0.26, -0.38, -0.5], L: [-0.26, -0.38, -0.5] };
+const TS_IDLE = { R: [0.19, -0.5, -0.62], L: [-0.19, -0.5, -0.62] };
 Object.assign(SFX, {
   tsSplash(v = 0.8) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.35); if (!o) return; this.nz(o, t, 0.5, 'bandpass', 1400, 0.8, 0.9, 0.005, 3200); this.nz(o, t + 0.05, 0.9, 'lowpass', 900, 0.6, 0.5, 0.02, 300); for (let i = 0; i < 6; i++) this.tn(o, t + 0.1 + i * 0.07, 'sine', rand(500, 1200), rand(250, 500), 0.12, 0.12, 0.003); },
   tsLand(v = 0.6, soft = false) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.25); if (!o) return; if (soft) { this.nz(o, t, 0.3, 'lowpass', 500, 0.7, 0.3, 0.02, 180); this.tn(o, t, 'sine', 90, 50, 0.3, 0.3, 0.01); } else { this.tn(o, t, 'sine', 110, 40, 0.22, 0.9, 0.002); this.nz(o, t, 0.08, 'lowpass', 900, 0.8, 0.6, 0.002); } },
@@ -21695,6 +21696,7 @@ function buildTestSite() {
   TS.pickup = kg;
   // хлопушки-ориентиры: высокий столб с цифрами высоты
   for (const [x, z] of [[-22, -22], [22, -22], [-22, 22], [22, 22]]) box(steel, x - 0.3, x + 0.3, 0, 4, z - 0.3, z + 0.3);
+  tsBuild2();
 }
 /* ---------- руки от первого лица ---------- */
 function tsBuildRig() {
@@ -21717,14 +21719,6 @@ function tsBuildRig() {
   { const kb = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.008, 6, 12), std({ color: 0xd8b040, metalness: 1, roughness: 0.25 })); rig.key.add(kb); const kbar = new THREE.Mesh(IM_G.box, kb.material); kbar.scale.set(0.01, 0.01, 0.12); kbar.position.z = 0.06; rig.key.add(kbar); }
   TS.rig = rig; return rig;
 }
-function tsSetArm(A, target, curl, wristRot, dt) {
-  // плечо смотрит на цель; локоть сгибается, если цель близко
-  const sh = A.sh, dir = new V3(target[0] - sh.position.x, target[1] - sh.position.y, target[2] - sh.position.z);
-  const q = new THREE.Quaternion().setFromUnitVectors(new V3(0, 0, 1), dir.clone().normalize()); sh.quaternion.slerp(q, Math.min(1, dt * 14));
-  const bend = clamp(0.9 - dir.length() * 1.2, 0, 1.3); A.el.rotation.x = lerp(A.el.rotation.x, -bend, Math.min(1, dt * 10));
-  A.wr.rotation.z = lerp(A.wr.rotation.z, wristRot, Math.min(1, dt * 10));
-  for (const f of A.fingers) f.rotation.x = lerp(f.rotation.x, -curl * 1.5, Math.min(1, dt * 12)); A.th.rotation.x = lerp(A.th.rotation.x, -curl * 0.8, Math.min(1, dt * 12));
-}
 function tsVM(dt) {
   if (!TS.on) return; const R = tsBuildRig(); const p = player.pos;
   { let dy = player.yaw - (TS.lastYaw ?? player.yaw); if (dy > Math.PI) dy -= 2 * Math.PI; if (dy < -Math.PI) dy += 2 * Math.PI; TS.lastYaw = player.yaw; const k = Math.min(1, dt * 10); TS.swayX = lerp(TS.swayX || 0, -dy * 2.2, k); TS.swayX = clamp(TS.swayX, -0.09, 0.09); TS.swayY = lerp(TS.swayY || 0, clamp(-(player.pitch - (TS.lastPitch ?? player.pitch)) * 2, -0.05, 0.05), k); TS.lastPitch = player.pitch; }
@@ -21739,7 +21733,7 @@ function tsVM(dt) {
   if (TS.swim) { const s = Math.sin(TS.paddle); R_t[1] += s * 0.12; L_t[1] -= s * 0.12; R_t[2] += Math.cos(TS.paddle) * 0.08; L_t[2] -= Math.cos(TS.paddle) * 0.08; }
   if (TS.gest) { TS.gestT += dt; const g = TS_GEST[TS.gest], k = Math.min(1, TS.gestT * 3); R_t = R_t.map((v, i) => lerp(v, g.R[i], k)); curlR = g.curl; wristR = g.wrist; if (TS.gest === 'wave') { R_t[0] += Math.sin(TS.gestT * 12) * 0.08; wristR += Math.sin(TS.gestT * 12) * 0.5; } if (TS.gestT > 2.2) TS.gest = null; }
   if (TS.hasKey && !TS.keyAnim) { curlR = 0.3; }
-  if (TS.keyAnim) { const K = TS.keyAnim; K.t += dt; const kl = TS.door ? vmRoot.worldToLocal(TS.door.pivot.localToWorld(TS.door.kh.clone())) : new V3(0, -0.3, -0.5); const ease = (x) => x * x * (3 - 2 * x);
+  if (TS.keyAnim) { const K = TS.keyAnim; K.t += dt; const kla = TS.door ? tsLoc(TS.door.pivot.localToWorld(TS.door.kh.clone())) : [0, -0.3, -0.5], kl = { x: kla[0], y: kla[1] - 0.3, z: kla[2] }; const ease = (x) => x * x * (3 - 2 * x);
     if (K.t < 0.9) { const e = ease(K.t / 0.9); R_t = [lerp(TS_IDLE.R[0], kl.x, e), lerp(TS_IDLE.R[1], kl.y, e), lerp(TS_IDLE.R[2], kl.z + 0.1, e)]; curlR = 0.6; }
     else if (K.t < 1.3) { R_t = [kl.x, kl.y, kl.z + 0.05]; curlR = 0.9; wristR = lerp(0, -1.45, ease((K.t - 0.9) / 0.4)); if (!K.snd) { K.snd = 1; SFX.tsKey(0.6); } }
     else if (K.t < 1.8) { R_t = [kl.x, kl.y, kl.z + 0.05]; curlR = 0.9; wristR = -1.45 + Math.sin((K.t - 1.3) * 40) * 0.03 * Math.max(0, 1 - (K.t - 1.3) * 2); if (!K.opened) { K.opened = 1; shake = Math.max(shake, 0.25); SFX.tsLock(0.7); TS.door.tgt = 1; TS.door.obs && obstacles.indexOf(TS.door.obs) >= 0 && obstacles.splice(obstacles.indexOf(TS.door.obs), 1); TS.door.locked = false; banner('🔓 ДВЕРЬ ОТКРЫТА', ''); } }
@@ -21751,24 +21745,25 @@ function tsVM(dt) {
   // пальцы: у каждой фаланги своё сгибание (хват реальнее, чем один кулак)
   // шаги по дистанции, а не по времени — походка совпадает со скоростью
   if (!(TS.keyAnim && TS.keyAnim.t > 0.9 && TS.keyAnim.t < 1.8)) curlL = 0.25 + brace * 0.2;
+  { const o = { R: R_t, L: L_t, curlR, curlL, wristR, wristL }; tsVM2(o, dt); R_t = o.R; L_t = o.L; curlR = o.curlR; curlL = o.curlL; wristR = o.wristR; wristL = o.wristL; }
   tsSetArm(R.R, [R_t[0] - 0.24 + 0.24, R_t[1] + 0.3, R_t[2]], curlR, wristR, dt);
   tsSetArm(R.L, [L_t[0] + 0.24 - 0.24, L_t[1] + 0.3, L_t[2]], curlL, wristL, dt);
   R.key.visible = !!(TS.hasKey || TS.keyAnim && TS.keyAnim.t < 2.6 && TS.keyAnim.t > 0);
   if (TS.keyAnim) R.key.visible = TS.keyAnim.t < 2.4;
 }
-function tsOff() { if (!TS.hid.length) return; for (const c of TS.hid) c.visible = true; TS.hid = []; if (TS.rig) { TS.rig.R.sh.visible = TS.rig.L.sh.visible = false; TS.rig.key.visible = false; } }
+function tsOff() { tsOff2(); if (!TS.hid.length) return; for (const c of TS.hid) c.visible = true; TS.hid = []; if (TS.rig) { TS.rig.R.sh.visible = TS.rig.L.sh.visible = false; TS.rig.key.visible = false; } }
 /* ---------- физика: мат, вода, приземление, ключ ---------- */
 function tsIn(r, x, z) { return x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1; }
 function tsPre(dt) {
   const p = player.pos; LV.groundY = tsIn(TS.pit, p.x, p.z) ? -1.2 : 0;
-  TS.prevVy = player.vel.y;
+  TS.prevVy = player.vel.y; tsPre2(dt);
   if (player.vel.y < -7.5 && (tsIn(TS.pit, p.x, p.z) || tsIn(TS.mat, p.x, p.z))) player.vel.y = -7.2; // мягкие посадки: мат и вода
 }
 function tsPost(dt) {
   const p = player.pos, inPit = tsIn(TS.pit, p.x, p.z), inMat = tsIn(TS.mat, p.x, p.z);
   // приземление
   if (player.onGround && !TS.wasGround) {
-    const imp = -TS.prevVy; if (imp > 2.2 && !inPit) {
+    const imp = -TS.prevVy; if (imp > 2.2 && !inPit && !tsLand2(imp, tsSoftAt(p.x, p.z), inPit)) {
       const soft = inMat ? 0.35 : 1; TS.dip = Math.min(0.22, imp * 0.02 * soft) + TS.dip * 0.5; TS.dipV = -2 * soft; TS.brace = 1; TS.landT = 0.3;
       SFX.tsLand(clamp(imp / 14, 0.2, 0.9), inMat); if (imp > 5) { for (let i = 0; i < 8; i++) spawnSprite(TEX.soft, new V3(p.x + rand(-0.6, 0.6), p.y + 0.05, p.z + rand(-0.6, 0.6)), { color: 0xc8c0b0, size: rand(0.4, 0.9), grow: 1.8, life: rand(0.5, 0.9), opacity: 0.5, vel: new V3(rand(-1, 1), rand(0.3, 1), rand(-1, 1)) }); } if (inMat) banner('🟦 МЯГКАЯ ПОСАДКА', 'мат погасил удар'); shake = Math.max(shake, Math.min(0.4, imp * 0.03)); }
     else if (inPit) { }
@@ -21800,19 +21795,21 @@ function tsPost(dt) {
   if (TS.door && TS.door.open !== undefined) { const D = TS.door; D.open = lerp(D.open, D.tgt, Math.min(1, dt * 2.5)); D.pivot.rotation.y = -D.open * 1.7; }
   if (TS.pickup) TS.pickup.visible = !TS.hasKey;
   if (TS.matM) { const onM = tsIn(TS.mat, p.x, p.z) && player.onGround; const tgt = onM ? 0.09 : 0; TS.matV += (-(TS.matSag - tgt) * 90 - TS.matV * 12) * dt; TS.matSag += TS.matV * dt; const sy = 0.3 - TS.matSag; TS.matM.scale.y = Math.max(0.05, sy); TS.matM.position.y = sy / 2; }
+  tsPost2(dt);
   if (TS.hudT === undefined || (TS.hudT -= dt) < 0) { TS.hudT = 0.2; tsHud(); }
 }
 function tsDoorNear() { const p = player.pos; return TS.door && Math.hypot(p.x - (-10.8), p.z - 6) < 2.2 && TS.door.tgt === 0; }
 function tsKeyNear() { const p = player.pos, k = TS.pickup; return k && k.visible && Math.hypot(p.x - -5.2, p.z - 9.9) < 2; }
 function tsInteract() {
   if (!TS.on) return;
+  if (!tsKeyNear() && !tsDoorNear() && tsInteract2()) return;
   if (tsKeyNear()) { TS.hasKey = true; SFX.tsKey(0.4); banner('🔑 КЛЮЧ', 'Подойдите к двери и нажмите E'); return; }
   if (tsDoorNear()) { if (!TS.hasKey) { SFX.tsLock(0.4); banner('🔒 ЗАПЕРТО', 'Нужен ключ'); return; } if (!TS.keyAnim) { TS.keyAnim = { t: 0 }; banner('🔑 ВСТАВЛЯЕМ КЛЮЧ', ''); } }
 }
 function tsGest(name) { TS.gest = name; TS.gestT = 0; }
 /* ---------- управление и HUD ---------- */
 function tsHud() {
-  const h = TS.hud; if (!h) return; const k = h.querySelector('#tsK'); if (k) k.textContent = tsKeyNear() ? 'E — взять ключ' : tsDoorNear() ? (TS.hasKey ? 'E — открыть ключом' : 'Дверь заперта') : TS.hudWater ? '🌊 В воде: прыжок — всплыть' : ''; }
+  const h = TS.hud; if (!h) return; const k = h.querySelector('#tsK'); const l2 = tsLabel2(); const ab = h.querySelector('#tsA'); if (ab) { ab.classList.toggle('held', !!TS.held); ab.classList.toggle('fl', !!TS.flash); ab.classList.toggle('cr', !!TS.crouchOn); } if (k) k.textContent = tsKeyNear() ? 'E — взять ключ' : tsDoorNear() ? (TS.hasKey ? 'E — открыть ключом' : 'Дверь заперта') : l2 ? l2 : TS.hudWater ? '🌊 В воде: прыжок — всплыть' : ''; }
 function tsUi(on) {
   let h = document.getElementById('tsHud');
   if (!h) {
@@ -21820,17 +21817,23 @@ function tsUi(on) {
 #tsHud .x{position:absolute;left:calc(10px + env(safe-area-inset-left,0px));top:calc(8px + env(safe-area-inset-top,0px));pointer-events:auto;padding:7px 12px;border-radius:10px;background:rgba(10,20,30,.8);border:1px solid #4a8ab0;font:700 13px var(--ui)}
 #tsG{position:absolute;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(130px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,58px);gap:7px;pointer-events:auto}
 #tsG b{width:58px;height:58px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:800 9px var(--ui);background:radial-gradient(circle,#2a5a7a,#0c2030);border:2px solid #8fe0ff;color:#fff;touch-action:none;user-select:none}#tsG b span{font-size:20px;line-height:22px}
+#tsA{position:absolute;right:calc(100px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;pointer-events:auto}
+#tsA b{width:62px;height:62px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:800 9px var(--ui);background:radial-gradient(circle,#3a4a2a,#141c0c);border:2px solid #c8f08a;color:#fff;touch-action:none;user-select:none}#tsA b span{font-size:22px;line-height:24px}
+#tsA b[data-a="use"]{width:74px;height:74px;background:radial-gradient(circle,#6a5a1a,#2a2008);border-color:#ffd84a}
+#tsA b[data-a="throw"]{display:none}#tsA.held b[data-a="throw"]{display:flex}#tsA.cr b[data-a="crouch"]{background:radial-gradient(circle,#7ab040,#2a4a10)}#tsA b[data-a="flash"]{opacity:.45}#tsA.fl b[data-a="flash"]{opacity:1}
+#tsG{bottom:calc(96px + env(safe-area-inset-bottom,0px))!important;grid-template-columns:repeat(5,48px)!important;gap:6px!important}#tsG b{width:48px!important;height:48px!important}#tsG b span{font-size:17px!important}
 #tsK{position:absolute;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font:800 15px var(--ui);text-shadow:0 0 6px #000;white-space:nowrap}
 body.ts-ui #stats,body.ts-ui #health,body.ts-ui #slots,body.ts-ui #weapon,body.ts-ui #cross,body.ts-ui #madHud,body.ts-ui #touch .tb:not([data-act="jump"]){display:none!important}
 body.ts-ui #touch .tb[data-act="jump"]{right:calc(14px + env(safe-area-inset-right,0px))!important;bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;top:auto!important;left:auto!important}
 #tsUnder{position:fixed;inset:0;z-index:40;pointer-events:none;background:radial-gradient(ellipse at center,rgba(40,120,170,.25),rgba(10,60,110,.55));opacity:0;transition:opacity .25s}`; document.head.appendChild(css);
     const u = document.createElement('div'); u.id = 'tsUnder'; document.body.appendChild(u);
-    h = document.createElement('div'); h.id = 'tsHud'; h.innerHTML = `<div class="x" data-k="x">✕ Выйти</div><div id="tsK"></div><div id="tsG"></div>`; document.body.appendChild(h);
+    h = document.createElement('div'); h.id = 'tsHud'; h.innerHTML = `<div class="x" data-k="x">✕ Выйти</div><div id="tsK"></div><div id="tsG"></div><div id="tsA"><b data-a="throw"><span>✊</span>БРОСИТЬ</b><b data-a="flash"><span>🔦</span>СВЕТ</b><b data-a="crouch"><span>🧎</span>ПРИСЕСТЬ</b><b data-a="use"><span>✋</span>E</b></div>`; document.body.appendChild(h);
     h.querySelector('[data-k="x"]').onclick = () => { tsUi(false); TS.on = false; tsOff(); };
-    const G = h.querySelector('#tsG'), items = [['wave', '👋', 'ПРИВЕТ', '1'], ['point', '👉', 'ТУДА', '2'], ['thumb', '👍', 'ОК', '3'], ['stop', '✋', 'СТОП', '4'], ['grab', '🤏', 'ВЗЯТЬ', '5'], ['use', '🔑', 'E', 'E']];
+    const G = h.querySelector('#tsG'), items = [['wave', '👋', 'ПРИВЕТ', '1'], ['point', '👉', 'ТУДА', '2'], ['thumb', '👍', 'ОК', '3'], ['stop', '✋', 'СТОП', '4'], ['grab', '🤏', 'ВЗЯТЬ', '5']];
     for (const [id, ic, t] of items) { const b = document.createElement('b'); b.innerHTML = `<span>${ic}</span>${t}`; b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); if (id === 'use') tsInteract(); else tsGest(id); }); G.appendChild(b); }
-    ['touchstart', 'pointerdown', 'mousedown'].forEach((e) => h.querySelector('#tsG').addEventListener(e, (ev) => ev.stopPropagation()));
-    window.addEventListener('keydown', (e) => { if (!TS.on) return; const m = { Digit1: 'wave', Digit2: 'point', Digit3: 'thumb', Digit4: 'stop', Digit5: 'grab' }[e.code]; if (m) tsGest(m); if (e.code === 'KeyE') tsInteract(); });
+    for (const b of h.querySelectorAll('#tsA b')) b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); const a = b.dataset.a; if (a === 'use') tsInteract(); else if (a === 'crouch') tsCrouch(); else if (a === 'throw') tsThrow(); else if (a === 'flash') tsFlashT(); tsHud(); });
+    ['touchstart', 'pointerdown', 'mousedown'].forEach((e) => { h.querySelector('#tsG').addEventListener(e, (ev) => ev.stopPropagation()); h.querySelector('#tsA').addEventListener(e, (ev) => ev.stopPropagation()); });
+    window.addEventListener('keydown', (e) => { if (!TS.on) return; const m = { Digit1: 'wave', Digit2: 'point', Digit3: 'thumb', Digit4: 'stop', Digit5: 'grab' }[e.code]; if (m) tsGest(m); if (e.code === 'KeyE') tsInteract(); if (e.code === 'KeyC') tsCrouch(); if (e.code === 'KeyG' || e.code === 'KeyQ') tsThrow(); if (e.code === 'KeyF') tsFlashT(); });
     TS.hud = h;
   }
   h.style.display = on ? 'block' : 'none'; document.body.classList.toggle('ts-ui', !!on); // свой класс: прячем стандартный HUD и боевые кнопки
@@ -21840,6 +21843,368 @@ function tsSync() { const on = mapId === 'testsite' && state === 'play' && !VEH.
 
 // прямая кнопка в меню: выбирает карту и сразу запускает песочницу
 { const b = document.getElementById('playTest'); if (b) b.onclick = () => { Sound.init(); const c = document.querySelector('#mapChips [data-v="testsite"]'); if (c) c.click(); document.getElementById('playSandbox').click(); }; }
+/* ===================== ТЕСТ-ПЛОЩАДКА 2: тело, предметы, падения =====================
+   Видимое тело и ноги от первого лица (голова и руки аватара скрыты — вместо них руки с IK),
+   приседание, сидение на стуле, лестница с перехватом рук, упор рукой в стену, бег с работой рук,
+   брошенные предметы с физикой (мяч, ящики, банки), кольцо со счётом, выключатель и лампа, ящик стола с фонариком,
+   рычаг и ворота, автомат с газировкой (нажать — выпала банка — взять — открыть — выпить),
+   падения по силе удара: присед → удар руками → на колени / кувырок → рэгдолл, батут-подушка. */
+Object.assign(TS, { cfg: { shY: -0.22, roll: 0.9, pron: 0.9, back: 0.17, backDown: 0.03 }, act: null, held: null, crouch: 0, crouchOn: false, sit: null, climb: null, air: 0, camP: 0, camR: 0, camPV: 0, camRV: 0, camDrop: 0, knees: 0, limpT: 0, breath: 0, stam: 0, wall: 0, wallP: null, bodyHid: [], ints: [], items: [], score: 0, flash: null, flashOn: false, slam: 0, lastNear: null });
+const _tsV = new V3(), _tsV2 = new V3(), _tsM4 = new THREE.Matrix4(), _tsQ = new THREE.Quaternion(), _tsQa = new THREE.Quaternion(), _tsUP = new V3(0, 1, 0), _tsX = new V3(1, 0, 0), _tsZ = new V3(0, 0, 1);
+Object.assign(SFX, {
+  tsClick(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.05); if (!o) return; this.nz(o, t, 0.02, 'highpass', 3000, 1, 0.9, 0.001); this.tn(o, t, 'square', 1800, 900, 0.02, 0.2, 0.001); },
+  tsSlide(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.1); if (!o) return; this.nz(o, t, 0.35, 'bandpass', 600, 1.2, 0.5, 0.03, 900); this.tn(o, t + 0.33, 'sine', 160, 80, 0.06, 0.5, 0.002); },
+  tsLever(v = 0.6) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.15); if (!o) return; for (let i = 0; i < 7; i++) this.metal(o, t + i * 0.07, 900 + i * 40, 0.05, 0.12, [1, 2.3]); this.metal(o, t + 0.55, 400, 0.3, 0.4, [1, 2.7, 4.1]); },
+  tsGate(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.4); if (!o) return; this.tn(o, t, 'sawtooth', 55, 70, 2.4, 0.25, 0.2); this.nz(o, t, 2.4, 'lowpass', 300, 0.7, 0.3, 0.2); this.metal(o, t + 2.4, 300, 0.4, 0.4, [1, 2.2, 3.7]); },
+  tsWhoosh(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.1); if (!o) return; this.nz(o, t, 0.22, 'bandpass', 700, 1.4, 0.6, 0.04, 2200); },
+  tsBonk(v = 0.5, f = 1) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.15); if (!o) return; this.tn(o, t, 'sine', 180 * f, 70 * f, 0.18, 0.7, 0.002); this.nz(o, t, 0.05, 'lowpass', 1200, 0.8, 0.4, 0.001); },
+  tsCanHit(v = 0.4) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.15); if (!o) return; this.metal(o, t, rand(1400, 2200), 0.12, 0.25, [1, 2.9, 5.1]); },
+  tsVend(v = 0.6) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.3); if (!o) return; this.tn(o, t, 'sawtooth', 90, 110, 0.9, 0.18, 0.05); this.nz(o, t, 0.9, 'bandpass', 400, 2, 0.2, 0.05); this.metal(o, t + 0.95, 500, 0.15, 0.45, [1, 2.4]); this.tn(o, t + 1.0, 'sine', 140, 60, 0.15, 0.6, 0.002); },
+  tsPssht(v = 0.6) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.1); if (!o) return; this.metal(o, t, 2600, 0.03, 0.3, [1]); this.nz(o, t + 0.02, 0.45, 'highpass', 4000, 0.8, 0.7, 0.002, 2500); },
+  tsGulp(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.1); if (!o) return; this.tn(o, t, 'sine', 300, 120, 0.12, 0.6, 0.01); this.nz(o, t, 0.1, 'lowpass', 500, 2, 0.4, 0.01); },
+  tsAh(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.2); if (!o) return; this.nz(o, t, 0.5, 'bandpass', 1100, 3, 0.5, 0.05, 700); },
+  tsRung(v = 0.35) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.1); if (!o) return; this.metal(o, t, rand(700, 900), 0.08, 0.25, [1, 2.6]); },
+  tsGrunt(v = 0.6) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.2); if (!o) return; this.tn(o, t, 'sawtooth', 160, 95, 0.28, 0.35, 0.01); this.nz(o, t, 0.25, 'bandpass', 500, 3, 0.4, 0.01, 300); },
+  tsBreath(v = 0.3) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.2); if (!o) return; this.nz(o, t, 0.35, 'bandpass', 900, 1.5, 0.4, 0.08); this.nz(o, t + 0.45, 0.4, 'bandpass', 600, 1.5, 0.35, 0.1); },
+  tsBoing(v = 0.6) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.2); if (!o) return; this.tn(o, t, 'sine', 70, 140, 0.35, 0.8, 0.01); this.nz(o, t, 0.2, 'lowpass', 400, 0.7, 0.5, 0.01); },
+  tsCreak(v = 0.4) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.1); if (!o) return; this.tn(o, t, 'sawtooth', 220, 180, 0.25, 0.12, 0.03); },
+  tsNet(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.2); if (!o) return; this.nz(o, t, 0.3, 'bandpass', 2500, 1, 0.5, 0.01, 1500); for (let i = 0; i < 3; i++) this.tn(o, t + 0.35 + i * 0.12, 'sine', 880 + i * 220, 880 + i * 220, 0.12, 0.25, 0.005); },
+});
+/* ---------- помощники ---------- */
+// мировая точка → система координат рук (камера смотрит в −Z)
+// руки рисуются отдельной камерой с меньшим FOV — пересчитываем, чтобы кисть оказалась ровно поверх предмета на экране
+function tsLoc(w) { eye.updateMatrixWorld(); const v = eye.worldToLocal(_tsV2.copy(w)), k = Math.tan(vmCamera.fov * Math.PI / 360) / Math.tan(camera.fov * Math.PI / 360); v.x *= k; v.y *= k; v.sub(vmRoot.position); return [v.x, v.y, v.z]; }
+function tsFwd() { return _tsV.set(-Math.sin(player.yaw) * Math.cos(player.pitch), Math.sin(player.pitch), -Math.cos(player.yaw) * Math.cos(player.pitch)).clone(); }
+function tsEyeP() { return new V3(player.pos.x, player.pos.y + player.eye - (player.landDip || 0), player.pos.z); }
+const tsEase = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+const tsMix = (a, b, k) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
+function tsCanvasM(w, h, fn, o = {}) { const t = cvTex(w, h, fn); if (o.rep) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(o.rep[0], o.rep[1]); } return std(Object.assign({ map: t, roughness: 0.8 }, o.m || {})); }
+/* ---------- IK рук: плечо → локоть → запястье точно в цель ---------- */
+function tsSetArm(A, target, curl, wristRot, dt) {
+  const sh = A.sh, side = A === TS.rig.R ? 1 : -1, C = TS.cfg; sh.position.y = C.shY; const T = _tsV.set(target[0], target[1], target[2]), L1 = 0.34, L2 = 0.32;
+  let d = _tsV2.subVectors(T, sh.position).length(); d = clamp(d, 0.14, L1 + L2 - 0.004);
+  const bend = Math.PI - Math.acos(clamp((L1 * L1 + L2 * L2 - d * d) / (2 * L1 * L2), -1, 1)), alpha = Math.acos(clamp((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1));
+  _tsM4.lookAt(T, sh.position, _tsUP); _tsQ.setFromRotationMatrix(_tsM4);
+  _tsQ.multiply(_tsQa.setFromAxisAngle(_tsZ, side * (C.roll + (A.roll || 0)))).multiply(_tsQa.setFromAxisAngle(_tsX, alpha));
+  const k = Math.min(1, dt * 16); sh.quaternion.slerp(_tsQ, k); A.el.rotation.x = lerp(A.el.rotation.x, -bend, k);
+  A.wr.rotation.z = lerp(A.wr.rotation.z, side * C.pron + wristRot, Math.min(1, dt * 10)); A.wr.rotation.x = lerp(A.wr.rotation.x, A.wrX || 0, Math.min(1, dt * 10));
+  for (let i = 0; i < A.fingers.length; i++) A.fingers[i].rotation.x = lerp(A.fingers[i].rotation.x, -(A.point && i > 0 ? 1 : A.point ? 0 : clamp(curl + (A.spread ? (i - 1.5) * 0.06 : 0), 0, 1.2)) * 1.5, Math.min(1, dt * 12));
+  A.th.rotation.x = lerp(A.th.rotation.x, -curl * 0.8, Math.min(1, dt * 12));
+}
+/* ---------- модели ---------- */
+function tsTexBrick() { return tsCanvasM(512, 512, (g) => { g.fillStyle = '#8a8580'; g.fillRect(0, 0, 512, 512); for (let r = 0; r < 16; r++) for (let c = -1; c < 9; c++) { const x = c * 64 + (r % 2 ? 32 : 0), y = r * 32, v = 120 + Math.random() * 50 | 0; g.fillStyle = `rgb(${v + 40},${v - 30},${v - 45})`; g.fillRect(x + 2, y + 2, 60, 28); g.fillStyle = 'rgba(0,0,0,.12)'; g.fillRect(x + 2, y + 24, 60, 6); for (let i = 0; i < 12; i++) { g.fillStyle = `rgba(${Math.random() < 0.5 ? '0,0,0' : '255,255,255'},.08)`; g.fillRect(x + 2 + Math.random() * 56, y + 2 + Math.random() * 24, 3, 3); } } }, { rep: [2, 1.2], m: { roughness: 0.95 } }); }
+function tsTexTile() { return tsCanvasM(256, 256, (g) => { g.fillStyle = '#5a5e62'; g.fillRect(0, 0, 256, 256); for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) { const v = 196 + Math.random() * 20 | 0; g.fillStyle = `rgb(${v},${v - 4},${v - 10})`; g.fillRect(x * 64 + 2, y * 64 + 2, 60, 60); } }, { rep: [4, 4], m: { roughness: 0.35 } }); }
+function tsTexPlank(col = '#a87a48') { return tsCanvasM(256, 256, (g) => { g.fillStyle = col; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 4; i++) { g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(0, i * 64, 256, 3); for (let k = 0; k < 30; k++) { g.strokeStyle = `rgba(60,30,10,${0.08 + Math.random() * 0.1})`; g.beginPath(); const y = i * 64 + 5 + Math.random() * 56; g.moveTo(0, y); g.bezierCurveTo(80, y + rand(-4, 4), 170, y + rand(-4, 4), 256, y); g.stroke(); } } g.fillStyle = '#333'; for (const [x, y] of [[12, 12], [244, 12], [12, 244], [244, 244], [12, 128], [244, 128]]) { g.beginPath(); g.arc(x, y, 4, 0, 7); g.fill(); } }); }
+function tsTexPlate() { return tsCanvasM(256, 256, (g) => { const gr = g.createLinearGradient(0, 0, 256, 256); gr.addColorStop(0, '#8d9399'); gr.addColorStop(1, '#6d7379'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256); g.fillStyle = 'rgba(255,255,255,.35)'; for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) { g.save(); g.translate(x * 16 + 8, y * 16 + 8); g.rotate((x + y) % 2 ? 0.8 : -0.8); g.fillRect(-5, -1.5, 10, 3); g.restore(); } }, { rep: [3, 3], m: { roughness: 0.4, metalness: 0.7 } }); }
+function tsTexBall() { return cvTex(512, 256, (g) => { g.fillStyle = '#d8661e'; g.fillRect(0, 0, 512, 256); for (let i = 0; i < 4000; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.12})`; g.fillRect(Math.random() * 512, Math.random() * 256, 2, 2); } g.strokeStyle = '#1a0e08'; g.lineWidth = 6; g.beginPath(); g.moveTo(0, 128); g.lineTo(512, 128); g.stroke(); for (const x of [128, 384]) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 256); g.stroke(); } for (const x of [0, 256, 512]) { g.beginPath(); g.ellipse(x, 128, 70, 128, 0, 0, 7); g.stroke(); } }); }
+function tsTexVend() { return cvTex(512, 1024, (g) => { const gr = g.createLinearGradient(0, 0, 512, 0); gr.addColorStop(0, '#b0121e'); gr.addColorStop(0.5, '#e02a34'); gr.addColorStop(1, '#a00e18'); g.fillStyle = gr; g.fillRect(0, 0, 512, 1024);
+  g.fillStyle = '#fff'; g.font = 'italic 900 64px sans-serif'; g.textAlign = 'center'; g.fillText('ХОЛОДОК', 256, 92); g.font = '700 22px sans-serif'; g.fillText('ледяная газировка', 256, 124);
+  g.fillStyle = '#10161c'; g.fillRect(36, 150, 330, 600); const cols = ['#e02a34', '#2a8ae0', '#f0c020', '#30c060', '#ff7a1a', '#9a40e0'];
+  for (let r = 0; r < 6; r++) { g.fillStyle = '#3a444e'; g.fillRect(36, 240 + r * 100, 330, 8); for (let c = 0; c < 5; c++) { const x = 60 + c * 62, y = 170 + r * 100, col = cols[(r + c) % 6]; const cg = g.createLinearGradient(x, 0, x + 40, 0); cg.addColorStop(0, '#222'); cg.addColorStop(0.3, col); cg.addColorStop(0.6, '#fff'); cg.addColorStop(1, col); g.fillStyle = cg; g.fillRect(x, y, 40, 68); g.fillStyle = '#ccc'; g.fillRect(x + 4, y - 4, 32, 5); g.fillStyle = '#ffd'; g.font = '700 13px monospace'; g.fillText(`${r + 1}${c + 1}`, x + 20, y + 90); } }
+  g.fillStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.moveTo(36, 150); g.lineTo(160, 150); g.lineTo(36, 520); g.fill();
+  g.fillStyle = '#1c1c20'; g.fillRect(390, 170, 96, 420); g.fillStyle = '#4af05a'; g.fillRect(400, 184, 76, 34); g.fillStyle = '#063'; g.font = '700 22px monospace'; g.fillText('50₽', 438, 210);
+  for (let i = 0; i < 6; i++) { g.fillStyle = '#d8d8d8'; g.beginPath(); g.arc(415 + (i % 2) * 46, 260 + (i >> 1) * 52, 17, 0, 7); g.fill(); g.fillStyle = '#333'; g.font = '700 14px sans-serif'; g.fillText(String(i + 1), 415 + (i % 2) * 46, 265 + (i >> 1) * 52); }
+  g.fillStyle = '#ffcc33'; g.beginPath(); g.arc(438, 430, 26, 0, 7); g.fill(); g.fillStyle = '#000'; g.font = '900 13px sans-serif'; g.fillText('ЖМИ', 438, 435); g.fillStyle = '#000'; g.fillRect(426, 490, 24, 50);
+  g.fillStyle = '#0b0b0d'; g.fillRect(60, 800, 300, 120); g.fillStyle = '#222'; g.fillRect(70, 810, 280, 30); g.fillStyle = '#fff'; g.font = '700 18px sans-serif'; g.fillText('ВЫДАЧА ▼', 210, 870); }); }
+function tsTexBag() { return tsCanvasM(512, 256, (g) => { g.fillStyle = '#f2c018'; g.fillRect(0, 0, 512, 256); g.strokeStyle = '#a07a08'; g.lineWidth = 3; g.setLineDash([8, 6]); for (let x = 64; x < 512; x += 128) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 256); g.stroke(); } g.setLineDash([]); g.fillStyle = '#c2181e'; g.font = '900 48px sans-serif'; g.textAlign = 'center'; g.fillText('ПОДУШКА', 256, 150); g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(0, 20, 512, 18); }, { m: { roughness: 0.45 } }); }
+function tsTexStripes() { return tsCanvasM(128, 128, (g) => { g.fillStyle = '#f0c010'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#111'; for (let i = -4; i < 8; i++) { g.beginPath(); g.moveTo(i * 32, 0); g.lineTo(i * 32 + 16, 0); g.lineTo(i * 32 + 16 + 128, 128); g.lineTo(i * 32 + 128, 128); g.fill(); } }, { m: { roughness: 0.6 } }); }
+// ящик со скруглёнными гранями (вместо голого куба)
+function tsRBox(w, h, d, r = 0.03) { const s = new THREE.Shape(), x = w / 2 - r, y = h / 2 - r; s.moveTo(-x, -h / 2); s.lineTo(x, -h / 2); s.quadraticCurveTo(w / 2, -h / 2, w / 2, -y); s.lineTo(w / 2, y); s.quadraticCurveTo(w / 2, h / 2, x, h / 2); s.lineTo(-x, h / 2); s.quadraticCurveTo(-w / 2, h / 2, -w / 2, y); s.lineTo(-w / 2, -y); s.quadraticCurveTo(-w / 2, -h / 2, -x, -h / 2); const g = new THREE.ExtrudeGeometry(s, { depth: d - 2 * r, bevelEnabled: true, bevelSize: r, bevelThickness: r, bevelSegments: 2, curveSegments: 3 }); g.translate(0, 0, -(d - 2 * r) / 2); g.computeVertexNormals(); return g; }
+function tsMesh(geo, mat, x, y, z, par = null) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; if (par) par.add(m); else addMesh(m); return m; }
+function tsGrp(x, y, z, ry = 0) { const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; scene.add(g); mapObjs.push(g); return g; }
+function tsInt(o) { TS.ints.push(o); return o; }
+/* ---------- постройка новых объектов ---------- */
+function tsBuild2() {
+  if (TS.held && TS.held.m.parent) TS.held.m.parent.remove(TS.held.m); if (TS.flash) { TS.flash.m.parent && TS.flash.m.parent.remove(TS.flash.m); if (TS.flash.light) { scene.remove(TS.flash.light); scene.remove(TS.flash.tgt); } }
+  TS.ints = []; TS.items = []; TS.held = null; TS.act = null; TS.sit = null; TS.climb = null; TS.score = 0; TS.flash = null; TS.flashOn = false; TS.crouchOn = false; TS.crouch = 0;
+  const box = (m, xa, xb, ya, yb, za, zb, sol = true) => { const g = new THREE.Mesh(IM_G.box, m); g.position.set((xa + xb) / 2, (ya + yb) / 2, (za + zb) / 2); g.scale.set(xb - xa, yb - ya, zb - za); g.receiveShadow = true; g.castShadow = true; addMesh(g); if (sol) solid((xa + xb) / 2, (ya + yb) / 2, (za + zb) / 2, xb - xa, yb - ya, zb - za); return g; };
+  const brick = tsTexBrick(), tile = tsTexTile(), steel = std({ color: 0x8a9098, roughness: 0.3, metalness: 0.75 }), dark = std({ color: 0x24282c, roughness: 0.5, metalness: 0.4 }), wood = tsTexPlank('#9a6a3a'), white = std({ color: 0xeeeeea, roughness: 0.5 }), plate = tsTexPlate(), stripes = tsTexStripes(), rubber = std({ color: 0x18181a, roughness: 0.9 });
+  /* --- комната (кирпич, плитка, крыша): выключатель, лампа, стол с ящиком, стул --- */
+  const RX0 = -22, RX1 = -14, RZ0 = -11, RZ1 = -3;
+  box(brick, RX0 - 0.25, RX0, 0, 3, RZ0 - 0.25, RZ1 + 0.25); box(brick, RX0, RX1, 0, 3, RZ0 - 0.25, RZ0); box(brick, RX0, RX1, 0, 3, RZ1, RZ1 + 0.25); box(brick, RX0 - 0.25, RX1 + 0.1, 3, 3.2, RZ0 - 0.25, RZ1 + 0.25, false);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(RX1 - RX0, RZ1 - RZ0), tile.clone()); fl.material.map = tile.map; fl.rotation.x = -Math.PI / 2; fl.position.set((RX0 + RX1) / 2, 0.012, (RZ0 + RZ1) / 2); fl.receiveShadow = true; addMesh(fl);
+  box(white, RX1 - 0.02, RX1 + 0.1, 0, 3, RZ0 - 0.25, RZ0 + 0.3, false); box(white, RX1 - 0.02, RX1 + 0.1, 0, 3, RZ1 - 0.3, RZ1 + 0.25, false);
+  // лампа под потолком
+  const lampG = tsGrp(-18, 0, -7); tsMesh(new THREE.CylinderGeometry(0.006, 0.006, 0.5, 4), dark, 0, 2.95, 0, lampG); const shade = tsMesh(new THREE.ConeGeometry(0.28, 0.22, 20, 1, true), std({ color: 0x2a5a3a, roughness: 0.4, metalness: 0.5, side: THREE.DoubleSide }), 0, 2.62, 0, lampG);
+  const bulbM = new THREE.MeshStandardMaterial({ color: 0xfff4e0, emissive: 0xffe0a0, emissiveIntensity: 2.2 }); tsMesh(new THREE.SphereGeometry(0.07, 14, 10), bulbM, 0, 2.52, 0, lampG); void shade;
+  const lampL = new THREE.PointLight(0xffd8a0, 40, 11, 2); lampL.position.set(-18, 2.45, -7); scene.add(lampL); mapObjs.push(lampL);
+  // выключатель на стене у входа
+  const swG = tsGrp(-15, 1.35, RZ1 - 0.01); tsMesh(new THREE.BoxGeometry(0.09, 0.13, 0.02), white, 0, 0, 0, swG); const key = tsMesh(new THREE.BoxGeometry(0.045, 0.07, 0.025), std({ color: 0xf8f8f4, roughness: 0.3 }), 0, 0, -0.012, swG); key.rotation.x = -0.25;
+  const SW = { on: true, key, lampL, bulbM };
+  tsInt({ id: 'switch', pos: new V3(-15, 1.35, RZ1 - 0.05), r: 1.7, label: () => SW.on ? 'E — выключить свет' : 'E — включить свет', use() { tsAct('press', { w: new V3(-15, 1.35, RZ1 - 0.04), at: 0.32, fn() { SW.on = !SW.on; SFX.tsClick(0.6); } }); } });
+  TS.sw = SW;
+  // стол с выдвижным ящиком (внутри фонарик)
+  const desk = tsGrp(-21.3, 0, -5.5); const dw = tsTexPlank('#7a4a28');
+  tsMesh(tsRBox(0.7, 0.05, 1.4, 0.015), dw, 0, 0.78, 0, desk); for (const [x, z] of [[-0.3, -0.64], [0.3, -0.64], [-0.3, 0.64], [0.3, 0.64]]) tsMesh(new THREE.BoxGeometry(0.05, 0.76, 0.05), dw, x, 0.38, z, desk);
+  tsMesh(new THREE.BoxGeometry(0.62, 0.2, 0.5), dw, 0, 0.65, -0.35, desk); solid(-21.3, 0.4, -5.5, 0.7, 0.8, 1.4);
+  const drawer = new THREE.Group(); drawer.position.set(0.02, 0.62, 0.3); desk.add(drawer); tsMesh(new THREE.BoxGeometry(0.6, 0.02, 0.48), dw, 0, -0.08, 0, drawer); for (const [x, z, sx, sz] of [[0.3, 0, 0.02, 0.48], [-0.29, 0, 0.02, 0.48], [0, 0.23, 0.6, 0.02], [0, -0.23, 0.6, 0.02]]) tsMesh(new THREE.BoxGeometry(sx, 0.14, sz), dw, x, 0, z, drawer);
+  tsMesh(new THREE.BoxGeometry(0.04, 0.03, 0.14), steel, 0.33, 0.01, 0, drawer);
+  const flashM = tsFlashMesh(); flashM.position.set(0, -0.04, 0); flashM.rotation.set(0, 0.4, Math.PI / 2); drawer.add(flashM);
+  const DR = { g: drawer, open: 0, tgt: 0, flash: flashM };
+  tsInt({ id: 'drawer', pos: new V3(-20.9, 0.62, -5.2), r: 1.5, label: () => DR.tgt ? 'E — задвинуть ящик' : 'E — выдвинуть ящик', use() { const w = () => desk.localToWorld(new V3(0.33 + DR.open * 0.38, 0.63, 0.3)); tsAct('pull', { wf: w, at: 0.3, fn() { DR.tgt = DR.tgt ? 0 : 1; SFX.tsSlide(0.6); } }); } });
+  tsInt({ id: 'flash', pos: new V3(-20.6, 0.62, -5.2), r: 1.6, pri: 1, label: () => DR.open > 0.8 && DR.flash.parent === drawer ? 'E — взять фонарик' : null, use() { tsAct('pick', { wf: () => DR.flash.getWorldPosition(new V3()), at: 0.38, fn() { drawer.remove(DR.flash); TS.flash = { m: DR.flash }; TS.flashOn = true; tsFlashOn(); SFX.tsClick(0.5); banner('🔦 ФОНАРИК', 'кнопка 🔦 — вкл/выкл'); } }); } });
+  TS.drawer = DR;
+  // стул (можно сесть)
+  const chair = tsGrp(-18, 0, -9.4, 0); const cm = tsTexPlank('#6a4428');
+  tsMesh(tsRBox(0.46, 0.05, 0.46, 0.012), cm, 0, 0.46, 0, chair); for (const [x, z] of [[-0.2, -0.2], [0.2, -0.2], [-0.2, 0.2], [0.2, 0.2]]) tsMesh(new THREE.CylinderGeometry(0.02, 0.018, 0.46, 8), cm, x, 0.23, z, chair);
+  tsMesh(tsRBox(0.46, 0.4, 0.04, 0.012), cm, 0, 0.72, -0.21, chair); for (const x of [-0.2, 0.2]) tsMesh(new THREE.CylinderGeometry(0.02, 0.02, 0.45, 8), cm, x, 0.7, -0.21, chair);
+  tsInt({ id: 'chair', pos: new V3(-18, 0.5, -9.4), r: 1.5, label: () => TS.sit ? 'E — встать' : 'E — сесть на стул', use() { if (TS.sit) tsStand(); else tsSitDown(chair); } });
+  const tbl = tsGrp(-18, 0, -8.2); tsMesh(tsRBox(1.0, 0.05, 0.7, 0.015), cm, 0, 0.74, 0, tbl); for (const [x, z] of [[-0.44, -0.3], [0.44, -0.3], [-0.44, 0.3], [0.44, 0.3]]) tsMesh(new THREE.BoxGeometry(0.04, 0.72, 0.04), cm, x, 0.37, z, tbl); solid(-18, 0.38, -8.2, 1.0, 0.76, 0.7);
+  /* --- автомат с газировкой --- */
+  const vend = tsGrp(-12.2, 0, -14.6, 0); const vm = std({ map: tsTexVend(), roughness: 0.35, metalness: 0.2 }), red = std({ color: 0xb0121e, roughness: 0.35, metalness: 0.3 });
+  const vbody = tsMesh(tsRBox(1.0, 1.95, 0.8, 0.04), [red, red, vm, red, red, red].length ? red : red, 0, 0.975, 0, vend); void vbody;
+  const front = tsMesh(new THREE.PlaneGeometry(0.98, 1.92), vm, 0, 0.975, 0.405, vend); front.castShadow = false;
+  const glass = tsMesh(new THREE.PlaneGeometry(0.62, 1.12), new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.12, roughness: 0.02, metalness: 1 }), -0.12, 1.15, 0.42, vend); glass.castShadow = false;
+  tsMesh(new THREE.BoxGeometry(0.6, 0.24, 0.06), dark, -0.06, 0.25, 0.42, vend); solid(-12.2, 0.975, -14.6, 1.0, 1.95, 0.8);
+  const vl = new THREE.PointLight(0xbfe0ff, 6, 3, 2); vl.position.set(-12.3, 1.2, -13.9); scene.add(vl); mapObjs.push(vl);
+  const VD = { state: 'idle', g: vend, can: null, cans: 0 };
+  const btnW = new V3(-12.2 + 0.36, 0.975 + (0.5 - 430 / 1024) * 1.92, -14.6 + 0.42), trayW = new V3(-12.26, 0.25, -14.6 + 0.4);
+  tsInt({ id: 'vend', pos: new V3(-12.2, 1.0, -14.0), r: 1.8, label: () => TS.held ? null : VD.state === 'idle' ? 'E — нажать кнопку автомата' : VD.state === 'busy' ? 'автомат выдаёт…' : 'E — забрать банку', use() {
+    if (VD.state === 'idle') { VD.state = 'busy'; tsAct('press', { w: btnW, at: 0.3, fn() { SFX.tsClick(0.6); SFX.tsVend(0.6); later(1.05, () => { VD.can = tsCanMesh(); VD.can.position.copy(trayW); VD.can.rotation.z = Math.PI / 2; scene.add(VD.can); VD.state = 'ready'; shake = Math.max(shake, 0.05); }); } }); }
+    else if (VD.state === 'ready' && !TS.held) tsAct('pick', { w: trayW.clone(), at: 0.4, crouch: true, fn() { scene.remove(VD.can); tsHold(tsMakeItem('can', VD.can)); VD.can = null; VD.state = 'idle'; } });
+  } });
+  TS.vend = VD;
+  /* --- вышка с лестницей, трамплин и надувная подушка --- */
+  const TX0 = 4, TX1 = 7, TZ0 = 14, TZ1 = 17, TH = 5;
+  for (const [x, z] of [[TX0, TZ0], [TX1, TZ0], [TX0, TZ1], [TX1, TZ1]]) box(steel, x - 0.08, x + 0.08, 0, TH, z - 0.08, z + 0.08);
+  for (const y of [1.6, 3.2]) { box(steel, TX0, TX1, y - 0.03, y + 0.03, TZ1 - 0.04, TZ1 + 0.04, false); box(steel, TX0 - 0.04, TX0 + 0.04, y - 0.03, y + 0.03, TZ0, TZ1, false); }
+  const pf = new THREE.Mesh(new THREE.BoxGeometry(TX1 - TX0 + 0.2, 0.12, TZ1 - TZ0 + 0.2), plate); pf.position.set((TX0 + TX1) / 2, TH - 0.06, (TZ0 + TZ1) / 2); pf.castShadow = pf.receiveShadow = true; addMesh(pf); addDeck(TX0 - 0.1, TX1 + 0.1, TZ0 - 0.1, TZ1 + 0.1, TH); addBody((TX0 + TX1) / 2, TH - 0.06, (TZ0 + TZ1) / 2, (TX1 - TX0) / 2 + 0.1, 0.06, (TZ1 - TZ0) / 2 + 0.1);
+  // перила (с трёх сторон, кроме лестницы и трамплина)
+  for (const [xa, xb, za, zb] of [[TX0 - 0.1, TX0, TZ0, TZ1], [TX0, TX1, TZ1, TZ1 + 0.1]]) { box(stripes, xa, xb, TH + 0.95, TH + 1.02, za, zb, false); obstacles.push({ min: new V3(xa, TH, za), max: new V3(xb, TH + 1.02, zb) }); for (let i = 0; i <= 4; i++) { const x = lerp(xa, xb, i / 4), z = lerp(za, zb, i / 4); box(steel, x - 0.02, x + 0.02, TH, TH + 0.95, z - 0.02, z + 0.02, false); } }
+  box(stripes, TX0, 5.0, TH + 0.95, TH + 1.02, TZ0 - 0.1, TZ0, false); obstacles.push({ min: new V3(TX0, TH, TZ0 - 0.1), max: new V3(5.0, TH + 1.02, TZ0) }); box(stripes, 6.1, TX1, TH + 0.95, TH + 1.02, TZ0 - 0.1, TZ0, false); obstacles.push({ min: new V3(6.1, TH, TZ0 - 0.1), max: new V3(TX1, TH + 1.02, TZ0) });
+  // лестница (на южной стороне, x 5..6)
+  const LAD = { x0: 5.05, x1: 5.95, z: TZ0 - 0.1, top: TH, rung: 0.3 };
+  for (const x of [LAD.x0, LAD.x1]) box(steel, x - 0.03, x + 0.03, 0, TH + 1.0, LAD.z - 0.03, LAD.z + 0.03, false);
+  for (let y = 0.3; y < TH; y += LAD.rung) { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, LAD.x1 - LAD.x0, 8), steel); r.rotation.z = Math.PI / 2; r.position.set((LAD.x0 + LAD.x1) / 2, y, LAD.z); r.castShadow = true; addMesh(r); }
+  TS.lad = LAD;
+  // трамплин-доска над подушкой
+  const board = new THREE.Mesh(tsRBox(2.6, 0.08, 0.6, 0.02), tsTexPlank('#3a7ac0')); board.position.set(TX1 + 1.3, TH - 0.04, 15.5); board.castShadow = board.receiveShadow = true; addMesh(board); addDeck(TX1, TX1 + 2.6, 15.2, 15.8, TH); TS.board = board;
+  // надувная подушка
+  const bagM = tsTexBag(), BAG = { x0: 8.4, x1: 13.6, z0: 12.6, z1: 18.4, h: 0.9, sag: 0, v: 0 };
+  const bag = new THREE.Mesh(tsRBox(BAG.x1 - BAG.x0, BAG.h, BAG.z1 - BAG.z0, 0.3), bagM); bag.position.set((BAG.x0 + BAG.x1) / 2, BAG.h / 2, (BAG.z0 + BAG.z1) / 2); bag.castShadow = bag.receiveShadow = true; addMesh(bag); BAG.m = bag; addDeck(BAG.x0, BAG.x1, BAG.z0, BAG.z1, BAG.h); addBody((BAG.x0 + BAG.x1) / 2, BAG.h / 2, (BAG.z0 + BAG.z1) / 2, (BAG.x1 - BAG.x0) / 2, BAG.h / 2, (BAG.z1 - BAG.z0) / 2);
+  TS.bag = BAG;
+  /* --- клетка с рычагом и воротами; внутри ящики --- */
+  const CX0 = 14, CX1 = 20, CZ0 = 20, CZ1 = 26, mesh = std({ color: 0x6a7076, roughness: 0.5, metalness: 0.6, transparent: true, opacity: 0.85, alphaTest: 0.5, map: cvTex(128, 128, (g) => { g.clearRect(0, 0, 128, 128); g.strokeStyle = '#fff'; g.lineWidth = 6; for (let i = 0; i <= 128; i += 32) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 128); g.stroke(); g.beginPath(); g.moveTo(0, i); g.lineTo(128, i); g.stroke(); } }) });
+  mesh.map.wrapS = mesh.map.wrapT = THREE.RepeatWrapping; mesh.map.repeat.set(6, 3); mesh.side = THREE.DoubleSide;
+  for (const [xa, xb, za, zb] of [[CX0 - 0.03, CX0 + 0.03, CZ0, CZ1], [CX1 - 0.03, CX1 + 0.03, CZ0, CZ1], [CX0, CX1, CZ1 - 0.03, CZ1 + 0.03], [CX0, 15.6, CZ0 - 0.03, CZ0 + 0.03], [18.4, CX1, CZ0 - 0.03, CZ0 + 0.03]]) { const g = box(mesh, xa, xb, 0, 2.6, za, zb); g.castShadow = false; }
+  for (const [x, z] of [[CX0, CZ0], [CX1, CZ0], [CX0, CZ1], [CX1, CZ1], [15.6, CZ0], [18.4, CZ0]]) box(stripes, x - 0.07, x + 0.07, 0, 2.8, z - 0.07, z + 0.07, false);
+  const gate = new THREE.Group(); gate.position.set(17, 0, CZ0); scene.add(gate); mapObjs.push(gate); for (let i = 0; i < 9; i++) { const b = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 2.4, 8), steel); b.position.set(-1.3 + i * 0.325, 1.25, 0); b.castShadow = true; gate.add(b); } for (const y of [0.15, 1.25, 2.4]) { const b = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.08, 0.06), stripes); b.position.y = y; gate.add(b); }
+  const gObs = { min: new V3(15.6, 0, CZ0 - 0.06), max: new V3(18.4, 2.5, CZ0 + 0.06) }; obstacles.push(gObs); const gBody = addBody(17, 1.25, CZ0, 1.4, 1.25, 0.06);
+  const GT = { g: gate, obs: gObs, body: gBody, open: 0, tgt: 0 };
+  const lev = tsGrp(13.2, 0, 19.3, 0); tsMesh(tsRBox(0.3, 1.0, 0.22, 0.03), std({ color: 0x2a6a3a, roughness: 0.5, metalness: 0.4 }), 0, 0.5, 0, lev); const arm = new THREE.Group(); arm.position.set(0, 0.92, 0.12); lev.add(arm); tsMesh(new THREE.CylinderGeometry(0.02, 0.02, 0.55, 8), steel, 0, 0.27, 0, arm); tsMesh(new THREE.SphereGeometry(0.055, 14, 10), std({ color: 0xd02020, roughness: 0.3 }), 0, 0.56, 0, arm); arm.rotation.x = -0.7; solid(13.2, 0.5, 19.3, 0.3, 1.0, 0.22);
+  GT.arm = arm;
+  tsInt({ id: 'lever', pos: new V3(13.2, 1.0, 19.5), r: 1.7, label: () => GT.tgt ? 'E — опустить ворота' : 'E — дёрнуть рычаг', use() { const from = arm.rotation.x, to = GT.tgt ? -0.7 : 0.7; tsAct('lever', { wf: () => arm.localToWorld(new V3(0, 0.56, 0)), dur: 1.2, tick(t) { arm.rotation.x = lerp(from, to, tsEase((t - 0.35) / 0.55)); }, at: 0.9, fn() { GT.tgt = GT.tgt ? 0 : 1; SFX.tsLever(0.7); SFX.tsGate(0.5); shake = Math.max(shake, 0.12); } }); } });
+  TS.gate = GT;
+  /* --- баскетбольное кольцо --- */
+  const hoop = tsGrp(0, 0, 24, Math.PI); box(steel, -0.07, 0.07, 0, 3.4, 24.6, 24.75); const bb = tsMesh(new THREE.BoxGeometry(1.8, 1.05, 0.05), std({ color: 0xffffff, roughness: 0.2, transparent: true, opacity: 0.9 }), 0, 3.35, 0.5, hoop); void bb; addBody(0, 3.35, 23.5, 0.9, 0.53, 0.03);
+  tsMesh(new THREE.BoxGeometry(0.6, 0.45, 0.06), std({ color: 0xffffff, roughness: 0.3, map: cvTex(64, 64, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, 64, 64); g.strokeStyle = '#e03020'; g.lineWidth = 5; g.strokeRect(5, 5, 54, 54); }) }), 0, 3.15, 0.47, hoop);
+  const rim = tsMesh(new THREE.TorusGeometry(0.23, 0.012, 8, 28), std({ color: 0xe04010, roughness: 0.4, metalness: 0.6 }), 0, 3.05, 0.2, hoop); rim.rotation.x = Math.PI / 2; void rim;
+  const net = tsMesh(new THREE.CylinderGeometry(0.23, 0.15, 0.4, 16, 3, true), new THREE.MeshStandardMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.8 }), 0, 2.85, 0.2, hoop); net.castShadow = false; TS.net = net;
+  { const rb = new CANNON.Body({ mass: 0, material: mGround, collisionFilterGroup: G_STATIC }); for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; rb.addShape(new CANNON.Sphere(0.02), new CANNON.Vec3(Math.cos(a) * 0.23, 0, Math.sin(a) * 0.23)); } rb.position.set(0, 3.05, 23.8); world.addBody(rb); mapBodies.push(rb); }
+  TS.hoop = { c: new V3(0, 3.05, 23.8) };
+  /* --- предметы: мячи, ящики, банки --- */
+  // предметы создаются на первом кадре игры (после сборки карты пропы очищаются)
+  TS.needItems = true;
+}
+function tsSpawnItems() {
+  TS.needItems = false; TS.items = [];
+  for (const [x, z] of [[1.5, 20.5], [-1.2, 20.8], [2.6, 3]]) tsItemAt('ball', x, 0.3, z);
+  for (const [x, z, y] of [[15.5, 23.5, 0.21], [16.2, 24.5, 0.21], [15.8, 24.0, 0.63], [18.4, 22.5, 0.21], [-3, 3, 0.21]]) tsItemAt('crate', x, y, z);
+  for (const [x, z] of [[-5.0, 9.6], [-4.7, 10.2]]) tsItemAt('can', x, 0.97, z);
+}
+/* ---------- предметы с физикой ---------- */
+function tsFlashMesh() { const g = new THREE.Group(), bm = std({ color: 0x22262a, roughness: 0.35, metalness: 0.6 }); const b = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.02, 0.17, 12), bm); b.rotation.x = Math.PI / 2; g.add(b); const h = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.024, 0.06, 14), bm); h.rotation.x = Math.PI / 2; h.position.z = -0.11; g.add(h); const lens = new THREE.Mesh(new THREE.CircleGeometry(0.03, 14), new THREE.MeshBasicMaterial({ color: 0xfff6d0 })); lens.position.z = -0.141; lens.rotation.y = Math.PI; g.add(lens); g.userData.lens = lens; const sw = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.008, 0.02), std({ color: 0xd04020 })); sw.position.set(0, 0.022, 0.01); g.add(sw); return g; }
+function tsCanMesh() { const g = new THREE.Group(), col = pick([0xe02a34, 0x2a8ae0, 0x30c060, 0xf0c020]); const lab = cvTex(128, 64, (c) => { c.fillStyle = '#' + col.toString(16).padStart(6, '0'); c.fillRect(0, 0, 128, 64); c.fillStyle = '#fff'; c.font = 'italic 900 18px sans-serif'; c.fillText('ХОЛОДОК', 14, 38); c.fillStyle = 'rgba(255,255,255,.4)'; c.fillRect(0, 6, 128, 4); c.fillRect(0, 54, 128, 4); });
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.033, 0.033, 0.115, 16), std({ map: lab, roughness: 0.25, metalness: 0.6 })); body.castShadow = true; g.add(body); const top = new THREE.Mesh(new THREE.CylinderGeometry(0.029, 0.033, 0.01, 16), std({ color: 0xcfd3d8, roughness: 0.2, metalness: 0.9 })); top.position.y = 0.062; g.add(top); const tab = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.003, 0.02), top.material); tab.position.set(0, 0.068, 0.008); g.add(tab); g.userData.tab = tab; return g; }
+function tsCrateMesh() { const s = 0.42, g = new THREE.Group(), m = new THREE.Mesh(tsRBox(s, s, s, 0.02), tsTexPlank('#b0844e')); m.castShadow = m.receiveShadow = true; g.add(m); const e = std({ color: 0x6a4a2a, roughness: 0.8 }); for (const [x, y] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, s + 0.01), e); b.position.set(x * (s / 2 - 0.02), y * (s / 2 - 0.02), 0); g.add(b); } return g; }
+function tsBallMesh() { const m = new THREE.Mesh(new THREE.SphereGeometry(0.12, 24, 16), std({ map: tsTexBall(), roughness: 0.75 })); m.castShadow = true; const g = new THREE.Group(); g.add(m); return g; }
+const TS_ITEM = { ball: { r: 0.12, mass: 0.6, mk: tsBallMesh, sh: () => new CANNON.Sphere(0.12), bounce: 1, label: 'мяч' }, crate: { r: 0.21, mass: 4, mk: tsCrateMesh, sh: () => new CANNON.Box(new CANNON.Vec3(0.21, 0.21, 0.21)), label: 'ящик', heavy: true }, can: { r: 0.04, mass: 0.35, mk: tsCanMesh, sh: () => new CANNON.Cylinder(0.033, 0.033, 0.115, 8), label: 'банку' } };
+function tsMakeItem(kind, mesh) { const D = TS_ITEM[kind]; const m = mesh || D.mk(); return { kind, m, D, body: null, pr: null, full: kind === 'can', hitCd: 0 }; }
+function tsItemAt(kind, x, y, z) { const it = tsMakeItem(kind); scene.add(it.m); tsDrop(it, new V3(x, y, z), new V3()); return it; }
+function tsDrop(it, pos, vel, spin = 0) {
+  const D = it.D; const b = new CANNON.Body({ mass: D.mass, material: mProp, position: new CANNON.Vec3(pos.x, pos.y, pos.z), collisionFilterGroup: G_PROP, collisionFilterMask: G_STATIC | G_BODY | G_GIB | G_PROP, angularDamping: 0.3, linearDamping: 0.05 });
+  b.addShape(D.sh()); b.velocity.set(vel.x, vel.y, vel.z); if (spin) b.angularVelocity.set(rand(-spin, spin), rand(-spin, spin), rand(-spin, spin)); if (it.m.parent !== scene) scene.add(it.m); it.m.quaternion.identity(); b.quaternion.copy(it.m.quaternion);
+  world.addBody(b); it.body = b; it.pr = { kind: 'tsItem', m: it.m, body: b, r: D.r, hp: 999, dead: false, tsItem: it }; it.m.userData = { kind: 'prop', prop: it.pr, body: b }; props.push(it.pr); targetsDirty = true; if (TS.items.indexOf(it) < 0) TS.items.push(it);
+  b.addEventListener('collide', (e) => { const v = Math.abs(e.contact.getImpactVelocityAlongNormal()); if (v < 1.2 || it.hitCd > 0) return; it.hitCd = 0.08; if (dv(it.m.position) < 0.02) return; const k = clamp(v / 9, 0.1, 0.8) * Math.min(1, dv(it.m.position) * 1.5); if (it.kind === 'ball') SFX.tsBonk(k, 1.3); else if (it.kind === 'can') SFX.tsCanHit(k); else SFX.tsBonk(k, 0.6); });
+}
+function tsLift(it) { if (it.body) { world.removeBody(it.body); const i = props.indexOf(it.pr); if (i >= 0) props.splice(i, 1); targetsDirty = true; it.body = null; it.pr = null; } }
+function tsHold(it) { tsLift(it); TS.held = it; const R = tsBuildRig(); R.R.wr.add(it.m); it.m.position.set(0, 0.03 + it.D.r, 0.07); it.m.rotation.set(0, 0, 0); if (it.kind === 'can') it.m.rotation.set(Math.PI / 2, 0, 0); if (it.kind === 'crate') { it.m.position.set(-0.12, 0.05 + it.D.r, 0.08); } it.m.userData.tsOwn = true; SFX.tsClick(0.3); }
+function tsThrow() {
+  const it = TS.held; if (TS.act && it) { TS.pend = 'throw'; return; } if (!it) return;
+  tsAct('throw', { dur: 0.6, at: 0.32, fn() { const f = tsFwd(), e = tsEyeP(), right = new V3(Math.cos(player.yaw), 0, -Math.sin(player.yaw)); TS.held = null; const pos = e.clone().addScaledVector(f, 0.55).addScaledVector(right, 0.18).add(new V3(0, -0.12, 0)); const sp = it.D.heavy ? 6 : it.kind === 'can' ? 11 : 10.5; const vel = f.clone().multiplyScalar(sp).add(new V3(0, it.D.heavy ? 2.4 : 1.6, 0)).add(new V3(player.vel.x, 0, player.vel.z)); it.m.parent && it.m.parent.remove(it.m); scene.add(it.m); it.m.position.copy(pos); tsDrop(it, pos, vel, it.kind === 'ball' ? 4 : 7); SFX.tsWhoosh(it.D.heavy ? 0.6 : 0.4); TS.camRV += 0.6; } });
+}
+function tsPlace() { const it = TS.held; if (!it || TS.act) return; tsAct('place', { dur: 0.7, at: 0.4, crouch: true, fn() { const f = tsFwd(); f.y = 0; f.normalize(); TS.held = null; const pos = player.pos.clone().addScaledVector(f, 0.7); pos.y = floorAt(pos.x, pos.z, player.pos.y) + it.D.r + 0.05; it.m.parent && it.m.parent.remove(it.m); scene.add(it.m); it.m.position.copy(pos); tsDrop(it, pos, new V3()); } }); }
+function tsItemNear() { let best = null, bd = 1.7; const e = tsEyeP(), f = tsFwd(); for (const it of TS.items) { if (!it.body || TS.held === it) continue; const p = it.m.position, d = p.distanceTo(e); const dir = _tsV2.subVectors(p, e).normalize(); const look = dir.dot(f); if (d < bd + (look > 0.8 ? 0.5 : 0) && look > 0.35) { bd = d; best = it; } } return best; }
+function tsDrink() { const it = TS.held; if (!it || it.kind !== 'can' || !it.full || TS.act) return; tsAct('drink', { dur: 2.6, at: 0.45, fn() { SFX.tsPssht(0.6); }, ev: [[1.0, () => SFX.tsGulp(0.5)], [1.35, () => SFX.tsGulp(0.5)], [1.7, () => SFX.tsGulp(0.5)], [2.05, () => { SFX.tsAh(0.5); it.full = false; player.hp = Math.min(100, player.hp + 25); toast('🥤 +25 здоровья, банка пустая — её можно бросить'); }]] }); }
+/* ---------- фонарик ---------- */
+function tsFlashOn() { const F = TS.flash; if (!F) return; if (!F.light) { F.light = new THREE.SpotLight(0xfff2d8, 70, 30, 0.42, 0.55, 1.6); F.tgt = new THREE.Object3D(); scene.add(F.light); scene.add(F.tgt); mapObjs.push(F.light, F.tgt); F.light.target = F.tgt; } const R = tsBuildRig(); if (F.m.parent !== R.L.wr) { R.L.wr.add(F.m); F.m.position.set(0, 0.04, 0.06); F.m.rotation.set(0, 0, 0); F.m.userData.tsOwn = true; } F.light.visible = TS.flashOn; F.m.userData.lens.material.color.setHex(TS.flashOn ? 0xfff6d0 : 0x333333); }
+/* ---------- система действий рук ---------- */
+function tsAct(kind, o = {}) { if (TS.act) return false; TS.act = Object.assign({ kind, t: 0, dur: o.dur || (kind === 'press' ? 0.7 : kind === 'pull' ? 0.85 : kind === 'pick' ? 0.8 : 0.7), done: false }, o); return true; }
+function tsActStep(o, dt) {
+  const A = TS.act; if (!A) return; A.t += dt; const t = A.t, D = A.dur;
+  if (A.tick) A.tick(t); if (A.at !== undefined && !A.fired && t >= A.at) { A.fired = true; A.fn && A.fn(); } if (A.ev) for (const e of A.ev) if (!e.f && t >= e[0]) { e.f = 1; e[1](); }
+  const w = A.wf ? A.wf() : A.w; const tgt = w ? tsLoc(w) : null; const ret = (t - (A.at || D * 0.5)) / Math.max(0.15, D - (A.at || D * 0.5));
+  const toward = (side, k, curl, wr) => { const base = o[side]; o[side] = tsMix(base, tgt, k); if (side === 'R') { o.curlR = curl; o.wristR = wr; } else { o.curlL = curl; o.wristL = wr; } };
+  if (A.kind === 'press') { const k = t < A.at ? tsEase(t / A.at) : 1 - tsEase(ret); toward('R', k, 0, 0); TS.rig.R.point = true; }
+  else if (A.kind === 'pull') { const k = t < A.at ? tsEase(t / A.at) : 1 - tsEase(ret); toward('R', k, t > A.at * 0.8 ? 1 : 0.2, -0.8); }
+  else if (A.kind === 'pick') { const k = t < A.at ? tsEase(t / A.at) : 1 - tsEase(ret); toward('R', k, t > A.at * 0.85 ? 0.85 : 0.1, 0.2); if (A.crouch || (w && w.y < player.pos.y + 0.8)) TS.camDropT = Math.max(TS.camDropT || 0, 0.42 * Math.sin(Math.PI * clamp(t / D, 0, 1))); }
+  else if (A.kind === 'lever') { const k = t < 0.35 ? tsEase(t / 0.35) : t < 0.95 ? 1 : 1 - tsEase((t - 0.95) / 0.25); toward('R', k, 1, -0.5); const l = tgt ? tsMix(o.L, [tgt[0] - 0.07, tgt[1] - 0.02, tgt[2] + 0.02], k) : o.L; o.L = l; o.curlL = 1; if (t > 0.4 && t < 0.9) TS.camPV -= dt * 0.6; }
+  else if (A.kind === 'throw') { const ke = t < 0.28 ? tsEase(t / 0.28) : 0, kf = t < 0.28 ? 0 : t < 0.4 ? tsEase((t - 0.28) / 0.12) : 1 - tsEase((t - 0.4) / 0.2); const back = [0.32, 0.12, -0.12], fwd = [0.12, 0.02, -0.66]; o.R = t < 0.28 ? tsMix(o.R, back, ke) : tsMix(t < 0.4 ? back : o.R, fwd, kf); o.curlR = t < 0.32 ? 0.8 : 0.05; o.L = tsMix(o.L, [-0.22, -0.02, -0.5], Math.sin(Math.PI * clamp(t / 0.6, 0, 1))); }
+  else if (A.kind === 'place') { const k = Math.sin(Math.PI * clamp(t / D, 0, 1)); o.R = tsMix(o.R, [0.16, -0.38, -0.5], k); o.curlR = t < A.at ? 0.7 : 0.1; TS.camDropT = Math.max(TS.camDropT || 0, 0.4 * k); }
+  else if (A.kind === 'drink') { const k = t < 0.9 ? tsEase(t / 0.9) : t < 2.1 ? 1 : 1 - tsEase((t - 2.1) / 0.5); const mouth = [0.04, -0.08, -0.12]; o.R = tsMix(o.R, mouth, k); o.curlR = 0.85; o.wristR = -0.6 * k; TS.rig.R.wrX = -0.9 * k; TS.drinkTilt = k * 0.35; if (t > 0.3 && t < 0.5) { o.L = tsMix(o.L, [0.02, -0.1, -0.38], Math.sin(Math.PI * (t - 0.3) / 0.2)); o.curlL = 0.5; } }
+  if (t >= D) { TS.act = null; if (TS.pend === 'throw') { TS.pend = null; later(0.05, tsThrow); } TS.rig.R.point = false; TS.rig.R.wrX = 0; TS.drinkTilt = 0; }
+}
+/* ---------- руки: дополнительные анимации (вызывается из tsVM) ---------- */
+function tsVM2(o, dt) {
+  const R = TS.rig; R.R.spread = R.L.spread = false;
+  // перевод в «пространство камеры» (tsVM добавляет +0.3 по Y при вызове tsSetArm)
+  o.R = [o.R[0], o.R[1] + 0.3, o.R[2]]; o.L = [o.L[0], o.L[1] + 0.3, o.L[2]];
+  const sp = Math.hypot(player.vel.x, player.vel.z), now = performance.now() / 1000;
+  if (!TS.gest && !TS.keyAnim) { o.curlR = Math.max(o.curlR, 0.3); o.curlL = Math.max(o.curlL, 0.3); }
+  // дыхание: спокойно ~0.25 Гц, после бега — чаще и глубже
+  TS.breath += dt * (1.6 + TS.stam * 3.2); const br = Math.sin(TS.breath) * (0.006 + TS.stam * 0.014); o.R[1] += br; o.L[1] += br;
+  // спринт: руки работают в противофазе, кулаки сжаты
+  if (player.onGround && sp > 5.5 && !TS.act && !TS.held && !TS.climb) { const s = Math.sin(TS.bob * 0.5 + 0.0), k = clamp((sp - 5.5) / 1.5, 0, 1); o.R[2] += s * 0.12 * k; o.L[2] -= s * 0.12 * k; o.R[1] += Math.abs(s) * 0.03 * k; o.L[1] += Math.abs(s) * 0.03 * k; o.curlR = Math.max(o.curlR, 0.75 * k); o.curlL = Math.max(o.curlL, 0.75 * k); }
+  // приседание: руки ближе к телу
+  if (TS.crouch > 0.05) { o.R[1] -= 0.04 * TS.crouch; o.L[1] -= 0.04 * TS.crouch; o.R[2] += 0.06 * TS.crouch; o.L[2] += 0.06 * TS.crouch; }
+  // взгляд вниз: руки уходят в стороны, чтобы было видно тело и ноги
+  const down = clamp((-player.pitch - 0.45) / 0.6, 0, 1); if (down > 0 && !TS.act) { o.R[0] += 0.14 * down; o.L[0] -= 0.14 * down; o.R[1] += 0.06 * down; o.L[1] += 0.06 * down; }
+  // долгое падение: руки вскинуты и «ищут опору»
+  if (TS.air > 0.45 && player.vel.y < -3 && !TS.swim) { const k = clamp((TS.air - 0.45) * 3, 0, 1), w = Math.sin(now * 9); o.R = tsMix(o.R, [0.45 + w * 0.05, 0.22, -0.32], k); o.L = tsMix(o.L, [-0.45 - w * 0.05, 0.25, -0.3], k); o.curlR = o.curlL = 0.1; R.R.spread = R.L.spread = true; }
+  // удар руками о землю при жёстком приземлении
+  if (TS.slam > 0) { const k = Math.sin(Math.PI * clamp(1 - TS.slam, 0, 1)); o.R = tsMix(o.R, [0.22, -0.36, -0.42], k); o.L = tsMix(o.L, [-0.22, -0.36, -0.42], k); o.curlR = o.curlL = 0; R.R.spread = R.L.spread = true; TS.slam = Math.max(0, TS.slam - dt * 1.6); }
+  // упор ладонью в стену
+  if (TS.wall > 0.01 && TS.wallP && !TS.act) { const l = tsLoc(TS.wallP); o.L = tsMix(o.L, l, TS.wall); o.curlL = 0; o.wristL = -0.9 * TS.wall; R.L.spread = true; }
+  // лестница: руки по очереди перехватывают ступени
+  if (TS.climb) { const C = TS.climb, ph = C.y / TS.lad.rung, rr = Math.floor(ph), fr = ph - rr, L = TS.lad; const rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw), mk = (side, off) => { const ry = (Math.floor((C.y + 1.45) / L.rung) + off) * L.rung, sg = side === 'R' ? 0.24 : -0.24; return tsLoc(new V3(C.x + rx * sg, ry, L.z + rz * sg)); }; const odd = rr % 2; o.R = tsMix(mk('R', odd ? 1 : 0), mk('R', 2), odd ? 0 : tsEase(fr)); o.L = tsMix(mk('L', odd ? 0 : 1), mk('L', 2), odd ? tsEase(fr) : 0); o.curlR = odd ? 0.95 : 0.95 - Math.sin(Math.PI * fr) * 0.8; o.curlL = !odd ? 0.95 : 0.95 - Math.sin(Math.PI * fr) * 0.8; o.wristR = o.wristL = 0; }
+  // сидя: руки на коленях
+  if (TS.sit) { o.R = tsMix(o.R, [0.16, -0.38, -0.32], TS.sit.k); o.L = tsMix(o.L, [-0.16, -0.38, -0.32], TS.sit.k); o.curlR = o.curlL = 0.3; }
+  // предмет в руке
+  if (TS.held && !TS.act) { const it = TS.held; if (it.D.heavy) { o.R = tsMix(o.R, [0.14, -0.15, -0.42], 1); o.L = tsMix(o.L, [-0.3, -0.15, -0.44], 1); o.curlR = o.curlL = 0.55; } else { o.R = tsMix(o.R, [0.22, -0.13, -0.42], 1); o.curlR = it.kind === 'ball' ? 0.45 : 0.85; } }
+  if (TS.flash) { const fo = TS.flashOn ? [-0.2, -0.1, -0.46] : [-0.22, -0.2, -0.38]; if (!TS.climb && !(TS.act && TS.act.kind === 'lever') && !(TS.held && TS.held.D.heavy)) { o.L = tsMix(o.L, fo, 1); o.curlL = 0.9; } }
+  if (TS.act) tsActStep(o, dt);
+  o.R = [o.R[0], o.R[1] - 0.3, o.R[2]]; o.L = [o.L[0], o.L[1] - 0.3, o.L[2]];
+  // кольцо: банка в руке крутится к лицу; ящик держим двумя руками
+  if (TS.held && TS.held.kind === 'can') { const tab = TS.held.m.userData.tab; if (tab) tab.rotation.x = TS.held.full ? 0 : -1.2; }
+}
+/* ---------- тело от первого лица ---------- */
+function tsBodyUndo() { for (const P of TS.bodyHid) P.mesh.visible = true; TS.bodyHid = []; }
+function tsBody() {
+  const A = avatar; if (!A) return;
+  if (!(mapId === 'testsite' && TS.on && A.state === 'alive' && !view3() && !VEH.in)) { if (TS.bodyHid.length) tsBodyUndo(); return; }
+  A.root.visible = true; if (A.held) A.held.visible = false;
+  if (!TS.bodyHid.length) for (const n of ['head', 'uArmL', 'uArmR', 'lArmL', 'lArmR']) { const P = A.parts[n]; if (P && !P.gone && P.mesh.visible) { P.mesh.visible = false; TS.bodyHid.push(P); } }
+  const P = A.parts, c = Math.max(TS.crouch, Math.min(1, (TS.camDropT || 0) / 0.42)), fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
+  if (TS.sit) { const S = TS.sit, k = S.k; A.root.position.set(lerp(player.pos.x, S.x - S.fx * 0.06, k), player.pos.y, lerp(player.pos.z, S.z - S.fz * 0.06, k)); A.root.rotation.y = S.yaw; return; }
+  const down = clamp((-player.pitch - 0.3) / 0.9, 0, 1), back = TS.cfg.back + down * TS.cfg.backDown + c * 0.12; A.root.position.set(player.pos.x - fx * back, player.pos.y, player.pos.z - fz * back);
+  // туловище наклоняется вслед за взглядом, чтобы не лезть в камеру
+  if (P.torso) P.torso.pivot.rotation.x += -down * 0.12 + c * 0.35;
+  if (c > 0.01) { const a = 0.95 * c; P.pelvis.pivot.position.y -= 0.4 * c; for (const s of ['L', 'R']) { P['uLeg' + s].pivot.rotation.x -= a; P['lLeg' + s].pivot.rotation.x += 2 * a; } }
+  if (TS.knees > 0) { const k = Math.sin(Math.PI * clamp(TS.knees, 0, 1)); P.pelvis.pivot.position.y -= 0.45 * k; for (const s of ['L', 'R']) { P['uLeg' + s].pivot.rotation.x -= 1.0 * k; P['lLeg' + s].pivot.rotation.x += 2.0 * k; } }
+  if (TS.climb) { const ph = TS.climb.y / TS.lad.rung; P.uLegL.pivot.rotation.x = -0.6 - Math.max(0, Math.sin(ph * Math.PI)) * 0.5; P.uLegR.pivot.rotation.x = -0.6 - Math.max(0, -Math.sin(ph * Math.PI)) * 0.5; P.lLegL.pivot.rotation.x = P.lLegR.pivot.rotation.x = 1.0; A.root.position.set(player.pos.x - fx * 0.32, player.pos.y, player.pos.z - fz * 0.32); }
+}
+/* ---------- сидение ---------- */
+function tsSitDown(chair) { const yaw = chair.rotation.y, fx = Math.sin(yaw), fz = Math.cos(yaw); TS.sit = { x: chair.position.x, z: chair.position.z, yaw, fx, fz, k: 0, t: 0 }; player.yaw = yaw + Math.PI; player.pitch = -0.2; TS.lastYaw = player.yaw; avatar.pose = 'sit'; avatar.poseDur = Infinity; avatar.poseT = 0; SFX.tsCreak(0.5); TS.crouchOn = false; }
+function tsStand() { if (!TS.sit) return; TS.sit = null; avatar.pose = 'stand'; avatar.poseDur = 0; SFX.tsCreak(0.35); }
+/* ---------- физика игрока: pre/post-хуки ---------- */
+function tsSoftAt(x, z) { const B = TS.bag; if (B && x >= B.x0 && x <= B.x1 && z >= B.z0 && z <= B.z1) return 'bag'; if (tsIn(TS.mat, x, z)) return 'mat'; return null; }
+function tsSpdK() { return (1 - 0.55 * TS.crouch) * (TS.limpT > 0 ? 0.5 : 1) * (TS.held && TS.held.D.heavy ? 0.8 : 1) * (TS.climb || TS.sit ? 0 : 1); }
+function tsLand2(imp, soft, inPit) {
+  const p = player.pos;
+  if (inPit) return;
+  if (soft === 'bag') { const k = clamp(imp / 10, 0.2, 1); player.vel.y = imp * 0.48; player.onGround = false; TS.wasGround = false; TS.bag.v = -imp * 0.5; SFX.tsBoing(0.4 + k * 0.5); TS.dip = 0.08 * k; TS.dipV = -1; if (imp > 6) banner('🟨 ПОДУШКА', 'отскок!'); return true; }
+  if (soft === 'mat') return false; // обработано в ts.js
+  if (imp > 9.2) { // очень жёстко: на колени (или кувырок на бегу) + урон + хромота
+    const hs = Math.hypot(player.vel.x, player.vel.z) || Math.hypot(TS.lastHV || 0, 0), roll = (TS.lastHV || 0) > 3.2;
+    const dmg = Math.round((imp - 8.5) * (roll ? 3 : 7)); if (dmg > 0) damagePlayer(dmg); SFX.tsGrunt(0.7); SFX.tsLand(0.9, false); flashScreen('rgba(160,0,0,.45)', 600); shake = Math.max(shake, 0.6);
+    if (roll) { TS.rollT = 0; TS.camPV -= 2.0; banner('🤸 КУВЫРОК', 'погасил удар перекатом'); TS.limpT = 0.8; } else { TS.knees = 0.01; TS.slam = 1; TS.camPV -= 3.2; TS.camRV += rand(-2.2, 2.2); TS.limpT = 3.5; banner('🦵 ЖЁСТКОЕ ПРИЗЕМЛЕНИЕ', `−${dmg} HP, хромота`); }
+    TS.stam = 1; void hs; return false;
+  }
+  if (imp > 6.5) { TS.slam = 1; TS.camPV -= 1.6; TS.camRV += rand(-1.2, 1.2); SFX.tsGrunt(0.45); const dmg = Math.round((imp - 6.5) * 2); if (dmg > 0) damagePlayer(dmg); TS.limpT = 1.2; TS.stam = Math.max(TS.stam, 0.6); return false; }
+  if (imp > 4) { TS.camPV -= 0.6; TS.camRV += rand(-0.3, 0.3); }
+  return false;
+}
+function tsPre2(dt) {
+  const p = player.pos;
+  // мягкая подушка/мат — ограничение скорости падения, чтобы не включился рэгдолл
+  if (player.vel.y < -7.5 && tsSoftAt(p.x, p.z)) player.vel.y = -7.2;
+  if (TS.climb || TS.sit) { touch.jump = TS.climb ? touch.jump : false; }
+  if (TS.crouchOn && touch.jump && player.onGround) { TS.crouchOn = false; touch.jump = false; }
+  if (player.onGround) TS.lastHV = Math.hypot(player.vel.x, player.vel.z); else TS.lastHV = Math.max(TS.lastHV || 0, Math.hypot(player.vel.x, player.vel.z) * 0.9);
+}
+function tsPost2(dt) {
+  const p = player.pos; if (TS.needItems) tsSpawnItems();
+  // лестница: подойти вплотную и толкать вперёд
+  const L = TS.lad;
+  if (L && !TS.climb && !TS.sit) { const fz = -Math.cos(player.yaw), push = touch.moveId !== null && touch.jy < -0.35; if (p.x > L.x0 - 0.05 && p.x < L.x1 + 0.05 && Math.abs(p.z - (L.z - 0.42)) < 0.35 && fz > 0.4 && push && p.y < L.top - 0.5) { TS.climb = { y: p.y, x: (L.x0 + L.x1) / 2, z: L.z - 0.38, last: Math.floor(p.y / L.rung) }; TS.crouchOn = false; if (TS.held) { const it = TS.held; TS.held = null; it.m.parent && it.m.parent.remove(it.m); const q = new V3(p.x - 0.4, 0.3, p.z - 0.3); scene.add(it.m); it.m.position.copy(q); tsDrop(it, q, new V3()); toast('Предмет поставлен на землю — лестница двумя руками'); } SFX.tsRung(0.4); } }
+  if (TS.climb) { const C = TS.climb, v = touch.moveId !== null ? -touch.jy * 1.6 : 0; C.y = clamp(C.y + v * dt, 0, L.top + 0.2); p.set(C.x, C.y, C.z); player.vel.set(0, 0, 0); player.onGround = false; TS.air = 0;
+    const r = Math.floor(C.y / L.rung); if (r !== C.last) { C.last = r; SFX.tsRung(0.35); TS.dipV -= 0.5; }
+    if (C.y >= L.top - 0.15) { TS.climb = null; p.set(C.x, L.top, L.z + 0.5); player.onGround = true; TS.wasGround = true; SFX.tsStep(0.5); TS.slam = 0.5; }
+    else if (C.y <= 0.01 && v < 0) { TS.climb = null; p.y = 0; p.z -= 0.2; player.onGround = true; TS.wasGround = true; }
+    else if (touch.jump) { touch.jump = false; TS.climb = null; player.vel.set(0, 2.5, -2.5); } }
+  // сидение
+  if (TS.sit) { const S = TS.sit; S.t += dt; S.k = Math.min(1, S.k + dt * 2.5); p.x = lerp(p.x, S.x + S.fx * 0.06, Math.min(1, dt * 8)); p.z = lerp(p.z, S.z + S.fz * 0.06, Math.min(1, dt * 8)); player.vel.set(0, 0, 0); if (S.t > 0.6 && touch.moveId !== null && Math.hypot(touch.jx, touch.jy) > 0.6) tsStand(); }
+  // приседание
+  TS.crouch = lerp(TS.crouch, TS.crouchOn ? 1 : 0, Math.min(1, dt * 7));
+  // время в воздухе (для рук и падений)
+  if (!player.onGround && !TS.swim && !TS.climb) TS.air += dt; else TS.air = 0;
+  // выносливость: бег разгоняет дыхание
+  const hs = Math.hypot(player.vel.x, player.vel.z); TS.stam = clamp(TS.stam + (hs > 6 ? dt * 0.12 : -dt * 0.07), 0, 1); if (TS.stam > 0.55 && (TS.brT = (TS.brT || 0) - dt) < 0) { TS.brT = 1.6 - TS.stam * 0.6; SFX.tsBreath(0.12 + TS.stam * 0.18); }
+  TS.limpT = Math.max(0, TS.limpT - dt); if (TS.limpT > 0 && player.onGround && hs > 1) TS.camRV += Math.sin(TS.bob * 0.5) * dt * 3;
+  // колени после жёсткого приземления
+  if (TS.knees > 0) { TS.knees += dt / 1.6; if (TS.knees >= 1) TS.knees = 0; }
+  // высота глаз: присед / стул / колени / подбор с пола
+  TS.camDropT = Math.max(0, (TS.camDropT || 0) - dt * 0.6);
+  const eyeT = TS.sit ? lerp(1.62, 1.12, TS.sit.k) : 1.62 - Math.max(0.47 * TS.crouch, TS.camDropT || 0) - (TS.knees > 0 ? 0.62 * Math.sin(Math.PI * clamp(TS.knees, 0, 1)) : 0);
+  player.eye = lerp(player.eye, eyeT, Math.min(1, dt * 10));
+  // упор в стену: короткий луч вперёд на уровне груди
+  const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw); let wt = 0;
+  if (player.onGround && hs > 0.8 && !TS.climb && !(TS.held && TS.held.D.heavy)) { const o = new V3(p.x, p.y + 1.3, p.z), d = new V3(fx, 0, fz); const len = makRayLen(o, d, 1.0); if (len < 0.8) { wt = 1; TS.wallP = o.addScaledVector(d, len - 0.02).add(new V3(fz * 0.18, 0.05, -fx * 0.18)); } }
+  TS.wall = lerp(TS.wall, wt, Math.min(1, dt * 8));
+  // пружины камеры (кивок и крен)
+  TS.camPV += (-TS.camP * 70 - TS.camPV * 11) * dt; TS.camP += TS.camPV * dt; TS.camRV += (-TS.camR * 50 - TS.camRV * 8) * dt; TS.camR += TS.camRV * dt; TS.camP = clamp(TS.camP, -1.2, 0.6); TS.camR = clamp(TS.camR, -0.5, 0.5);
+  if (TS.rollT !== undefined) { TS.rollT += dt; if (TS.rollT > 0.8) TS.rollT = undefined; }
+  // ящик стола, ворота, подушка, свет, фонарик
+  const DR = TS.drawer; if (DR) { DR.open = lerp(DR.open, DR.tgt, Math.min(1, dt * 7)); DR.g.position.x = 0.02 + DR.open * 0.38; }
+  const G = TS.gate; if (G) { G.open = lerp(G.open, G.tgt, Math.min(1, dt * 0.9)); G.g.position.y = G.open * 2.3; G.body.position.y = 1.25 + G.open * 2.3; const blocked = G.open < 0.75; const i = obstacles.indexOf(G.obs); if (blocked && i < 0) obstacles.push(G.obs); else if (!blocked && i >= 0) obstacles.splice(i, 1); }
+  const B = TS.bag; if (B) { const on = player.onGround && tsSoftAt(p.x, p.z) === 'bag' && p.y > 0.5; const tg = on ? 0.12 : 0; B.v += (-(B.sag - tg) * 120 - B.v * 7) * dt; B.sag += B.v * dt; const sy = (B.h - B.sag) / B.h; B.m.scale.set(1 + B.sag * 0.08, sy, 1 + B.sag * 0.08); B.m.position.y = (B.h - B.sag) / 2; }
+  const S = TS.sw; if (S) { S.lampL.intensity = lerp(S.lampL.intensity, S.on ? 40 : 0, Math.min(1, dt * 20)); S.bulbM.emissiveIntensity = S.on ? 2.2 : 0; S.key.rotation.x = S.on ? -0.25 : 0.25; }
+  const F = TS.flash; if (F && F.light) { const e = tsEyeP(), f = tsFwd(), r = new V3(Math.cos(player.yaw), 0, -Math.sin(player.yaw)); F.light.position.copy(e).addScaledVector(r, -0.2).add(new V3(0, -0.15, 0)); F.tgt.position.copy(e).addScaledVector(f, 8); F.light.visible = TS.flashOn; }
+  // предметы: счёт в кольцо, остывание звука ударов
+  for (const it of TS.items) { it.hitCd = Math.max(0, it.hitCd - dt); if (it.kind === 'ball' && it.body) { const b = it.body.position, H = TS.hoop.c; const inR = Math.hypot(b.x - H.x, b.z - H.z) < 0.2; if (inR && it.prevY > H.y && b.y <= H.y && it.body.velocity.y < 0) { TS.score++; SFX.tsNet(0.6); banner('🏀 ПОПАДАНИЕ!', `счёт: ${TS.score}`); TS.netT = 0.6; } it.prevY = b.y; } if (it.body && (it.body.position.y < -6 || Math.abs(it.body.position.x) > 33 || Math.abs(it.body.position.z) > 33)) { it.body.position.set(0, 1, 18); it.body.velocity.set(0, 0, 0); } }
+  if (TS.net) { TS.netT = Math.max(0, (TS.netT || 0) - dt); TS.net.scale.y = 1 + Math.sin(TS.netT * 20) * 0.15 * TS.netT; }
+  // лёгкий кивок при каждом шаге в присяде
+  if (TS.crouch > 0.5 && hs > 1 && player.onGround) TS.camRV += Math.sin(TS.bob) * dt * 0.6;
+}
+// поворот камеры: кивок/крен от приземлений, наклон при питье, кувырок
+function tsCam() {
+  if (!TS.on) return; let p = TS.camP + (TS.drinkTilt || 0); if (TS.rollT !== undefined) { const k = TS.rollT / 0.8; p -= Math.sin(k * Math.PI) * 1.6; }
+  eye.rotation.x += p; eye.rotation.z += TS.camR;
+}
+/* ---------- взаимодействие ---------- */
+function tsNear2() { const e = tsEyeP(), f = tsFwd(); let best = null, bs = -1; for (const I of TS.ints) { const d = I.pos.distanceTo(e); if (d > I.r) continue; const lab = I.label(); if (!lab) continue; const dir = _tsV2.subVectors(I.pos, e).normalize(), look = dir.dot(f); if (look < 0.15 && d > 0.9) continue; const sc = look * 2 - d + (I.pri || 0); if (sc > bs) { bs = sc; best = I; } } return best; }
+function tsInteract2() {
+  if (TS.act) return true;
+  if (TS.climb) return true;
+  if (TS.sit) { tsStand(); return true; }
+  const I = tsNear2(); if (I) { I.use(); return true; }
+  const it = !TS.held && tsItemNear(); if (it) { tsAct('pick', { wf: () => it.m.position.clone(), at: 0.38, fn() { tsHold(it); } }); return true; }
+  if (TS.held) { if (TS.held.kind === 'can' && TS.held.full) tsDrink(); else tsPlace(); return true; }
+  return false;
+}
+function tsLabel2() {
+  if (TS.climb) return '🪜 Джойстик вверх/вниз — лезть, прыжок — спрыгнуть';
+  if (TS.sit) return '🪑 Сидите. E или джойстик — встать';
+  const I = tsNear2(); if (I) return I.label();
+  if (!TS.held) { const it = tsItemNear(); if (it) return `E — взять ${it.D.label}`; }
+  if (TS.held) return TS.held.kind === 'can' && TS.held.full ? 'E — открыть и выпить · ✊ — бросить' : `✊ — бросить · E — положить`;
+  const L = TS.lad, p = player.pos; if (L && Math.abs(p.x - 5.5) < 1 && Math.abs(p.z - (L.z - 0.4)) < 1 && p.y < 1) return '🪜 Подойдите к лестнице и толкайте вперёд';
+  return null;
+}
+function tsCrouch() { if (TS.sit || TS.climb) return; TS.crouchOn = !TS.crouchOn; SFX.tsStep(0.25); }
+function tsFlashT() { if (!TS.flash) { toast('🔦 Фонарик лежит в ящике стола в комнате'); return; } TS.flashOn = !TS.flashOn; SFX.tsClick(0.5); tsFlashOn(); }
+// выход с карты: вернуть рост глаз и тело
+function tsOff2() { if (TS.held && TS.held.m.parent) { TS.held.m.parent.remove(TS.held.m); TS.held = null; } TS.act = null; player.eye = 1.62; TS.crouchOn = false; TS.crouch = 0; TS.climb = null; if (TS.sit) tsStand(); tsBodyUndo(); if (TS.flash && TS.flash.light) TS.flash.light.visible = false; TS.camP = TS.camR = TS.camPV = TS.camRV = 0; player.landDip = 0; }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
@@ -22546,7 +22911,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { get cutT() { return story.cut ? story.cut.t : -1; }, set cutT(v) { if (story.cut) story.cut.t = v; }, MONS, MV, MIT, MVP, MVG, SFX, DOG, H2, SKN, SKINS, HOUSE_MAPS, mvUse, mvDraw, monsBotKill, mvActTrap, mvActBoard, mvActLamp, mvActSalt, mvActPill, mvActEnergy, mvActBat, mvActFlare, mvActSmoke, mvActBone, mvActAdren, mvActFlash, get touch() { return touch; }, MILK, MILK_META, MK, MP, milkStart, milkPage, milkCaseOpen, milkRoll, milkW, milkPct, milkAdmItems, milkPick, TS, tsKeyNear, tsInteract, tsGest, get mapId() { return mapId; }, renderer, sun, settings, scene, bloodSpray, sparks, screenBlood, spawnSprite, tracer, TEX, MAK, MAK_SAVE, startCh3, makStage, makTimeStop, makHook, makPunch, makFlyToggle, updMak, makHurt, scpPuzzle, updScp, scpQteHit, scpLockDoor, scpKillPlayer, MC, scpMonBegin, scpMonRage, SCP, SCP_META, scpStart, scpGen, scpRage, scpFinishTerm, scpUseTerm, milkEnd, milkAward, updMilk, milkFire, milkPortrait, DREAM, DWP, dreamBegin, dreamCheck, updDream, dreamFinish, dreamSay, dreamStalkSpawn, dreamHands, mvBarSync, mvUiShow, mvSkinApply, mvTrapAt, mvBotJob, monsProbeTick, monsPickWin, houseFloorY, crystalsAdd, skinCaseMenu, skinCaseOpen, skinCollection, emotePlay, emoteWheel, dogStart, monsBotRevive, mvSaltPlace, mvLampPlace, monsRoomPts, winY, mvKey, mvSet, get player() { return player; }, get camera() { return camera; }, get settings() { return settings; }, LOB, lobbyStart, lobAction, lobBotAdd, monsChat, chatSend, chatToggle, chatNorm, MONS_ACH, monsAchGive, monsCnt, monsTvShow, monsScareTick, monsStormTick, monsPhoneEnsure, lobSpinMenu, lobTasksMenu, MON_WIN, MON_KINDS, winIn, winOut, roomOf, anyPath, monsBreach, monsSunrise, monsUse, monsSpawnPicks, monsPowerOut, monsPowerOn, MONS_META, MONS_CLS, monsTaskInc, monsCoins, monsPlaceTrap, monsBoardWin, monsGhostStart, monsRevive, monsMenu, monsClsMenu, monsStart, monsBegin, monsCut, monsOver, monsDoorSet, monsHideIn, monsAction, monsPickEvent, mkNoob, mkMonster, loadMap, resume, openSpawn, get spc() { return spc; }, spRender, wpBuildSample, spawnAtAim, get state() { return state; }, DACHA, dachaBlast, applyNewLook, spawnNPC, D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, vehPlaceRamp, vehSpec, vehGround, vehPhys, makeCar, vehRemove, vehAI, vehCollide, vehTrackIdx, vehBox, obbHit, vehFlip, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { get cutT() { return story.cut ? story.cut.t : -1; }, set cutT(v) { if (story.cut) story.cut.t = v; }, MONS, MV, MIT, MVP, MVG, SFX, DOG, H2, SKN, SKINS, HOUSE_MAPS, mvUse, mvDraw, monsBotKill, mvActTrap, mvActBoard, mvActLamp, mvActSalt, mvActPill, mvActEnergy, mvActBat, mvActFlare, mvActSmoke, mvActBone, mvActAdren, mvActFlash, get touch() { return touch; }, MILK, MILK_META, MK, MP, milkStart, milkPage, milkCaseOpen, milkRoll, milkW, milkPct, milkAdmItems, milkPick, TS, tsKeyNear, tsInteract, tsGest, tsThrow, tsCrouch, tsFlashT, tsLabel2, tsNear2, tsStand, tsAct, get player() { return player; }, get eyeObj() { return eye; }, get touchS() { return touch; }, get mapId() { return mapId; }, renderer, sun, settings, scene, bloodSpray, sparks, screenBlood, spawnSprite, tracer, TEX, MAK, MAK_SAVE, startCh3, makStage, makTimeStop, makHook, makPunch, makFlyToggle, updMak, makHurt, scpPuzzle, updScp, scpQteHit, scpLockDoor, scpKillPlayer, MC, scpMonBegin, scpMonRage, SCP, SCP_META, scpStart, scpGen, scpRage, scpFinishTerm, scpUseTerm, milkEnd, milkAward, updMilk, milkFire, milkPortrait, DREAM, DWP, dreamBegin, dreamCheck, updDream, dreamFinish, dreamSay, dreamStalkSpawn, dreamHands, mvBarSync, mvUiShow, mvSkinApply, mvTrapAt, mvBotJob, monsProbeTick, monsPickWin, houseFloorY, crystalsAdd, skinCaseMenu, skinCaseOpen, skinCollection, emotePlay, emoteWheel, dogStart, monsBotRevive, mvSaltPlace, mvLampPlace, monsRoomPts, winY, mvKey, mvSet, get player() { return player; }, get camera() { return camera; }, get settings() { return settings; }, LOB, lobbyStart, lobAction, lobBotAdd, monsChat, chatSend, chatToggle, chatNorm, MONS_ACH, monsAchGive, monsCnt, monsTvShow, monsScareTick, monsStormTick, monsPhoneEnsure, lobSpinMenu, lobTasksMenu, MON_WIN, MON_KINDS, winIn, winOut, roomOf, anyPath, monsBreach, monsSunrise, monsUse, monsSpawnPicks, monsPowerOut, monsPowerOn, MONS_META, MONS_CLS, monsTaskInc, monsCoins, monsPlaceTrap, monsBoardWin, monsGhostStart, monsRevive, monsMenu, monsClsMenu, monsStart, monsBegin, monsCut, monsOver, monsDoorSet, monsHideIn, monsAction, monsPickEvent, mkNoob, mkMonster, loadMap, resume, openSpawn, get spc() { return spc; }, spRender, wpBuildSample, spawnAtAim, get state() { return state; }, DACHA, dachaBlast, applyNewLook, spawnNPC, D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, vehPlaceRamp, vehSpec, vehGround, vehPhys, makeCar, vehRemove, vehAI, vehCollide, vehTrackIdx, vehBox, obbHit, vehFlip, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
