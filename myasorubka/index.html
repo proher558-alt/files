@@ -21338,40 +21338,60 @@ function makCoreTex() { return cvTex(128, 128, (g) => { const r = g.createRadial
 function makPadFace(happy) { return cvTex(64, 64, (g) => { g.fillStyle = '#5a6c84'; g.fillRect(0, 0, 64, 64); g.strokeStyle = '#0c1018'; g.lineWidth = 3; g.fillStyle = '#0c1018'; g.beginPath(); g.arc(22, 26, 4, 0, 6.283); g.arc(42, 26, 4, 0, 6.283); g.fill(); g.beginPath(); if (happy) g.arc(32, 36, 12, 0.2, Math.PI - 0.2); else { g.moveTo(18, 46); g.quadraticCurveTo(32, 36, 46, 46); g.moveTo(16, 18); g.lineTo(28, 22); g.moveTo(48, 18); g.lineTo(36, 22); } g.stroke(); }); }
 /* ---------- модель Макара ---------- */
 function makBuild() {
-  const armor = std({ color: 0xffffff, map: makArmorTex(), roughness: 0.35, metalness: 0.6 }), grid = std({ color: 0xffffff, map: makGridTex(), roughness: 0.45, metalness: 0.5 }), gridD = std({ color: 0xffffff, map: makGridTex('#3a4656'), roughness: 0.5, metalness: 0.5 }), dark = std({ color: 0x1a2028, roughness: 0.6, metalness: 0.4 }), skin = std({ color: 0xe8bc98, roughness: 0.6 }), red = std({ color: 0xc02a2a, roughness: 0.5, metalness: 0.3 }), hair = std({ color: 0x2a1a12, roughness: 0.8 });
+  // человеческий рост (~1.8 м). Броня — «яйцо» с трещинами и лаком, под ней тёмный комбинезон.
+  const armor = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: makArmorTex(), roughness: 0.32, metalness: 0.55, clearcoat: 0.7, clearcoatRoughness: 0.25 }), grid = std({ color: 0xffffff, map: makGridTex(), roughness: 0.5, metalness: 0.35 }), gridD = std({ color: 0xffffff, map: makGridTex('#3a4656'), roughness: 0.55, metalness: 0.3 }), suit = std({ color: 0x1c232c, roughness: 0.75, metalness: 0.15 }), dark = std({ color: 0x12161c, roughness: 0.5, metalness: 0.5 }), skin = std({ color: 0xe8bc98, roughness: 0.62 }), red = std({ color: 0xc02a2a, roughness: 0.45, metalness: 0.35 }), gold = std({ color: 0xd8b040, roughness: 0.25, metalness: 0.9 }), hair = std({ color: 0x24160e, roughness: 0.75 }), steel = std({ color: 0xaab4c0, roughness: 0.25, metalness: 0.9 });
   const coreM = new THREE.MeshBasicMaterial({ map: makCoreTex() }), glow = new THREE.MeshBasicMaterial({ color: 0x8ff8ff, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false });
   const root = new THREE.Group(), A = {}; const mk = (geo, mat, par, x = 0, y = 0, z = 0, sx = 1, sy = 1, sz = 1) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = true; par.add(m); return m; }, pv = (par, x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); par.add(g); return g; };
-  const sph = new THREE.SphereGeometry(1, 20, 14), box = IM_G.box, cyl = (a, b, h) => new THREE.CylinderGeometry(a, b, h, 12);
-  A.hip = pv(root, 0, 0.95, 0); mk(box, dark, A.hip, 0, 0, 0, 0.42, 0.16, 0.26); mk(box, red, A.hip, 0, 0.07, 0, 0.46, 0.06, 0.3);
+  const sph = new THREE.SphereGeometry(1, 24, 16), cap = (r, l) => new THREE.CapsuleGeometry(r, l, 6, 12), cyl = (a, b, h, n = 14) => new THREE.CylinderGeometry(a, b, h, n), rb = (w, h, d, r) => tsRBox(w, h, d, r);
+  // таз и пояс
+  A.hip = pv(root, 0, 0.9, 0); mk(sph, suit, A.hip, 0, -0.02, 0, 0.17, 0.11, 0.12); mk(cyl(0.175, 0.17, 0.06, 20), red, A.hip, 0, 0.06, 0); mk(rb(0.07, 0.05, 0.02, 0.008), gold, A.hip, 0, 0.06, 0.17);
   A.flames = [];
-  for (const s of [-1, 1]) { const th = pv(A.hip, s * 0.13, -0.06, 0), kn = pv(th, 0, -0.42, 0); mk(cyl(0.085, 0.07, 0.42), dark, th, 0, -0.21, 0); mk(box, grid, kn, 0, 0, 0.03, 0.16, 0.16, 0.16); mk(cyl(0.07, 0.065, 0.4), dark, kn, 0, -0.21, 0); const bt = pv(kn, 0, -0.42, 0); mk(box, armor, bt, 0, -0.04, 0.05, 0.17, 0.14, 0.3); mk(cyl(0.05, 0.065, 0.1), dark, bt, 0, -0.1, -0.06); const fl = mk(new THREE.ConeGeometry(0.075, 0.45, 10), new THREE.MeshBasicMaterial({ color: 0x8ff8ff, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false }), bt, 0, -0.38, -0.06, 1, 1, 1); fl.rotation.x = Math.PI; fl.visible = false; A.flames.push(fl); const fl2 = mk(new THREE.ConeGeometry(0.11, 0.7, 10), new THREE.MeshBasicMaterial({ color: 0x3a8aff, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false }), bt, 0, -0.5, -0.06); fl2.rotation.x = Math.PI; fl2.visible = false; A.flames.push(fl2); (s < 0 ? (A.thL = th, A.knL = kn) : (A.thR = th, A.knR = kn)); }
-  A.torso = pv(A.hip, 0, 0.08, 0); mk(sph, armor, A.torso, 0, 0.42, 0, 0.36, 0.5, 0.28);
-  A.core = mk(new THREE.CylinderGeometry(0.12, 0.12, 0.04, 24), coreM, A.torso, 0, 0.5, 0.255); A.core.rotation.x = Math.PI / 2; mk(new THREE.TorusGeometry(0.13, 0.02, 8, 24), dark, A.torso, 0, 0.5, 0.262); A.coreGlow = mk(sph, glow, A.torso, 0, 0.5, 0.27, 0.2, 0.2, 0.08);
-  mk(box, red, A.torso, 0, 0.3, 0.255, 0.06, 0.16, 0.02);
-  A.neck = pv(A.torso, 0, 0.88, 0); mk(cyl(0.08, 0.1, 0.12), skin, A.neck, 0, 0.04, 0);
-  A.head = pv(A.neck, 0, 0.1, 0); const hd = mk(sph, skin, A.head, 0, 0.22, 0, 0.23, 0.25, 0.23); const face = mk(new THREE.SphereGeometry(0.236, 24, 16, Math.PI / 2 - 0.95, 1.9, 0.95, 1.25), new THREE.MeshBasicMaterial({ map: makFaceTex(), transparent: false }), A.head, 0, 0.22, 0); face.scale.set(1, 1.06, 1);
-  for (let i = 0; i < 16; i++) { const a = (i / 16) * Math.PI * 2, r = 0.2; const c = mk(new THREE.ConeGeometry(0.05, 0.16, 6), hair, A.head, Math.sin(a) * r * 0.9, 0.38 + (Math.cos(a) < 0 ? 0.02 : 0) + rand(0, 0.03), Math.cos(a) * r * 0.85 - 0.02); c.rotation.set(Math.cos(a) * 0.9, 0, -Math.sin(a) * 0.9); }
-  mk(sph, hair, A.head, 0, 0.36, -0.03, 0.21, 0.09, 0.2);
   for (const s of [-1, 1]) {
-    const pad = pv(A.torso, s * 0.4, 0.78, 0); const p = mk(new THREE.ConeGeometry(0.16, 0.32, 4), armor, pad, 0, 0.04, 0); p.rotation.z = -s * 0.9; const pf = mk(new THREE.PlaneGeometry(0.14, 0.14), new THREE.MeshBasicMaterial({ map: makPadFace(s > 0) }), pad, s * 0.06, 0.02, 0.16); pf.rotation.y = s * 0.3;
-    const sh = pv(A.torso, s * 0.42, 0.68, 0), el = pv(sh, 0, -0.34, 0); mk(sph, dark, sh, 0, 0, 0, 0.1, 0.1, 0.1); mk(cyl(0.075, 0.065, 0.34), dark, sh, 0, -0.17, 0); mk(cyl(0.1, 0.09, 0.3), grid, el, 0, -0.16, 0); const fist = pv(el, 0, -0.34, 0); mk(box, gridD, fist, 0, -0.04, 0, 0.17, 0.15, 0.15); for (let f = 0; f < 4; f++) mk(box, dark, fist, (f - 1.5) * 0.038, -0.13, 0.03, 0.03, 0.06, 0.05);
+    const th = pv(A.hip, s * 0.095, -0.04, 0), kn = pv(th, 0, -0.41, 0);
+    mk(cap(0.072, 0.26), suit, th, 0, -0.2, 0); mk(rb(0.13, 0.12, 0.05, 0.02), armor, th, 0, -0.19, 0.06);
+    mk(rb(0.12, 0.12, 0.08, 0.03), grid, kn, 0, 0, 0.055); mk(cap(0.06, 0.28), suit, kn, 0, -0.2, 0); mk(rb(0.1, 0.24, 0.05, 0.02), armor, kn, 0, -0.2, 0.05);
+    const bt = pv(kn, 0, -0.4, 0); mk(rb(0.12, 0.1, 0.24, 0.035), armor, bt, 0, -0.035, 0.04); mk(rb(0.125, 0.03, 0.25, 0.01), dark, bt, 0, -0.085, 0.04); mk(cyl(0.035, 0.05, 0.06), steel, bt, 0, -0.085, -0.07);
+    const fl = mk(new THREE.ConeGeometry(0.05, 0.36, 10), new THREE.MeshBasicMaterial({ color: 0x8ff8ff, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false }), bt, 0, -0.28, -0.07); fl.rotation.x = Math.PI; fl.visible = false; A.flames.push(fl);
+    const fl2 = mk(new THREE.ConeGeometry(0.08, 0.55, 10), new THREE.MeshBasicMaterial({ color: 0x3a8aff, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false }), bt, 0, -0.38, -0.07); fl2.rotation.x = Math.PI; fl2.visible = false; A.flames.push(fl2);
+    (s < 0 ? (A.thL = th, A.knL = kn) : (A.thR = th, A.knR = kn)); }
+  // корпус-«яйцо»: броня с трещинами, сегменты живота, ядро-вентилятор
+  A.torso = pv(A.hip, 0, 0.06, 0); mk(sph, armor, A.torso, 0, 0.3, 0, 0.24, 0.32, 0.18);
+  for (let i = 0; i < 3; i++) mk(new THREE.TorusGeometry(0.19 - i * 0.012, 0.008, 6, 28), dark, A.torso, 0, 0.06 + i * 0.045, 0, 1, 1, 0.78).rotation.x = Math.PI / 2;
+  A.core = mk(cyl(0.075, 0.075, 0.03, 28), coreM, A.torso, 0, 0.36, 0.175); A.core.rotation.x = Math.PI / 2; mk(new THREE.TorusGeometry(0.083, 0.014, 8, 28), steel, A.torso, 0, 0.36, 0.18); A.coreGlow = mk(sph, glow, A.torso, 0, 0.36, 0.19, 0.13, 0.13, 0.05);
+  for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + Math.PI / 4; mk(rb(0.016, 0.016, 0.012, 0.004), steel, A.torso, Math.cos(a) * 0.1, 0.36 + Math.sin(a) * 0.1, 0.17); }
+  mk(rb(0.05, 0.1, 0.02, 0.008), red, A.torso, 0, 0.2, 0.18);
+  A.neck = pv(A.torso, 0, 0.6, 0); mk(cyl(0.05, 0.06, 0.1), skin, A.neck, 0, 0.03, 0); mk(new THREE.TorusGeometry(0.07, 0.022, 8, 20), dark, A.neck, 0, -0.01, 0).rotation.x = Math.PI / 2;
+  // голова: лицо с оскалом, нос, уши, колючие волосы
+  A.head = pv(A.neck, 0, 0.08, 0); mk(sph, skin, A.head, 0, 0.12, 0, 0.105, 0.125, 0.115);
+  const face = mk(new THREE.SphereGeometry(0.108, 28, 18, Math.PI / 2 - 0.95, 1.9, 0.95, 1.25), new THREE.MeshBasicMaterial({ map: makFaceTex() }), A.head, 0, 0.12, 0.004); face.scale.set(1, 1.16, 1.08);
+  const nose = mk(new THREE.ConeGeometry(0.016, 0.04, 8), skin, A.head, 0, 0.115, 0.125); nose.rotation.x = Math.PI / 2 + 0.3;
+  for (const s of [-1, 1]) mk(sph, skin, A.head, s * 0.103, 0.12, -0.005, 0.016, 0.03, 0.022);
+  mk(sph, hair, A.head, 0, 0.19, -0.012, 0.108, 0.07, 0.11);
+  for (let r = 0; r < 2; r++) for (let i = 0; i < 13; i++) { const a = (i / 13) * Math.PI * 2 + r * 0.24, rr = 0.075 + r * 0.025; if (Math.cos(a) > 0.75 && r === 1) continue; const c = mk(new THREE.ConeGeometry(0.024, 0.09 + rand(0, 0.03), 6), hair, A.head, Math.sin(a) * rr, 0.225 - r * 0.02 + rand(0, 0.01), Math.cos(a) * rr * 0.95 - 0.015); c.rotation.set(Math.cos(a) * (0.5 + r * 0.5) - 0.2, 0, -Math.sin(a) * (0.5 + r * 0.5)); }
+  // руки: наплечники с рожицами, клетчатые перчатки
+  for (const s of [-1, 1]) {
+    const pad = pv(A.torso, s * 0.25, 0.53, 0); const p = mk(new THREE.SphereGeometry(0.1, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), armor, pad, 0, 0, 0, 1, 0.8, 1.05); p.rotation.z = -s * 0.35; mk(new THREE.TorusGeometry(0.1, 0.01, 6, 20), dark, pad, 0, 0, 0, 1, 1.05, 1).rotation.x = Math.PI / 2;
+    const pf = mk(new THREE.CircleGeometry(0.05, 18), new THREE.MeshBasicMaterial({ map: makPadFace(s > 0) }), pad, s * 0.035, 0.035, 0.085); pf.rotation.set(-0.35, s * 0.35, 0);
+    const sh = pv(A.torso, s * 0.27, 0.46, 0), el = pv(sh, 0, -0.28, 0); mk(cap(0.05, 0.2), suit, sh, 0, -0.14, 0); mk(rb(0.09, 0.1, 0.09, 0.03), armor, sh, 0, -0.06, 0);
+    mk(cyl(0.06, 0.052, 0.22, 16), grid, el, 0, -0.12, 0); mk(new THREE.TorusGeometry(0.06, 0.01, 6, 16), dark, el, 0, -0.01, 0).rotation.x = Math.PI / 2;
+    const fist = pv(el, 0, -0.26, 0); mk(rb(0.09, 0.08, 0.085, 0.025), gridD, fist, 0, -0.03, 0); for (let f = 0; f < 4; f++) mk(rb(0.019, 0.04, 0.03, 0.008), dark, fist, (f - 1.5) * 0.021, -0.085, 0.022); mk(rb(0.022, 0.04, 0.025, 0.008), dark, fist, -s * 0.05, -0.04, 0.03);
     (s < 0 ? (A.shL = sh, A.elL = el, A.fL = fist) : (A.shR = sh, A.elR = el, A.fR = fist));
   }
   // крюк на левой перчатке и карманные часы в правой
-  A.hookTip = mk(new THREE.TorusGeometry(0.07, 0.018, 6, 12, Math.PI * 1.4), std({ color: 0xcfd6de, metalness: 1, roughness: 0.2 }), A.fL, 0, -0.18, 0.05); A.hookTip.visible = false;
-  A.watch = pv(A.fR, 0, -0.15, 0.06); mk(new THREE.CylinderGeometry(0.07, 0.07, 0.02, 20), std({ color: 0xd8b040, metalness: 1, roughness: 0.25 }), A.watch, 0, -0.12, 0).rotation.x = Math.PI / 2; mk(new THREE.CircleGeometry(0.06, 20), new THREE.MeshBasicMaterial({ map: cvTex(64, 64, (g) => { g.fillStyle = '#fff8e8'; g.beginPath(); g.arc(32, 32, 31, 0, 6.283); g.fill(); g.strokeStyle = '#222'; g.lineWidth = 3; for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283; g.beginPath(); g.moveTo(32 + Math.cos(a) * 24, 32 + Math.sin(a) * 24); g.lineTo(32 + Math.cos(a) * 29, 32 + Math.sin(a) * 29); g.stroke(); } g.beginPath(); g.moveTo(32, 32); g.lineTo(32, 12); g.moveTo(32, 32); g.lineTo(46, 32); g.stroke(); }) }), A.watch, 0, -0.12, 0.012); mk(box, std({ color: 0xd8b040, metalness: 1 }), A.watch, 0, -0.03, 0, 0.008, 0.12, 0.008); A.watch.visible = false;
+  A.hookTip = mk(new THREE.TorusGeometry(0.05, 0.013, 6, 12, Math.PI * 1.4), steel, A.fL, 0, -0.13, 0.04); A.hookTip.visible = false;
+  A.watch = pv(A.fR, 0, -0.1, 0.05); mk(cyl(0.05, 0.05, 0.016, 20), gold, A.watch, 0, -0.09, 0).rotation.x = Math.PI / 2; mk(new THREE.CircleGeometry(0.044, 20), new THREE.MeshBasicMaterial({ map: cvTex(64, 64, (g) => { g.fillStyle = '#fff8e8'; g.beginPath(); g.arc(32, 32, 31, 0, 6.283); g.fill(); g.strokeStyle = '#222'; g.lineWidth = 3; for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283; g.beginPath(); g.moveTo(32 + Math.cos(a) * 24, 32 + Math.sin(a) * 24); g.lineTo(32 + Math.cos(a) * 29, 32 + Math.sin(a) * 29); g.stroke(); } g.beginPath(); g.moveTo(32, 32); g.lineTo(32, 12); g.moveTo(32, 32); g.lineTo(46, 32); g.stroke(); }) }), A.watch, 0, -0.09, 0.009); mk(IM_G.box, gold, A.watch, 0, -0.02, 0, 0.006, 0.09, 0.006); A.watch.visible = false;
   root.traverse((o) => { if (o.isMesh) o.castShadow = true; }); root.userData.A = A; return root;
 }
 function makPose(M, st, dt, t) {
   const A = M.userData.A, k = Math.min(1, dt * 12), lp = (o, a, v) => { o.rotation[a] = lerp(o.rotation[a], v, k); }, sp = M.userData.spd || 0, w = t * (6 + sp * 1.4);
-  let hip = 0.95, tor = 0, hd = 0, sl = [0, 0.15], sr = [0, -0.15], el = 0, er = 0, tl = 0, tr = 0, kl = 0, kr = 0;
-  if (st === 'run' || st === 'walk') { const a = Math.min(1, sp / 6); tl = Math.sin(w) * 0.9 * a; tr = -tl; kl = Math.max(0, -Math.sin(w)) * 1.2 * a; kr = Math.max(0, Math.sin(w)) * 1.2 * a; sl = [-Math.sin(w) * 0.8 * a, 0.2]; sr = [Math.sin(w) * 0.8 * a, -0.2]; el = -0.6 * a; er = -0.6 * a; tor = 0.15 * a; hip = 0.95 + Math.abs(Math.sin(w)) * 0.05 * a; }
+  let hip = 0.9, tor = 0, hd = 0, sl = [0, 0.15], sr = [0, -0.15], el = 0, er = 0, tl = 0, tr = 0, kl = 0, kr = 0;
+  if (st === 'run' || st === 'walk') { const a = Math.min(1, sp / 6); tl = Math.sin(w) * 0.9 * a; tr = -tl; kl = Math.max(0, -Math.sin(w)) * 1.2 * a; kr = Math.max(0, Math.sin(w)) * 1.2 * a; sl = [-Math.sin(w) * 0.8 * a, 0.2]; sr = [Math.sin(w) * 0.8 * a, -0.2]; el = -0.6 * a; er = -0.6 * a; tor = 0.15 * a; hip = 0.9 + Math.abs(Math.sin(w)) * 0.045 * a; }
   else if (st === 'fly') { tor = 0.5; tl = 0.35; tr = 0.2; kl = 0.5; kr = 0.7; sl = [-0.2, 0.5]; sr = [-0.2, -0.5]; el = -0.3; er = -0.3; hd = -0.4; }
   else if (st === 'punch') { const p = M.userData.punch || 0; sr = [-1.55 * p, -0.1]; er = -0.1; sl = [0.3, 0.3]; el = -1.4; tor = 0.15; tl = -0.3; tr = 0.3; }
   else if (st === 'beam') { tor = -0.25; hd = -0.1; sl = [-0.4, 1.1]; sr = [-0.4, -1.1]; el = -0.4; er = -0.4; tl = -0.25; tr = 0.25; kl = 0.3; kr = 0.3; }
   else if (st === 'hook') { sl = [-1.6, 0.1]; el = 0; sr = [0.2, -0.3]; er = -0.8; tor = 0.1; tl = -0.4; tr = 0.4; }
   else if (st === 'stop') { sr = [-2.6, -0.2]; er = -0.3; sl = [0, 0.25]; el = -0.4; hd = -0.2; tor = -0.05; }
-  else if (st === 'sit') { hip = 0.62; tl = -1.45; tr = -1.45; kl = 1.45; kr = 1.45; sl = [-0.35, 0.2]; sr = [-0.35, -0.2]; el = -1.2; er = -1.2; tor = -0.05; hd = 0.05; }
+  else if (st === 'sit') { hip = 0.55; tl = -1.45; tr = -1.45; kl = 1.45; kr = 1.45; sl = [-0.35, 0.2]; sr = [-0.35, -0.2]; el = -1.2; er = -1.2; tor = -0.05; hd = 0.05; }
   else if (st === 'pose') { sl = [-0.2, 0.9]; sr = [-0.2, -0.9]; el = -1.6; er = -1.6; tor = -0.05; hd = -0.05; }
   else { tor = Math.sin(t * 1.6) * 0.03; sl = [0.05, 0.18]; sr = [0.05, -0.18]; el = -0.25; er = -0.25; }
   A.hip.position.y = lerp(A.hip.position.y, hip, k); lp(A.torso, 'x', tor); lp(A.head, 'x', hd); lp(A.shL, 'x', sl[0]); lp(A.shL, 'z', sl[1]); lp(A.shR, 'x', sr[0]); lp(A.shR, 'z', sr[1]); lp(A.elL, 'x', el); lp(A.elR, 'x', er); lp(A.thL, 'x', tl); lp(A.thR, 'x', tr); lp(A.knL, 'x', kl); lp(A.knR, 'x', kr);
@@ -21472,7 +21492,7 @@ function makPlayable() { return MAK.on && MAK.hero === 'makar' && !MAK.cut && (M
 function makLoad(map) { loadMap(map); clearAll(); respawnPlayer(); invReset(); camera.far = 260; camera.updateProjectionMatrix(); MAK.foes = []; MAK.civ = []; MAK.boss = null; if (MAK.ally) { MAK.ally = null; } makHookEnd(); MAK.fly = false; MAK.landing = false; story.ride = null; story.rideCam = null; story.fov = 0; if (MAK.ts > 0) makTimeGo(); MAK.tsCd = 0; MAK.en = 100;
   MAK.m = makBuild(); scene.add(MAK.m); mapObjs.push(MAK.m); MAK.beamM = makBeamMesh(); mapObjs.push(MAK.beamM); }
 function makHero(h) { MAK.hero = h; { const B = document.getElementById('makBtns'); if (B) B.style.bottom = h === 'makar' ? '' : 'calc(150px + env(safe-area-inset-bottom,0px))'; } document.body.classList.toggle('mons-ui', h === 'makar'); document.body.classList.toggle('mak-we', h === 'we'); $('hud').hidden = h === 'makar'; if (h === 'makar') { story.rideCam = makCam; MAK.m.visible = true; const fi = WEAPONS.findIndex((w) => w.id === 'fists'); if (fi >= 0) selectWeapon(fi); } else { story.rideCam = null; MAK.m.visible = false; const ri = WEAPONS.findIndex((w) => w.id === 'rifle'); if (ri >= 0) selectWeapon(ri); } makBtns(); }
-function makCam(dt) { const p = player.pos, f = _mk3.set(-Math.sin(player.yaw), 0, -Math.cos(player.yaw)), pit = clamp(player.pitch, -0.6, 0.8); const P = new V3(p.x, p.y + 1.7, p.z), back = new V3(-f.x * Math.cos(pit * 0.7), 0.3 + pit * 0.55, -f.z * Math.cos(pit * 0.7)).normalize(); const want = camClip(P, back, MAK.fly ? 5 : 3.9), pos = P.clone().addScaledVector(back, want); pos.x += Math.cos(player.yaw) * 0.6; pos.z += -Math.sin(player.yaw) * 0.6; camera.position.lerp(pos, Math.min(1, dt * 10)); if (camera.position.distanceTo(pos) > 5) camera.position.copy(pos); const sh = shake * 0.06; camera.position.x += (Math.random() - 0.5) * sh; camera.position.y += (Math.random() - 0.5) * sh; camera.lookAt(p.x + f.x * 6 + Math.cos(player.yaw) * 0.6, p.y + 1.5 - pit * 3, p.z + f.z * 6 - Math.sin(player.yaw) * 0.6); story.fov = MAK.fly ? 78 : 72; }
+function makCam(dt) { const p = player.pos, f = _mk3.set(-Math.sin(player.yaw), 0, -Math.cos(player.yaw)), pit = clamp(player.pitch, -0.6, 0.8); const P = new V3(p.x, p.y + 1.45, p.z), back = new V3(-f.x * Math.cos(pit * 0.7), 0.3 + pit * 0.55, -f.z * Math.cos(pit * 0.7)).normalize(); const want = camClip(P, back, MAK.fly ? 5 : 3.9), pos = P.clone().addScaledVector(back, want); pos.x += Math.cos(player.yaw) * 0.6; pos.z += -Math.sin(player.yaw) * 0.6; camera.position.lerp(pos, Math.min(1, dt * 10)); if (camera.position.distanceTo(pos) > 5) camera.position.copy(pos); const sh = shake * 0.06; camera.position.x += (Math.random() - 0.5) * sh; camera.position.y += (Math.random() - 0.5) * sh; camera.lookAt(p.x + f.x * 6 + Math.cos(player.yaw) * 0.6, p.y + 1.5 - pit * 3, p.z + f.z * 6 - Math.sin(player.yaw) * 0.6); story.fov = MAK.fly ? 78 : 72; }
 /* ---- кат-сцены: реплики + камера ---- */
 function makBars(on) { for (const s of ['top', 'bottom']) { const b = document.getElementById('makBar' + s); if (b) b.style.transform = on ? 'translateY(0)' : `translateY(${s === 'top' ? '-100%' : '100%'})`; } }
 function makCut(lines, done) { MAK.cut = { lines, i: -1, t: 0, done }; { const s = document.getElementById('makSay'); if (s) s.style.pointerEvents = 'auto'; } story.ride = () => { player.vel.set(0, 0, 0); }; makBars(true); document.getElementById('makBtns').style.display = 'none'; makCutNext(); }
@@ -21497,7 +21517,7 @@ function makStage(st) {
     makCut([
       { who: '', txt: 'Глава 3. «МАКАР»', dur: 3, cam: makOrbit(p.x, p.y, p.z, 7, 2.5, 0.18), act: () => { MAK.pose = 'idle'; } },
       { who: 'МАКАР', txt: 'Меня зовут Макар.', act: () => { MAK.pose = 'pose'; } },
-      { who: 'МАКАР', txt: 'Когда-то я был другом Воскресителя. Давно. До всего этого.', cam: makShot(p.x + 1.4, p.y + 1.9, p.z + 2.6, p.x, p.y + 1.8, p.z, 42), act: () => { MAK.pose = 'idle'; } },
+      { who: 'МАКАР', txt: 'Когда-то я был другом Воскресителя. Давно. До всего этого.', cam: makShot(p.x + 1.4, p.y + 1.7, p.z + 2.6, p.x, p.y + 1.8, p.z, 42), act: () => { MAK.pose = 'idle'; } },
       { who: 'МАКАР', txt: 'Со Свити мы дружили по-настоящему. Она… даже любила меня.' },
       { who: 'МАКАР', txt: 'А потом Свити стала преступницей. Её банда «Черепа» держит набережную в страхе.', cam: makOrbit(p.x, p.y, p.z, 5, 1.2, -0.22, 2) },
       { who: 'МАКАР', txt: 'Я не злодей. Я побеждаю злодеев. Тогда я и стал супер-героем.', act: () => { MAK.pose = 'stop'; MAK.m.userData.watch = true; } },
@@ -21511,10 +21531,10 @@ function makStage(st) {
     makCut([
       { who: '', txt: 'Чуть позже. На набережную приходите вы.', dur: 2.8, cam: makShot(p.x - 3, p.y + 2.2, p.z + 3, p.x + 2, p.y + 4, p.z - 4, 60), tick: (t) => { MAK.m.position.y = Math.max(p.y, 14 - t * 5); } },
       { who: 'ВЫ', txt: 'Это ты их всех так?..', act: () => { MAK.m.position.y = p.y; MAK.m.userData.jet = false; MAK.pose = 'idle'; MAK.m.rotation.y = Math.atan2(p.x - MAK.m.position.x, p.z - MAK.m.position.z); SFX.makPunch(0.6); }, cam: makShot(p.x - 1.2, p.y + 1.8, p.z + 1.8, p.x + 2, p.y + 1.6, p.z - 4, 50) },
-      { who: 'МАКАР', txt: 'Макар. Я знаю, кто ты. Ты уже бывал на складе №13 в порту.', cam: makShot(p.x + 1.2, p.y + 1.9, p.z - 1.6, p.x + 2, p.y + 1.9, p.z - 4, 42) },
+      { who: 'МАКАР', txt: 'Макар. Я знаю, кто ты. Ты уже бывал на складе №13 в порту.', cam: makShot(p.x + 1.2, p.y + 1.7, p.z - 1.6, p.x + 2, p.y + 1.7, p.z - 4, 42) },
       { who: 'МАКАР', txt: 'Черепа прячутся там. И… возможно, Свити тоже.' },
       { who: 'ВЫ', txt: 'Свити? Ты её знаешь?', cam: makShot(p.x + 2.6, p.y + 1.8, p.z - 2.4, p.x, p.y + 1.6, p.z, 46) },
-      { who: 'МАКАР', txt: 'Лучше, чем кто-либо. Пойдёшь первым — я прикрою с воздуха. Станет жарко — кричи. Я остановлю время.', cam: makShot(p.x + 1.2, p.y + 1.9, p.z - 1.6, p.x + 2, p.y + 1.9, p.z - 4, 42), act: () => { MAK.pose = 'stop'; MAK.m.userData.watch = true; } },
+      { who: 'МАКАР', txt: 'Лучше, чем кто-либо. Пойдёшь первым — я прикрою с воздуха. Станет жарко — кричи. Я остановлю время.', cam: makShot(p.x + 1.2, p.y + 1.7, p.z - 1.6, p.x + 2, p.y + 1.7, p.z - 4, 42), act: () => { MAK.pose = 'stop'; MAK.m.userData.watch = true; } },
     ], () => { MAK.m.userData.watch = false; makStage('stealth'); }); return; }
   if (st === 'm2') { MAK.ckpt = 'm2'; MAK_SAVE.at = 'm2'; makSaveP(); if (MAK.from !== 'stealth') makLoad('port'); MAK.from = ''; { const b = document.getElementById('makTake'); if (b) b.style.display = 'none'; if (MAK.beacon) { scene.remove(MAK.beacon); MAK.beacon = null; } } makHero('we'); player.hp = Math.max(player.hp, 70); makAllySpawn(player.pos.x + 3, player.pos.z); MAK.m.visible = false;
     makCut([{ who: 'МАКАР', txt: 'Склад №13. Слышишь шаги? Готовься. Жми «⏱ МАКАР!», когда их станет много.', cam: null }], () => makWave()); return; }
@@ -21523,12 +21543,12 @@ function makStage(st) {
     makCut([
       { who: '', txt: 'Склад затих. Слишком тихо.', dur: 2.4, cam: makShot(p.x + 3, p.y + 2.5, p.z + 2, p.x, p.y + 1.6, bz, 55) },
       { who: 'БУЛЬДОГ', txt: 'Ну здравствуй, «герой». Свити предупреждала, что ты придёшь.', cam: makShot(p.x - 1.5, p.y + 1.6, bz + 4.5, p.x, p.y + 2.2, bz, 42) },
-      { who: 'МАКАР', txt: 'Где она?', cam: makShot(p.x + 1.2, p.y + 1.9, p.z - 1.8, p.x, p.y + 1.9, p.z, 42), act: () => { MAK.pose = 'pose'; } },
+      { who: 'МАКАР', txt: 'Где она?', cam: makShot(p.x + 1.2, p.y + 1.7, p.z - 1.8, p.x, p.y + 1.7, p.z, 42), act: () => { MAK.pose = 'pose'; } },
       { who: 'БУЛЬДОГ', txt: 'Пройди сначала меня. Мой щит не пробьёт ни пуля, ни твой фонарик в груди.', cam: makShot(p.x - 1.5, p.y + 1.6, bz + 4.5, p.x, p.y + 2.2, bz, 42) },
       { who: 'МАКАР', txt: 'Щит пробивают крюками. А время… время на моей стороне.', cam: makOrbit(p.x, p.y, p.z, 4, 1.4, 0.4), act: () => { MAK.pose = 'stop'; MAK.m.userData.watch = true; } },
     ], () => { MAK.m.userData.watch = false; bn.scripted = false; MAK.obj = '⚔ Победите Бульдога: 🪝 крюки или ⏱ время снимают щит'; for (let i = 0; i < 3; i++) makSpawnFoe(rand(-12, 12), bz - rand(0, 3)); }); return; }
   if (st === 'end') { makHero('makar'); MAK.m.visible = true; const p = player.pos.clone(); let sv = null; const ux = -Math.sin(player.yaw), uz = -Math.cos(player.yaw), sx = p.x + ux * 4, sz = p.z + uz * 4, rx = -uz, rz = ux; MAK.m.position.copy(p); MAK.m.rotation.y = Math.atan2(ux, uz); sv = spawnNPC('human', sx, sz, Math.atan2(-ux, -uz), 'svity-street'); if (sv) { sv.scripted = true; sv.pos.set(sx, p.y, sz); sv.yaw = Math.atan2(-ux, -uz); }
-    const onS = makShot(p.x - ux * 1.3 + rx * 0.75, p.y + 1.95, p.z - uz * 1.3 + rz * 0.75, sx, p.y + 1.5, sz, 40), onM = makShot(sx + ux * 1.2 + rx * 0.6, p.y + 1.7, sz + uz * 1.2 + rz * 0.6, p.x, p.y + 1.9, p.z, 40), wide = makShot((p.x + sx) / 2 + rx * 2.6, p.y + 1.9, (p.z + sz) / 2 + rz * 2.6, (p.x + sx) / 2, p.y + 1.4, (p.z + sz) / 2, 55);
+    const onS = makShot(p.x - ux * 1.3 + rx * 0.75, p.y + 1.75, p.z - uz * 1.3 + rz * 0.75, sx, p.y + 1.5, sz, 40), onM = makShot(sx + ux * 1.2 + rx * 0.6, p.y + 1.7, sz + uz * 1.2 + rz * 0.6, p.x, p.y + 1.7, p.z, 40), wide = makShot((p.x + sx) / 2 + rx * 2.6, p.y + 1.7, (p.z + sz) / 2 + rz * 2.6, (p.x + sx) / 2, p.y + 1.4, (p.z + sz) / 2, 55);
     makCut([
       { who: '', txt: 'Из темноты выходит она.', dur: 2.6, cam: wide },
       { who: 'СВИТИ', txt: 'Макар… Ты всё-таки пришёл.', cam: onS },
@@ -21689,7 +21709,7 @@ function makNpcGone(n) { if (!n) return; try { n.dispose(); } catch (e) { scene.
 function makGGArrive() {
   MAK.stage = 'gg'; makHero('makar'); const p = player.pos.clone(), f = makFwd(new V3()), gx = p.x + f.x * 3.2, gz = p.z + f.z * 3.2; MAK.m.visible = true; MAK.m.position.copy(p); MAK.m.rotation.y = Math.atan2(f.x, f.z);
   const g = MAK.ggN = makGG(gx, gz, 14); if (!g) { makStage1('host'); return; } makFace(g, p.x, p.z); g.ggWing = 1.4;
-  const onG = makShot(p.x + f.x * 0.9 - f.z * 0.7, p.y + 1.9, p.z + f.z * 0.9 + f.x * 0.7, gx, 1.6, gz, 40), onM = makShot(gx - f.x * 1.1 + f.z * 0.6, 1.8, gz - f.z * 1.1 - f.x * 0.6, p.x, p.y + 1.9, p.z, 42), wide = makShot(p.x - f.z * 5 + f.x * 1.5, p.y + 2.2, p.z + f.x * 5 + f.z * 1.5, (p.x + gx) / 2, 1.6, (p.z + gz) / 2, 55);
+  const onG = makShot(p.x + f.x * 0.9 - f.z * 0.7, p.y + 1.7, p.z + f.z * 0.9 + f.x * 0.7, gx, 1.6, gz, 40), onM = makShot(gx - f.x * 1.1 + f.z * 0.6, 1.8, gz - f.z * 1.1 - f.x * 0.6, p.x, p.y + 1.7, p.z, 42), wide = makShot(p.x - f.z * 5 + f.x * 1.5, p.y + 2.2, p.z + f.x * 5 + f.z * 1.5, (p.x + gx) / 2, 1.6, (p.z + gz) / 2, 55);
   const after = (k) => { MAK.ggHand = k; const tr = { hand: [{ who: 'ВОСКРЕСИТЕЛЬ', txt: '…Ты подаёшь мне руку. После всего, что было.', cam: onG, act: () => { g.ggWing = 0.5; g.talkT = 3; } }, { who: 'МАКАР', txt: 'Старые друзья не считают долги.', cam: onM }], no: [{ who: 'МАКАР', txt: 'Ты сам выбрал свою дорогу. Не жди от меня руки.', cam: onM, act: () => { MAK.pose = 'idle'; } }, { who: 'ВОСКРЕСИТЕЛЬ', txt: 'Понимаю. Я бы и сам себе не поверил.', cam: onG, act: () => { g.ggDim = 0.3; g.talkT = 3; } }], null: [{ who: '', txt: 'Макар не успел решиться.', dur: 2.2, cam: wide, act: () => { MAK.pose = 'idle'; } }, { who: 'ВОСКРЕСИТЕЛЬ', txt: 'Молчишь… Как всегда.', cam: onG, act: () => { g.talkT = 2; } }] }[k ?? 'null'];
     makInsert(tr.concat([
       { who: 'ВОСКРЕСИТЕЛЬ', txt: 'Я прилетел предупредить. Кто-то охотится за тем, что делает меня бессмертным.', cam: onG, act: () => { g.talkT = 4; } },
@@ -21707,7 +21727,7 @@ function makGGArrive() {
 function makCurse() {
   MAK.stage = 'curse'; makHero('makar'); const p = player.pos.clone(), f = makFwd(new V3()); MAK.m.visible = true; MAK.m.position.copy(p); MAK.m.rotation.y = Math.atan2(f.x, f.z);
   const gx = p.x - f.z * 2.4 + f.x * 1.5, gz = p.z + f.x * 2.4 + f.z * 1.5, ox = p.x + f.x * 8, oz = p.z + f.z * 8;
-  const wide = makShot(p.x - f.z * 6, p.y + 2.4, p.z + f.x * 6, (p.x + ox) / 2, 1.4, (p.z + oz) / 2, 58), onM = makShot(p.x + f.x * 1.3 + f.z * 0.6, p.y + 1.9, p.z + f.z * 1.3 - f.x * 0.6, p.x, p.y + 1.9, p.z, 42);
+  const wide = makShot(p.x - f.z * 6, p.y + 2.4, p.z + f.x * 6, (p.x + ox) / 2, 1.4, (p.z + oz) / 2, 58), onM = makShot(p.x + f.x * 1.3 + f.z * 0.6, p.y + 1.7, p.z + f.z * 1.3 - f.x * 0.6, p.x, p.y + 1.7, p.z, 42);
   let g = null, ob = null, beam = null;
   const onG = () => { if (!g) return; const q = g.pos; camera.position.set(q.x + Math.sin(g.yaw) * 2.5 + 0.5, 1.9, q.z + Math.cos(g.yaw) * 2.5); camera.lookAt(q.x, 1.2, q.z); story.fov = 46; };
   const onO = () => { if (!ob) return; const q = ob.pos; camera.position.set(q.x + Math.sin(ob.yaw) * 1.6 - 0.4, 1.8, q.z + Math.cos(ob.yaw) * 1.6); camera.lookAt(q.x, 1.6, q.z); story.fov = 38; };
@@ -21760,7 +21780,7 @@ function makCarEnd(cont) {
   const car = makCarMesh(); car.position.set(CX, 0, CZ); scene.add(car); mapObjs.push(car);
   const g = MAK.ggN = makGG(CX - 0.45, CZ - 0.05, 0.12); if (g) { g.yaw = Math.PI; g.pose = 'sit'; g.poseDur = 1e9; g.poseT = 0; g.ggWing = 0.08; g.ggHalo = 0.01; g.ggDim = 0.5; g.ggCrack = 1; }
   const mel = MAK.melN = spawnNPC('human', CX, CZ + 0.95, Math.PI, 'melodie'); if (mel) { mel.scripted = true; mel.pos.set(CX, 0.12, CZ + 0.95); mel.yaw = Math.PI; mel.pose = 'sit'; mel.poseDur = 1e9; mel.poseT = 0; mel.protect = true; }
-  MAK.m.visible = true; MAK.m.position.set(CX + 0.5, 0.08, CZ - 0.02); MAK.m.rotation.y = Math.PI; MAK.m.scale.setScalar(0.82); MAK.pose = 'sit';
+  MAK.m.visible = true; MAK.m.position.set(CX + 0.45, 0.12, CZ - 0.02); MAK.m.rotation.y = Math.PI; MAK.pose = 'sit';
   const dash = makShot(CX + 0.1, 1.45, CZ - 1.35, CX, 1.15, CZ + 0.6, 62), onG = makShot(CX - 0.1, 1.42, CZ - 0.95, CX - 0.45, 1.25, CZ, 38), onMel = makShot(CX - 0.02, 1.42, CZ - 1.0, CX, 1.08, CZ + 1.0, 32), onMak = makShot(CX - 0.15, 1.45, CZ - 0.9, CX + 0.45, 1.35, CZ, 38), road = makShot(CX + 3.5, 1.6, CZ + 6, CX, 3, CZ - 20, 60), side = makShot(CX + 7, 2.2, CZ + 1.5, CX - 3, 1.4, CZ, 55);
   let mon = null; const foes = []; const tremble = (t) => { if (g) { g.yaw = Math.PI + Math.sin(t * 40) * 0.015; g.talkT = Math.max(g.talkT || 0, 0.1); } };
   const throwMen = () => { const spots = [[-4.2, -1.2], [-4.6, 0.4], [-4.3, 2.0], [-3.8, 3.4]]; spots.forEach(([dx, dz], i) => later(0.35 * i, () => { const n = spawnNPC('soldier', CX + dx, CZ + dz, 0); if (!n) return; makFoeLook(n); n.scripted = true; n.protect = true; const from = new V3(mon ? mon.pos.x - 2 : -6, 9, mon ? mon.pos.z + 2 : -20), to = new V3(CX + dx, 0, CZ + dz); n.pos.copy(from); n.fl = { from, to, t: 0 }; foes.push(n); SFX.makWhoosh && SFX.makWhoosh(0.5); })); };
