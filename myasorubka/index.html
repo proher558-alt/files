@@ -21810,7 +21810,7 @@ function tsInteract() {
 function tsGest(name) { TS.gest = name; TS.gestT = 0; }
 /* ---------- управление и HUD ---------- */
 function tsHud() {
-  const h = TS.hud; if (!h) return; const k = h.querySelector('#tsK'); const l2 = tsLabel2(); const ab = h.querySelector('#tsA'); const gg = h.querySelector('#tsG'); if (gg) { const L = TS.lost; gg.classList.toggle('lost', !!(L.armL || L.armR || L.legL || L.legR)); } if (ab) { ab.classList.toggle('held', !!TS.held); ab.classList.toggle('fl', !!TS.flash); ab.classList.toggle('cr', !!TS.crouchOn); } if (k) k.textContent = tsKeyNear() ? 'E — взять ключ' : tsDoorNear() ? (TS.hasKey ? 'E — открыть ключом' : 'Дверь заперта') : l2 ? l2 : TS.hudWater ? '🌊 В воде: прыжок — всплыть' : ''; }
+  const h = TS.hud; if (!h) return; const k = h.querySelector('#tsK'); const l2 = tsLabel2(); document.body.classList.toggle('ts-fists', !!TS.fists); const ab = h.querySelector('#tsA'); const gg = h.querySelector('#tsG'); if (gg) { const L = TS.lost; gg.classList.toggle('lost', !!(L.armL || L.armR || L.legL || L.legR)); } if (ab) { ab.classList.toggle('held', !!TS.held); ab.classList.toggle('fl', !!TS.flash); ab.classList.toggle('cr', !!TS.crouchOn); } if (k) k.textContent = tsKeyNear() ? 'E — взять ключ' : tsDoorNear() ? (TS.hasKey ? 'E — открыть ключом' : 'Дверь заперта') : l2 ? l2 : TS.hudWater ? '🌊 В воде: прыжок — всплыть' : ''; }
 function tsUi(on) {
   let h = document.getElementById('tsHud');
   if (!h) {
@@ -21818,23 +21818,38 @@ function tsUi(on) {
 #tsHud .x{position:absolute;left:calc(10px + env(safe-area-inset-left,0px));top:calc(8px + env(safe-area-inset-top,0px));pointer-events:auto;padding:7px 12px;border-radius:10px;background:rgba(10,20,30,.8);border:1px solid #4a8ab0;font:700 13px var(--ui)}
 #tsG{position:absolute;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(130px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,58px);gap:7px;pointer-events:auto}
 #tsG b{width:58px;height:58px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:800 9px var(--ui);background:radial-gradient(circle,#2a5a7a,#0c2030);border:2px solid #8fe0ff;color:#fff;touch-action:none;user-select:none}#tsG b span{font-size:20px;line-height:22px}
-#tsA{position:absolute;right:calc(100px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;pointer-events:auto}
-#tsA b{width:62px;height:62px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:800 9px var(--ui);background:radial-gradient(circle,#3a4a2a,#141c0c);border:2px solid #c8f08a;color:#fff;touch-action:none;user-select:none}#tsA b span{font-size:22px;line-height:24px}
-#tsA b[data-a="use"]{width:74px;height:74px;background:radial-gradient(circle,#6a5a1a,#2a2008);border-color:#ffd84a}
+#tsA{position:absolute;right:calc(92px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,56px);gap:6px;pointer-events:auto;direction:rtl}
+#tsA b{direction:ltr;width:56px;height:56px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:800 9px var(--ui);background:radial-gradient(circle,#3a4a2a,#141c0c);border:2px solid #c8f08a;color:#fff;touch-action:none;user-select:none}#tsA b span{font-size:22px;line-height:24px}
+#tsA b[data-a="use"]{background:radial-gradient(circle,#6a5a1a,#2a2008);border-color:#ffd84a}
 #tsA b[data-a="throw"]{display:none}#tsA.held b[data-a="throw"]{display:flex}#tsA.cr b[data-a="crouch"]{background:radial-gradient(circle,#7ab040,#2a4a10)}#tsA b[data-a="flash"]{opacity:.45}#tsA.fl b[data-a="flash"]{opacity:1}
 #tsG{bottom:calc(96px + env(safe-area-inset-bottom,0px))!important;grid-template-columns:repeat(3,60px)!important;gap:7px!important}#tsG b{width:60px!important;height:60px!important;background:radial-gradient(circle,#7a2a2a,#2a0c0c)!important;border-color:#ff9a8a!important}#tsG b span{font-size:22px!important}#tsG b.on{background:radial-gradient(circle,#e05a3a,#6a1a0a)!important;transform:scale(1.08)}#tsG b[data-g="heal"]{display:none;background:radial-gradient(circle,#2a7a4a,#0c2a14)!important;border-color:#9affb0!important}#tsG.lost b[data-g="heal"]{display:flex}
-#tsK{position:absolute;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font:800 15px var(--ui);text-shadow:0 0 6px #000;white-space:nowrap}
+#tsA b[data-a="fists"].on,body.ts-fists #tsA b[data-a="fists"]{background:radial-gradient(circle,#e04a2a,#5a1208);border-color:#ffb08a}
+#tsG{bottom:calc(136px + env(safe-area-inset-bottom,0px))!important;right:calc(92px + env(safe-area-inset-right,0px))!important}
+body.ts-fists #tsG{display:none!important}
+#tsF{position:absolute;right:calc(92px + env(safe-area-inset-right,0px));bottom:calc(136px + env(safe-area-inset-bottom,0px));display:none;grid-template-columns:repeat(3,62px);gap:7px;pointer-events:auto}
+#tsF b{width:62px;height:62px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:800 9px var(--ui);background:radial-gradient(circle,#a02020,#2a0606);border:2px solid #ffb08a;color:#fff;touch-action:none;user-select:none}#tsF b span{font-size:22px;line-height:24px}#tsF b.on{transform:scale(1.1);background:radial-gradient(circle,#2a6ad0,#0a1a40)}#tsF b[data-p="block"]{background:radial-gradient(circle,#2a4a7a,#0a1426);border-color:#8ac8ff}
+#tsInv{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;padding:5px;border-radius:14px;background:rgba(8,12,18,.55);border:1px solid rgba(255,255,255,.18);pointer-events:auto}
+#tsInv div{position:relative;width:54px;height:54px;border-radius:10px;background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.03));border:2px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;touch-action:none}
+#tsInv div img{width:44px;height:44px;display:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}#tsInv div.sel{border-color:#ffd84a;box-shadow:0 0 12px rgba(255,216,74,.7);background:linear-gradient(160deg,rgba(255,216,74,.3),rgba(255,216,74,.05))}
+#tsInv div em{position:absolute;left:4px;top:1px;font:800 10px var(--ui);color:rgba(255,255,255,.6);font-style:normal}#tsInv div i{position:absolute;bottom:-1px;left:0;right:0;text-align:center;font:700 8px var(--ui);color:#fff;text-shadow:0 0 3px #000;font-style:normal}
+#tsFH{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:none;gap:12px;align-items:center;pointer-events:none}
+#tsFH .b{width:170px}#tsFH s{display:block;font:800 11px var(--ui);text-decoration:none;color:#fff;text-shadow:0 0 4px #000;margin-bottom:2px}#tsFH .op s{text-align:right}#tsFH u{display:block;height:12px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.4);border-radius:6px;overflow:hidden}#tsFH u b{display:block;height:100%;background:linear-gradient(90deg,#d02020,#ff7a3a);transition:width .2s}#tsFH .op u b{margin-left:auto;background:linear-gradient(270deg,#d02020,#ff7a3a)}#tsFH u.st{height:6px;margin-top:3px}#tsFH u.st b{background:linear-gradient(90deg,#2a9ae0,#8ae0ff)}
+#tsFH .tm{font:900 22px var(--ui);color:#ffd84a;text-shadow:0 0 6px #000;min-width:54px;text-align:center}
+#tsK{position:absolute;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font:800 15px var(--ui);text-shadow:0 0 6px #000;white-space:nowrap}
 body.ts-ui #stats,body.ts-ui #health,body.ts-ui #slots,body.ts-ui #weapon,body.ts-ui #cross,body.ts-ui #madHud,body.ts-ui #touch .tb:not([data-act="jump"]){display:none!important}
 body.ts-ui #touch .tb[data-act="jump"]{right:calc(14px + env(safe-area-inset-right,0px))!important;bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;top:auto!important;left:auto!important}
 #tsUnder{position:fixed;inset:0;z-index:40;pointer-events:none;background:radial-gradient(ellipse at center,rgba(40,120,170,.25),rgba(10,60,110,.55));opacity:0;transition:opacity .25s}`; document.head.appendChild(css);
     const u = document.createElement('div'); u.id = 'tsUnder'; document.body.appendChild(u);
-    h = document.createElement('div'); h.id = 'tsHud'; h.innerHTML = `<div class="x" data-k="x">✕ Выйти</div><div id="tsK"></div><div id="tsG"></div><div id="tsA"><b data-a="throw"><span>✊</span>БРОСИТЬ</b><b data-a="flash"><span>🔦</span>СВЕТ</b><b data-a="crouch"><span>🧎</span>ПРИСЕСТЬ</b><b data-a="use"><span>✋</span>E</b></div>`; document.body.appendChild(h);
+    h = document.createElement('div'); h.id = 'tsHud'; h.innerHTML = `<div class="x" data-k="x">✕ Выйти</div><div id="tsK"></div><div id="tsG"></div><div id="tsA"><b data-a="throw"><span>✊</span>БРОСИТЬ</b><b data-a="flash"><span>🔦</span>СВЕТ</b><b data-a="crouch"><span>🧎</span>ПРИСЕСТЬ</b><b data-a="use"><span>✋</span>E</b><b data-a="fists"><span>🥊</span>КУЛАКИ</b></div><div id="tsF"><b data-p="jab"><span>👊</span>ДЖЕБ</b><b data-p="cross"><span>🤜</span>КРОСС</b><b data-p="hook"><span>🪝</span>ХУК</b><b data-p="upper"><span>⤴️</span>АППЕРКОТ</b><b data-p="block"><span>🛡️</span>БЛОК</b></div><div id="tsInv"><div><em>1</em><img><i></i></div><div><em>2</em><img><i></i></div><div><em>3</em><img><i></i></div></div>`; document.body.appendChild(h);
     h.querySelector('[data-k="x"]').onclick = () => { tsUi(false); TS.on = false; tsOff(); };
     const G = h.querySelector('#tsG'), items = [['arm', '💪', 'РУКА'], ['leg', '🦵', 'НОГА'], ['heal', '🩹', 'ПРИШИТЬ']];
     for (const [id, ic, t] of items) { const b = document.createElement('b'); b.innerHTML = `<span>${ic}</span>${t}`; b.dataset.g = id; b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); if (id === 'heal') tsHealBtn(); else { TS.ext[id] = true; b.classList.add('on'); try { b.setPointerCapture(e.pointerId); } catch (_) {} } }); const off = () => { if (id !== 'heal') { TS.ext[id] = false; b.classList.remove('on'); } }; b.addEventListener('pointerup', off); b.addEventListener('pointercancel', off); b.addEventListener('lostpointercapture', off); G.appendChild(b); }
-    for (const b of h.querySelectorAll('#tsA b')) b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); const a = b.dataset.a; if (a === 'use') tsInteract(); else if (a === 'crouch') tsCrouch(); else if (a === 'throw') tsThrow(); else if (a === 'flash') tsFlashT(); tsHud(); });
+    for (const b of h.querySelectorAll('#tsA b')) b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); const a = b.dataset.a; if (a === 'use') tsInteract(); else if (a === 'crouch') tsCrouch(); else if (a === 'throw') tsThrow(); else if (a === 'flash') tsFlashT(); else if (a === 'fists') { if (!(TS.fight && TS.fight.on)) { TS.fists = !TS.fists; if (TS.fists) { tsStow(); tsInvDraw(); } TS.block = false; } } tsHud(); });
+    for (const b of h.querySelectorAll('#tsF b')) { const p = b.dataset.p; b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); b.classList.add('on'); if (p === 'block') { TS.block = true; try { b.setPointerCapture(e.pointerId); } catch (_) {} } else tsPunch(p); }); const off = () => { b.classList.remove('on'); if (p === 'block') TS.block = false; }; b.addEventListener('pointerup', off); b.addEventListener('pointercancel', off); b.addEventListener('lostpointercapture', off); }
+    [...h.querySelectorAll('#tsInv div')].forEach((d, i) => d.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); tsInvSel(i); }));
+    ['touchstart', 'pointerdown', 'mousedown'].forEach((ev0) => { for (const id of ['#tsF', '#tsInv']) h.querySelector(id).addEventListener(ev0, (ev) => ev.stopPropagation()); });
     ['touchstart', 'pointerdown', 'mousedown'].forEach((e) => { h.querySelector('#tsG').addEventListener(e, (ev) => ev.stopPropagation()); h.querySelector('#tsA').addEventListener(e, (ev) => ev.stopPropagation()); });
-    window.addEventListener('keydown', (e) => { if (!TS.on) return; const m = { Digit1: 'arm', Digit2: 'leg' }[e.code]; if (m) TS.ext[m] = true; if (e.code === 'KeyH') tsHealBtn(); if (e.code === 'KeyE') tsInteract(); if (e.code === 'KeyC') tsCrouch(); if (e.code === 'KeyG' || e.code === 'KeyQ') tsThrow(); if (e.code === 'KeyF') tsFlashT(); });
+    window.addEventListener('keydown', (e) => { if (!TS.on) return; const m = { Digit1: 'arm', Digit2: 'leg' }[e.code]; if (m) TS.ext[m] = true; if (e.code === 'KeyH') tsHealBtn(); if (e.code === 'KeyE') tsInteract(); const sl = { Digit3: 0, Digit4: 1, Digit5: 2 }[e.code]; if (sl !== undefined) tsInvSel(sl); const pk = { KeyJ: 'jab', KeyK: 'cross', KeyL: 'hook', KeyU: 'upper' }[e.code]; if (pk) tsPunch(pk); if (e.code === 'KeyB') TS.block = true; if (e.code === 'KeyV') { TS.fists = !TS.fists; if (TS.fists) tsStow(); } if (e.code === 'KeyC') tsCrouch(); if (e.code === 'KeyG' || e.code === 'KeyQ') tsThrow(); if (e.code === 'KeyF') tsFlashT(); });
     TS.hud = h;
   }
   h.style.display = on ? 'block' : 'none'; document.body.classList.toggle('ts-ui', !!on); // свой класс: прячем стандартный HUD и боевые кнопки
@@ -21964,9 +21979,9 @@ function tsBuild2() {
   const vl = new THREE.PointLight(0xbfe0ff, 6, 3, 2); vl.position.set(-12.3, 1.2, -13.9); scene.add(vl); mapObjs.push(vl);
   const VD = { state: 'idle', g: vend, can: null, cans: 0 };
   const btnW = new V3(-12.2 + 0.36, 0.975 + (0.5 - 430 / 1024) * 1.92, -14.6 + 0.42), trayW = new V3(-12.26, 0.25, -14.6 + 0.4);
-  tsInt({ id: 'vend', pos: new V3(-12.2, 1.0, -14.0), r: 1.8, label: () => TS.held ? null : VD.state === 'idle' ? 'E — нажать кнопку автомата' : VD.state === 'busy' ? 'автомат выдаёт…' : 'E — забрать банку', use() {
+  tsInt({ id: 'vend', pos: new V3(-12.2, 1.0, -14.0), r: 1.8, label: () => TS.held && (TS.held.kind === 'medkit' || (TS.held.kind === 'can' && TS.held.full)) ? null : VD.state === 'ready' && tsInvFree() < 0 ? '🎒 инвентарь полон' : VD.state === 'idle' ? 'E — нажать кнопку автомата' : VD.state === 'busy' ? 'автомат выдаёт…' : 'E — забрать банку', use() {
     if (VD.state === 'idle') { VD.state = 'busy'; tsAct('press', { w: btnW, at: 0.3, fn() { SFX.tsClick(0.6); SFX.tsVend(0.6); later(1.05, () => { VD.can = tsCanMesh(); VD.can.position.copy(trayW); VD.can.rotation.z = Math.PI / 2; scene.add(VD.can); VD.state = 'ready'; shake = Math.max(shake, 0.05); }); } }); }
-    else if (VD.state === 'ready' && !TS.held) tsAct('pick', { w: trayW.clone(), at: 0.4, crouch: true, fn() { scene.remove(VD.can); tsHold(tsMakeItem('can', VD.can)); VD.can = null; VD.state = 'idle'; } });
+    else if (VD.state === 'ready' && tsInvFree() >= 0) tsAct('pick', { w: trayW.clone(), at: 0.4, crouch: true, fn() { scene.remove(VD.can); tsHold(tsMakeItem('can', VD.can)); VD.can = null; VD.state = 'idle'; } });
   } });
   TS.vend = VD;
   /* --- вышка с лестницей, трамплин и надувная подушка --- */
@@ -22011,6 +22026,7 @@ function tsBuild2() {
   // предметы создаются на первом кадре игры (после сборки карты пропы очищаются)
   TS.needItems = true;
   tsBuild3();
+  tsBuild4();
 }
 function tsSpawnItems() {
   TS.needItems = false; TS.items = [];
@@ -22034,13 +22050,13 @@ function tsDrop(it, pos, vel, spin = 0) {
   b.addEventListener('collide', (e) => { const v = Math.abs(e.contact.getImpactVelocityAlongNormal()); if (v < 1.2 || it.hitCd > 0) return; it.hitCd = 0.08; if (dv(it.m.position) < 0.02) return; const k = clamp(v / 9, 0.1, 0.8) * Math.min(1, dv(it.m.position) * 1.5); if (it.kind === 'ball') SFX.tsBonk(k, 1.3); else if (it.kind === 'can') SFX.tsCanHit(k); else SFX.tsBonk(k, 0.6); });
 }
 function tsLift(it) { if (it.body) { world.removeBody(it.body); const i = props.indexOf(it.pr); if (i >= 0) props.splice(i, 1); targetsDirty = true; it.body = null; it.pr = null; } }
-function tsHold(it) { tsLift(it); TS.held = it; const R = tsBuildRig(), hs = tsHS() || 'R'; R[hs].wr.add(it.m); it.m.position.set(0, 0.03 + it.D.r, 0.07); it.m.rotation.set(0, 0, 0); if (it.kind === 'can') it.m.rotation.set(Math.PI / 2, 0, 0); if (it.kind === 'crate') { it.m.position.set(hs === 'R' ? -0.12 : 0.12, 0.05 + it.D.r, 0.08); } if (it.kind === 'limb') { it.m.position.set(0, 0.06, 0.12); it.m.rotation.set(Math.PI / 2, 0, 0); } if (hs === 'L' && TS.flash) { TS.flashOn = false; tsFlashOn(); TS.flash.m.visible = false; } it.m.userData.tsOwn = true; SFX.tsClick(0.3); }
+function tsHold(it) { tsLift(it); if (TS.items.indexOf(it) < 0) TS.items.push(it); tsInvSync(); const f = tsInvFree(); if (f < 0) { scene.add(it.m); const q = player.pos.clone().add(new V3(0, 0.5, 0)); it.m.position.copy(q); tsDrop(it, q, new V3()); toast('🎒 Инвентарь полон (3/3)'); return; } tsStow(); TS.inv[f] = it; TS.held = it; TS.sel = f; TS.fists = false; tsAttach(it); const hs = tsHS() || 'R'; if (hs === 'L' && TS.flash) { TS.flashOn = false; tsFlashOn(); TS.flash.m.visible = false; } SFX.tsClick(0.3); tsInvDraw(); }
 function tsThrow() {
   const it = TS.held; if (TS.act && it) { TS.pend = 'throw'; return; } if (!it) return;
   tsAct('throw', { dur: 0.6, at: 0.32, fn() { const f = tsFwd(), e = tsEyeP(), right = new V3(Math.cos(player.yaw), 0, -Math.sin(player.yaw)); TS.held = null; const pos = e.clone().addScaledVector(f, 0.55).addScaledVector(right, 0.18).add(new V3(0, -0.12, 0)); const sp = it.D.heavy ? 6 : it.kind === 'can' ? 11 : 10.5; const vel = f.clone().multiplyScalar(sp).add(new V3(0, it.D.heavy ? 2.4 : 1.6, 0)).add(new V3(player.vel.x, 0, player.vel.z)); it.m.parent && it.m.parent.remove(it.m); scene.add(it.m); it.m.position.copy(pos); tsDrop(it, pos, vel, it.kind === 'ball' ? 4 : 7); SFX.tsWhoosh(it.D.heavy ? 0.6 : 0.4); TS.camRV += 0.6; } });
 }
 function tsPlace() { const it = TS.held; if (!it || TS.act) return; tsAct('place', { dur: 0.7, at: 0.4, crouch: true, fn() { const f = tsFwd(); f.y = 0; f.normalize(); TS.held = null; const pos = player.pos.clone().addScaledVector(f, 0.7); pos.y = floorAt(pos.x, pos.z, player.pos.y) + it.D.r + 0.05; it.m.parent && it.m.parent.remove(it.m); scene.add(it.m); it.m.position.copy(pos); tsDrop(it, pos, new V3()); } }); }
-function tsItemNear() { let best = null, bd = 1.7; const e = tsEyeP(), f = tsFwd(); for (const it of TS.items) { if (!it.body || TS.held === it) continue; const p = it.m.position, d = p.distanceTo(e); const dir = _tsV2.subVectors(p, e).normalize(); const look = dir.dot(f); if (d < bd + (look > 0.8 ? 0.5 : 0) && look > 0.35) { bd = d; best = it; } } return best; }
+function tsItemNear() { let best = null, bd = 1.95; const e = tsEyeP(), f = tsFwd(); for (const it of TS.items) { if (!it.body || TS.held === it) continue; const p = it.m.position, d = p.distanceTo(e); const dir = _tsV2.subVectors(p, e).normalize(); const look = dir.dot(f); if (d < bd + (look > 0.8 ? 0.5 : 0) && look > 0.35) { bd = d; best = it; } } return best; }
 function tsDrink() { const it = TS.held; if (!it || it.kind !== 'can' || !it.full || TS.act) return; tsAct('drink', { dur: 2.6, at: 0.45, fn() { SFX.tsPssht(0.6); }, ev: [[1.0, () => SFX.tsGulp(0.5)], [1.35, () => SFX.tsGulp(0.5)], [1.7, () => SFX.tsGulp(0.5)], [2.05, () => { SFX.tsAh(0.5); it.full = false; player.hp = Math.min(100, player.hp + 25); toast('🥤 +25 здоровья, банка пустая — её можно бросить'); }]] }); }
 /* ---------- фонарик ---------- */
 function tsFlashOn() { const F = TS.flash; if (!F) return; if (!F.light) { F.light = new THREE.SpotLight(0xfff2d8, 70, 30, 0.42, 0.55, 1.6); F.tgt = new THREE.Object3D(); scene.add(F.light); scene.add(F.tgt); mapObjs.push(F.light, F.tgt); F.light.target = F.tgt; } const R = tsBuildRig(); if (F.m.parent !== R.L.wr) { R.L.wr.add(F.m); F.m.position.set(0, 0.04, 0.06); F.m.rotation.set(0, 0, 0); F.m.userData.tsOwn = true; } F.light.visible = TS.flashOn; F.m.userData.lens.material.color.setHex(TS.flashOn ? 0xfff6d0 : 0x333333); }
@@ -22092,13 +22108,15 @@ function tsVM2(o, dt) {
   if (TS.flash) { const fo = TS.flashOn ? [-0.2, -0.1, -0.46] : [-0.22, -0.2, -0.38]; if (!TS.climb && !(TS.act && TS.act.kind === 'lever') && !(TS.held && TS.held.D.heavy)) { o.L = tsMix(o.L, fo, 1); o.curlL = 0.9; } }
   if (TS.act) tsActStep(o, dt);
   tsVM3(o, dt);
+  tsVM4(o, dt);
+  if (TS.act && TS.act.kind === 'bandage') { const t = TS.act.t, w = Math.sin(t * 7); o.L = [-0.04, -0.16, -0.34]; o.R = [0.05 + w * 0.06, -0.14 + Math.cos(t * 7) * 0.04, -0.33]; o.curlL = 0.6; o.curlR = 0.8; TS.camDropT = Math.max(TS.camDropT || 0, 0.05); }
   o.R = [o.R[0], o.R[1] - 0.3, o.R[2]]; o.L = [o.L[0], o.L[1] - 0.3, o.L[2]];
   // кольцо: банка в руке крутится к лицу; ящик держим двумя руками
   if (TS.held && TS.held.kind === 'can') { const tab = TS.held.m.userData.tab; if (tab) tab.rotation.x = TS.held.full ? 0 : -1.2; }
 }
 /* ---------- тело от первого лица ---------- */
 function tsBodyUndo() { for (const P of TS.bodyHid) P.mesh.visible = true; TS.bodyHid = []; }
-function tsBody() { tsBody2(); const A = avatar; if (A && mapId === 'testsite' && TS.on && A.state === 'alive') tsBody3(A); }
+function tsBody() { tsBody2(); const A = avatar; if (A && mapId === 'testsite' && TS.on && A.state === 'alive') tsBody3(A); if (mapId === 'testsite' && TS.on) tsBotPose(); }
 function tsBody2() {
   const A = avatar; if (!A) return;
   if (!(mapId === 'testsite' && TS.on && A.state === 'alive' && !view3() && !VEH.in)) { if (TS.bodyHid.length) tsBodyUndo(); return; }
@@ -22186,6 +22204,7 @@ function tsPost2(dt) {
   // лёгкий кивок при каждом шаге в присяде
   if (TS.crouch > 0.5 && hs > 1 && player.onGround) TS.camRV += Math.sin(TS.bob) * dt * 0.6;
   tsPost3(dt);
+  tsPost4(dt);
 }
 // поворот камеры: кивок/крен от приземлений, наклон при питье, кувырок
 function tsCam() {
@@ -22194,29 +22213,37 @@ function tsCam() {
 }
 /* ---------- взаимодействие ---------- */
 function tsNear2() { const e = tsEyeP(), f = tsFwd(); let best = null, bs = -1; for (const I of TS.ints) { const d = I.pos.distanceTo(e); if (d > I.r) continue; const lab = I.label(); if (!lab) continue; const dir = _tsV2.subVectors(I.pos, e).normalize(), look = dir.dot(f); if (look < 0.15 && d > 0.9) continue; const sc = look * 2 - d + (I.pri || 0); if (sc > bs) { bs = sc; best = I; } } return best; }
+// единый выбор действия для E: что ближе и под взглядом — то и делаем; подсказка всегда совпадает с действием
+function tsDecide() {
+  const it = tsItemNear(), I = tsNear2(), e0 = tsEyeP(), H = TS.held, cons = H && (H.kind === 'medkit' || (H.kind === 'can' && H.full));
+  const dI = I ? I.pos.distanceTo(e0) : 99, dIt = it ? it.m.position.distanceTo(e0) : 99;
+  if (it && dIt <= dI) return tsInvFree() < 0 ? { label: '🎒 Инвентарь полон — бросьте что-нибудь', run() { toast('🎒 Инвентарь полон (3/3)'); } } : { label: `E — взять ${it.D.label}`, run() { tsAct('pick', { wf: () => it.m.position.clone(), at: 0.38, fn() { tsHold(it); } }); } };
+  if (I && (!cons || dI < 1.0)) return { label: I.label(), run: () => I.use() };
+  if (H && H.kind === 'medkit') return { label: 'E — перевязаться (+40 HP) · ✊ — бросить', run: tsBandage };
+  if (H && H.kind === 'can' && H.full) return { label: 'E — открыть и выпить · ✊ — бросить', run: tsDrink };
+  if (I) return { label: I.label(), run: () => I.use() };
+  if (H) return { label: '✊ — бросить · E — положить', run: tsPlace };
+  return null;
+}
 function tsInteract2() {
   if (TS.act) return true;
   if (TS.climb) return true;
   if (TS.sit) { tsStand(); return true; }
   if (!tsHS()) { toast('🩸 Рук нет — нажмите 🩹, чтобы пришить'); return true; }
-  const I = tsNear2(); if (I) { I.use(); return true; }
-  const it = !TS.held && tsItemNear(); if (it) { tsAct('pick', { wf: () => it.m.position.clone(), at: 0.38, fn() { tsHold(it); } }); return true; }
-  if (TS.held) { if (TS.held.kind === 'can' && TS.held.full) tsDrink(); else tsPlace(); return true; }
+  const D = tsDecide(); if (D) { D.run(); return true; }
   return false;
 }
 function tsLabel2() {
   if (TS.climb) return '🪜 Джойстик вверх/вниз — лезть, прыжок — спрыгнуть';
   if (TS.sit) return '🪑 Сидите. E или джойстик — встать';
-  const I = tsNear2(); if (I) return I.label();
-  if (!TS.held) { const it = tsItemNear(); if (it) return `E — взять ${it.D.label}`; }
-  if (TS.held) return TS.held.kind === 'can' && TS.held.full ? 'E — открыть и выпить · ✊ — бросить' : `✊ — бросить · E — положить`;
+  const D = tsDecide(); if (D) return D.label;
   const L = TS.lad, p = player.pos; if (L && Math.abs(p.x - 5.5) < 1 && Math.abs(p.z - (L.z - 0.4)) < 1 && p.y < 1) return '🪜 Подойдите к лестнице и толкайте вперёд';
   return null;
 }
 function tsCrouch() { if (TS.sit || TS.climb) return; TS.crouchOn = !TS.crouchOn; SFX.tsStep(0.25); }
 function tsFlashT() { if (!TS.flash) { toast('🔦 Фонарик лежит в ящике стола в комнате'); return; } TS.flashOn = !TS.flashOn; SFX.tsClick(0.5); tsFlashOn(); }
 // выход с карты: вернуть рост глаз и тело
-function tsOff2() { tsHeal(); TS.ext.arm = TS.ext.leg = false; if (TS.held && TS.held.m.parent) { TS.held.m.parent.remove(TS.held.m); TS.held = null; } TS.act = null; player.eye = 1.62; TS.crouchOn = false; TS.crouch = 0; TS.climb = null; if (TS.sit) tsStand(); tsBodyUndo(); if (TS.flash && TS.flash.light) TS.flash.light.visible = false; TS.camP = TS.camR = TS.camPV = TS.camRV = 0; player.landDip = 0; }
+function tsOff2() { if (TS.fight && TS.fight.on) tsFightEnd(false, 'вы покинули ринг'); if (TS.bot) tsBotRemove(); TS.fists = false; TS.block = false; tsHeal(); TS.ext.arm = TS.ext.leg = false; if (TS.held && TS.held.m.parent) { TS.held.m.parent.remove(TS.held.m); TS.held = null; } TS.act = null; player.eye = 1.62; TS.crouchOn = false; TS.crouch = 0; TS.climb = null; if (TS.sit) tsStand(); tsBodyUndo(); if (TS.flash && TS.flash.light) TS.flash.light.visible = false; TS.camP = TS.camR = TS.camPV = TS.camRV = 0; player.landDip = 0; }
 /* ===================== ТЕСТ-ПЛОЩАДКА 3: вытянуть руку/ногу, пилы и зубастик =====================
    Кнопки 💪 «РУКА» и 🦵 «НОГА» (удерживать): рука вытягивается туда, куда смотрит камера, с инерцией,
    при отпускании втягивается к груди; нога выпрямляется вперёд (камера опускается, чтобы её было видно).
@@ -22405,6 +22432,258 @@ function tsHealBtn() {
   tsHeal(); SFX.tsSew(0.6); player.hp = Math.min(100, player.hp + 30); banner('🩹 ПРИШИТО', 'руки и ноги снова на месте'); tsHud();
 }
 window.addEventListener('keyup', (e) => { const m = { Digit1: 'arm', Digit2: 'leg' }[e.code]; if (m) TS.ext[m] = false; });
+/* ===================== ТЕСТ-ПЛОЩАДКА 4: инвентарь, кулачный бой, груша, аптечка =====================
+   Инвентарь на 3 слота внизу экрана (у каждого предмета своя нарисованная иконка); в руке — только один предмет.
+   Ринг с ботами-боксёрами: стойка, джеб, кросс, хук, апперкот, блок, уклон приседом, выносливость, комбо,
+   реакции на удары (голова откидывается, корпус сгибается, шаг назад), нокдауны с отсчётом и нокаут.
+   Боксёрская груша на цепи (качается от удара, показывает силу), аптечка (бинтует и лечит). */
+Object.assign(TS, { inv: [null, null, null], sel: -1, swapT: 0, fists: false, punch: null, block: false, fsta: 100, combo: 0, comboT: 0, fight: null, bot: null, bag2: null, gloves: null, wins: 0 });
+Object.assign(SFX, {
+  tsPunch(v = 0.7, heavy = false) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.15); if (!o) return; this.tn(o, t, 'sine', heavy ? 120 : 160, 45, heavy ? 0.16 : 0.11, 0.9, 0.001); this.nz(o, t, 0.06, 'lowpass', heavy ? 900 : 1400, 0.8, 0.8, 0.001); this.nz(o, t, 0.03, 'highpass', 2500, 0.7, 0.25, 0.001); },
+  tsBlockHit(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.1); if (!o) return; this.nz(o, t, 0.07, 'bandpass', 700, 1.2, 0.7, 0.001); this.tn(o, t, 'sine', 220, 120, 0.06, 0.4, 0.001); },
+  tsWhiff(v = 0.35) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.08); if (!o) return; this.nz(o, t, 0.13, 'bandpass', 1100, 1.6, 0.5, 0.02, 2600); },
+  tsBell(v = 0.7, n = 1) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 1.5); if (!o) return; for (let i = 0; i < n; i++) this.metal(o, t + i * 0.35, 1450, 1.4, 0.6, [1, 2.76, 5.4, 8.9]); },
+  tsRing(v = 0.25) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 1.2); if (!o) return; this.tn(o, t, 'sine', 3200, 3150, 1.6, 0.25, 0.05); },
+  tsGrunt2(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.15); if (!o) return; this.tn(o, t, 'sawtooth', rand(110, 150), 80, 0.16, 0.3, 0.005); this.nz(o, t, 0.12, 'bandpass', 600, 2.5, 0.35, 0.005); },
+  tsChain(v = 0.4) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.2); if (!o) return; for (let i = 0; i < 4; i++) this.metal(o, t + i * 0.05, rand(2200, 3400), 0.05, 0.12, [1, 2.4]); },
+  tsTape(v = 0.4) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.2); if (!o) return; for (let i = 0; i < 5; i++) this.nz(o, t + i * 0.22, 0.16, 'bandpass', 2800, 1.2, 0.35, 0.01, 1800); },
+});
+/* ---------- иконки (рисуются на канвасе) ---------- */
+const TS_ICON = {};
+function tsIcon(kind, it) {
+  const key = kind + (it && it.D && it.D.label === 'ногу' ? 'L' : '') + (it && it.kind === 'can' && !it.full ? 'E' : ''); if (TS_ICON[key]) return TS_ICON[key];
+  const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d'); g.lineJoin = 'round';
+  const shadow = () => { g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(50, 84, 28, 6, 0, 0, 7); g.fill(); };
+  if (kind === 'ball') { shadow(); const gr = g.createRadialGradient(38, 34, 4, 48, 48, 38); gr.addColorStop(0, '#ffb070'); gr.addColorStop(0.55, '#e0661c'); gr.addColorStop(1, '#8a3008'); g.fillStyle = gr; g.beginPath(); g.arc(48, 48, 34, 0, 7); g.fill(); g.strokeStyle = '#2a1206'; g.lineWidth = 3; g.beginPath(); g.moveTo(14, 48); g.lineTo(82, 48); g.stroke(); g.beginPath(); g.moveTo(48, 14); g.lineTo(48, 82); g.stroke(); g.beginPath(); g.ellipse(48, 48, 16, 34, 0, 0, 7); g.stroke(); g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.ellipse(36, 30, 9, 5, -0.6, 0, 7); g.fill(); }
+  else if (kind === 'crate') { shadow(); g.fillStyle = '#c8965a'; g.beginPath(); g.moveTo(48, 12); g.lineTo(84, 28); g.lineTo(48, 44); g.lineTo(12, 28); g.closePath(); g.fill(); g.fillStyle = '#a8763e'; g.beginPath(); g.moveTo(12, 28); g.lineTo(48, 44); g.lineTo(48, 84); g.lineTo(12, 68); g.closePath(); g.fill(); g.fillStyle = '#8a5e2e'; g.beginPath(); g.moveTo(84, 28); g.lineTo(48, 44); g.lineTo(48, 84); g.lineTo(84, 68); g.closePath(); g.fill(); g.strokeStyle = '#5a3a18'; g.lineWidth = 3; for (const [a, b, cc, d] of [[12, 28, 48, 84], [48, 44, 12, 68], [84, 28, 48, 84], [48, 44, 84, 68]]) { g.beginPath(); g.moveTo(a, b); g.lineTo(cc, d); g.stroke(); } g.strokeStyle = 'rgba(0,0,0,.25)'; g.lineWidth = 1.5; for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(12, 28 + i * 10); g.lineTo(48, 44 + i * 10); g.stroke(); g.beginPath(); g.moveTo(48, 44 + i * 10); g.lineTo(84, 28 + i * 10); g.stroke(); } }
+  else if (kind === 'can') { shadow(); const col = it && it.m && it.m.children[0] && it.m.children[0].material.map ? '#2a8ae0' : '#e02a34'; const gr = g.createLinearGradient(28, 0, 68, 0); gr.addColorStop(0, '#3a0a0e'); gr.addColorStop(0.35, col); gr.addColorStop(0.55, '#ffffff'); gr.addColorStop(0.7, col); gr.addColorStop(1, '#3a0a0e'); g.fillStyle = gr; g.fillRect(28, 20, 40, 60); g.fillStyle = '#d8dce0'; g.beginPath(); g.ellipse(48, 20, 20, 6, 0, 0, 7); g.fill(); g.fillStyle = '#9aa0a8'; g.beginPath(); g.ellipse(48, 80, 20, 6, 0, 0, Math.PI); g.fill(); g.save(); g.translate(48, 52); g.rotate(-Math.PI / 2); g.fillStyle = '#fff'; g.font = 'italic 900 11px sans-serif'; g.textAlign = 'center'; g.fillText('ХОЛОДОК', 0, 4); g.restore(); if (it && !it.full) { g.fillStyle = 'rgba(0,0,0,.5)'; g.beginPath(); g.ellipse(52, 19, 5, 2, 0, 0, 7); g.fill(); } }
+  else if (kind === 'medkit') { shadow(); const gr = g.createLinearGradient(0, 22, 0, 80); gr.addColorStop(0, '#ffffff'); gr.addColorStop(1, '#c8ccd0'); g.fillStyle = gr; g.beginPath(); g.roundRect(14, 26, 68, 52, 9); g.fill(); g.strokeStyle = '#9aa0a8'; g.lineWidth = 2; g.stroke(); g.fillStyle = '#d8201a'; g.fillRect(41, 36, 14, 34); g.fillRect(31, 46, 34, 14); g.fillStyle = '#5a5e62'; g.beginPath(); g.roundRect(36, 16, 24, 12, 4); g.fill(); g.fillStyle = '#ffffff'; g.fillRect(40, 20, 16, 6); }
+  else if (kind === 'limb') { shadow(); const leg = it && it.D.label === 'ногу'; g.save(); g.translate(48, 48); g.rotate(-0.7); if (leg) { g.fillStyle = '#2a3448'; g.beginPath(); g.roundRect(-12, -38, 24, 56, 8); g.fill(); g.fillStyle = '#1a1a1a'; g.beginPath(); g.roundRect(-13, 14, 34, 16, 6); g.fill(); } else { g.fillStyle = '#3a4a64'; g.beginPath(); g.roundRect(-10, -38, 20, 34, 6); g.fill(); g.fillStyle = '#e8eaf0'; g.fillRect(-11, -6, 22, 6); g.fillStyle = '#e0b48c'; g.beginPath(); g.roundRect(-11, 0, 22, 26, 6); g.fill(); for (let i = 0; i < 4; i++) g.fillRect(-10 + i * 5.5, 24, 4.5, 12); } g.fillStyle = '#9a0a14'; g.beginPath(); g.ellipse(0, -38, 12, 5, 0, 0, 7); g.fill(); g.fillStyle = '#f0e8d8'; g.beginPath(); g.ellipse(0, -38, 4, 2, 0, 0, 7); g.fill(); g.restore(); g.fillStyle = 'rgba(160,0,0,.8)'; for (let i = 0; i < 5; i++) { g.beginPath(); g.arc(20 + Math.random() * 20, 22 + Math.random() * 16, 2 + Math.random() * 3, 0, 7); g.fill(); } }
+  return (TS_ICON[key] = c.toDataURL());
+}
+/* ---------- инвентарь ---------- */
+function tsAttach(it) { const R = tsBuildRig(), hs = tsHS() || 'R'; R[hs].wr.add(it.m); it.m.visible = true; it.m.position.set(0, 0.03 + it.D.r, 0.07); it.m.rotation.set(0, 0, 0); it.m.scale.setScalar(it.kind === 'limb' ? 0.8 : 1); if (it.kind === 'can') it.m.rotation.set(Math.PI / 2, 0, 0); if (it.kind === 'crate') it.m.position.set(hs === 'R' ? -0.12 : 0.12, 0.05 + it.D.r, 0.08); if (it.kind === 'limb') { it.m.position.set(0, 0.06, 0.12); it.m.rotation.set(Math.PI / 2, 0, 0); } if (it.kind === 'medkit') { it.m.position.set(0, 0.07, 0.07); it.m.scale.setScalar(0.55); } it.m.userData.tsOwn = true; }
+function tsStow() { const it = TS.held; if (!it) return; it.m.parent && it.m.parent.remove(it.m); TS.held = null; TS.sel = -1; }
+function tsInvFree() { return TS.inv.indexOf(null); }
+function tsInvSync() {
+  for (let i = 0; i < 3; i++) { const it = TS.inv[i]; if (it && (it.body || it.gone || TS.items.indexOf(it) < 0)) TS.inv[i] = null; }
+  if (TS.held && TS.inv.indexOf(TS.held) < 0) { const f = tsInvFree(); if (f >= 0) { TS.inv[f] = TS.held; TS.sel = f; } }
+  if (!TS.held) TS.sel = -1; else TS.sel = TS.inv.indexOf(TS.held);
+}
+function tsInvSel(i) {
+  if (TS.act || TS.punch || !tsHS()) return; tsInvSync();
+  const it = TS.inv[i]; if (TS.fight && TS.fight.on) { toast('🥊 Во время боя руки заняты'); return; }
+  if (TS.sel === i) { tsStow(); SFX.tsClick(0.25); TS.swapT = 0.3; tsInvDraw(); return; }
+  if (!it) return;
+  TS.swapT = 0.36; later(0.16, () => { tsStow(); TS.held = it; TS.sel = i; tsAttach(it); SFX.tsClick(0.3); tsInvDraw(); }); TS.fists = false;
+}
+function tsInvDraw() {
+  const box = document.getElementById('tsInv'); if (!box) return; tsInvSync();
+  for (let i = 0; i < 3; i++) { const el = box.children[i], it = TS.inv[i]; el.classList.toggle('sel', TS.sel === i && !!it); el.classList.toggle('full', !!it); const img = el.querySelector('img'), lab = el.querySelector('i'); if (it) { const src = tsIcon(it.kind, it); if (img.dataset.k !== src.length + it.kind) { img.src = src; img.dataset.k = src.length + it.kind; } img.style.display = 'block'; lab.textContent = it.kind === 'limb' ? (it.D.label === 'ногу' ? 'нога' : 'рука') : { ball: 'мяч', crate: 'ящик', can: it.full ? 'газировка' : 'пустая', medkit: 'аптечка' }[it.kind] || ''; } else { img.style.display = 'none'; lab.textContent = ''; } }
+}
+/* ---------- аптечка ---------- */
+function tsMedMesh() { const g = new THREE.Group(); const tex = cvTex(128, 96, (c) => { c.fillStyle = '#f4f6f8'; c.fillRect(0, 0, 128, 96); c.fillStyle = '#d8201a'; c.fillRect(54, 22, 20, 52); c.fillRect(38, 38, 52, 20); }); const b = new THREE.Mesh(tsRBox(0.26, 0.16, 0.18, 0.025), std({ color: 0xf0f2f4, roughness: 0.4 })); b.castShadow = true; g.add(b); const f = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.12), std({ map: tex, roughness: 0.4 })); f.position.z = 0.091; g.add(f); const h = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.008, 6, 12, Math.PI), std({ color: 0x4a4e52, roughness: 0.5 })); h.position.y = 0.08; g.add(h); return g; }
+TS_ITEM.medkit = { r: 0.1, mass: 1.2, mk: tsMedMesh, sh: () => new CANNON.Box(new CANNON.Vec3(0.13, 0.08, 0.09)), label: 'аптечку' };
+function tsBandage() { const it = TS.held; if (!it || it.kind !== 'medkit' || TS.act) return; tsAct('bandage', { dur: 2.4, at: 2.0, fn() { it.gone = true; TS.held = null; it.m.parent && it.m.parent.remove(it.m); const k = TS.items.indexOf(it); if (k >= 0) TS.items.splice(k, 1); player.hp = Math.min(100, player.hp + 40); TS.bleedT = 0; if (TS.clutch) TS.clutch.t = 99; banner('🩹 ПЕРЕВЯЗАНО', '+40 здоровья, кровь остановлена'); tsInvDraw(); }, ev: [[0.2, () => SFX.tsTape(0.5)], [1.2, () => SFX.tsTape(0.4)]] }); }
+/* ---------- ринг, груша, колокол ---------- */
+const TS_RING = { x0: -27.3, x1: -20.7, z0: 11.7, z1: 18.3 };
+const TS_FOES = [
+  { name: 'Вася «Новичок»', hp: 90, spd: 0.8, react: 0.2, cd: [1.4, 2.4], dmg: 0.7, combo: 0.1, shirt: 0x3a8a3a },
+  { name: 'Гриша «Молот»', hp: 120, spd: 1.0, react: 0.4, cd: [1.0, 1.8], dmg: 1.0, combo: 0.35, shirt: 0x2a5ad0 },
+  { name: 'Бульдог «Чемпион»', hp: 160, spd: 1.2, react: 0.6, cd: [0.7, 1.3], dmg: 1.3, combo: 0.6, shirt: 0xc02020 },
+];
+function tsBuild4() {
+  TS.inv = [null, null, null]; TS.sel = -1; TS.fight = null; if (TS.bot) tsBotRemove(); TS.fists = false; TS.punch = null;
+  const R = TS_RING, cx = (R.x0 + R.x1) / 2, cz = (R.z0 + R.z1) / 2, W = R.x1 - R.x0 + 0.6;
+  const mat = new THREE.Mesh(new THREE.BoxGeometry(W + 0.6, 0.04, W + 0.6), std({ roughness: 0.85, map: cvTex(512, 512, (g) => { g.fillStyle = '#1e4a8a'; g.fillRect(0, 0, 512, 512); g.fillStyle = '#2a5aa0'; g.fillRect(30, 30, 452, 452); for (let i = 0; i < 4000; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.08})`; g.fillRect(Math.random() * 512, Math.random() * 512, 2, 2); } g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 6; g.beginPath(); g.arc(256, 256, 70, 0, 7); g.stroke(); g.fillStyle = '#fff'; g.font = '900 44px sans-serif'; g.textAlign = 'center'; g.fillText('ТЕСТ-РИНГ', 256, 270); g.fillStyle = '#c82020'; g.fillRect(30, 30, 40, 40); g.fillStyle = '#2040c0'; g.fillRect(442, 442, 40, 40); }) }));
+  mat.position.set(cx, 0.02, cz); mat.receiveShadow = true; addMesh(mat);
+  const corners = [[R.x0, R.z0, 0x2040c0], [R.x1, R.z1, 0xc82020], [R.x0, R.z1, 0xf0f0f0], [R.x1, R.z0, 0xf0f0f0]];
+  for (const [x, z, c] of corners) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.5, 12), std({ color: 0xd0d4d8, metalness: 0.7, roughness: 0.3 })); p.position.set(x, 0.75, z); p.castShadow = true; addMesh(p); const pad = new THREE.Mesh(tsRBox(0.24, 1.1, 0.24, 0.06), std({ color: c, roughness: 0.5 })); pad.position.set(x, 0.8, z); pad.castShadow = true; addMesh(pad); }
+  const ropeC = [0xc82020, 0xf0f0f0, 0x2040c0];
+  for (let k = 0; k < 3; k++) { const y = 0.5 + k * 0.4, m = std({ color: ropeC[k], roughness: 0.6 }); for (const [ax, az, bx, bz] of [[R.x0, R.z0, R.x1, R.z0], [R.x1, R.z0, R.x1, R.z1], [R.x1, R.z1, R.x0, R.z1], [R.x0, R.z1, R.x0, R.z0]]) { const L = Math.hypot(bx - ax, bz - az), r = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, L, 8), m); r.position.set((ax + bx) / 2, y, (az + bz) / 2); r.rotation.z = Math.PI / 2; r.rotation.y = Math.atan2(-(bz - az), bx - ax); r.rotation.order = 'YZX'; r.castShadow = true; addMesh(r); } }
+  const spot = new THREE.SpotLight(0xfff4e0, 120, 18, 0.75, 0.5, 1.6); spot.position.set(cx, 7, cz); spot.target.position.set(cx, 0, cz); scene.add(spot); scene.add(spot.target); mapObjs.push(spot, spot.target);
+  // табурет и колокол
+  const bell = tsGrp(R.x1 + 0.9, 0, cz + 1.2); tsMesh(new THREE.CylinderGeometry(0.05, 0.08, 1.2, 10), std({ color: 0x2a2a2e, roughness: 0.5 }), 0, 0.6, 0, bell); const bm = tsMesh(new THREE.SphereGeometry(0.16, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), std({ color: 0xe0b030, metalness: 0.9, roughness: 0.25, side: THREE.DoubleSide }), 0, 1.25, 0, bell); bm.rotation.x = Math.PI / 2; bm.position.z = 0.12;
+  const board = tsGrp(R.x1 + 0.9, 0, cz - 1.4, -Math.PI / 2); tsMesh(new THREE.BoxGeometry(0.06, 1.6, 0.06), std({ color: 0x2a2a2e }), 0, 0.8, 0, board); const bt = tsMesh(new THREE.PlaneGeometry(1.1, 0.8), std({ roughness: 0.6, side: THREE.DoubleSide, map: cvTex(256, 186, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 256, 186); g.fillStyle = '#ffd84a'; g.font = '900 26px sans-serif'; g.textAlign = 'center'; g.fillText('🥊 БОИ', 128, 34); g.font = '700 16px sans-serif'; g.fillStyle = '#fff'; TS_FOES.forEach((f, i) => g.fillText(`${i + 1}. ${f.name}`, 128, 70 + i * 34)); }) }), 0, 1.7, 0.04, board); bt.castShadow = false;
+  tsInt({ id: 'bell', pos: new V3(R.x1 + 0.9, 1.2, cz + 1.2), r: 2.0, label: () => TS.fight && TS.fight.on ? null : `E — бой: ${TS_FOES[Math.min(TS.wins, TS_FOES.length - 1)].name}`, use() { tsFightStart(Math.min(TS.wins, TS_FOES.length - 1)); } });
+  // боксёрская груша на цепи
+  const frame = tsGrp(-26.5, 0, 22); const fm = std({ color: 0x2a2e34, metalness: 0.6, roughness: 0.4 }); tsMesh(new THREE.BoxGeometry(0.1, 2.6, 0.1), fm, -0.9, 1.3, 0, frame); tsMesh(new THREE.BoxGeometry(1.9, 0.1, 0.1), fm, 0, 2.6, 0, frame); solid(-27.4, 1.3, 22, 0.12, 2.6, 0.12);
+  const piv = new THREE.Group(); piv.position.set(0, 2.55, 0); frame.add(piv); const chain = tsMesh(new THREE.CylinderGeometry(0.01, 0.01, 0.6, 6), std({ color: 0x9aa0a8, metalness: 0.9 }), 0, -0.3, 0, piv); void chain;
+  const bagM = std({ roughness: 0.45, map: cvTex(256, 256, (g) => { g.fillStyle = '#8a1a1a'; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 3000; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.15})`; g.fillRect(Math.random() * 256, Math.random() * 256, 2, 2); } g.fillStyle = '#111'; g.fillRect(0, 20, 256, 14); g.fillRect(0, 222, 256, 14); g.fillStyle = '#ffd84a'; g.font = '900 30px sans-serif'; g.textAlign = 'center'; g.fillText('ГРУША', 128, 140); }) });
+  const bag = tsMesh(new THREE.CylinderGeometry(0.2, 0.2, 1.1, 20), bagM, 0, -1.15, 0, piv); void bag;
+  TS.bag2 = { piv, ax: 0, az: 0, vx: 0, vz: 0, c: new V3(-26.5, 1.4, 22), lastF: 0 };
+  // аптечки: в комнате на столе и у ринга
+  TS.medSpots = [[-18, 0.84, -8.2], [R.x1 + 0.9, 0.1, cz - 2.4]];
+}
+/* ---------- бот-боксёр ---------- */
+function tsGloveMesh(col) { const m = new THREE.Mesh(tsRBox(0.1, 0.1, 0.13, 0.04), std({ color: col, roughness: 0.35 })); m.castShadow = true; return m; }
+function tsBotRemove() { const F = TS.bot; if (!F) return; const n = F.n; try { n.dispose(); } catch (e) { scene.remove(n.root); } const i = npcs.indexOf(n); if (i >= 0) npcs.splice(i, 1); targetsDirty = true; TS.bot = null; }
+function tsFightStart(lv) {
+  if (TS.fight && TS.fight.on) return; if (!tsHS() || TS.lost.armL || TS.lost.armR) { toast('🩹 Для боя нужны обе руки — сначала пришейте'); return; }
+  if (TS.bot) tsBotRemove(); const D = TS_FOES[lv], R = TS_RING;
+  const n = spawnNPC('human', R.x0 + 1.2, R.z0 + 1.2, 0); if (!n) return; n.scripted = true; n.pos.set(R.x0 + 1.2, 0, R.z0 + 1.2);
+  for (const s of ['L', 'R']) { const h = n.parts['lArm' + s].hand; if (h) { const gl = tsGloveMesh(D.shirt); gl.position.set(0, -0.04, 0.01); h.add(gl); } }
+  if (n.parts.torso && n.parts.torso.mat) n.parts.torso.mat.color.setHex(0xe0b48c);
+  TS.bot = { n, D, lv, hp: D.hp, maxHp: D.hp, st: 'wait', t: 0, cd: 1.5, atk: null, block: 0, stag: 0, strafe: 1, strafeT: 2, kd: 0, down: false, cnt: 0, hs: 0, hsV: 0, hy: 0, hyV: 0, tb: 0, tbV: 0, guard: 1, dmgDealt: 0 };
+  tsStow(); TS.fists = true; player.pos.set(R.x1 - 1.2, 0, R.z1 - 1.2); player.yaw = Math.atan2(-(n.pos.x - player.pos.x), -(n.pos.z - player.pos.z)); player.pitch = 0; player.hp = 100; TS.fsta = 100;
+  TS.fight = { on: true, t: 0, time: 90, lv, pkd: 0, intro: 3, dealt: 0, taken: 0 };
+  banner(`🥊 ${D.name}`, 'Раунд 1 · 3…'); SFX.tsBell(0.6, 1); Sound.crowd && Sound.crowd(0.25); tsFightUi(true);
+}
+function tsFightEnd(win, why) {
+  const F = TS.fight; if (!F || !F.on) return; F.on = false; tsFightUi(false); SFX.tsBell(0.7, 3);
+  if (win) { TS.wins = Math.max(TS.wins, F.lv + 1); banner('🏆 ПОБЕДА', why); Sound.crowd && Sound.crowd(0.6); }
+  else banner('😵 ПОРАЖЕНИЕ', why);
+  later(5, () => { if (TS.bot && !(TS.fight && TS.fight.on)) tsBotRemove(); player.hp = 100; });
+  TS.fists = false; TS.block = false;
+}
+// удар бота по игроку
+function tsHitPlayer(type, F) {
+  const p = player.pos, n = F.n, dx = p.x - n.pos.x, dz = p.z - n.pos.z, d = Math.hypot(dx, dz); const face = Math.abs(angDiff(Math.atan2(dx, dz), n.yaw));
+  if (d > 1.3 || face > 0.55) { SFX.tsWhiff(0.35); return; }
+  const head = type !== 'body'; if (head && TS.crouch > 0.5) { SFX.tsWhiff(0.4); toast('💨 Уклон!'); return; }
+  let dmg = { jab: 5, cross: 9, hook: 12, upper: 14, body: 8 }[type] * F.D.dmg;
+  const pFace = Math.abs(angDiff(Math.atan2(-dx, -dz), player.yaw + Math.PI)) < 0.8;
+  if (TS.block && pFace) { dmg *= 0.15; TS.fsta = Math.max(0, TS.fsta - 8); SFX.tsBlockHit(0.6); TS.camPV -= 0.6; TS.blockHit = 0.25; }
+  else { SFX.tsPunch(0.8, dmg > 9); TS.camPV += (type === 'upper' ? 2.2 : -0.6) - dmg * 0.12; TS.camRV += (type === 'hook' ? (Math.random() < 0.5 ? -1 : 1) * 2.4 : rand(-0.8, 0.8)); shake = Math.max(shake, 0.12 + dmg * 0.02); flashScreen(`rgba(150,0,0,${clamp(dmg / 30, 0.15, 0.5)})`, 350); if (dmg > 8) screenBlood(0.12); if (dmg > 11) SFX.tsRing(0.2); TS.combo = 0; TS.hitT = 0.3; }
+  player.hp -= dmg; player.lastHurt = 0; TS.fight.taken += dmg; F.dmgDealt += dmg;
+  if (player.hp <= 0) { TS.fight.pkd++; if (TS.fight.pkd >= 2) { player.hp = 1; TS.knees = 0.01; tsFightEnd(false, `${F.D.name} отправил вас в нокаут`); } else { player.hp = 40; TS.knees = 0.01; TS.camPV -= 4; flashScreen('rgba(0,0,0,.9)', 1600); banner('😵 НОКДАУН', 'вставайте! ещё один — и поражение'); SFX.tsRing(0.35); F.atk = null; F.cd = 3; } }
+}
+// удар игрока по боту
+function tsHitBot(type, power) {
+  const F = TS.bot; const e = tsEyeP(), yaw = player.yaw;
+  // груша
+  const B = TS.bag2; if (B) { const w = B.piv.localToWorld(new V3(0, -1.15, 0)); const dx = w.x - e.x, dz = w.z - e.z, d = Math.hypot(dx, dz); if (d < 1.05 && Math.abs(angDiff(Math.atan2(-dx, -dz), yaw)) < 0.6) { const f = { jab: 1, cross: 1.6, hook: 1.8, upper: 1.4 }[type] * power; B.vx += dx / d * f * 1.4; B.vz += dz / d * f * 1.4; B.lastF = Math.round(f * 330 + rand(-20, 20)); SFX.tsPunch(0.8, f > 1.4); SFX.tsChain(0.3); toast(`💥 Сила удара: ${B.lastF} Н`); return true; } }
+  // предметы рядом
+  for (const it of TS.items) if (it.body) { const q = it.body.position, dx = q.x - e.x, dz = q.z - e.z, d = Math.hypot(dx, dz); if (d < 1.1 && Math.abs(q.y - (e.y - 0.4)) < 0.9 && Math.abs(angDiff(Math.atan2(-dx, -dz), yaw)) < 0.6) { it.body.wakeUp(); it.body.velocity.set(dx / d * 5 * power, 2 * power, dz / d * 5 * power); SFX.tsPunch(0.5, false); return true; } }
+  if (!F || F.down || !F.n.alive) return false; const n = F.n;
+  const hp = n.parts.head.mesh.getWorldPosition(new V3()), dx = hp.x - e.x, dz = hp.z - e.z, d = Math.hypot(dx, dz);
+  if (d > 1.3 || Math.abs(angDiff(Math.atan2(-dx, -dz), yaw)) > 0.5) return false;
+  const body = player.pitch < -0.25 || TS.crouch > 0.5; let dmg = { jab: 5, cross: 10, hook: 12, upper: 15 }[type] * power * (body ? 0.75 : 1) * (1 + Math.min(4, TS.combo) * 0.1);
+  if (F.block > 0 && !(type === 'upper' && Math.random() < 0.5) && !(type === 'hook' && Math.random() < 0.3)) { dmg *= 0.2; SFX.tsBlockHit(0.6); F.hsV -= 0.5; TS.camPV -= 0.3; TS.combo = 0; }
+  else if (!body && (type === 'jab' || type === 'cross') && Math.random() < F.D.react * 0.35 && !F.atk && F.stag <= 0) { SFX.tsWhiff(0.45); F.hyV += (Math.random() < 0.5 ? -1 : 1) * 6; toast('💨 Соперник уклонился'); return true; }
+  else {
+    SFX.tsPunch(0.9, dmg > 9); SFX.tsGrunt2(0.45); TS.combo = TS.comboT > 0 ? TS.combo + 1 : 1; TS.comboT = 0.9; if (TS.combo >= 2) toast(`🔥 Комбо ×${TS.combo}`);
+    if (body) { F.tbV += 5 + dmg * 0.35; F.stag = Math.max(F.stag, 0.35); } else if (type === 'hook') { F.hyV += (Math.random() < 0.5 ? -1 : 1) * (8 + dmg * 0.5); F.stag = 0.4; } else if (type === 'upper') { F.hsV -= 9 + dmg * 0.4; F.stag = 0.5; } else { F.hsV -= 5 + dmg * 0.45; F.stag = Math.max(F.stag, 0.25); }
+    const fx = Math.sin(n.yaw), fz = Math.cos(n.yaw); n.pos.x -= fx * dmg * 0.012; n.pos.z -= fz * dmg * 0.012; F.atk = null;
+    if (!body && dmg > 8) { bloodSpray(hp.clone().add(new V3(fx * 0.1, -0.03, fz * 0.1)), new V3(fx, 0.2, fz).normalize(), 6 + dmg | 0, 0.6, 0.5, 2.2, 0.003, 0.008); }
+    else for (let i = 0; i < 4; i++) spawnSprite(TEX.soft, hp.clone(), { color: 0xeef6ff, size: 0.05, grow: 1.2, life: 0.35, opacity: 0.7, vel: new V3(rand(-1, 1), rand(0, 1), rand(-1, 1)) });
+    shake = Math.max(shake, 0.05 + dmg * 0.006);
+  }
+  F.hp -= dmg; TS.fight && (TS.fight.dealt += dmg);
+  if (F.hp <= 0) tsBotDown(type);
+  return true;
+}
+function tsBotDown(type) {
+  const F = TS.bot, n = F.n; F.down = true; F.kd++; F.cnt = 0; F.atk = null; Sound.crowd && Sound.crowd(0.45);
+  n.goLimp(); const fx = Math.sin(n.yaw), fz = Math.cos(n.yaw); const hb = n.parts.head.body; if (hb) hb.applyImpulse(new CANNON.Vec3(-fx * 30, type === 'upper' ? 35 : 8, -fz * 30)); const tb = n.parts.torso.body; if (tb) tb.applyImpulse(new CANNON.Vec3(-fx * 40, 5, -fz * 40));
+  banner(F.kd >= 3 ? '💥 НОКАУТ!' : '💥 НОКДАУН!', F.kd >= 3 ? '' : 'рефери считает…');
+  if (F.kd >= 3) { later(1.2, () => tsFightEnd(true, `нокаут · ${F.D.name} не встаёт`)); return; }
+  F.getAt = F.kd === 1 ? rand(3, 6) : rand(6, 9.5); if (F.D.hp > 140 && F.kd === 1) F.getAt = rand(2, 4);
+}
+function tsBotPost(dt) {
+  const F = TS.bot; if (!F) return; const n = F.n, R = TS_RING, Fi = TS.fight;
+  if (F.down) {
+    if (!Fi || !Fi.on) return; const c0 = Math.floor(F.cnt); F.cnt += dt; const c1 = Math.floor(F.cnt); if (c1 !== c0 && c1 >= 1 && c1 <= 10) { banner(`${c1}`, F.kd >= 2 ? 'ещё нокдаун — и всё' : ''); SFX.tsClick(0.6); }
+    if (F.cnt >= F.getAt || (n.state === 'alive' && F.cnt > 1.5)) { if (n.state === 'alive' || n.revive('down', 1.2)) { n.scripted = true; F.down = false; F.hp = F.maxHp * (F.kd === 1 ? 0.5 : 0.3); F.stag = 1.4; F.cd = 2; banner('🥊 ВСТАЛ', 'бой продолжается'); } }
+    if (F.cnt >= 10 && F.down) { F.down = false; tsFightEnd(true, `нокаут · ${F.D.name} не успел встать`); }
+    return;
+  }
+  if (!n.alive || n.state !== 'alive') return;
+  const p = player.pos, dx = p.x - n.pos.x, dz = p.z - n.pos.z, d = Math.hypot(dx, dz) || 1, want = Math.atan2(dx, dz);
+  F.t += dt; F.stag = Math.max(0, F.stag - dt); F.block = Math.max(0, F.block - dt);
+  const fighting = Fi && Fi.on && Fi.intro <= 0;
+  n.yaw += clamp(angDiff(n.yaw, want), -dt * 6, dt * 6);
+  let vx = 0, vz = 0; const fx = dx / d, fz = dz / d, sx = -fz, sz = fx, spd = F.D.spd;
+  if (n.pose === 'stand') {
+    if (!fighting) { vx = 0; vz = 0; }
+    else if (F.stag > 0) { vx = -fx * 0.9; vz = -fz * 0.9; }
+    else { const range = 0.95; if (d > range + 0.2) { vx = fx * 1.8 * spd; vz = fz * 1.8 * spd; } else if (d < range - 0.2) { vx = -fx * 1.2; vz = -fz * 1.2; } if ((F.strafeT -= dt) < 0) { F.strafeT = rand(0.8, 2.2); F.strafe = Math.random() < 0.5 ? -1 : 1; } vx += sx * F.strafe * 0.7 * spd; vz += sz * F.strafe * 0.7 * spd; if (F.atk) { vx *= 0.3; vz *= 0.3; } }
+    n.pos.x += vx * dt; n.pos.z += vz * dt; n.pos.x = clamp(n.pos.x, R.x0 + 0.4, R.x1 - 0.4); n.pos.z = clamp(n.pos.z, R.z0 + 0.4, R.z1 - 0.4);
+    const dd = Math.hypot(p.x - n.pos.x, p.z - n.pos.z); if (dd < 0.72) { n.pos.x -= (p.x - n.pos.x) / dd * (0.72 - dd); n.pos.z -= (p.z - n.pos.z) / dd * (0.72 - dd); }
+    n.speed = Math.hypot(vx, vz); n.root.position.copy(n.pos); n.root.rotation.y = n.yaw;
+    // реакция на замах игрока: блок
+    if (fighting && TS.punch && TS.punch.t < 0.06 && !TS.punch.seen) { TS.punch.seen = true; if (!F.atk && Math.random() < F.D.react) F.block = 0.45; }
+    // атака
+    if (fighting && F.stag <= 0) { F.cd -= dt; if (!F.atk && F.cd <= 0 && d < 1.35) { const r = Math.random(); const type = r < 0.38 ? 'jab' : r < 0.62 ? 'cross' : r < 0.8 ? 'hook' : r < 0.92 ? 'upper' : 'body'; F.atk = { type, t: 0, wind: rand(0.16, 0.3) / spd, hit: false }; F.cd = rand(F.D.cd[0], F.D.cd[1]); SFX.tsGrunt2(0.2 * dv(n.pos) * 2); } }
+    if (F.atk) { const A = F.atk; A.t += dt; if (!A.hit && A.t >= A.wind + 0.08) { A.hit = true; tsHitPlayer(A.type, F); } if (A.t > A.wind + 0.38) { F.atk = null; if (Math.random() < F.D.combo) { F.cd = 0.05; } } }
+  }
+  // пружины реакций: голова назад/вбок, корпус сгибается
+  F.hsV += (-F.hs * 60 - F.hsV * 9) * dt; F.hs += F.hsV * dt; F.hyV += (-F.hy * 50 - F.hyV * 8) * dt; F.hy += F.hyV * dt; F.tbV += (-F.tb * 40 - F.tbV * 8) * dt; F.tb += F.tbV * dt;
+  // раунд
+  if (Fi && Fi.on) { if (Fi.intro > 0) { const a = Math.ceil(Fi.intro); Fi.intro -= dt; const b = Math.ceil(Fi.intro); if (a !== b) { if (b > 0) banner(`${b}`, ''); else { banner('🥊 БОЙ!', ''); SFX.tsBell(0.7, 1); } } } else { Fi.time -= dt; if (Fi.time <= 0) { const win = Fi.dealt > Fi.taken; tsFightEnd(win, `решение судей · нанесено ${Fi.dealt | 0} / получено ${Fi.taken | 0}`); } } }
+}
+// поза бота поверх анимации (вызывается после обновления NPC)
+function tsBotPose() {
+  const F = TS.bot; if (!F || F.down) return; const n = F.n; if (!n.alive || n.state !== 'alive' || n.pose !== 'stand') return; const P = n.parts, set = (k, x, y, z) => { if (P[k] && !P[k].gone) P[k].pivot.rotation.set(x, y, z); };
+  const A = F.atk; let L = { u: [-0.6, -0.35, 0.15], l: [-2.15, 0, 0] }, Rr = { u: [-0.6, 0.35, -0.15], l: [-2.15, 0, 0] }, tw = 0, tx = 0.12, hd = [0.1, 0, 0];
+  if (F.block > 0) { L = { u: [-0.9, -0.55, 0.1], l: [-2.5, 0, 0] }; Rr = { u: [-0.9, 0.55, -0.1], l: [-2.5, 0, 0] }; tx = 0.25; hd = [0.35, 0, 0]; }
+  if (A) { const w = A.t < A.wind ? A.t / A.wind : 0, s = A.t >= A.wind ? clamp((A.t - A.wind) / 0.09, 0, 1) * clamp(1 - (A.t - A.wind - 0.14) / 0.2, 0, 1) : 0;
+    if (A.type === 'jab') { L = { u: [lerp(-0.6 + w * 0.15, -1.55, s), lerp(-0.35, -0.12, s), 0.12], l: [lerp(-2.15, -0.1, s), 0, 0] }; tw = -0.3 * s; }
+    else if (A.type === 'cross' || A.type === 'body') { const lo = A.type === 'body' ? 0.5 : 0; Rr = { u: [lerp(-0.6 + w * 0.25, -1.5 + lo, s), lerp(0.35, 0.15, s), -0.12], l: [lerp(-2.15, -0.12, s), 0, 0] }; tw = 0.15 * w + 0.45 * s; tx += lo * 0.3 * s; }
+    else if (A.type === 'hook') { Rr = { u: [lerp(-0.6, -1.35, Math.max(w, s)), lerp(0.35, 0.95, s) - w * 0.4, lerp(-0.15, -1.1, Math.max(w * 0.7, s))], l: [lerp(-2.15, -1.5, Math.max(w, s)), 0, 0] }; tw = -0.25 * w + 0.6 * s; }
+    else if (A.type === 'upper') { Rr = { u: [lerp(-0.6, -0.2, w) + (-0.9) * s, 0.25, -0.1], l: [lerp(-2.15, -1.9, w) - 0.6 * s, 0, 0] }; tx = 0.12 + 0.2 * w - 0.25 * s; tw = 0.3 * s; } }
+  set('uArmL', ...L.u); set('lArmL', ...L.l); set('uArmR', ...Rr.u); set('lArmR', ...Rr.l);
+  P.torso.pivot.rotation.set(tx + F.tb * 0.6 - F.hs * 0.15, tw + F.hy * 0.2, 0); if (P.head && !P.head.gone) P.head.pivot.rotation.set(hd[0] + F.hs * 0.9, hd[1] + F.hy, F.hy * 0.3);
+  if (n.speed < 0.3) { set('uLegL', -0.3, 0, 0.08); set('lLegL', 0.45, 0, 0); set('uLegR', 0.15, 0, -0.08); set('lLegR', 0.4, 0, 0); P.pelvis.pivot.position.y -= 0.05; }
+}
+/* ---------- удары игрока ---------- */
+const TS_PUNCH = { jab: { side: 'L', cost: 7, dur: 0.3, at: 0.11, pow: 1 }, cross: { side: 'R', cost: 12, dur: 0.38, at: 0.14, pow: 1 }, hook: { side: 'R', cost: 15, dur: 0.44, at: 0.18, pow: 1 }, upper: { side: 'R', cost: 16, dur: 0.46, at: 0.2, pow: 1 } };
+function tsPunch(type) {
+  if (!TS.on || TS.punch || TS.act || TS.climb || TS.sit) return; const P = TS_PUNCH[type]; if (TS.lost['arm' + P.side]) return;
+  if (TS.held) { tsStow(); tsInvDraw(); } TS.fists = true;
+  const tired = TS.fsta < P.cost; TS.fsta = Math.max(0, TS.fsta - P.cost); TS.punch = { type, t: 0, dur: P.dur * (tired ? 1.5 : 1), at: P.at * (tired ? 1.4 : 1), pow: tired ? 0.45 : 1, done: false };
+  SFX.tsWhiff(0.25); if (type === 'cross' || type === 'hook') TS.camRV += type === 'hook' ? -1.4 : -0.7; TS.lastPunchT = 0;
+}
+function tsFightUi(on) {
+  const h = TS.hud; if (!h) return; let fh = document.getElementById('tsFH');
+  if (!fh) { fh = document.createElement('div'); fh.id = 'tsFH'; fh.innerHTML = '<div class="b me"><s>ВЫ</s><u><b></b></u><u class="st"><b></b></u></div><div class="tm">1:30</div><div class="b op"><s></s><u><b></b></u></div>'; h.appendChild(fh); }
+  fh.style.display = on ? 'flex' : 'none'; document.body.classList.toggle('ts-fight', !!on);
+}
+function tsFightHud() {
+  const fh = document.getElementById('tsFH'); const F = TS.fight, B = TS.bot; const box = document.getElementById('tsF'); if (box) box.style.display = TS.fists || (F && F.on) ? 'grid' : 'none';
+  if (!fh || !F || !F.on || !B) return; fh.querySelector('.me u:not(.st) b').style.width = clamp(player.hp, 0, 100) + '%'; fh.querySelector('.me .st b').style.width = TS.fsta + '%'; fh.querySelector('.op s').textContent = B.D.name; fh.querySelector('.op u b').style.width = clamp(B.hp / B.maxHp * 100, 0, 100) + '%';
+  const t = Math.max(0, F.time); fh.querySelector('.tm').textContent = F.intro > 0 ? Math.ceil(F.intro) : `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+}
+/* ---------- руки: стойка, удары, блок, смена предмета (координаты камеры) ---------- */
+function tsVM4(o, dt) {
+  const R = TS.rig; if (TS.swapT > 0) { TS.swapT = Math.max(0, TS.swapT - dt); const k = Math.sin(Math.PI * (1 - TS.swapT / 0.36)); const hs = tsHS() || 'R'; o[hs] = [o[hs][0], o[hs][1] - 0.22 * k, o[hs][2] + 0.1 * k]; }
+  // перчатки на руках в боевом режиме
+  const gl = TS.fists && !TS.held; tsGloves(gl);
+  if (!gl) return;
+  const tr = TS.fsta < 25 ? Math.sin(performance.now() / 90) * 0.006 : 0, bob = Math.sin(TS.bob) * 0.012;
+  let Lp = [-0.15 + tr, -0.12 + bob, -0.48], Rp = [0.16, -0.15 + bob, -0.44];
+  if (TS.block) { Lp = [-0.07, -0.04, -0.3]; Rp = [0.07, -0.05, -0.29]; }
+  if (TS.blockHit > 0) { TS.blockHit -= dt; Lp[2] += 0.05; Rp[2] += 0.05; }
+  if (TS.hitT > 0) { TS.hitT -= dt; Lp[0] -= 0.05; Rp[0] += 0.06; Lp[1] -= 0.05; Rp[1] -= 0.05; }
+  const P = TS.punch; if (P) { P.t += dt; const def = TS_PUNCH[P.type], k1 = clamp(P.t / P.at, 0, 1), k2 = clamp((P.t - P.at - 0.03) / (P.dur - P.at - 0.03), 0, 1), e = tsEase(k1) * (1 - tsEase(k2));
+    if (P.type === 'jab') Lp = tsMix(Lp, [-0.03, -0.03, -0.74], e);
+    else if (P.type === 'cross') Rp = tsMix(Rp, [0.02, -0.03, -0.76], e);
+    else if (P.type === 'hook') { const a = tsEase(k1); Rp = tsMix(Rp, tsMix([0.38, -0.02, -0.42], [-0.06, -0.02, -0.56], a), Math.max(e, 0.0001) > 0 ? 1 - tsEase(k2) : 0); if (k1 < 1) R.R.hz = new V3(-1, 0, -0.4).normalize(); }
+    else if (P.type === 'upper') { const a = tsEase(k1); Rp = tsMix(Rp, tsMix([0.1, -0.3, -0.36], [0.03, 0.05, -0.56], a), 1 - tsEase(k2)); }
+    if (!P.done && P.t >= P.at) { P.done = true; if (!tsHitBot(P.type, P.pow)) SFX.tsWhiff(0.35); }
+    if (P.t >= P.dur) TS.punch = null; void def; }
+  if (!TS.lost.armL) { o.L = Lp; o.curlL = 1; R.L.hz = R.L.hz || new V3(0.05, 0.5, -1).normalize(); R.L.hy = new V3(1, 0, 0.2); }
+  if (!TS.lost.armR) { o.R = Rp; o.curlR = 1; R.R.hz = R.R.hz || new V3(-0.05, 0.5, -1).normalize(); R.R.hy = new V3(-1, 0, 0.2); }
+}
+function tsGloves(on) {
+  const R = TS.rig; if (!R) return; if (!TS.gloves) { TS.gloves = {}; for (const s of ['R', 'L']) { const g = tsGloveMesh(0xc81e1e); g.scale.set(0.82, 0.8, 0.82); g.position.set(0, 0.0, 0.05); g.userData.tsOwn = true; R[s].wr.add(g); g.visible = false; TS.gloves[s] = g; } }
+  for (const s of ['R', 'L']) { const A = R[s], g = TS.gloves[s]; if (g.visible === on) continue; g.visible = on; for (const f of A.fingers) f.visible = !on; A.th.visible = !on; A.palm.visible = !on; }
+}
+/* ---------- кадр ---------- */
+function tsPost4(dt) {
+  TS.lastDt = dt; tsInvSync(); if (!TS.medDone && TS.medSpots && TS.items.length) { TS.medDone = true; for (const [x, y, z] of TS.medSpots) tsItemAt('medkit', x, y, z); }
+  TS.comboT = Math.max(0, TS.comboT - dt); TS.fsta = clamp(TS.fsta + dt * (TS.punch ? 0 : TS.block ? 7 : 16), 0, 100);
+  if (TS.fsta < 20 && (TS.fbrT = (TS.fbrT || 0) - dt) < 0) { TS.fbrT = 1.1; SFX.tsBreath(0.25); }
+  if (TS.block && TS.fists) TS.fsta = Math.max(0, TS.fsta - dt * 2);
+  // в бою игрок не выходит за канаты
+  const F = TS.fight; if (F && F.on) { const R = TS_RING, p = player.pos; p.x = clamp(p.x, R.x0 + 0.35, R.x1 - 0.35); p.z = clamp(p.z, R.z0 + 0.35, R.z1 - 0.35); if (F.intro > 0) { player.vel.x = player.vel.z = 0; } TS.fists = true; }
+  tsBotPost(dt);
+  // груша: маятник
+  const B = TS.bag2; if (B) { B.vx += (-B.ax * 14 - B.vx * 0.6) * dt; B.vz += (-B.az * 14 - B.vz * 0.6) * dt; B.ax += B.vx * dt; B.az += B.vz * dt; B.ax = clamp(B.ax, -0.9, 0.9); B.az = clamp(B.az, -0.9, 0.9); B.piv.rotation.set(-B.az, 0, B.ax); }
+  if ((TS.invT = (TS.invT || 0) - dt) < 0) { TS.invT = 0.25; tsInvDraw(); tsFightHud(); }
+}
+
+window.addEventListener('keyup', (e) => { if (e.code === 'KeyB') TS.block = false; });
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
@@ -23111,7 +23390,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { get cutT() { return story.cut ? story.cut.t : -1; }, set cutT(v) { if (story.cut) story.cut.t = v; }, MONS, MV, MIT, MVP, MVG, SFX, DOG, H2, SKN, SKINS, HOUSE_MAPS, mvUse, mvDraw, monsBotKill, mvActTrap, mvActBoard, mvActLamp, mvActSalt, mvActPill, mvActEnergy, mvActBat, mvActFlare, mvActSmoke, mvActBone, mvActAdren, mvActFlash, get touch() { return touch; }, MILK, MILK_META, MK, MP, milkStart, milkPage, milkCaseOpen, milkRoll, milkW, milkPct, milkAdmItems, milkPick, TS, tsKeyNear, tsInteract, tsGest, tsThrow, tsCrouch, tsFlashT, tsHealBtn, tsChop, tsLabel2, tsNear2, tsStand, tsAct, get player() { return player; }, get eyeObj() { return eye; }, get touchS() { return touch; }, get mapId() { return mapId; }, renderer, sun, settings, scene, bloodSpray, sparks, screenBlood, spawnSprite, tracer, TEX, MAK, MAK_SAVE, startCh3, makStage, makTimeStop, makHook, makPunch, makFlyToggle, updMak, makHurt, scpPuzzle, updScp, scpQteHit, scpLockDoor, scpKillPlayer, MC, scpMonBegin, scpMonRage, SCP, SCP_META, scpStart, scpGen, scpRage, scpFinishTerm, scpUseTerm, milkEnd, milkAward, updMilk, milkFire, milkPortrait, DREAM, DWP, dreamBegin, dreamCheck, updDream, dreamFinish, dreamSay, dreamStalkSpawn, dreamHands, mvBarSync, mvUiShow, mvSkinApply, mvTrapAt, mvBotJob, monsProbeTick, monsPickWin, houseFloorY, crystalsAdd, skinCaseMenu, skinCaseOpen, skinCollection, emotePlay, emoteWheel, dogStart, monsBotRevive, mvSaltPlace, mvLampPlace, monsRoomPts, winY, mvKey, mvSet, get player() { return player; }, get camera() { return camera; }, get settings() { return settings; }, LOB, lobbyStart, lobAction, lobBotAdd, monsChat, chatSend, chatToggle, chatNorm, MONS_ACH, monsAchGive, monsCnt, monsTvShow, monsScareTick, monsStormTick, monsPhoneEnsure, lobSpinMenu, lobTasksMenu, MON_WIN, MON_KINDS, winIn, winOut, roomOf, anyPath, monsBreach, monsSunrise, monsUse, monsSpawnPicks, monsPowerOut, monsPowerOn, MONS_META, MONS_CLS, monsTaskInc, monsCoins, monsPlaceTrap, monsBoardWin, monsGhostStart, monsRevive, monsMenu, monsClsMenu, monsStart, monsBegin, monsCut, monsOver, monsDoorSet, monsHideIn, monsAction, monsPickEvent, mkNoob, mkMonster, loadMap, resume, openSpawn, get spc() { return spc; }, spRender, wpBuildSample, spawnAtAim, get state() { return state; }, DACHA, dachaBlast, applyNewLook, spawnNPC, D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, vehPlaceRamp, vehSpec, vehGround, vehPhys, makeCar, vehRemove, vehAI, vehCollide, vehTrackIdx, vehBox, obbHit, vehFlip, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { get cutT() { return story.cut ? story.cut.t : -1; }, set cutT(v) { if (story.cut) story.cut.t = v; }, MONS, MV, MIT, MVP, MVG, SFX, DOG, H2, SKN, SKINS, HOUSE_MAPS, mvUse, mvDraw, monsBotKill, mvActTrap, mvActBoard, mvActLamp, mvActSalt, mvActPill, mvActEnergy, mvActBat, mvActFlare, mvActSmoke, mvActBone, mvActAdren, mvActFlash, get touch() { return touch; }, MILK, MILK_META, MK, MP, milkStart, milkPage, milkCaseOpen, milkRoll, milkW, milkPct, milkAdmItems, milkPick, TS, tsKeyNear, tsInteract, tsGest, tsThrow, tsCrouch, tsFlashT, tsHealBtn, tsChop, tsInvSel, tsPunch, tsFightStart, tsInvDraw, tsLabel2, tsNear2, tsStand, tsAct, get player() { return player; }, get eyeObj() { return eye; }, get touchS() { return touch; }, get mapId() { return mapId; }, renderer, sun, settings, scene, bloodSpray, sparks, screenBlood, spawnSprite, tracer, TEX, MAK, MAK_SAVE, startCh3, makStage, makTimeStop, makHook, makPunch, makFlyToggle, updMak, makHurt, scpPuzzle, updScp, scpQteHit, scpLockDoor, scpKillPlayer, MC, scpMonBegin, scpMonRage, SCP, SCP_META, scpStart, scpGen, scpRage, scpFinishTerm, scpUseTerm, milkEnd, milkAward, updMilk, milkFire, milkPortrait, DREAM, DWP, dreamBegin, dreamCheck, updDream, dreamFinish, dreamSay, dreamStalkSpawn, dreamHands, mvBarSync, mvUiShow, mvSkinApply, mvTrapAt, mvBotJob, monsProbeTick, monsPickWin, houseFloorY, crystalsAdd, skinCaseMenu, skinCaseOpen, skinCollection, emotePlay, emoteWheel, dogStart, monsBotRevive, mvSaltPlace, mvLampPlace, monsRoomPts, winY, mvKey, mvSet, get player() { return player; }, get camera() { return camera; }, get settings() { return settings; }, LOB, lobbyStart, lobAction, lobBotAdd, monsChat, chatSend, chatToggle, chatNorm, MONS_ACH, monsAchGive, monsCnt, monsTvShow, monsScareTick, monsStormTick, monsPhoneEnsure, lobSpinMenu, lobTasksMenu, MON_WIN, MON_KINDS, winIn, winOut, roomOf, anyPath, monsBreach, monsSunrise, monsUse, monsSpawnPicks, monsPowerOut, monsPowerOn, MONS_META, MONS_CLS, monsTaskInc, monsCoins, monsPlaceTrap, monsBoardWin, monsGhostStart, monsRevive, monsMenu, monsClsMenu, monsStart, monsBegin, monsCut, monsOver, monsDoorSet, monsHideIn, monsAction, monsPickEvent, mkNoob, mkMonster, loadMap, resume, openSpawn, get spc() { return spc; }, spRender, wpBuildSample, spawnAtAim, get state() { return state; }, DACHA, dachaBlast, applyNewLook, spawnNPC, D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, vehPlaceRamp, vehSpec, vehGround, vehPhys, makeCar, vehRemove, vehAI, vehCollide, vehTrackIdx, vehBox, obbHit, vehFlip, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
