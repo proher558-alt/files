@@ -21888,7 +21888,11 @@ function tsSetArm(A, target, curl, wristRot, dt) {
   _tsM4.lookAt(T, sh.position, _tsUP); _tsQ.setFromRotationMatrix(_tsM4);
   _tsQ.multiply(_tsQa.setFromAxisAngle(_tsZ, side * (C.roll + (A.roll || 0)))).multiply(_tsQa.setFromAxisAngle(_tsX, alpha));
   const k = Math.min(1, dt * 16); sh.quaternion.slerp(_tsQ, k); A.el.rotation.x = lerp(A.el.rotation.x, -bend, k);
-  A.wr.rotation.z = lerp(A.wr.rotation.z, side * C.pron + wristRot, Math.min(1, dt * 10)); A.wr.rotation.x = lerp(A.wr.rotation.x, A.wrX || 0, Math.min(1, dt * 10));
+  // кисть ориентируется сама: пальцы вперёд, ладонь вниз-внутрь (или к предмету/стене), большой палец с внутренней стороны
+  { const dir = _tsV2.subVectors(T, sh.position).normalize(), Z = A.hz ? A.hz.clone() : new V3(-side * 0.12, 0.06, -1).normalize().lerp(dir, 0.3).normalize();
+    const Y = A.hy ? A.hy.clone() : A.palmUp ? new V3(-side * 0.85, 0.5, 0) : new V3(-side * 0.45, -0.9, 0); Y.addScaledVector(Z, -Y.dot(Z)).normalize(); const X = new V3().crossVectors(Y, Z);
+    const want = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z)); want.multiply(_tsQa.setFromAxisAngle(_tsZ, wristRot * side)); if (A.wrX) want.multiply(_tsQa.setFromAxisAngle(_tsX, A.wrX));
+    A.el.updateMatrix(); const par = sh.quaternion.clone().multiply(A.el.quaternion); A.wr.quaternion.slerp(par.invert().multiply(want), Math.min(1, dt * 14)); }
   for (let i = 0; i < A.fingers.length; i++) A.fingers[i].rotation.x = lerp(A.fingers[i].rotation.x, -(A.point && i > 0 ? 1 : A.point ? 0 : clamp(curl + (A.spread ? (i - 1.5) * 0.06 : 0), 0, 1.2)) * 1.5, Math.min(1, dt * 12));
   A.th.rotation.x = lerp(A.th.rotation.x, -curl * 0.8, Math.min(1, dt * 12));
 }
@@ -22059,7 +22063,7 @@ function tsActStep(o, dt) {
 }
 /* ---------- руки: дополнительные анимации (вызывается из tsVM) ---------- */
 function tsVM2(o, dt) {
-  const R = TS.rig; R.R.spread = R.L.spread = false;
+  const R = TS.rig; R.R.spread = R.L.spread = false; for (const s of ['R', 'L']) { R[s].hz = R[s].hy = null; R[s].palmUp = false; }
   // перевод в «пространство камеры» (tsVM добавляет +0.3 по Y при вызове tsSetArm)
   o.R = [o.R[0], o.R[1] + 0.3, o.R[2]]; o.L = [o.L[0], o.L[1] + 0.3, o.L[2]];
   const sp = Math.hypot(player.vel.x, player.vel.z), now = performance.now() / 1000;
@@ -22077,13 +22081,14 @@ function tsVM2(o, dt) {
   // удар руками о землю при жёстком приземлении
   if (TS.slam > 0) { const k = Math.sin(Math.PI * clamp(1 - TS.slam, 0, 1)); o.R = tsMix(o.R, [0.22, -0.36, -0.42], k); o.L = tsMix(o.L, [-0.22, -0.36, -0.42], k); o.curlR = o.curlL = 0; R.R.spread = R.L.spread = true; TS.slam = Math.max(0, TS.slam - dt * 1.6); }
   // упор ладонью в стену
-  if (TS.wall > 0.01 && TS.wallP && !TS.act) { const l = tsLoc(TS.wallP); o.L = tsMix(o.L, l, TS.wall); o.curlL = 0; o.wristL = -0.9 * TS.wall; R.L.spread = true; }
+  if (TS.wall > 0.01 && TS.wallP && !TS.act) { const l = tsLoc(TS.wallP); o.L = tsMix(o.L, l, TS.wall); o.curlL = 0; R.L.spread = true; if (TS.wall > 0.5) { R.L.hz = new V3(0.1, 1, -0.3).normalize(); R.L.hy = new V3(0, 0, -1); } }
   // лестница: руки по очереди перехватывают ступени
   if (TS.climb) { const C = TS.climb, ph = C.y / TS.lad.rung, rr = Math.floor(ph), fr = ph - rr, L = TS.lad; const rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw), mk = (side, off) => { const ry = (Math.floor((C.y + 1.45) / L.rung) + off) * L.rung, sg = side === 'R' ? 0.24 : -0.24; return tsLoc(new V3(C.x + rx * sg, ry, L.z + rz * sg)); }; const odd = rr % 2; o.R = tsMix(mk('R', odd ? 1 : 0), mk('R', 2), odd ? 0 : tsEase(fr)); o.L = tsMix(mk('L', odd ? 0 : 1), mk('L', 2), odd ? tsEase(fr) : 0); o.curlR = odd ? 0.95 : 0.95 - Math.sin(Math.PI * fr) * 0.8; o.curlL = !odd ? 0.95 : 0.95 - Math.sin(Math.PI * fr) * 0.8; o.wristR = o.wristL = 0; }
   // сидя: руки на коленях
   if (TS.sit) { o.R = tsMix(o.R, [0.16, -0.38, -0.32], TS.sit.k); o.L = tsMix(o.L, [-0.16, -0.38, -0.32], TS.sit.k); o.curlR = o.curlL = 0.3; }
   // предмет в руке
-  if (TS.held && !TS.act) { const it = TS.held; if (it.D.heavy) { o.R = tsMix(o.R, [0.14, -0.15, -0.42], 1); o.L = tsMix(o.L, [-0.3, -0.15, -0.44], 1); o.curlR = o.curlL = 0.55; } else { const hs = tsHS() || 'R', g = hs === 'R' ? 1 : -1; o[hs] = tsMix(o[hs], [0.22 * g, -0.13, -0.42], 1); o['curl' + hs] = it.kind === 'ball' ? 0.45 : 0.85; } }
+  if (TS.held) R[tsHS() || 'R'].palmUp = true; if (TS.flash && TS.flash.m.visible) R.L.palmUp = true;
+  if (TS.held && !TS.act) { const it = TS.held; if (it.D.heavy) { o.R = tsMix(o.R, [0.14, -0.15, -0.42], 1); o.L = tsMix(o.L, [-0.3, -0.15, -0.44], 1); o.curlR = o.curlL = 0.55; } else { const hs = tsHS() || 'R', g = hs === 'R' ? 1 : -1; o[hs] = tsMix(o[hs], [0.26 * g, -0.18, -0.5], 1); o['curl' + hs] = it.kind === 'ball' ? 0.45 : 0.85; } }
   if (TS.flash) { const fo = TS.flashOn ? [-0.2, -0.1, -0.46] : [-0.22, -0.2, -0.38]; if (!TS.climb && !(TS.act && TS.act.kind === 'lever') && !(TS.held && TS.held.D.heavy)) { o.L = tsMix(o.L, fo, 1); o.curlL = 0.9; } }
   if (TS.act) tsActStep(o, dt);
   tsVM3(o, dt);
@@ -22098,7 +22103,7 @@ function tsBody2() {
   const A = avatar; if (!A) return;
   if (!(mapId === 'testsite' && TS.on && A.state === 'alive' && !view3() && !VEH.in)) { if (TS.bodyHid.length) tsBodyUndo(); return; }
   A.root.visible = true; if (A.held) A.held.visible = false;
-  if (!TS.bodyHid.length) for (const n of ['head', 'uArmL', 'uArmR', 'lArmL', 'lArmR']) { const P = A.parts[n]; if (P && !P.gone && P.mesh.visible) { P.mesh.visible = false; TS.bodyHid.push(P); } }
+  if (!TS.bodyHid.length) for (const n of ['head', 'torso', 'uArmL', 'uArmR', 'lArmL', 'lArmR']) { const P = A.parts[n]; if (P && !P.gone && P.mesh.visible) { P.mesh.visible = false; TS.bodyHid.push(P); } }
   const P = A.parts, c = Math.max(TS.crouch, Math.min(1, (TS.camDropT || 0) / 0.42)), fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
   if (TS.sit) { const S = TS.sit, k = S.k; A.root.position.set(lerp(player.pos.x, S.x - S.fx * 0.06, k), player.pos.y, lerp(player.pos.z, S.z - S.fz * 0.06, k)); A.root.rotation.y = S.yaw; return; }
   const down = clamp((-player.pitch - 0.3) / 0.9, 0, 1), back = TS.cfg.back + down * TS.cfg.backDown + c * 0.12; A.root.position.set(player.pos.x - fx * back, player.pos.y, player.pos.z - fz * back);
@@ -22278,6 +22283,7 @@ function tsLimbItem(mesh, label, len) {
 }
 function tsGiveLimb(it, at) {
   // отрубленная часть — в свободную руку; если рук нет — падает на землю
+  scene.add(it.m); const q = at.clone(); q.y = Math.max(q.y, 0.3); it.m.position.copy(q); tsDrop(it, q, new V3(rand(-0.8, 0.8), 1.2, rand(-0.8, 0.8)), 6); return;
   const hs = tsHS();
   if (TS.held) { const old = TS.held; TS.held = null; old.m.parent && old.m.parent.remove(old.m); const q = at.clone(); q.y = Math.max(q.y, 0.4); scene.add(old.m); old.m.position.copy(q); tsDrop(old, q, new V3(rand(-1, 1), 1, rand(-1, 1)), 3); }
   if (!hs) { scene.add(it.m); it.m.position.copy(at); tsDrop(it, at, new V3(0, 1, 0), 4); return; }
@@ -22295,24 +22301,25 @@ function tsChop0(part, side, hz, at) {
     A.wr.visible = false; cuff.visible = false; fore.scale.y = 0.15; fore.position.z = 0.075; const st = tsStumpMesh(0.036); st.rotation.x = Math.PI / 2; st.position.z = 0.152; A.el.add(st); A.stump = st; TS.stumps.push({ obj: st, kind: 'vm' });
     if (TS.flash && side === 'L') { TS.flashOn = false; tsFlashOn(); TS.flash.m.visible = false; }
     if (TS.held && TS.held.m.parent === A.wr) { const h = TS.held; TS.held = null; h.m.parent.remove(h.m); scene.add(h.m); h.m.position.copy(at); tsDrop(h, at.clone(), new V3(0, 1, 0), 3); }
-    damageSelf(18); banner('🩸 РУКА ОТРУБЛЕНА', tsHS() ? 'отрубленная рука у вас в другой руке · ✊ бросить · 🩹 пришить' : 'рук больше нет · 🩹 пришить');
+    damageSelf(18); banner('🩸 РУКА ОТРУБЛЕНА', tsHS() ? 'держитесь за рану · 🩹 пришить' : 'рук больше нет · 🩹 пришить');
   } else {
     const P = avatar.parts['lLeg' + side]; P.mesh.updateMatrixWorld(true); const ud = []; P.mesh.traverse((q) => { ud.push([q, q.userData]); q.userData = {}; }); let cl; try { cl = P.mesh.clone(true); } finally { for (const [q, u] of ud) q.userData = u; } cl.position.set(0, 0, 0); cl.quaternion.identity(); cl.scale.copy(P.mesh.getWorldScale(new V3()));
     it = tsLimbItem(cl, 'ногу', 0.5);
     P.mesh.visible = false; const st = tsStumpMesh(0.065); P.pivot.add(st); st.position.set(0, -0.01, 0); TS.stumps.push({ obj: st, kind: 'av', P });
     TS.knees = 0.01; TS.camPV -= 2.5; TS.camRV += (side === 'R' ? 1 : -1) * 2;
-    damageSelf(22); banner('🩸 НОГА ОТРУБЛЕНА', tsLegS() ? 'прыгаете на одной ноге · 🩹 пришить' : 'ползком… · 🩹 пришить');
+    damageSelf(22); banner('🩸 НОГА ОТРУБЛЕНА', tsLegS() ? 'держитесь за ногу, прыгаете на одной · 🩹 пришить' : 'ползком… · 🩹 пришить');
   }
   // кровь, звук, экран
   bloodSpray(at, new V3(rand(-0.3, 0.3), 1, rand(-0.3, 0.3)).normalize(), 60, 1, 1, 4.5, 0.006, 0.016); if (typeof bloodMist === 'function') bloodMist(at, 0.4);
   Sound.crunch(1); Sound.splat(1); Sound.voice('scream', 0.9); if (hz.type === 'saw') SFX.tsGrind(0.9); else SFX.tsChomp(1);
   screenBlood(0.9); flashScreen('rgba(170,0,0,.55)', 700); shake = Math.max(shake, 0.7); TS.bleedT = 9; hz.bloody = (hz.bloody || 0) + 1;
   if (hz.type === 'saw') { const mat = hz.m.material[1]; mat.color.lerp(new THREE.Color(0xa01010), 0.45); }
-  tsGiveLimb(it, at.clone());
+  tsGiveLimb(it, at.clone()); TS.clutch = { part, side, t: 0 }; if (TS.held && tsHS()) { const h = TS.held; TS.held = null; h.m.parent && h.m.parent.remove(h.m); const q = player.pos.clone().add(new V3(0.3, 0.4, 0.3)); scene.add(h.m); h.m.position.copy(q); tsDrop(h, q, new V3(0, 0.5, 0)); }
   TS.ext.arm = TS.ext.leg = false;
 }
 function damageSelf(d) { player.hp = Math.max(5, player.hp - d); player.lastHurt = 0; }
 function tsHeal() {
+  TS.clutch = null;
   for (const k in TS.lost) TS.lost[k] = false;
   for (const S of TS.stumps) S.obj.parent && S.obj.parent.remove(S.obj); TS.stumps = [];
   const R = TS.rig; if (R) for (const s of ['R', 'L']) { const A = R[s], ms = A.el.children.filter((c) => c.isMesh); A.wr.visible = true; ms[0].scale.y = 0.3; ms[0].position.z = 0.14; ms[1].visible = true; A.stump = null; }
@@ -22334,8 +22341,15 @@ function tsVM3(o, dt) {
   if (E.ret > 0) { E.ret = Math.max(0, E.ret - dt); const s = E.retSide, sg = s === 'R' ? 1 : -1, kk = Math.sin(Math.PI * (1 - E.ret / 0.4)); o[s] = tsMix(o[s], [0.08 * sg, -0.2, -0.22], kk); if (s === 'R') o.curlR = 0.9; else o.curlL = 0.9; }
   // нога: руки разводятся для равновесия
   if (E.kl > 0.05) { const e = tsEase(E.kl); o.R = tsMix(o.R, [0.4, -0.1, -0.4], e * 0.5); o.L = tsMix(o.L, [-0.4, -0.1, -0.4], e * 0.5); }
-  // отрубленная рука: культя висит внизу, не тянется
-  for (const s of ['R', 'L']) if (L['arm' + s]) { const sg = s === 'R' ? 1 : -1; o[s] = [0.32 * sg, -0.3 + Math.sin(TS.breath) * 0.01, -0.34]; if (s === 'R') o.curlR = 0; else o.curlL = 0; }
+  // отрубленная рука: культя прижата к телу, дрожит
+  const tr = Math.sin(performance.now() / 1000 * 31) * 0.004;
+  for (const s of ['R', 'L']) if (L['arm' + s]) { const sg = s === 'R' ? 1 : -1; o[s] = TS.clutch && TS.clutch.part === 'arm' && TS.clutch.side === s && tsHS() ? [0.05 * sg + tr, -0.06 + Math.sin(TS.breath) * 0.01, -0.46] : [0.22 * sg + tr, -0.2, -0.4]; if (s === 'R') o.curlR = 0; else o.curlL = 0; }
+  // свободная рука держится за рану (кроме моментов, когда она занята действием)
+  const C = TS.clutch, hs = tsHS();
+  if (C && hs && !TS.act && !(E.ka > 0.05) && !TS.climb) { C.t += dt; const sg = hs === 'R' ? 1 : -1, os = hs === 'R' ? 'L' : 'R';
+    if (C.part === 'arm') { const st = o[os]; o[hs] = [st[0] - 0.02 * Math.sign(st[0]) + tr, st[1] + 0.03, st[2] + 0.06]; R[hs].hz = new V3(-sg * 0.9, -0.1, -0.4).normalize(); R[hs].hy = new V3(0, -1, 0); }
+    else { const S = TS.stumps.find((x) => x.kind === 'av'); const w = S ? S.obj.getWorldPosition(new V3()) : null; const loc = w ? tsLoc(w) : [0.1 * sg, -0.5, -0.4]; const ln = Math.hypot(loc[0], loc[1] + 0.22, loc[2]); const kk = Math.min(1, 0.6 / Math.max(0.01, ln)); o[hs] = [loc[0] * kk + tr, (loc[1] + 0.22) * kk - 0.22, loc[2] * kk]; R[hs].hz = new V3(0, -1, -0.3).normalize(); R[hs].hy = new V3(-sg * 0.3, 0, 1); }
+    if (hs === 'R') { o.curlR = 0.85; o.wristR = 0; } else { o.curlL = 0.85; o.wristL = 0; } }
 }
 /* ---------- тело: вытянутая нога и отрубленные ноги ---------- */
 function tsBody3(A) {
@@ -22354,7 +22368,7 @@ function tsPost3(dt) {
   const E = TS.ext, p = player.pos;
   const ls = tsLegS(); const wantL = E.leg && ls && player.onGround && !TS.climb && !TS.sit;
   E.kl = clamp(E.kl + (wantL ? dt * 3.5 : -dt * 4), 0, 1); if (wantL) E.lside = ls;
-  TS.legLook = -0.42 * tsEase(E.kl); tsHop(dt);
+  TS.legLook = -0.42 * tsEase(E.kl) + (TS.clutch && TS.clutch.part === 'leg' && tsHS() ? -0.85 * clamp(1 - Math.max(0, TS.clutch.t - 2.5) / 0.8, 0, 1) : 0); tsHop(dt);
   if (avatar !== TS.avRef) { TS.avRef = avatar; if (TS.lost.legL || TS.lost.legR || TS.lost.armL || TS.lost.armR) tsHeal(); }
   // опасности: вращение пил, зубастик дышит и щёлкает
   let near = 99;
@@ -22378,6 +22392,7 @@ function tsPost3(dt) {
   // кровь из культей и с отрубленной части
   if (TS.bleedT > 0) { TS.bleedT -= dt; if (Math.random() < dt * 6) { for (const S of TS.stumps) { if (S.kind === 'av') { const w = S.obj.getWorldPosition(new V3()); bloodSpray(w, new V3(rand(-0.2, 0.2), -1, rand(-0.2, 0.2)).normalize(), 4, 0.6, 0.3, 1.2, 0.004, 0.009); } else { const w = tsEyeP().add(new V3(0, -0.55, 0)).addScaledVector(tsFwd().setY(0).normalize(), 0.3); bloodSpray(w, new V3(0, -1, 0), 3, 0.5, 0.2, 1, 0.003, 0.008); } } }
     if (TS.bleedT > 4 && Math.random() < dt * 1.5) screenBlood(0.15); }
+  if (TS.clutch && Math.random() < dt * 5) { const w = tsEyeP().addScaledVector(tsFwd().setY(0).normalize(), 0.35).add(new V3(0, TS.clutch.part === 'arm' ? -0.5 : -1.0, 0)); bloodSpray(w, new V3(0, -1, 0), 2, 0.4, 0.2, 0.8, 0.003, 0.007); }
   for (const it of TS.items) if (it.kind === 'limb' && it.drip > 0 && it.body) { it.drip -= dt; if (Math.random() < dt * 5) bloodSpray(it.m.position.clone(), new V3(0, -1, 0), 2, 0.5, 0.2, 0.8, 0.003, 0.007); }
 }
 function tsHop(dt) { const L = TS.lost; if ((L.legL !== L.legR) && player.onGround && Math.hypot(player.vel.x, player.vel.z) > 0.6 && (TS.hopT = (TS.hopT || 0) - dt) < 0) { TS.hopT = 0.42; player.vel.y = 2.4; player.onGround = false; SFX.tsStep(0.35); TS.camRV += (L.legR ? -1 : 1) * 0.5; } }
