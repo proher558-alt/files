@@ -7699,6 +7699,7 @@ function placeCamera(dt) {
   const hs = Math.hypot(player.vel.x, player.vel.z);
   camera.position.copy(eye.position);
   camera.rotation.set(player.pitch + (Math.random() - 0.5) * shake * 0.06, player.yaw + (Math.random() - 0.5) * shake * 0.06, Math.sin(player.bob) * 0.006 * Math.min(1, hs / 4));
+  if (mapId === 'testsite' && TS.on) { camera.rotation.x += eye.rotation.x - player.pitch; camera.rotation.z += eye.rotation.z; }
 }
 function baseFov() { return story.zoom ? 13 : story.fov ? story.fov : 74 + fallFx.k * 22; }
 
@@ -21809,7 +21810,7 @@ function tsInteract() {
 function tsGest(name) { TS.gest = name; TS.gestT = 0; }
 /* ---------- управление и HUD ---------- */
 function tsHud() {
-  const h = TS.hud; if (!h) return; const k = h.querySelector('#tsK'); const l2 = tsLabel2(); const ab = h.querySelector('#tsA'); if (ab) { ab.classList.toggle('held', !!TS.held); ab.classList.toggle('fl', !!TS.flash); ab.classList.toggle('cr', !!TS.crouchOn); } if (k) k.textContent = tsKeyNear() ? 'E — взять ключ' : tsDoorNear() ? (TS.hasKey ? 'E — открыть ключом' : 'Дверь заперта') : l2 ? l2 : TS.hudWater ? '🌊 В воде: прыжок — всплыть' : ''; }
+  const h = TS.hud; if (!h) return; const k = h.querySelector('#tsK'); const l2 = tsLabel2(); const ab = h.querySelector('#tsA'); const gg = h.querySelector('#tsG'); if (gg) { const L = TS.lost; gg.classList.toggle('lost', !!(L.armL || L.armR || L.legL || L.legR)); } if (ab) { ab.classList.toggle('held', !!TS.held); ab.classList.toggle('fl', !!TS.flash); ab.classList.toggle('cr', !!TS.crouchOn); } if (k) k.textContent = tsKeyNear() ? 'E — взять ключ' : tsDoorNear() ? (TS.hasKey ? 'E — открыть ключом' : 'Дверь заперта') : l2 ? l2 : TS.hudWater ? '🌊 В воде: прыжок — всплыть' : ''; }
 function tsUi(on) {
   let h = document.getElementById('tsHud');
   if (!h) {
@@ -21821,7 +21822,7 @@ function tsUi(on) {
 #tsA b{width:62px;height:62px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:800 9px var(--ui);background:radial-gradient(circle,#3a4a2a,#141c0c);border:2px solid #c8f08a;color:#fff;touch-action:none;user-select:none}#tsA b span{font-size:22px;line-height:24px}
 #tsA b[data-a="use"]{width:74px;height:74px;background:radial-gradient(circle,#6a5a1a,#2a2008);border-color:#ffd84a}
 #tsA b[data-a="throw"]{display:none}#tsA.held b[data-a="throw"]{display:flex}#tsA.cr b[data-a="crouch"]{background:radial-gradient(circle,#7ab040,#2a4a10)}#tsA b[data-a="flash"]{opacity:.45}#tsA.fl b[data-a="flash"]{opacity:1}
-#tsG{bottom:calc(96px + env(safe-area-inset-bottom,0px))!important;grid-template-columns:repeat(5,48px)!important;gap:6px!important}#tsG b{width:48px!important;height:48px!important}#tsG b span{font-size:17px!important}
+#tsG{bottom:calc(96px + env(safe-area-inset-bottom,0px))!important;grid-template-columns:repeat(3,60px)!important;gap:7px!important}#tsG b{width:60px!important;height:60px!important;background:radial-gradient(circle,#7a2a2a,#2a0c0c)!important;border-color:#ff9a8a!important}#tsG b span{font-size:22px!important}#tsG b.on{background:radial-gradient(circle,#e05a3a,#6a1a0a)!important;transform:scale(1.08)}#tsG b[data-g="heal"]{display:none;background:radial-gradient(circle,#2a7a4a,#0c2a14)!important;border-color:#9affb0!important}#tsG.lost b[data-g="heal"]{display:flex}
 #tsK{position:absolute;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font:800 15px var(--ui);text-shadow:0 0 6px #000;white-space:nowrap}
 body.ts-ui #stats,body.ts-ui #health,body.ts-ui #slots,body.ts-ui #weapon,body.ts-ui #cross,body.ts-ui #madHud,body.ts-ui #touch .tb:not([data-act="jump"]){display:none!important}
 body.ts-ui #touch .tb[data-act="jump"]{right:calc(14px + env(safe-area-inset-right,0px))!important;bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;top:auto!important;left:auto!important}
@@ -21829,11 +21830,11 @@ body.ts-ui #touch .tb[data-act="jump"]{right:calc(14px + env(safe-area-inset-rig
     const u = document.createElement('div'); u.id = 'tsUnder'; document.body.appendChild(u);
     h = document.createElement('div'); h.id = 'tsHud'; h.innerHTML = `<div class="x" data-k="x">✕ Выйти</div><div id="tsK"></div><div id="tsG"></div><div id="tsA"><b data-a="throw"><span>✊</span>БРОСИТЬ</b><b data-a="flash"><span>🔦</span>СВЕТ</b><b data-a="crouch"><span>🧎</span>ПРИСЕСТЬ</b><b data-a="use"><span>✋</span>E</b></div>`; document.body.appendChild(h);
     h.querySelector('[data-k="x"]').onclick = () => { tsUi(false); TS.on = false; tsOff(); };
-    const G = h.querySelector('#tsG'), items = [['wave', '👋', 'ПРИВЕТ', '1'], ['point', '👉', 'ТУДА', '2'], ['thumb', '👍', 'ОК', '3'], ['stop', '✋', 'СТОП', '4'], ['grab', '🤏', 'ВЗЯТЬ', '5']];
-    for (const [id, ic, t] of items) { const b = document.createElement('b'); b.innerHTML = `<span>${ic}</span>${t}`; b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); if (id === 'use') tsInteract(); else tsGest(id); }); G.appendChild(b); }
+    const G = h.querySelector('#tsG'), items = [['arm', '💪', 'РУКА'], ['leg', '🦵', 'НОГА'], ['heal', '🩹', 'ПРИШИТЬ']];
+    for (const [id, ic, t] of items) { const b = document.createElement('b'); b.innerHTML = `<span>${ic}</span>${t}`; b.dataset.g = id; b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); if (id === 'heal') tsHealBtn(); else { TS.ext[id] = true; b.classList.add('on'); try { b.setPointerCapture(e.pointerId); } catch (_) {} } }); const off = () => { if (id !== 'heal') { TS.ext[id] = false; b.classList.remove('on'); } }; b.addEventListener('pointerup', off); b.addEventListener('pointercancel', off); b.addEventListener('lostpointercapture', off); G.appendChild(b); }
     for (const b of h.querySelectorAll('#tsA b')) b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); const a = b.dataset.a; if (a === 'use') tsInteract(); else if (a === 'crouch') tsCrouch(); else if (a === 'throw') tsThrow(); else if (a === 'flash') tsFlashT(); tsHud(); });
     ['touchstart', 'pointerdown', 'mousedown'].forEach((e) => { h.querySelector('#tsG').addEventListener(e, (ev) => ev.stopPropagation()); h.querySelector('#tsA').addEventListener(e, (ev) => ev.stopPropagation()); });
-    window.addEventListener('keydown', (e) => { if (!TS.on) return; const m = { Digit1: 'wave', Digit2: 'point', Digit3: 'thumb', Digit4: 'stop', Digit5: 'grab' }[e.code]; if (m) tsGest(m); if (e.code === 'KeyE') tsInteract(); if (e.code === 'KeyC') tsCrouch(); if (e.code === 'KeyG' || e.code === 'KeyQ') tsThrow(); if (e.code === 'KeyF') tsFlashT(); });
+    window.addEventListener('keydown', (e) => { if (!TS.on) return; const m = { Digit1: 'arm', Digit2: 'leg' }[e.code]; if (m) TS.ext[m] = true; if (e.code === 'KeyH') tsHealBtn(); if (e.code === 'KeyE') tsInteract(); if (e.code === 'KeyC') tsCrouch(); if (e.code === 'KeyG' || e.code === 'KeyQ') tsThrow(); if (e.code === 'KeyF') tsFlashT(); });
     TS.hud = h;
   }
   h.style.display = on ? 'block' : 'none'; document.body.classList.toggle('ts-ui', !!on); // свой класс: прячем стандартный HUD и боевые кнопки
@@ -22005,6 +22006,7 @@ function tsBuild2() {
   /* --- предметы: мячи, ящики, банки --- */
   // предметы создаются на первом кадре игры (после сборки карты пропы очищаются)
   TS.needItems = true;
+  tsBuild3();
 }
 function tsSpawnItems() {
   TS.needItems = false; TS.items = [];
@@ -22028,7 +22030,7 @@ function tsDrop(it, pos, vel, spin = 0) {
   b.addEventListener('collide', (e) => { const v = Math.abs(e.contact.getImpactVelocityAlongNormal()); if (v < 1.2 || it.hitCd > 0) return; it.hitCd = 0.08; if (dv(it.m.position) < 0.02) return; const k = clamp(v / 9, 0.1, 0.8) * Math.min(1, dv(it.m.position) * 1.5); if (it.kind === 'ball') SFX.tsBonk(k, 1.3); else if (it.kind === 'can') SFX.tsCanHit(k); else SFX.tsBonk(k, 0.6); });
 }
 function tsLift(it) { if (it.body) { world.removeBody(it.body); const i = props.indexOf(it.pr); if (i >= 0) props.splice(i, 1); targetsDirty = true; it.body = null; it.pr = null; } }
-function tsHold(it) { tsLift(it); TS.held = it; const R = tsBuildRig(); R.R.wr.add(it.m); it.m.position.set(0, 0.03 + it.D.r, 0.07); it.m.rotation.set(0, 0, 0); if (it.kind === 'can') it.m.rotation.set(Math.PI / 2, 0, 0); if (it.kind === 'crate') { it.m.position.set(-0.12, 0.05 + it.D.r, 0.08); } it.m.userData.tsOwn = true; SFX.tsClick(0.3); }
+function tsHold(it) { tsLift(it); TS.held = it; const R = tsBuildRig(), hs = tsHS() || 'R'; R[hs].wr.add(it.m); it.m.position.set(0, 0.03 + it.D.r, 0.07); it.m.rotation.set(0, 0, 0); if (it.kind === 'can') it.m.rotation.set(Math.PI / 2, 0, 0); if (it.kind === 'crate') { it.m.position.set(hs === 'R' ? -0.12 : 0.12, 0.05 + it.D.r, 0.08); } if (it.kind === 'limb') { it.m.position.set(0, 0.06, 0.12); it.m.rotation.set(Math.PI / 2, 0, 0); } if (hs === 'L' && TS.flash) { TS.flashOn = false; tsFlashOn(); TS.flash.m.visible = false; } it.m.userData.tsOwn = true; SFX.tsClick(0.3); }
 function tsThrow() {
   const it = TS.held; if (TS.act && it) { TS.pend = 'throw'; return; } if (!it) return;
   tsAct('throw', { dur: 0.6, at: 0.32, fn() { const f = tsFwd(), e = tsEyeP(), right = new V3(Math.cos(player.yaw), 0, -Math.sin(player.yaw)); TS.held = null; const pos = e.clone().addScaledVector(f, 0.55).addScaledVector(right, 0.18).add(new V3(0, -0.12, 0)); const sp = it.D.heavy ? 6 : it.kind === 'can' ? 11 : 10.5; const vel = f.clone().multiplyScalar(sp).add(new V3(0, it.D.heavy ? 2.4 : 1.6, 0)).add(new V3(player.vel.x, 0, player.vel.z)); it.m.parent && it.m.parent.remove(it.m); scene.add(it.m); it.m.position.copy(pos); tsDrop(it, pos, vel, it.kind === 'ball' ? 4 : 7); SFX.tsWhoosh(it.D.heavy ? 0.6 : 0.4); TS.camRV += 0.6; } });
@@ -22044,15 +22046,16 @@ function tsActStep(o, dt) {
   const A = TS.act; if (!A) return; A.t += dt; const t = A.t, D = A.dur;
   if (A.tick) A.tick(t); if (A.at !== undefined && !A.fired && t >= A.at) { A.fired = true; A.fn && A.fn(); } if (A.ev) for (const e of A.ev) if (!e.f && t >= e[0]) { e.f = 1; e[1](); }
   const w = A.wf ? A.wf() : A.w; const tgt = w ? tsLoc(w) : null; const ret = (t - (A.at || D * 0.5)) / Math.max(0.15, D - (A.at || D * 0.5));
+  const HS = tsHS() || 'R', sg = HS === 'R' ? 1 : -1, mir = (a) => [a[0] * sg, a[1], a[2]];
   const toward = (side, k, curl, wr) => { const base = o[side]; o[side] = tsMix(base, tgt, k); if (side === 'R') { o.curlR = curl; o.wristR = wr; } else { o.curlL = curl; o.wristL = wr; } };
-  if (A.kind === 'press') { const k = t < A.at ? tsEase(t / A.at) : 1 - tsEase(ret); toward('R', k, 0, 0); TS.rig.R.point = true; }
-  else if (A.kind === 'pull') { const k = t < A.at ? tsEase(t / A.at) : 1 - tsEase(ret); toward('R', k, t > A.at * 0.8 ? 1 : 0.2, -0.8); }
-  else if (A.kind === 'pick') { const k = t < A.at ? tsEase(t / A.at) : 1 - tsEase(ret); toward('R', k, t > A.at * 0.85 ? 0.85 : 0.1, 0.2); if (A.crouch || (w && w.y < player.pos.y + 0.8)) TS.camDropT = Math.max(TS.camDropT || 0, 0.42 * Math.sin(Math.PI * clamp(t / D, 0, 1))); }
-  else if (A.kind === 'lever') { const k = t < 0.35 ? tsEase(t / 0.35) : t < 0.95 ? 1 : 1 - tsEase((t - 0.95) / 0.25); toward('R', k, 1, -0.5); const l = tgt ? tsMix(o.L, [tgt[0] - 0.07, tgt[1] - 0.02, tgt[2] + 0.02], k) : o.L; o.L = l; o.curlL = 1; if (t > 0.4 && t < 0.9) TS.camPV -= dt * 0.6; }
-  else if (A.kind === 'throw') { const ke = t < 0.28 ? tsEase(t / 0.28) : 0, kf = t < 0.28 ? 0 : t < 0.4 ? tsEase((t - 0.28) / 0.12) : 1 - tsEase((t - 0.4) / 0.2); const back = [0.32, 0.12, -0.12], fwd = [0.12, 0.02, -0.66]; o.R = t < 0.28 ? tsMix(o.R, back, ke) : tsMix(t < 0.4 ? back : o.R, fwd, kf); o.curlR = t < 0.32 ? 0.8 : 0.05; o.L = tsMix(o.L, [-0.22, -0.02, -0.5], Math.sin(Math.PI * clamp(t / 0.6, 0, 1))); }
-  else if (A.kind === 'place') { const k = Math.sin(Math.PI * clamp(t / D, 0, 1)); o.R = tsMix(o.R, [0.16, -0.38, -0.5], k); o.curlR = t < A.at ? 0.7 : 0.1; TS.camDropT = Math.max(TS.camDropT || 0, 0.4 * k); }
-  else if (A.kind === 'drink') { const k = t < 0.9 ? tsEase(t / 0.9) : t < 2.1 ? 1 : 1 - tsEase((t - 2.1) / 0.5); const mouth = [0.04, -0.08, -0.12]; o.R = tsMix(o.R, mouth, k); o.curlR = 0.85; o.wristR = -0.6 * k; TS.rig.R.wrX = -0.9 * k; TS.drinkTilt = k * 0.35; if (t > 0.3 && t < 0.5) { o.L = tsMix(o.L, [0.02, -0.1, -0.38], Math.sin(Math.PI * (t - 0.3) / 0.2)); o.curlL = 0.5; } }
-  if (t >= D) { TS.act = null; if (TS.pend === 'throw') { TS.pend = null; later(0.05, tsThrow); } TS.rig.R.point = false; TS.rig.R.wrX = 0; TS.drinkTilt = 0; }
+  if (A.kind === 'press') { const k = t < A.at ? tsEase(t / A.at) : 1 - tsEase(ret); toward(HS, k, 0, 0); TS.rig[HS].point = true; }
+  else if (A.kind === 'pull') { const k = t < A.at ? tsEase(t / A.at) : 1 - tsEase(ret); toward(HS, k, t > A.at * 0.8 ? 1 : 0.2, -0.8); }
+  else if (A.kind === 'pick') { const k = t < A.at ? tsEase(t / A.at) : 1 - tsEase(ret); toward(HS, k, t > A.at * 0.85 ? 0.85 : 0.1, 0.2); if (A.crouch || (w && w.y < player.pos.y + 0.8)) TS.camDropT = Math.max(TS.camDropT || 0, 0.42 * Math.sin(Math.PI * clamp(t / D, 0, 1))); }
+  else if (A.kind === 'lever') { const k = t < 0.35 ? tsEase(t / 0.35) : t < 0.95 ? 1 : 1 - tsEase((t - 0.95) / 0.25); toward(HS, k, 1, -0.5); const l = tgt ? tsMix(o.L, [tgt[0] - 0.07, tgt[1] - 0.02, tgt[2] + 0.02], k) : o.L; o.L = l; o.curlL = 1; if (t > 0.4 && t < 0.9) TS.camPV -= dt * 0.6; }
+  else if (A.kind === 'throw') { const ke = t < 0.28 ? tsEase(t / 0.28) : 0, kf = t < 0.28 ? 0 : t < 0.4 ? tsEase((t - 0.28) / 0.12) : 1 - tsEase((t - 0.4) / 0.2); const back = mir([0.32, 0.12, -0.12]), fwd = mir([0.12, 0.02, -0.66]), OS = HS === 'R' ? 'L' : 'R'; o[HS] = t < 0.28 ? tsMix(o[HS], back, ke) : tsMix(t < 0.4 ? back : o[HS], fwd, kf); o['curl' + HS] = t < 0.32 ? 0.8 : 0.05; o[OS] = tsMix(o[OS], mir([-0.22, -0.02, -0.5]), Math.sin(Math.PI * clamp(t / 0.6, 0, 1))); }
+  else if (A.kind === 'place') { const k = Math.sin(Math.PI * clamp(t / D, 0, 1)); o[HS] = tsMix(o[HS], mir([0.16, -0.38, -0.5]), k); o['curl' + HS] = t < A.at ? 0.7 : 0.1; TS.camDropT = Math.max(TS.camDropT || 0, 0.4 * k); }
+  else if (A.kind === 'drink') { const k = t < 0.9 ? tsEase(t / 0.9) : t < 2.1 ? 1 : 1 - tsEase((t - 2.1) / 0.5); const mouth = [0.04, -0.08, -0.12]; o[HS] = tsMix(o[HS], mir(mouth), k); o['curl' + HS] = 0.85; o['wrist' + HS] = -0.6 * k * sg; TS.rig[HS].wrX = -0.9 * k; TS.drinkTilt = k * 0.35; if (t > 0.3 && t < 0.5) { o.L = tsMix(o.L, [0.02, -0.1, -0.38], Math.sin(Math.PI * (t - 0.3) / 0.2)); o.curlL = 0.5; } }
+  if (t >= D) { TS.act = null; if (TS.pend === 'throw') { TS.pend = null; later(0.05, tsThrow); } TS.rig.R.point = TS.rig.L.point = false; TS.rig.R.wrX = TS.rig.L.wrX = 0; TS.drinkTilt = 0; }
 }
 /* ---------- руки: дополнительные анимации (вызывается из tsVM) ---------- */
 function tsVM2(o, dt) {
@@ -22080,16 +22083,18 @@ function tsVM2(o, dt) {
   // сидя: руки на коленях
   if (TS.sit) { o.R = tsMix(o.R, [0.16, -0.38, -0.32], TS.sit.k); o.L = tsMix(o.L, [-0.16, -0.38, -0.32], TS.sit.k); o.curlR = o.curlL = 0.3; }
   // предмет в руке
-  if (TS.held && !TS.act) { const it = TS.held; if (it.D.heavy) { o.R = tsMix(o.R, [0.14, -0.15, -0.42], 1); o.L = tsMix(o.L, [-0.3, -0.15, -0.44], 1); o.curlR = o.curlL = 0.55; } else { o.R = tsMix(o.R, [0.22, -0.13, -0.42], 1); o.curlR = it.kind === 'ball' ? 0.45 : 0.85; } }
+  if (TS.held && !TS.act) { const it = TS.held; if (it.D.heavy) { o.R = tsMix(o.R, [0.14, -0.15, -0.42], 1); o.L = tsMix(o.L, [-0.3, -0.15, -0.44], 1); o.curlR = o.curlL = 0.55; } else { const hs = tsHS() || 'R', g = hs === 'R' ? 1 : -1; o[hs] = tsMix(o[hs], [0.22 * g, -0.13, -0.42], 1); o['curl' + hs] = it.kind === 'ball' ? 0.45 : 0.85; } }
   if (TS.flash) { const fo = TS.flashOn ? [-0.2, -0.1, -0.46] : [-0.22, -0.2, -0.38]; if (!TS.climb && !(TS.act && TS.act.kind === 'lever') && !(TS.held && TS.held.D.heavy)) { o.L = tsMix(o.L, fo, 1); o.curlL = 0.9; } }
   if (TS.act) tsActStep(o, dt);
+  tsVM3(o, dt);
   o.R = [o.R[0], o.R[1] - 0.3, o.R[2]]; o.L = [o.L[0], o.L[1] - 0.3, o.L[2]];
   // кольцо: банка в руке крутится к лицу; ящик держим двумя руками
   if (TS.held && TS.held.kind === 'can') { const tab = TS.held.m.userData.tab; if (tab) tab.rotation.x = TS.held.full ? 0 : -1.2; }
 }
 /* ---------- тело от первого лица ---------- */
 function tsBodyUndo() { for (const P of TS.bodyHid) P.mesh.visible = true; TS.bodyHid = []; }
-function tsBody() {
+function tsBody() { tsBody2(); const A = avatar; if (A && mapId === 'testsite' && TS.on && A.state === 'alive') tsBody3(A); }
+function tsBody2() {
   const A = avatar; if (!A) return;
   if (!(mapId === 'testsite' && TS.on && A.state === 'alive' && !view3() && !VEH.in)) { if (TS.bodyHid.length) tsBodyUndo(); return; }
   A.root.visible = true; if (A.held) A.held.visible = false;
@@ -22108,7 +22113,7 @@ function tsSitDown(chair) { const yaw = chair.rotation.y, fx = Math.sin(yaw), fz
 function tsStand() { if (!TS.sit) return; TS.sit = null; avatar.pose = 'stand'; avatar.poseDur = 0; SFX.tsCreak(0.35); }
 /* ---------- физика игрока: pre/post-хуки ---------- */
 function tsSoftAt(x, z) { const B = TS.bag; if (B && x >= B.x0 && x <= B.x1 && z >= B.z0 && z <= B.z1) return 'bag'; if (tsIn(TS.mat, x, z)) return 'mat'; return null; }
-function tsSpdK() { return (1 - 0.55 * TS.crouch) * (TS.limpT > 0 ? 0.5 : 1) * (TS.held && TS.held.D.heavy ? 0.8 : 1) * (TS.climb || TS.sit ? 0 : 1); }
+function tsSpdK() { return (1 - 0.55 * TS.crouch) * (TS.limpT > 0 ? 0.5 : 1) * (TS.held && TS.held.D.heavy ? 0.8 : 1) * (TS.climb || TS.sit ? 0 : 1) * tsSpdK3(); }
 function tsLand2(imp, soft, inPit) {
   const p = player.pos;
   if (inPit) return;
@@ -22155,7 +22160,7 @@ function tsPost2(dt) {
   if (TS.knees > 0) { TS.knees += dt / 1.6; if (TS.knees >= 1) TS.knees = 0; }
   // высота глаз: присед / стул / колени / подбор с пола
   TS.camDropT = Math.max(0, (TS.camDropT || 0) - dt * 0.6);
-  const eyeT = TS.sit ? lerp(1.62, 1.12, TS.sit.k) : 1.62 - Math.max(0.47 * TS.crouch, TS.camDropT || 0) - (TS.knees > 0 ? 0.62 * Math.sin(Math.PI * clamp(TS.knees, 0, 1)) : 0);
+  const eyeT = TS.sit ? lerp(1.62, 1.12, TS.sit.k) : 1.62 - Math.max(0.47 * TS.crouch, TS.camDropT || 0, tsEyeK3()) - (TS.knees > 0 ? 0.62 * Math.sin(Math.PI * clamp(TS.knees, 0, 1)) : 0);
   player.eye = lerp(player.eye, eyeT, Math.min(1, dt * 10));
   // упор в стену: короткий луч вперёд на уровне груди
   const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw); let wt = 0;
@@ -22175,10 +22180,11 @@ function tsPost2(dt) {
   if (TS.net) { TS.netT = Math.max(0, (TS.netT || 0) - dt); TS.net.scale.y = 1 + Math.sin(TS.netT * 20) * 0.15 * TS.netT; }
   // лёгкий кивок при каждом шаге в присяде
   if (TS.crouch > 0.5 && hs > 1 && player.onGround) TS.camRV += Math.sin(TS.bob) * dt * 0.6;
+  tsPost3(dt);
 }
 // поворот камеры: кивок/крен от приземлений, наклон при питье, кувырок
 function tsCam() {
-  if (!TS.on) return; let p = TS.camP + (TS.drinkTilt || 0); if (TS.rollT !== undefined) { const k = TS.rollT / 0.8; p -= Math.sin(k * Math.PI) * 1.6; }
+  if (!TS.on) return; let p = TS.camP + (TS.drinkTilt || 0) + (TS.legLook || 0); if (TS.rollT !== undefined) { const k = TS.rollT / 0.8; p -= Math.sin(k * Math.PI) * 1.6; }
   eye.rotation.x += p; eye.rotation.z += TS.camR;
 }
 /* ---------- взаимодействие ---------- */
@@ -22187,6 +22193,7 @@ function tsInteract2() {
   if (TS.act) return true;
   if (TS.climb) return true;
   if (TS.sit) { tsStand(); return true; }
+  if (!tsHS()) { toast('🩸 Рук нет — нажмите 🩹, чтобы пришить'); return true; }
   const I = tsNear2(); if (I) { I.use(); return true; }
   const it = !TS.held && tsItemNear(); if (it) { tsAct('pick', { wf: () => it.m.position.clone(), at: 0.38, fn() { tsHold(it); } }); return true; }
   if (TS.held) { if (TS.held.kind === 'can' && TS.held.full) tsDrink(); else tsPlace(); return true; }
@@ -22204,7 +22211,185 @@ function tsLabel2() {
 function tsCrouch() { if (TS.sit || TS.climb) return; TS.crouchOn = !TS.crouchOn; SFX.tsStep(0.25); }
 function tsFlashT() { if (!TS.flash) { toast('🔦 Фонарик лежит в ящике стола в комнате'); return; } TS.flashOn = !TS.flashOn; SFX.tsClick(0.5); tsFlashOn(); }
 // выход с карты: вернуть рост глаз и тело
-function tsOff2() { if (TS.held && TS.held.m.parent) { TS.held.m.parent.remove(TS.held.m); TS.held = null; } TS.act = null; player.eye = 1.62; TS.crouchOn = false; TS.crouch = 0; TS.climb = null; if (TS.sit) tsStand(); tsBodyUndo(); if (TS.flash && TS.flash.light) TS.flash.light.visible = false; TS.camP = TS.camR = TS.camPV = TS.camRV = 0; player.landDip = 0; }
+function tsOff2() { tsHeal(); TS.ext.arm = TS.ext.leg = false; if (TS.held && TS.held.m.parent) { TS.held.m.parent.remove(TS.held.m); TS.held = null; } TS.act = null; player.eye = 1.62; TS.crouchOn = false; TS.crouch = 0; TS.climb = null; if (TS.sit) tsStand(); tsBodyUndo(); if (TS.flash && TS.flash.light) TS.flash.light.visible = false; TS.camP = TS.camR = TS.camPV = TS.camRV = 0; player.landDip = 0; }
+/* ===================== ТЕСТ-ПЛОЩАДКА 3: вытянуть руку/ногу, пилы и зубастик =====================
+   Кнопки 💪 «РУКА» и 🦵 «НОГА» (удерживать): рука вытягивается туда, куда смотрит камера, с инерцией,
+   при отпускании втягивается к груди; нога выпрямляется вперёд (камера опускается, чтобы её было видно).
+   Опасная зона: настольная пила, настенная пила и «Зубастик» — если сунуть туда вытянутую руку или ногу,
+   она отрубается: культя кровит, а отрубленная часть оказывается в свободной руке (её можно бросить).
+   Кнопка 🩹 «ПРИШИТЬ» возвращает всё на место. */
+Object.assign(TS, { ext: { arm: false, leg: false, ka: 0, kl: 0, ret: 0, retSide: 'R', lagX: 0, lagY: 0 }, lost: { armR: false, armL: false, legR: false, legL: false }, haz: [], stumps: [], bleedT: 0, legLook: 0, buzzT: 0 });
+Object.assign(SFX, {
+  tsSaw(v = 0.4) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.1); if (!o) return; this.tn(o, t, 'sawtooth', 190, 185, 0.22, 0.12, 0.01); this.nz(o, t, 0.22, 'bandpass', 3200, 2, 0.08, 0.01); },
+  tsGrind(v = 0.9) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.4); if (!o) return; this.tn(o, t, 'sawtooth', 240, 110, 0.7, 0.5, 0.005); this.nz(o, t, 0.6, 'bandpass', 2600, 1.5, 0.7, 0.005, 900); this.nz(o, t + 0.05, 0.4, 'lowpass', 500, 0.8, 0.6, 0.01); },
+  tsChomp(v = 0.8) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.2); if (!o) return; this.tn(o, t, 'sine', 140, 50, 0.16, 0.9, 0.002); this.nz(o, t, 0.08, 'lowpass', 1500, 0.8, 0.8, 0.001); this.metal(o, t, 1300, 0.05, 0.2, [1, 2.2]); },
+  tsGrowl(v = 0.4) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.3); if (!o) return; this.tn(o, t, 'sawtooth', 70, 55, 0.6, 0.35, 0.08); this.nz(o, t, 0.6, 'bandpass', 300, 3, 0.3, 0.08); },
+  tsSew(v = 0.5) { if (!this.ok()) return; const t = this.now(), o = this.bus(v, 0.2); if (!o) return; for (let i = 0; i < 4; i++) this.nz(o, t + i * 0.12, 0.06, 'highpass', 2500, 1, 0.4, 0.003); this.tn(o, t + 0.5, 'sine', 600, 900, 0.25, 0.3, 0.02); },
+});
+const tsHS = () => !TS.lost.armR ? 'R' : !TS.lost.armL ? 'L' : null; // какой рукой держим/действуем
+const tsArmS = () => tsHS();                                           // какую руку вытягиваем
+const tsLegS = () => !TS.lost.legR ? 'R' : !TS.lost.legL ? 'L' : null;
+/* ---------- модели: пилы и зубастик ---------- */
+function tsSawTex() { return cvTex(256, 256, (g) => { const c = 128; const gr = g.createRadialGradient(c, c, 10, c, c, 128); gr.addColorStop(0, '#e8ecf0'); gr.addColorStop(0.6, '#a8b0b8'); gr.addColorStop(1, '#6a7078'); g.fillStyle = gr; g.beginPath(); for (let i = 0; i < 40; i++) { const a0 = i / 40 * Math.PI * 2, a1 = (i + 0.6) / 40 * Math.PI * 2; g.lineTo(c + Math.cos(a0) * 112, c + Math.sin(a0) * 112); g.lineTo(c + Math.cos(a1) * 128, c + Math.sin(a1) * 128); } g.closePath(); g.fill();
+  g.strokeStyle = 'rgba(255,255,255,.35)'; for (let r = 30; r < 110; r += 7) { g.beginPath(); g.arc(c, c, r, 0, 7); g.stroke(); } g.fillStyle = '#3a3e44'; g.beginPath(); g.arc(c, c, 18, 0, 7); g.fill(); g.fillStyle = '#c8cdd2'; g.beginPath(); g.arc(c, c, 8, 0, 7); g.fill();
+  for (let i = 0; i < 4; i++) { g.save(); g.translate(c, c); g.rotate(i * Math.PI / 2); g.fillStyle = '#4a4e54'; g.fillRect(40, -4, 34, 8); g.restore(); } g.fillStyle = '#d0201a'; g.font = '900 16px sans-serif'; g.textAlign = 'center'; g.fillText('СТАЛЬ-3000', c, c + 58); }); }
+function tsSawBlade(r) { const t = tsSawTex(); const face = new THREE.MeshStandardMaterial({ map: t, metalness: 0.85, roughness: 0.28, transparent: true, alphaTest: 0.5 }); t.colorSpace = THREE.SRGBColorSpace;
+  const al = cvTex(256, 256, (g) => { g.fillStyle = '#000'; g.fillRect(0, 0, 256, 256); g.fillStyle = '#fff'; g.beginPath(); for (let i = 0; i < 40; i++) { const a0 = i / 40 * Math.PI * 2, a1 = (i + 0.6) / 40 * Math.PI * 2; g.lineTo(128 + Math.cos(a0) * 112, 128 + Math.sin(a0) * 112); g.lineTo(128 + Math.cos(a1) * 128, 128 + Math.sin(a1) * 128); } g.closePath(); g.fill(); }); face.alphaMap = al;
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.006, 48), [new THREE.MeshStandardMaterial({ color: 0x9aa0a8, metalness: 0.9, roughness: 0.3, transparent: true, opacity: 0 }), face, face]); m.castShadow = true; return m; }
+function tsSpotTex() { return cvTex(256, 256, (g) => { const gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#6a2a8a'); gr.addColorStop(1, '#3a7a2a'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 60; i++) { g.fillStyle = `rgba(${Math.random() < 0.5 ? '255,220,60' : '20,10,30'},${rand(0.2, 0.5)})`; g.beginPath(); g.ellipse(rand(0, 256), rand(0, 256), rand(3, 12), rand(3, 9), rand(0, 3), 0, 7); g.fill(); } for (let i = 0; i < 3000; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.12})`; g.fillRect(rand(0, 256), rand(0, 256), 2, 2); } }); }
+function tsBuild3() {
+  TS.haz = []; TS.stumps = []; for (const k in TS.lost) TS.lost[k] = false; TS.ext.arm = TS.ext.leg = false;
+  const steel = std({ color: 0x7a8088, roughness: 0.35, metalness: 0.75 }), yel = std({ color: 0xf0c010, roughness: 0.5 }), dark = std({ color: 0x24282c, roughness: 0.6, metalness: 0.3 });
+  // опасная зона: полосатый пол и табличка
+  const zone = new THREE.Mesh(new THREE.PlaneGeometry(10, 9), std({ map: (() => { const t = cvTex(256, 256, (g) => { g.fillStyle = '#5a5e62'; g.fillRect(0, 0, 256, 256); g.fillStyle = '#e8b810'; for (let i = -8; i < 16; i++) { g.beginPath(); g.moveTo(i * 32, 0); g.lineTo(i * 32 + 16, 0); g.lineTo(i * 32 + 16 - 256, 256); g.lineTo(i * 32 - 256, 256); g.fill(); } g.fillStyle = '#5a5e62'; g.fillRect(14, 14, 228, 228); }); return t; })(), roughness: 0.8 })); zone.rotation.x = -Math.PI / 2; zone.position.set(24, 0.011, -9.5); zone.receiveShadow = true; addMesh(zone);
+  const sign = tsGrp(19.3, 0, -5.2, -Math.PI / 4); tsMesh(new THREE.BoxGeometry(0.06, 1.4, 0.06), steel, 0, 0.7, 0, sign); const sm = tsMesh(new THREE.PlaneGeometry(0.9, 0.6), std({ roughness: 0.5, side: THREE.DoubleSide, map: cvTex(256, 170, (g) => { g.fillStyle = '#f0c010'; g.fillRect(0, 0, 256, 170); g.strokeStyle = '#111'; g.lineWidth = 10; g.strokeRect(5, 5, 246, 160); g.fillStyle = '#111'; g.font = '900 34px sans-serif'; g.textAlign = 'center'; g.fillText('ОПАСНО!', 128, 60); g.font = '700 20px sans-serif'; g.fillText('пилы и зубастик', 128, 100); g.fillText('не суй руки', 128, 135); }) }), 0, 1.6, 0.04, sign); sm.castShadow = false;
+  // 1) настольная пила: лезвие торчит из стола на высоте ноги (0.95 м)
+  const ts1 = tsGrp(22, 0, -9); tsMesh(tsRBox(1.4, 0.08, 1.0, 0.02), steel, 0, 0.86, 0, ts1); tsMesh(new THREE.BoxGeometry(1.2, 0.8, 0.85), std({ color: 0xc83a20, roughness: 0.5, metalness: 0.3 }), 0, 0.42, 0, ts1); tsMesh(new THREE.BoxGeometry(0.06, 0.04, 0.9), yel, 0.3, 0.92, 0, ts1);
+  solid(22, 0.45, -9, 1.4, 0.9, 1.0);
+  const b1 = tsSawBlade(0.3); b1.rotation.z = Math.PI / 2; b1.position.set(0, 0.95, 0.25); ts1.add(b1);
+  TS.haz.push({ type: 'saw', m: b1, c: new V3(22, 0.95, -8.75), n: new V3(1, 0, 0), r: 0.32, spin: 40, name: 'настольная пила' });
+  // 2) настенная пила на стойке — на уровне вытянутой руки
+  const ts2 = tsGrp(26, 0, -9); tsMesh(new THREE.BoxGeometry(0.2, 2.2, 0.2), dark, 0, 1.1, -0.45, ts2); tsMesh(new THREE.BoxGeometry(0.16, 0.16, 0.5), dark, 0, 1.5, -0.2, ts2); const mot = tsMesh(new THREE.CylinderGeometry(0.14, 0.14, 0.3, 18), std({ color: 0x2a6ad0, roughness: 0.4, metalness: 0.5 }), 0, 1.5, -0.05, ts2); mot.rotation.x = Math.PI / 2;
+  const guard = tsMesh(new THREE.BoxGeometry(0.16, 0.05, 1.2), yel, 0, 2.1, 0.22, ts2);
+  solid(26, 1.1, -9.45, 0.25, 2.2, 0.25);
+  const b2 = tsSawBlade(0.55); b2.rotation.z = Math.PI / 2; b2.position.set(0, 1.5, 0.22); ts2.add(b2); void guard;
+  TS.haz.push({ type: 'saw', m: b2, c: new V3(26, 1.5, -8.78), n: new V3(1, 0, 0), r: 0.57, spin: 28, name: 'настенная пила' });
+  // 3) Зубастик: хищная голова на стебле, пасть смотрит на игрока (+Z)
+  const zb = tsGrp(24, 0, -13); const skin = std({ map: tsSpotTex(), roughness: 0.55 }), gum = std({ color: 0x9a1a3a, roughness: 0.4 }), tooth = std({ color: 0xf4f0e0, roughness: 0.3 });
+  const stem = tsMesh(new THREE.CylinderGeometry(0.12, 0.22, 1.0, 12), std({ color: 0x3a6a2a, roughness: 0.7 }), 0, 0.5, 0, zb); void stem; for (let i = 0; i < 5; i++) { const lf = tsMesh(new THREE.SphereGeometry(0.3, 10, 6), std({ color: 0x4a8a3a, roughness: 0.7 }), Math.cos(i * 1.26) * 0.35, 0.08, Math.sin(i * 1.26) * 0.35, zb); lf.scale.set(1, 0.15, 0.5); lf.rotation.y = -i * 1.26; }
+  const head = new THREE.Group(); head.position.set(0, 1.2, 0); zb.add(head);
+  const mk = (up) => { const j = new THREE.Group(); head.add(j); j.position.set(0, 0, -0.42); const sh = new THREE.Mesh(new THREE.SphereGeometry(0.55, 28, 14, 0, Math.PI * 2, up ? 0 : Math.PI / 2, Math.PI / 2), skin); sh.scale.set(1, 0.75, 1.05); sh.position.z = 0.42; sh.castShadow = true; j.add(sh); const in1 = new THREE.Mesh(new THREE.SphereGeometry(0.5, 20, 10, 0, Math.PI * 2, up ? 0 : Math.PI / 2, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x5a0a1a, roughness: 0.5, side: THREE.BackSide })); in1.scale.set(1, 0.7, 1); in1.position.z = 0.42; j.add(in1);
+    for (let i = 0; i < 16; i++) { const a = (i / 15) * Math.PI - Math.PI / 2 + Math.PI / 2, x = Math.cos(a) * 0.52, z = Math.sin(a) * 0.52 * 1.05 + 0.42; if (z < 0.36) continue; const t = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.16 + (i % 2) * 0.05, 6), tooth); t.position.set(x, up ? -0.06 : 0.06, z); t.rotation.x = up ? Math.PI : 0; t.castShadow = true; j.add(t); }
+    const g = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.04, 6, 24, Math.PI), gum); g.rotation.x = Math.PI / 2; g.position.set(0, 0, 0.42); g.scale.z = 1; j.add(g); return j; };
+  const up = mk(true), lo = mk(false);
+  for (const s of [-1, 1]) { const e = tsMesh(new THREE.SphereGeometry(0.11, 14, 10), std({ color: 0xfff8e0, roughness: 0.2 }), s * 0.2, 0.42, 0.25, up); const p = tsMesh(new THREE.SphereGeometry(0.05, 10, 8), std({ color: 0x101010, roughness: 0.1 }), 0, 0.02, 0.08, e); p.name = 'pupil'; }
+  const tongue = tsMesh(new THREE.SphereGeometry(0.22, 14, 8), std({ color: 0xd04a6a, roughness: 0.35 }), 0, -0.05, 0.5, lo); tongue.scale.set(1, 0.3, 1.3);
+  solid(24, 0.6, -13, 0.4, 1.2, 0.4);
+  TS.haz.push({ type: 'jaw', g: zb, head, up, lo, c: new V3(24, 1.2, -12.55), r: 0.5, open: 0.5, st: 'idle', t: 0, name: 'зубастик' });
+}
+/* ---------- культи и отрубленные части ---------- */
+function tsStumpMesh(r) { const g = new THREE.Group(); const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r * 0.9, 0.03, 14), std({ color: 0x7a0a10, roughness: 0.35 })); g.add(m); const bone = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.32, r * 0.32, 0.036, 10), std({ color: 0xf0e8d8, roughness: 0.4 })); g.add(bone); return g; }
+function tsLimbItem(mesh, label, len) {
+  // центрируем копию части тела и делаем из неё предмет с физикой
+  const g = new THREE.Group(); mesh.updateMatrixWorld(true); const bb = new THREE.Box3().setFromObject(mesh), ct = bb.getCenter(new V3()); mesh.position.sub(ct); g.add(mesh); mesh.traverse((q) => { q.castShadow = true; });
+  const cap = tsStumpMesh(0.055); g.add(cap); cap.position.copy(bb.max).sub(ct); cap.position.x = 0; cap.position.z = 0;
+  const sz = bb.getSize(new V3()); const D = { r: Math.max(0.08, Math.min(sz.x, sz.z) / 2), mass: 3, mk: null, sh: () => new CANNON.Box(new CANNON.Vec3(Math.max(0.05, sz.x / 2), Math.max(0.05, sz.y / 2), Math.max(0.05, sz.z / 2))), label, limb: true, len };
+  return { kind: 'limb', m: g, D, body: null, pr: null, full: false, hitCd: 0, drip: 6 };
+}
+function tsGiveLimb(it, at) {
+  // отрубленная часть — в свободную руку; если рук нет — падает на землю
+  const hs = tsHS();
+  if (TS.held) { const old = TS.held; TS.held = null; old.m.parent && old.m.parent.remove(old.m); const q = at.clone(); q.y = Math.max(q.y, 0.4); scene.add(old.m); old.m.position.copy(q); tsDrop(old, q, new V3(rand(-1, 1), 1, rand(-1, 1)), 3); }
+  if (!hs) { scene.add(it.m); it.m.position.copy(at); tsDrop(it, at, new V3(0, 1, 0), 4); return; }
+  TS.held = it; TS.items.push(it); const W = TS.rig[hs].wr; W.add(it.m); it.m.position.set(0, 0.06, 0.12); it.m.rotation.set(Math.PI / 2, 0, 0); it.m.scale.setScalar(0.9);
+  if (hs === 'L' && TS.flash) { TS.flashOn = false; tsFlashOn(); TS.flash.m.visible = false; }
+}
+function tsChop(part, side, hz, at) { try { tsChop0(part, side, hz, at); } catch (e) { console.warn('chop', e); } finally { TS.ext.arm = TS.ext.leg = false; } }
+function tsChop0(part, side, hz, at) {
+  const L = TS.lost; if (L[part + side]) return; L[part + side] = true; const R = TS.rig;
+  let it;
+  if (part === 'arm') {
+    const A = R[side], ms = A.el.children.filter((c) => c.isMesh), fore = ms[0], cuff = ms[1];
+    const cl = A.wr.clone(true); cl.position.set(0, 0, 0); cl.rotation.set(0, 0, 0); const fc = fore.clone(); fc.position.set(0, 0, -0.09); fc.scale.y = 0.16; const cc = cuff.clone(); cc.position.set(0, 0, -0.01); const grp = new THREE.Group(); grp.add(cl, fc, cc); for (const c of cl.children) if (c.userData.tsOwn) cl.remove(c);
+    it = tsLimbItem(grp, 'руку', 0.35);
+    A.wr.visible = false; cuff.visible = false; fore.scale.y = 0.15; fore.position.z = 0.075; const st = tsStumpMesh(0.036); st.rotation.x = Math.PI / 2; st.position.z = 0.152; A.el.add(st); A.stump = st; TS.stumps.push({ obj: st, kind: 'vm' });
+    if (TS.flash && side === 'L') { TS.flashOn = false; tsFlashOn(); TS.flash.m.visible = false; }
+    if (TS.held && TS.held.m.parent === A.wr) { const h = TS.held; TS.held = null; h.m.parent.remove(h.m); scene.add(h.m); h.m.position.copy(at); tsDrop(h, at.clone(), new V3(0, 1, 0), 3); }
+    damageSelf(18); banner('🩸 РУКА ОТРУБЛЕНА', tsHS() ? 'отрубленная рука у вас в другой руке · ✊ бросить · 🩹 пришить' : 'рук больше нет · 🩹 пришить');
+  } else {
+    const P = avatar.parts['lLeg' + side]; P.mesh.updateMatrixWorld(true); const ud = []; P.mesh.traverse((q) => { ud.push([q, q.userData]); q.userData = {}; }); let cl; try { cl = P.mesh.clone(true); } finally { for (const [q, u] of ud) q.userData = u; } cl.position.set(0, 0, 0); cl.quaternion.identity(); cl.scale.copy(P.mesh.getWorldScale(new V3()));
+    it = tsLimbItem(cl, 'ногу', 0.5);
+    P.mesh.visible = false; const st = tsStumpMesh(0.065); P.pivot.add(st); st.position.set(0, -0.01, 0); TS.stumps.push({ obj: st, kind: 'av', P });
+    TS.knees = 0.01; TS.camPV -= 2.5; TS.camRV += (side === 'R' ? 1 : -1) * 2;
+    damageSelf(22); banner('🩸 НОГА ОТРУБЛЕНА', tsLegS() ? 'прыгаете на одной ноге · 🩹 пришить' : 'ползком… · 🩹 пришить');
+  }
+  // кровь, звук, экран
+  bloodSpray(at, new V3(rand(-0.3, 0.3), 1, rand(-0.3, 0.3)).normalize(), 60, 1, 1, 4.5, 0.006, 0.016); if (typeof bloodMist === 'function') bloodMist(at, 0.4);
+  Sound.crunch(1); Sound.splat(1); Sound.voice('scream', 0.9); if (hz.type === 'saw') SFX.tsGrind(0.9); else SFX.tsChomp(1);
+  screenBlood(0.9); flashScreen('rgba(170,0,0,.55)', 700); shake = Math.max(shake, 0.7); TS.bleedT = 9; hz.bloody = (hz.bloody || 0) + 1;
+  if (hz.type === 'saw') { const mat = hz.m.material[1]; mat.color.lerp(new THREE.Color(0xa01010), 0.45); }
+  tsGiveLimb(it, at.clone());
+  TS.ext.arm = TS.ext.leg = false;
+}
+function damageSelf(d) { player.hp = Math.max(5, player.hp - d); player.lastHurt = 0; }
+function tsHeal() {
+  for (const k in TS.lost) TS.lost[k] = false;
+  for (const S of TS.stumps) S.obj.parent && S.obj.parent.remove(S.obj); TS.stumps = [];
+  const R = TS.rig; if (R) for (const s of ['R', 'L']) { const A = R[s], ms = A.el.children.filter((c) => c.isMesh); A.wr.visible = true; ms[0].scale.y = 0.3; ms[0].position.z = 0.14; ms[1].visible = true; A.stump = null; }
+  if (avatar) for (const s of ['L', 'R']) { const P = avatar.parts['lLeg' + s]; if (P && !P.gone) P.mesh.visible = true; }
+  if (TS.flash) TS.flash.m.visible = true; TS.bleedT = 0;
+}
+/* ---------- руки: вытягивание (вызывается из tsVM2, координаты камеры) ---------- */
+function tsVM3(o, dt) {
+  const E = TS.ext, R = TS.rig, L = TS.lost;
+  const as = tsArmS(); const wantA = E.arm && as && !TS.act && !TS.climb && !TS.sit;
+  E.ka = clamp(E.ka + (wantA ? dt * 4 : -dt * 5), 0, 1);
+  if (wantA) E.side = as;
+  if (!E.arm && E.wasArm) { E.ret = 0.4; E.retSide = E.side || 'R'; } E.wasArm = E.arm;
+  // инерция: при повороте камеры вытянутая рука «отстаёт» и догоняет
+  const k = Math.min(1, dt * 7); E.lagX = lerp(E.lagX, (TS.swayX || 0) * 2.6, k); E.lagY = lerp(E.lagY, (TS.swayY || 0) * 2.6, k);
+  if (E.ka > 0 && E.side) { const s = E.side, sg = s === 'R' ? 1 : -1, e = tsEase(E.ka); o[s] = tsMix(o[s], [0.12 * sg + E.lagX, -0.06 + E.lagY, -0.95], e); if (s === 'R') { o.curlR = lerp(o.curlR, 0, e); o.wristR = -0.9 * e; } else { o.curlL = lerp(o.curlL, 0, e); o.wristL = 0.9 * e; } R[s].spread = true;
+    const os = s === 'R' ? 'L' : 'R'; o[os] = [o[os][0] - 0.05 * sg * e, o[os][1] - 0.04 * e, o[os][2] + 0.08 * e]; }
+  // втягивание: рука прижимается к груди и возвращается
+  if (E.ret > 0) { E.ret = Math.max(0, E.ret - dt); const s = E.retSide, sg = s === 'R' ? 1 : -1, kk = Math.sin(Math.PI * (1 - E.ret / 0.4)); o[s] = tsMix(o[s], [0.08 * sg, -0.2, -0.22], kk); if (s === 'R') o.curlR = 0.9; else o.curlL = 0.9; }
+  // нога: руки разводятся для равновесия
+  if (E.kl > 0.05) { const e = tsEase(E.kl); o.R = tsMix(o.R, [0.4, -0.1, -0.4], e * 0.5); o.L = tsMix(o.L, [-0.4, -0.1, -0.4], e * 0.5); }
+  // отрубленная рука: культя висит внизу, не тянется
+  for (const s of ['R', 'L']) if (L['arm' + s]) { const sg = s === 'R' ? 1 : -1; o[s] = [0.32 * sg, -0.3 + Math.sin(TS.breath) * 0.01, -0.34]; if (s === 'R') o.curlR = 0; else o.curlL = 0; }
+}
+/* ---------- тело: вытянутая нога и отрубленные ноги ---------- */
+function tsBody3(A) {
+  const P = A.parts, E = TS.ext, L = TS.lost;
+  for (const s of ['L', 'R']) if (L['leg' + s]) P['lLeg' + s].mesh.visible = false;
+  if (E.kl > 0.01 && E.lside) { const s = E.lside, e = tsEase(E.kl); P['uLeg' + s].pivot.rotation.x = lerp(P['uLeg' + s].pivot.rotation.x, -1.5, e); P['lLeg' + s].pivot.rotation.x = lerp(P['lLeg' + s].pivot.rotation.x, 0.04, e); const o = s === 'R' ? 'L' : 'R'; P['lLeg' + o].pivot.rotation.x += 0.25 * e; P.torso.pivot.rotation.x -= 0.15 * e; }
+  const both = L.legL && L.legR, one = L.legL || L.legR;
+  if (both) { P.pelvis.pivot.position.y -= 0.62; for (const s of ['L', 'R']) P['uLeg' + s].pivot.rotation.x = -1.4; }
+  else if (one && TS.ext.kl < 0.05) { const s = L.legR ? 'R' : 'L'; P['uLeg' + s].pivot.rotation.x = -0.5; }
+}
+/* ---------- кадр: опасности, проверка касаний, кровь ---------- */
+function tsHandW(s) { const e = tsEyeP(), f = tsFwd(), r = new V3(Math.cos(player.yaw), 0, -Math.sin(player.yaw)), sg = s === 'R' ? 1 : -1; return [0.5, 0.82].map((d) => e.clone().addScaledVector(f, d).addScaledVector(r, 0.12 * sg).add(new V3(0, -0.07, 0))); }
+function tsFootW(s) { const P = avatar && avatar.parts['lLeg' + s]; if (!P || !P.foot) return []; const a = P.foot.getWorldPosition(new V3()), b = P.pivot.getWorldPosition(new V3()); return [a, a.clone().lerp(b, 0.5)]; }
+function tsHazHit(H, p) { if (H.type === 'saw') { const d = _tsV2.subVectors(p, H.c), al = d.dot(H.n); if (Math.abs(al) > 0.25) return false; const ip = Math.sqrt(Math.max(0, d.lengthSq() - al * al)); return ip < H.r + 0.04; } return p.distanceTo(H.c) < H.r; }
+function tsPost3(dt) {
+  const E = TS.ext, p = player.pos;
+  const ls = tsLegS(); const wantL = E.leg && ls && player.onGround && !TS.climb && !TS.sit;
+  E.kl = clamp(E.kl + (wantL ? dt * 3.5 : -dt * 4), 0, 1); if (wantL) E.lside = ls;
+  TS.legLook = -0.42 * tsEase(E.kl); tsHop(dt);
+  if (avatar !== TS.avRef) { TS.avRef = avatar; if (TS.lost.legL || TS.lost.legR || TS.lost.armL || TS.lost.armR) tsHeal(); }
+  // опасности: вращение пил, зубастик дышит и щёлкает
+  let near = 99;
+  for (const H of TS.haz) {
+    const d = Math.hypot(p.x - H.c.x, p.z - H.c.z); near = Math.min(near, d);
+    if (H.type === 'saw') { H.m.rotation.y += H.spin * dt; }
+    else { H.t += dt; let tgt; if (H.st === 'idle') { tgt = 0.35 + Math.sin(H.t * 2.2) * 0.15 + (d < 3 ? 0.25 : 0); if (d < 2.6 && Math.random() < dt * 0.35) { H.st = 'snap'; H.t = 0; } } else if (H.st === 'snap') { tgt = H.t < 0.1 ? 0.75 : 0; if (H.t > 0.1 && !H.snd) { H.snd = 1; SFX.tsChomp(0.9 * dv(H.c) * 1.5); shake = Math.max(shake, 0.08); } if (H.t > 0.55) { H.st = 'idle'; H.t = 0; H.snd = 0; } } else tgt = 0.3;
+      H.open = lerp(H.open, tgt, Math.min(1, dt * (H.st === 'snap' && H.t > 0.1 ? 30 : 6))); H.up.rotation.x = -H.open * 0.55; H.lo.rotation.x = H.open * 0.4;
+      if (d < 6) H.g.rotation.y = lerp(H.g.rotation.y, clamp(Math.atan2(p.x - H.g.position.x, p.z - H.g.position.z), -0.9, 0.9), Math.min(1, dt * 2)); H.head.updateMatrixWorld(true); H.c.copy(H.head.localToWorld(new V3(0, 0, 0.42))); H.head.position.y = 1.2 + Math.sin(H.t * 1.7) * 0.03; const ang = Math.atan2(p.x - 24, p.z + 13);
+      for (const e of H.up.children) for (const c of e.children) if (c.name === 'pupil') c.position.x = clamp(Math.sin(ang - H.g.rotation.y) * 0.04, -0.04, 0.04);
+      if (d < 4 && (H.growlT = (H.growlT || 0) - dt) < 0) { H.growlT = rand(2.5, 5); SFX.tsGrowl(0.35 * dv(H.c) * 1.5); } }
+  }
+  if (near < 7 && (TS.buzzT -= dt) < 0) { TS.buzzT = 0.21; SFX.tsSaw(clamp(0.5 - near * 0.06, 0.05, 0.4)); }
+  // касание вытянутой рукой/ногой → отруб
+  const tests = []; if (E.ka > 0.6 && E.side) tests.push(['arm', E.side, tsHandW(E.side)]); if (E.kl > 0.6 && E.lside) tests.push(['leg', E.lside, tsFootW(E.lside)]);
+  for (const [part, side, pts] of tests) for (const H of TS.haz) for (const q of pts) if (tsHazHit(H, q)) {
+    if (H.type === 'jaw') { if (H.st !== 'snap' || H.t > 0.12) { H.st = 'snap'; H.t = 0.0; H.snd = 0; } H.victim = [part, side, q.clone()]; break; }
+    tsChop(part, side, H, q.clone()); break;
+  }
+  for (const H of TS.haz) if (H.type === 'jaw' && H.victim && H.st === 'snap' && H.t > 0.1) { const [part, side, q] = H.victim; H.victim = null; tsChop(part, side, H, q); }
+  // кровь из культей и с отрубленной части
+  if (TS.bleedT > 0) { TS.bleedT -= dt; if (Math.random() < dt * 6) { for (const S of TS.stumps) { if (S.kind === 'av') { const w = S.obj.getWorldPosition(new V3()); bloodSpray(w, new V3(rand(-0.2, 0.2), -1, rand(-0.2, 0.2)).normalize(), 4, 0.6, 0.3, 1.2, 0.004, 0.009); } else { const w = tsEyeP().add(new V3(0, -0.55, 0)).addScaledVector(tsFwd().setY(0).normalize(), 0.3); bloodSpray(w, new V3(0, -1, 0), 3, 0.5, 0.2, 1, 0.003, 0.008); } } }
+    if (TS.bleedT > 4 && Math.random() < dt * 1.5) screenBlood(0.15); }
+  for (const it of TS.items) if (it.kind === 'limb' && it.drip > 0 && it.body) { it.drip -= dt; if (Math.random() < dt * 5) bloodSpray(it.m.position.clone(), new V3(0, -1, 0), 2, 0.5, 0.2, 0.8, 0.003, 0.007); }
+}
+function tsHop(dt) { const L = TS.lost; if ((L.legL !== L.legR) && player.onGround && Math.hypot(player.vel.x, player.vel.z) > 0.6 && (TS.hopT = (TS.hopT || 0) - dt) < 0) { TS.hopT = 0.42; player.vel.y = 2.4; player.onGround = false; SFX.tsStep(0.35); TS.camRV += (L.legR ? -1 : 1) * 0.5; } }
+function tsSpdK3() { const L = TS.lost, both = L.legL && L.legR, one = L.legL || L.legR; return (both ? 0.28 : one ? 0.45 : 1) * (TS.ext.kl > 0.1 ? 0.15 : 1); }
+function tsEyeK3() { const L = TS.lost; return L.legL && L.legR ? 0.95 : 0; }
+function tsLimbHint() { const L = TS.lost; if (!(L.armL || L.armR || L.legL || L.legR)) return null; return L.armL && L.armR ? '🩸 рук нет — 🩹 пришить' : null; }
+function tsHealBtn() {
+  // пришить всё обратно: отрубленные части исчезают из мира
+  for (const it of TS.items.slice()) if (it.kind === 'limb') { if (TS.held === it) TS.held = null; tsLift(it); it.m.parent && it.m.parent.remove(it.m); TS.items.splice(TS.items.indexOf(it), 1); }
+  tsHeal(); SFX.tsSew(0.6); player.hp = Math.min(100, player.hp + 30); banner('🩹 ПРИШИТО', 'руки и ноги снова на месте'); tsHud();
+}
+window.addEventListener('keyup', (e) => { const m = { Digit1: 'arm', Digit2: 'leg' }[e.code]; if (m) TS.ext[m] = false; });
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
@@ -22911,7 +23096,7 @@ function frame(now) {
 loadMap(settings.map); populateSandbox(); placePills(); syncChips(); syncCont(); buildWard(); applyLook(); buildGhost(); syncSecrets();
 $('loading').remove();
 window.__gameReady = true;
-window.__game = { get cutT() { return story.cut ? story.cut.t : -1; }, set cutT(v) { if (story.cut) story.cut.t = v; }, MONS, MV, MIT, MVP, MVG, SFX, DOG, H2, SKN, SKINS, HOUSE_MAPS, mvUse, mvDraw, monsBotKill, mvActTrap, mvActBoard, mvActLamp, mvActSalt, mvActPill, mvActEnergy, mvActBat, mvActFlare, mvActSmoke, mvActBone, mvActAdren, mvActFlash, get touch() { return touch; }, MILK, MILK_META, MK, MP, milkStart, milkPage, milkCaseOpen, milkRoll, milkW, milkPct, milkAdmItems, milkPick, TS, tsKeyNear, tsInteract, tsGest, tsThrow, tsCrouch, tsFlashT, tsLabel2, tsNear2, tsStand, tsAct, get player() { return player; }, get eyeObj() { return eye; }, get touchS() { return touch; }, get mapId() { return mapId; }, renderer, sun, settings, scene, bloodSpray, sparks, screenBlood, spawnSprite, tracer, TEX, MAK, MAK_SAVE, startCh3, makStage, makTimeStop, makHook, makPunch, makFlyToggle, updMak, makHurt, scpPuzzle, updScp, scpQteHit, scpLockDoor, scpKillPlayer, MC, scpMonBegin, scpMonRage, SCP, SCP_META, scpStart, scpGen, scpRage, scpFinishTerm, scpUseTerm, milkEnd, milkAward, updMilk, milkFire, milkPortrait, DREAM, DWP, dreamBegin, dreamCheck, updDream, dreamFinish, dreamSay, dreamStalkSpawn, dreamHands, mvBarSync, mvUiShow, mvSkinApply, mvTrapAt, mvBotJob, monsProbeTick, monsPickWin, houseFloorY, crystalsAdd, skinCaseMenu, skinCaseOpen, skinCollection, emotePlay, emoteWheel, dogStart, monsBotRevive, mvSaltPlace, mvLampPlace, monsRoomPts, winY, mvKey, mvSet, get player() { return player; }, get camera() { return camera; }, get settings() { return settings; }, LOB, lobbyStart, lobAction, lobBotAdd, monsChat, chatSend, chatToggle, chatNorm, MONS_ACH, monsAchGive, monsCnt, monsTvShow, monsScareTick, monsStormTick, monsPhoneEnsure, lobSpinMenu, lobTasksMenu, MON_WIN, MON_KINDS, winIn, winOut, roomOf, anyPath, monsBreach, monsSunrise, monsUse, monsSpawnPicks, monsPowerOut, monsPowerOn, MONS_META, MONS_CLS, monsTaskInc, monsCoins, monsPlaceTrap, monsBoardWin, monsGhostStart, monsRevive, monsMenu, monsClsMenu, monsStart, monsBegin, monsCut, monsOver, monsDoorSet, monsHideIn, monsAction, monsPickEvent, mkNoob, mkMonster, loadMap, resume, openSpawn, get spc() { return spc; }, spRender, wpBuildSample, spawnAtAim, get state() { return state; }, DACHA, dachaBlast, applyNewLook, spawnNPC, D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, vehPlaceRamp, vehSpec, vehGround, vehPhys, makeCar, vehRemove, vehAI, vehCollide, vehTrackIdx, vehBox, obbHit, vehFlip, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
+window.__game = { get cutT() { return story.cut ? story.cut.t : -1; }, set cutT(v) { if (story.cut) story.cut.t = v; }, MONS, MV, MIT, MVP, MVG, SFX, DOG, H2, SKN, SKINS, HOUSE_MAPS, mvUse, mvDraw, monsBotKill, mvActTrap, mvActBoard, mvActLamp, mvActSalt, mvActPill, mvActEnergy, mvActBat, mvActFlare, mvActSmoke, mvActBone, mvActAdren, mvActFlash, get touch() { return touch; }, MILK, MILK_META, MK, MP, milkStart, milkPage, milkCaseOpen, milkRoll, milkW, milkPct, milkAdmItems, milkPick, TS, tsKeyNear, tsInteract, tsGest, tsThrow, tsCrouch, tsFlashT, tsHealBtn, tsChop, tsLabel2, tsNear2, tsStand, tsAct, get player() { return player; }, get eyeObj() { return eye; }, get touchS() { return touch; }, get mapId() { return mapId; }, renderer, sun, settings, scene, bloodSpray, sparks, screenBlood, spawnSprite, tracer, TEX, MAK, MAK_SAVE, startCh3, makStage, makTimeStop, makHook, makPunch, makFlyToggle, updMak, makHurt, scpPuzzle, updScp, scpQteHit, scpLockDoor, scpKillPlayer, MC, scpMonBegin, scpMonRage, SCP, SCP_META, scpStart, scpGen, scpRage, scpFinishTerm, scpUseTerm, milkEnd, milkAward, updMilk, milkFire, milkPortrait, DREAM, DWP, dreamBegin, dreamCheck, updDream, dreamFinish, dreamSay, dreamStalkSpawn, dreamHands, mvBarSync, mvUiShow, mvSkinApply, mvTrapAt, mvBotJob, monsProbeTick, monsPickWin, houseFloorY, crystalsAdd, skinCaseMenu, skinCaseOpen, skinCollection, emotePlay, emoteWheel, dogStart, monsBotRevive, mvSaltPlace, mvLampPlace, monsRoomPts, winY, mvKey, mvSet, get player() { return player; }, get camera() { return camera; }, get settings() { return settings; }, LOB, lobbyStart, lobAction, lobBotAdd, monsChat, chatSend, chatToggle, chatNorm, MONS_ACH, monsAchGive, monsCnt, monsTvShow, monsScareTick, monsStormTick, monsPhoneEnsure, lobSpinMenu, lobTasksMenu, MON_WIN, MON_KINDS, winIn, winOut, roomOf, anyPath, monsBreach, monsSunrise, monsUse, monsSpawnPicks, monsPowerOut, monsPowerOn, MONS_META, MONS_CLS, monsTaskInc, monsCoins, monsPlaceTrap, monsBoardWin, monsGhostStart, monsRevive, monsMenu, monsClsMenu, monsStart, monsBegin, monsCut, monsOver, monsDoorSet, monsHideIn, monsAction, monsPickEvent, mkNoob, mkMonster, loadMap, resume, openSpawn, get spc() { return spc; }, spRender, wpBuildSample, spawnAtAim, get state() { return state; }, DACHA, dachaBlast, applyNewLook, spawnNPC, D3, d3Start, d3Act, d3Play, d3Hollow, d3Finish, updD3, FL, MAPS, d3Ev, d3RoofLook, get curW() { return curW(); }, IDEA, ideaPick, ideaChance, ideasStart, ideaRound, ideaLottery, ideaPlayAll, ideaAsk, ideaAskSubmit, ideaSecretLove, secretLoveSeen, loveStart, LOVE, ideaFindWho, ideaSpawnObj, ideaLocBuild, ideaStatue, IM,  IDEA_WORDS, IDEA_FX, ideaApply, ideaParse, ideasOver, ideasMenu, VEH, CARS, makeCar, vehEnter, vehExit, vehDamage, updVeh, vehGarage, vehRaceStart, vehSpawnMine, vehPlaceRamp, vehSpec, vehGround, vehPhys, makeCar, vehRemove, vehAI, vehCollide, vehTrackIdx, vehBox, obbHit, vehFlip, damagePlayer, c3NpcX: (k, x, z, y) => c3Npc(k, x, z, y), d3Adm, d3OfficeStart, d3MelStart, d3MelFight, d3MelUpd, d3Yard, d3YardFight, d3RoofReturn, d3Flash, d3Embrace, M8, d3Tubes, d3Form, d3BossUpd, d3Phase2, d3OfficeUpd, flAcidSweep, flCarveHits, FLM, flMeltUpd, scene, updFluid, flGrid, flAdd, updFluidPost, FLX, flEffects, LQ, LQT, FLU, flHose, flStep, touch, cutC3Shield, c3Gun, C3, c3Start, c3Act, c3Finale, c2Flash, c2Blackout, c2PowerOn, c2Fuse, c2Chat, admCh2, adm, admRender, TRIAL, c2Police, c2Round, c2Ev, startCh2, C2, c2Act, story, cutC2End, c2Finish, c2SafeOpen, FAB, fabGo, fabDoor, throwMolotov, molotovBurst, FIRES, spawnHuggy, setMods2: setMods, BOTTLE, hitPart, wwWave, wwGuards, nearBin, takeBottle, bottleCast, MODELS, startTimeTravel, setupWW2, nearMachine, makeTimeMachine, spearHit, spearThrow, WW, TM, dropEggs, melodie: (x, z) => mkNpc('melodie', x, z, 0), buildAxe, setMods, getMods, catToss, catMeow, CAT, selectWeapon, WEAPONS, W, cutUlt, ULT, admUlt, ultStop, storySkip, skipAll: () => { story.lastSkip = 0; storySkip(); }, storyCafe, storyPort, storyStudio, cutArrest, cutPawn, cutJustice, cutPawnCell, cutRainbow, chooseArrest, portFree, portLedger, cutCable, cutStudioLive, cutStudioEnd, cutCafeEnd, cutPortEscape, evAdd, evCount, CAFE, PORT, STU, EXCL, admRainbow, brideSwap, nearHostage, nearCable, actInfo, storyFlat, flatSearch, nearClue, setMode: (m) => { mode = m; }, SECRETS, secretGet, secGot, moonOpen, spc, wpBuildSample, spRender, MOON, INV, openInv, closeInv, throwKnife, toggleLight, useMedkit, useAdren, buildNeckGash, ggTearFace, ggLayersStart, ggLayersUpdate, ggLayersEnd, ggFaceRestore, cutRegenHead, cutRegenLaugh, breakBone, tearCloth, fistHit, bareLimb, makeAvatar, get avatarObj() { return avatar; }, adm, admEnding, admFinale, Music, cine, Sound, KT, cutKissTrap, kissWatch, ggQuip, ggLaugh, gagCut, lfxInit, ggImpact, ggHeal, cutGhost, startSwatFight, renderExcl, addUn, getUn, addNote, startChase, cutSearch, cutBalcony, cutWedding, startHunted2, cutBaby, rollCredits, storyAct, cutEscape, storyStreet, showEnd, storyPolice, storyGala, storyPhoto, storyComplain, cutBaby, svAim, story, startStory, chooseShoot, chooseMarry, cutKiss, V3, touch, get avatar() { return avatar; }, playerRagdoll, playerGetUp, fallFx, eye, settings, ELV, TOWER, LV, BG, glassPanels, inCabin, setBackdropHeight, npcs, stats, spawnNPC, explode, player, startGame, startCutscene, suicide, madness, loadMap, cut, sc, get state2() { return state; }, get pills() { return pills; }, get mapId() { return mapId; }, fire: (p = true) => tryFire(p), probe: () => { raycaster.set(camera.position, forwardDir(new V3())); raycaster.far = 150; return raycaster.intersectObjects(getTargets(), false).slice(0, 4).map((h) => (h.object.userData.kind || "?") + ":" + (h.object.userData.part || "") + "@" + h.distance.toFixed(2)); }, nT: () => getTargets().length, select: selectWeapon, W, MODELS, get state() { return state; }, world, camera, hitTest: (type) => { const n = npcs.find((x) => x.type === type && x.alive); return n; } };
 requestAnimationFrame(frame);
 </script>
 <!--ARTIFACT-BODY-END-->
