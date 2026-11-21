@@ -11637,6 +11637,7 @@ function admCh2() {
 function admItems(tab) {
   const u = getUn(), on = (v) => (v ? 'ВКЛ' : 'выкл');
   if (tab === 'ch2') return admCh2();
+  if (tab === 'ch3') return admCh3();
   if (tab !== 'end' && tab !== 'cut' && tab !== 'gg') return [{ sec: 'Монеты и кристаллы' }, { l: MONS_META.infCoins ? '🪙 Бесконечные монеты: ВКЛ' : '🪙 Бесконечные монеты: выкл', s: 'Нажмите, чтобы переключить', f: () => { MONS_META.infCoins = !MONS_META.infCoins; MONS_META.coins = MONS_META.infCoins ? 999999 : Math.max(MONS_META.coins, 0); monsMetaSave(); toast(MONS_META.infCoins ? '🪙 Бесконечные монеты включены' : '🪙 Бесконечные монеты выключены'); admRender(); } }, { l: '💎 Кристаллы +500', s: 'Для сундука скинов', f: () => { crystalsAdd(500, 'админ'); } }, ...milkAdmItems(), ...admItems2(tab)];
   return admItems2(tab);
 }
@@ -11714,7 +11715,7 @@ function admRender() {
   $('admLock').hidden = adm.ok; $('admBody').hidden = !adm.ok;
   $('admDisp').textContent = [0, 1, 2, 3].map((i) => (i < adm.in.length ? '●' : '–')).join(' ');
   if (!adm.ok) return;
-  const T = [['end', 'Концовки'], ['cut', 'Кат-сцены'], ['ch2', 'Глава 2'], ['gg', 'Воскреситель'], ['cheat', 'Читы']];
+  const T = [['end', 'Концовки'], ['cut', 'Кат-сцены'], ['ch2', 'Глава 2'], ['ch3', 'Глава 3'], ['gg', 'Воскреситель'], ['cheat', 'Читы']];
   $('admTabs').innerHTML = T.map(([k, l]) => `<button class="chip${adm.tab === k ? ' on' : ''}" data-t="${k}">${l}</button>`).join('');
   $('admTabs').querySelectorAll('[data-t]').forEach((b) => b.onclick = () => { adm.tab = b.dataset.t; Sound.click(900, 0.15); admRender(); });
   const it = admItems(adm.tab); window.__admFns = it;
@@ -21820,6 +21821,35 @@ makStage = function (st) {
   if (st === 'intro') { MAK.ggHand = null; MAK.ggMortal = false; MAK.bullK = null; MAK.finalDead = false; }
   return makStage1(st);
 };
+/* ---------- админ-панель: вкладка «Глава 3» (код 6508) ---------- */
+function admCh3Go(stage, after, delay = 1500) {
+  admClose(); try { startCh3(stage); } catch (e) { toast('Не удалось запустить главу 3'); return; }
+  if (after) setTimeout(() => { if (MAK.on) after(); }, delay);
+}
+function admCh3() {
+  const u = getUn();
+  return [
+    { sec: 'Ключевые моменты главы' },
+    { l: 'Глава 3 с начала', s: 'Вступление, Макар представляется', f: () => admCh3Go('intro') },
+    { sec: 'Этапы' },
+    { l: 'Набережная: волны черепов', s: 'Бой на улице, люди вокруг', f: () => admCh3Go('m1') },
+    { l: 'Небо: полёт над городом', s: 'Дроны', f: () => admCh3Go('sky') },
+    { l: 'Встреча со Свити на набережной', s: 'Разговор с Макаром', f: () => admCh3Go('meet') },
+    { l: 'Тихо, как тень', s: 'Скрытное проникновение', f: () => admCh3Go('stealth') },
+    { l: 'Склад №13: волны', s: 'Бульдог ждёт у двери', f: () => admCh3Go('m2') },
+    { l: 'Хранилище: защита Макара', s: 'Дверь прожигается', f: () => admCh3Go('defend') },
+    { sec: 'Выборы (3 секунды, серый экран)' },
+    { l: 'Прилёт Воскресителя: «Подать руку?»', s: 'Макар на набережной после волн', f: () => admCh3Go('m1', () => makGGArrive(), 1200) },
+    { l: 'Бульдог: «Добить?» → Обнулитель', s: 'Потеря бессмертия Воскресителя', f: () => admCh3Go('boss', () => { MAK.cut = null; makCurse(); }, 1500) },
+    { l: 'Свити: «Протянуть руку / Отпустить»', s: 'Сцена на складе перед финалом', f: () => admCh3Go('end') },
+    { sec: 'Концовка' },
+    { l: 'Финал в машине (ветка «Подать руку»)', s: 'Монстр, четыре автомата, Воскреситель закрывает всех', f: () => admCh3Go('boss', () => { MAK.cut = null; MAK.ggHand = 'hand'; makCarEnd(() => { const r = makPanel(`<div style="font:900 22px var(--ui);margin-bottom:8px">ГЛАВА 3 «МАКАР» · КОНЕЦ</div><button class="btn primary" data-k="m" style="width:100%">В меню</button>`); r.querySelector('[data-k="m"]').onclick = () => makExit(); }); }, 900) },
+    { l: 'Финал в машине (ветка «Не подавать руку»)', s: 'То же, но Макар не подал руки', f: () => admCh3Go('boss', () => { MAK.cut = null; MAK.ggHand = 'no'; makCarEnd(() => { const r = makPanel(`<div style="font:900 22px var(--ui);margin-bottom:8px">ГЛАВА 3 «МАКАР» · КОНЕЦ</div><button class="btn primary" data-k="m" style="width:100%">В меню</button>`); r.querySelector('[data-k="m"]').onclick = () => makExit(); }); }, 900) },
+    { sec: 'Сохранение главы' },
+    { l: 'Сбросить прогресс главы 3', s: 'Начать главу заново с сохранения', f: () => { MAK_SAVE.at = 'intro'; MAK_SAVE.done = false; makSaveP(); toast('Прогресс главы 3 сброшен'); admRender(); } },
+    { l: 'Отметить главу 3 пройденной', s: 'Добавит «Макар» в коллекцию', f: () => { try { addUn('ch3'); } catch (e) {} toast('Глава 3 отмечена пройденной'); admRender(); } },
+  ];
+}
 /* ===================== ТЕСТ-ПЛОЩАДКА (экспериментальная) =====================
    Карта для проверки «реалистичных» систем: руки от первого лица реагируют на движение, приземление и воду;
    мягкий мат гасит падения; вода-бассейн с всплеском и плаванием; дверь с замком — ключ вставляется и поворачивается;
