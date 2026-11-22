@@ -24522,17 +24522,24 @@ function tsUnitHit(H, dmg, dir, w) {
 function tsUnitDie(U) {
   if (U.dead) return; U.dead = true; U.deadT = 0; const M = tsvMats();
   if (U.type === 'heli') { U.state = 'crash'; toast('🚁 Вертолёт подбит!'); return; }
-  const p = U.g.position.clone(); p.y += U.type === 'mech' ? 3 : 1; explode(p, U.type === 'car' ? 1.3 : 1.8); U.g.traverse((o) => { if (o.isMesh && o.material !== M.glow) o.material = M.wreck; }); toast({ car: '🚓 Машина взорвана', tank: '🪖 Танк уничтожен!', mech: '🤖 Мех повержен!' }[U.type]);
+  const p = U.g.position.clone(); p.y += U.type === 'mech' ? 3 : 1; tsBoom(p, U.type === 'car' ? 1.0 : 1.2); U.g.traverse((o) => { if (o.isMesh && o.material !== M.glow) o.material = M.wreck; }); toast({ car: '🚓 Машина взорвана', tank: '🪖 Танк уничтожен!', mech: '🤖 Мех повержен!' }[U.type]);
   if (U.type === 'tank' && U.g.userData.tur) { U.popT = { v: new V3(rand(-2, 2), 9, rand(-2, 2)), w: rand(-3, 3) }; }
   if (U.type === 'mech') U.fall = 0;
   tsWantedBump(U.type === 'car' ? 0 : 1);
 }
 function tsUnitsBlast(pos, power) { for (const U of TS.wl.units) { if (U.dead || U.gone) continue; const c = U.g.position, d = Math.hypot(c.x - pos.x, (c.y + 1) - pos.y, c.z - pos.z); const r = 6 * power + U.rad; if (d < r) { U.hp -= (1 - d / r) * 420 * power * ({ car: 1, heli: 1, tank: 0.9, mech: 0.8 }[U.type]); if (U.hp <= 0) tsUnitDie(U); } } }
 const _explode0 = explode;
+// взрыв от техники: игрок получает не больше 25% урона, его не сбивает с ног
+function tsBoom(pos, power) {
+  const hp0 = player.hp, rag = player.rag, dead0 = player.dead; player.rag = true;
+  try { _explode0(pos, power); } finally { player.rag = rag; }
+  const took = hp0 - player.hp; if (!dead0 && !player.dead && took > 0) player.hp = hp0 - took * 0.25;
+  tsUnitsBlast(pos, power);
+}
 explode = function (pos, power) { _explode0(pos, power); if (mapId === 'testsite') tsUnitsBlast(pos, power); };
 /* ---------- полицейские пешком ---------- */
 function tsCopSpawn(U, s) {
-  const W = TS.wl; if (W.cops.filter((c) => c.alive).length >= 8) return null; const c = U.g.position, yaw = U.g.rotation.y, rx = Math.cos(yaw), rz = -Math.sin(yaw);
+  const W = TS.wl; if (W.cops.filter((c) => c.alive).length >= 6) return null; const c = U.g.position, yaw = U.g.rotation.y, rx = Math.cos(yaw), rz = -Math.sin(yaw);
   const x = c.x + rx * s * 1.6, z = c.z + rz * s * 1.6; const n = mkNpc('cop', x, z, yaw, 'soldier'); guardSetup(n, [[x, z]]); n.calm = false; n.shootCd = rand(0.8, 1.6); n.tsCop = true; n.pos.set(x, 0, z); n.hp = n.maxHp = 110;
   const la = n.parts.lArmR; if (la) { for (const ch of [...la.mesh.children]) if (ch.geometry && ch.geometry.parameters && ch.geometry.parameters.depth === 0.55) ch.visible = false; const gm = W.stars >= 4 ? tsgCarbine() : tsgPistol(); gm.rotation.y = Math.PI; gm.position.set(0, -0.03, W.stars >= 4 ? 0.02 : 0.08); la.mesh.add(gm); n.tsGunM = gm; }
   W.cops.push(n); targetsDirty = true; if (!W.copSaid || performance.now() - W.copSaid > 25000) { W.copSaid = performance.now(); tsSay('Полиция', pick(['Это полиция! Бросай оружие!', 'Руки за голову! Ты окружён!', 'Стоять! Полиция!']), 2.8, { p: 0.8, r: 1.1 }); } return n;
@@ -24541,10 +24548,10 @@ const _guardFire0 = guardFire;
 guardFire = function (g) {
   if (!g.tsCop && g.bankRole !== 'guard') return _guardFire0(g);
   const from = headPos(g, _cfE).clone(); from.y -= 0.15; if (g.tsGunM) { g.tsGunM.updateMatrixWorld(true); g.tsGunM.localToWorld(from.copy(g.tsGunM.userData.muzzle)); }
-  const d = from.distanceTo(eye.position), hc = clamp(0.5 - d * 0.012, 0.12, 0.45) * (TS.crouch > 0.5 ? 0.7 : 1) * (Math.hypot(player.vel.x, player.vel.z) > 5 ? 0.6 : 1); const hit = Math.random() < hc;
+  const d = from.distanceTo(eye.position), hc = clamp(0.3 - d * 0.006, 0.06, 0.22) * (TS.crouch > 0.5 ? 0.7 : 1) * (Math.hypot(player.vel.x, player.vel.z) > 5 ? 0.6 : 1); const hit = Math.random() < hc; g.shootCd = rand(2.6, 3.6);
   const to = hit ? eye.position.clone().add(new V3(rand(-0.12, 0.12), rand(-0.3, 0.1), rand(-0.12, 0.12))) : eye.position.clone().add(new V3(rand(-1.4, 1.4), rand(-0.9, 0.6), rand(-1.4, 1.4)));
   tracer(from, to); SFX.tsGun(g.tsGunM && TS.wl.stars >= 4 ? 'rifle' : 'pistol', 0.8, from.x, from.z); spawnSprite(TEX.flash, from, { color: 0xffd9a0, size: rand(0.2, 0.32), grow: 0.4, life: 0.05, additive: true });
-  if (hit) { damagePlayer(rand(5, 9)); shake = Math.max(shake, 0.2); } else { const n = to.clone().sub(from).normalize(); const r = tsRay(from.clone().addScaledVector(n, 0.5), n, { id: 'pistol', dmg: 0, pen: 0, force: 5, range: 60 }); void r; }
+  if (hit) { damagePlayer(rand(3, 5)); shake = Math.max(shake, 0.2); } else { const n = to.clone().sub(from).normalize(); const r = tsRay(from.clone().addScaledVector(n, 0.5), n, { id: 'pistol', dmg: 0, pen: 0, force: 5, range: 60 }); void r; }
 };
 /* ---------- звёзды ---------- */
 function tsWlStars() { return TS.wl.stars; }
@@ -24564,7 +24571,7 @@ function tsPost9(dt) {
     if (seen) { W.unseen = 0; W.last.copy(player.pos); if (W.search) { W.search = false; toast('👁 Вас заметили!'); } } else { W.unseen += 0.25; if (W.unseen > 3 && !W.search) { W.search = true; toast('🔍 Вас потеряли из виду — затаитесь'); } } }
   if (W.stars && W.search && W.unseen > 6 + W.stars * 2.5) tsWlClear('escape');
   // подкрепление
-  if (W.stars) for (const type of ['car', 'heli', 'tank', 'mech']) { const cap = TS_WL_CAP[type][W.stars], have = W.units.filter((U) => U.type === type && !U.dead && U.state !== 'leave').length; W.spawnT[type] = (W.spawnT[type] || 0) - dt; if (have < cap && W.spawnT[type] <= 0) { W.spawnT[type] = type === 'car' ? rand(2.5, 4.5) : rand(6, 10); if (W.units.length < 18) tsUnitSpawn(type); } }
+  if (W.stars) for (const type of ['car', 'heli', 'tank', 'mech']) { const cap = Math.min(type === 'car' ? 99 : 99, TS_WL_CAP[type][W.stars]), have = W.units.filter((U) => U.type === type && !U.dead && U.state !== 'leave').length; W.spawnT[type] = (W.spawnT[type] || 0) - dt; if (have < cap && W.spawnT[type] <= 0) { W.spawnT[type] = type === 'car' ? rand(2.5, 4.5) : rand(6, 10); if (W.units.length < 18) tsUnitSpawn(type); } }
   // юниты
   let siren = 0, rotor = 0, eng = 0;
   for (let i = W.units.length - 1; i >= 0; i--) { const U = W.units[i]; U.t += dtt; const d = U.g.position.distanceTo(player.pos);
@@ -24607,7 +24614,7 @@ function tsCarStep(U, dt, d) {
 }
 function tsHeliStep(U, dt, d) {
   const g = U.g, ud = g.userData, W = TS.wl; ud.rot.rotation.y += dt * (U.dead ? 14 : 22); ud.tr.rotation.x += dt * 40;
-  if (U.state === 'crash') { U.vel.y -= 9.8 * dt; g.position.addScaledVector(U.vel, dt); U.yaw += dt * 5; g.rotation.set(0.3, U.yaw, 0.4); if ((U.smokeT -= dt) < 0) { U.smokeT = 0.05; spawnSprite(TEX.smoke, g.position.clone(), { color: 0x141210, size: 1.2, grow: 2.5, life: 2, opacity: 0.6, vel: new V3(0, 1, 0) }); } if (g.position.y < 1.2) { U.state = 'wreck'; g.position.y = 1.0; explode(g.position.clone(), 1.8); g.traverse((o) => { if (o.isMesh) o.material = TSV_M.wreck; }); ud.cone.visible = false; } return; }
+  if (U.state === 'crash') { U.vel.y -= 9.8 * dt; g.position.addScaledVector(U.vel, dt); U.yaw += dt * 5; g.rotation.set(0.3, U.yaw, 0.4); if ((U.smokeT -= dt) < 0) { U.smokeT = 0.05; spawnSprite(TEX.smoke, g.position.clone(), { color: 0x141210, size: 1.2, grow: 2.5, life: 2, opacity: 0.6, vel: new V3(0, 1, 0) }); } if (g.position.y < 1.2) { U.state = 'wreck'; g.position.y = 1.0; tsBoom(g.position.clone(), 1.8); g.traverse((o) => { if (o.isMesh) o.material = TSV_M.wreck; }); ud.cone.visible = false; } return; }
   if (U.state === 'wreck') return;
   const c = U.state === 'leave' ? new V3(g.position.x * 2, 40, g.position.z * 2) : (W.search ? W.last : player.pos);
   U.ang += dt * 0.22; const r = W.search ? 14 : 22; const tp = U.state === 'leave' ? c : new V3(c.x + Math.cos(U.ang) * r, U.alt, c.z + Math.sin(U.ang) * r);
@@ -24617,7 +24624,7 @@ function tsHeliStep(U, dt, d) {
   // прожектор: на игрока или в зону поиска
   const aim = W.search ? W.last.clone().add(new V3(Math.sin(U.t * 0.8) * 6, 0, Math.cos(U.t * 0.6) * 6)) : player.pos.clone(); const cp = ud.cone.getWorldPosition(_t9b).clone(), dir = aim.sub(cp).normalize(); ud.cone.quaternion.setFromUnitVectors(new V3(0, -1, 0), dir.applyQuaternion(g.quaternion.clone().invert())); ud.cone.visible = W.stars > 0;
   // стрелок в двери
-  if (U.state !== 'leave' && W.stars && !W.search) { U.cd -= dt; if (U.cd <= 0 && d < 55) { const from = ud.gun.getWorldPosition(new V3()); if (losFrom(from, eye.position)) { U.burst = 5; U.cd = rand(2.4, 3.6); } else U.cd = 0.5; } if (U.burst > 0 && (U.bt = (U.bt || 0) - dt) < 0) { U.bt = 0.11; U.burst--; const from = ud.gun.getWorldPosition(new V3()); const hit = Math.random() < clamp(0.34 - d * 0.004, 0.1, 0.3); const to = hit ? eye.position.clone().add(new V3(rand(-0.1, 0.1), rand(-0.3, 0.1), rand(-0.1, 0.1))) : player.pos.clone().add(new V3(rand(-2.5, 2.5), rand(0, 1.5), rand(-2.5, 2.5))); tracer(from, to); SFX.tsGun('rifle', 0.7, from.x, from.z); if (hit) { damagePlayer(rand(5, 8)); } else { const n = to.clone().sub(from).normalize(); tsRay(from.clone().addScaledVector(n, 1), n, { id: 'rifle', dmg: 0, pen: 0, force: 5, range: 90 }); } } }
+  if (U.state !== 'leave' && W.stars && !W.search) { U.cd -= dt; if (U.cd <= 0 && d < 55) { const from = ud.gun.getWorldPosition(new V3()); if (losFrom(from, eye.position)) { U.burst = 5; U.cd = rand(4, 5.5); } else U.cd = 0.5; } if (U.burst > 0 && (U.bt = (U.bt || 0) - dt) < 0) { U.bt = 0.11; U.burst--; const from = ud.gun.getWorldPosition(new V3()); const hit = Math.random() < clamp(0.34 - d * 0.004, 0.1, 0.3); const to = hit ? eye.position.clone().add(new V3(rand(-0.1, 0.1), rand(-0.3, 0.1), rand(-0.1, 0.1))) : player.pos.clone().add(new V3(rand(-2.5, 2.5), rand(0, 1.5), rand(-2.5, 2.5))); tracer(from, to); SFX.tsGun('rifle', 0.7, from.x, from.z); if (hit) { damagePlayer(rand(5, 8)); } else { const n = to.clone().sub(from).normalize(); tsRay(from.clone().addScaledVector(n, 1), n, { id: 'rifle', dmg: 0, pen: 0, force: 5, range: 90 }); } } }
 }
 function tsTankStep(U, dt, d) {
   const g = U.g, ud = g.userData, W = TS.wl;
@@ -24629,12 +24636,12 @@ function tsTankStep(U, dt, d) {
   for (const t of ud.trk) if (t.material.map) t.material.map.offset.y -= U.speed * dt * 0.15;
   // башня и ствол на цель
   const ty = Math.atan2(player.pos.x - g.position.x, player.pos.z - g.position.z) + Math.PI - U.yaw; U.turY += clamp(angDiff(U.turY, ty), -dt * 1.1, dt * 1.1); ud.tur.rotation.y = U.turY; const el = Math.atan2(eye.position.y - 2.0, d); U.gunP = lerp(U.gunP, clamp(el, -0.1, 0.35), Math.min(1, dt * 2)); ud.gunG.rotation.x = U.gunP;
-  if (U.state !== 'leave' && W.stars && !W.search) { U.cd2 -= dt; if (U.cd2 <= 0 && Math.abs(angDiff(U.turY, ty)) < 0.08 && d < 70) { const mz = ud.gunG.localToWorld(new V3(0, 0, -3.8)); if (losFrom(mz, eye.position)) { U.cd2 = rand(5, 7); const aimP = player.pos.clone().add(new V3(0, 1, 0)).add(player.vel.clone().multiplyScalar(d / 70)).add(new V3(rand(-1.5, 1.5), 0, rand(-1.5, 1.5))); const v = aimP.sub(mz).normalize().multiplyScalar(70); tsProjFire('shell', mz, v, U); spawnSprite(TEX.flash, mz, { color: 0xffc070, size: 2.2, grow: 0.6, life: 0.12, additive: true }); for (let i = 0; i < 6; i++) spawnSprite(TEX.smoke, mz.clone(), { color: 0xaaa49a, size: 1.2, grow: 2.5, life: 1.5, opacity: 0.5, vel: v.clone().normalize().multiplyScalar(rand(1, 4)).add(new V3(rand(-1, 1), rand(0, 1), rand(-1, 1))) }); SFX.tsGun('tank', 1.2, mz.x, mz.z); shake = Math.max(shake, clamp(1 - d / 50, 0.1, 0.6)); } else U.cd2 = 1; } }
+  if (U.state !== 'leave' && W.stars && !W.search) { U.cd2 -= dt; if (U.cd2 <= 0 && Math.abs(angDiff(U.turY, ty)) < 0.08 && d < 70) { const mz = ud.gunG.localToWorld(new V3(0, 0, -3.8)); if (losFrom(mz, eye.position)) { U.cd2 = rand(11, 14); const aimP = player.pos.clone().add(new V3(0, 1, 0)).add(player.vel.clone().multiplyScalar(d / 70)).add(new V3(rand(-1.5, 1.5), 0, rand(-1.5, 1.5))); const v = aimP.sub(mz).normalize().multiplyScalar(70); tsProjFire('shell', mz, v, U); spawnSprite(TEX.flash, mz, { color: 0xffc070, size: 2.2, grow: 0.6, life: 0.12, additive: true }); for (let i = 0; i < 6; i++) spawnSprite(TEX.smoke, mz.clone(), { color: 0xaaa49a, size: 1.2, grow: 2.5, life: 1.5, opacity: 0.5, vel: v.clone().normalize().multiplyScalar(rand(1, 4)).add(new V3(rand(-1, 1), rand(0, 1), rand(-1, 1))) }); SFX.tsGun('tank', 1.2, mz.x, mz.z); shake = Math.max(shake, clamp(1 - d / 50, 0.1, 0.6)); } else U.cd2 = 1; } }
 }
 function tsMechStep(U, dt, d) {
   const g = U.g, ud = g.userData, W = TS.wl;
-  if (U.state === 'drop') { U.vy = (U.vy || 0) - 18 * dt; g.position.y += U.vy * dt; if (Math.random() < 0.6) spawnSprite(TEX.soft, g.position.clone().add(new V3(rand(-1, 1), 1, rand(-1, 1))), { color: pick([0xff8a2a, 0x9ad8ff]), size: rand(0.8, 1.4), grow: 1.5, life: 0.35, additive: true, vel: new V3(0, -6, 0) }); if (g.position.y <= 0) { g.position.y = 0; U.state = 'walk'; shake = Math.max(shake, clamp(1 - d / 40, 0.2, 0.9)); SFX.tsStomp(1.2, g.position.x, g.position.z); explode && 0; for (let i = 0; i < 24; i++) { const a = i / 24 * 6.28; spawnSprite(TEX.smoke, g.position.clone().add(new V3(Math.cos(a) * 1.5, 0.3, Math.sin(a) * 1.5)), { color: 0x9a9080, size: 1.4, grow: 2.5, life: 1.4, opacity: 0.55, vel: new V3(Math.cos(a) * 6, 0.5, Math.sin(a) * 6) }); } if (d < 6) { damagePlayer(30); playerRagdoll((player.pos.x - g.position.x) * 2, 5, (player.pos.z - g.position.z) * 2); } } return; }
-  if (U.dead) { if (U.fall !== undefined && U.fall < 1) { U.fall = Math.min(1, U.fall + dt * 0.7); g.rotation.x = -U.fall * 1.3; g.position.y = -U.fall * 1.2; if (U.fall >= 1) { explode(g.position.clone().add(new V3(0, 1, 0)), 1.6); shake = Math.max(shake, 0.5); } } return; }
+  if (U.state === 'drop') { U.vy = (U.vy || 0) - 18 * dt; g.position.y += U.vy * dt; if (Math.random() < 0.6) spawnSprite(TEX.soft, g.position.clone().add(new V3(rand(-1, 1), 1, rand(-1, 1))), { color: pick([0xff8a2a, 0x9ad8ff]), size: rand(0.8, 1.4), grow: 1.5, life: 0.35, additive: true, vel: new V3(0, -6, 0) }); if (g.position.y <= 0) { g.position.y = 0; U.state = 'walk'; shake = Math.max(shake, clamp(1 - d / 40, 0.2, 0.9)); SFX.tsStomp(1.2, g.position.x, g.position.z); explode && 0; for (let i = 0; i < 24; i++) { const a = i / 24 * 6.28; spawnSprite(TEX.smoke, g.position.clone().add(new V3(Math.cos(a) * 1.5, 0.3, Math.sin(a) * 1.5)), { color: 0x9a9080, size: 1.4, grow: 2.5, life: 1.4, opacity: 0.55, vel: new V3(Math.cos(a) * 6, 0.5, Math.sin(a) * 6) }); } if (d < 5) { damagePlayer(10); } } return; }
+  if (U.dead) { if (U.fall !== undefined && U.fall < 1) { U.fall = Math.min(1, U.fall + dt * 0.7); g.rotation.x = -U.fall * 1.3; g.position.y = -U.fall * 1.2; if (U.fall >= 1) { tsBoom(g.position.clone().add(new V3(0, 1, 0)), 1.6); shake = Math.max(shake, 0.5); } } return; }
   const tgt = U.state === 'leave' ? new V3(g.position.x * 3, 0, g.position.z * 3) : W.search ? W.last : player.pos; const dx = tgt.x - g.position.x, dz = tgt.z - g.position.z, dist = Math.hypot(dx, dz);
   const go = U.state === 'leave' || dist > 22; let want = Math.atan2(dx, dz); const o = g.position.clone().add(new V3(0, 1.5, 0)); const L = tsProbe(o, new V3(Math.sin(want), 0, Math.cos(want)), 6); if (L < 5) want += 0.8;
   U.yaw += clamp(angDiff(U.yaw, want), -dt * 0.7, dt * 0.7); U.speed = lerp(U.speed, go ? 3.2 : 0, Math.min(1, dt * 1.5)); g.position.x += Math.sin(U.yaw) * U.speed * dt; g.position.z += Math.cos(U.yaw) * U.speed * dt; const P = g.position.clone(); pushOutAABBs(P, 2.2, 0); g.position.x = P.x; g.position.z = P.z; clampBounds(g.position, 3); g.rotation.y = U.yaw;
@@ -24644,8 +24651,8 @@ function tsMechStep(U, dt, d) {
   // торс и оружие
   const ty = Math.atan2(player.pos.x - g.position.x, player.pos.z - g.position.z) + Math.PI - U.yaw; U.turY = (U.turY || 0) + clamp(angDiff(U.turY || 0, ty), -dt * 1.0, dt * 1.0); ud.tor.rotation.y = U.turY; for (const A of ud.arms) { A.sh.rotation.x = lerp(A.sh.rotation.x, -Math.atan2(eye.position.y - 4.5, d) * 0.8, Math.min(1, dt * 2)); A.bar.rotation.z += dt * (U.burst > 0 ? 30 : 2); }
   if (U.state !== 'leave' && W.stars && !W.search && d < 60) {
-    U.cd -= dt; if (U.cd <= 0) { U.cd = rand(2.2, 3.2); U.burst = 8; } if (U.burst > 0 && (U.bt = (U.bt || 0) - dt) < 0) { U.bt = 0.09; U.burst--; const A = ud.arms[U.burst % 2], from = A.bar.localToWorld(new V3(0, 0, -1.0)); if (losFrom(from, eye.position)) { const hit = Math.random() < clamp(0.32 - d * 0.003, 0.1, 0.28); const to = hit ? eye.position.clone().add(new V3(rand(-0.1, 0.1), rand(-0.3, 0.1), rand(-0.1, 0.1))) : player.pos.clone().add(new V3(rand(-3, 3), rand(0, 1.5), rand(-3, 3))); tracer(from, to); SFX.tsGun('rifle', 0.9, from.x, from.z); spawnSprite(TEX.flash, from, { color: 0xffd090, size: 0.7, grow: 0.4, life: 0.05, additive: true }); if (hit) damagePlayer(rand(5, 9)); else { const n = to.clone().sub(from).normalize(); tsRay(from.clone().addScaledVector(n, 1), n, { id: 'rifle', dmg: 0, pen: 0, force: 5, range: 90 }); } } }
-    U.cd2 -= dt; if (U.cd2 <= 0) { U.cd2 = rand(6, 8); for (let i = 0; i < 4; i++) later(i * 0.2, () => { if (U.dead || U.gone) return; const from = ud.tor.localToWorld(new V3((i % 2 ? 1 : -1) * 1.0, 2.2, -0.6)); const aimP = player.pos.clone().add(new V3(rand(-2, 2), 0.5, rand(-2, 2))); const v = aimP.clone().sub(from).normalize().multiplyScalar(26).add(new V3(0, 6, 0)); tsProjFire('rocket', from, v, U, aimP); SFX.tsRocket(0.8, from.x, from.z); }); }
+    U.cd -= dt; if (U.cd <= 0) { U.cd = rand(4, 5.5); U.burst = 4; } if (U.burst > 0 && (U.bt = (U.bt || 0) - dt) < 0) { U.bt = 0.09; U.burst--; const A = ud.arms[U.burst % 2], from = A.bar.localToWorld(new V3(0, 0, -1.0)); if (losFrom(from, eye.position)) { const hit = Math.random() < clamp(0.32 - d * 0.003, 0.1, 0.28); const to = hit ? eye.position.clone().add(new V3(rand(-0.1, 0.1), rand(-0.3, 0.1), rand(-0.1, 0.1))) : player.pos.clone().add(new V3(rand(-3, 3), rand(0, 1.5), rand(-3, 3))); tracer(from, to); SFX.tsGun('rifle', 0.9, from.x, from.z); spawnSprite(TEX.flash, from, { color: 0xffd090, size: 0.7, grow: 0.4, life: 0.05, additive: true }); if (hit) damagePlayer(rand(5, 9)); else { const n = to.clone().sub(from).normalize(); tsRay(from.clone().addScaledVector(n, 1), n, { id: 'rifle', dmg: 0, pen: 0, force: 5, range: 90 }); } } }
+    U.cd2 -= dt; if (U.cd2 <= 0) { U.cd2 = rand(13, 16); for (let i = 0; i < 2; i++) later(i * 0.2, () => { if (U.dead || U.gone) return; const from = ud.tor.localToWorld(new V3((i % 2 ? 1 : -1) * 1.0, 2.2, -0.6)); const aimP = player.pos.clone().add(new V3(rand(-2, 2), 0.5, rand(-2, 2))); const v = aimP.clone().sub(from).normalize().multiplyScalar(26).add(new V3(0, 6, 0)); tsProjFire('rocket', from, v, U, aimP); SFX.tsRocket(0.8, from.x, from.z); }); }
   }
 }
 /* ---------- снаряды и ракеты ---------- */
@@ -24658,7 +24665,7 @@ function tsProjStep(dt) {
     if (!hitP && Pj.p.y + step.y <= floorAt(Pj.p.x, Pj.p.z)) hitP = Pj.p.clone().add(step).setY(floorAt(Pj.p.x, Pj.p.z) + 0.05);
     if (!hitP) { const cl = Pj.p.clone().add(step); if (cl.distanceTo(eye.position) < 1.2 || cl.distanceTo(player.pos.clone().add(new V3(0, 0.9, 0))) < 1.0) hitP = cl; }
     if (!hitP) for (const U of TS.wl.units) if (U !== Pj.owner && !U.gone && Pj.p.distanceTo(U.g.position) < U.rad * 0.7) { hitP = Pj.p.clone(); break; }
-    if (hitP || Pj.t > 6) { scene.remove(Pj.m); L.splice(i, 1); if (hitP) explode(hitP, Pj.kind === 'shell' ? 1.5 : 1.0); continue; }
+    if (hitP || Pj.t > 6) { scene.remove(Pj.m); L.splice(i, 1); if (hitP) tsBoom(hitP, Pj.kind === 'shell' ? 1.1 : 0.7); continue; }
     Pj.p.add(step); Pj.m.position.copy(Pj.p); if (Pj.kind === 'rocket') { Pj.m.quaternion.setFromUnitVectors(UP, dir); if (Math.random() < 0.8) spawnSprite(TEX.smoke, Pj.p.clone(), { color: 0xc8c4bc, size: 0.35, grow: 2.5, life: 1.0, opacity: 0.5, vel: new V3(0, 0.3, 0) }); spawnSprite(TEX.soft, Pj.p.clone(), { color: 0xffa040, size: 0.4, grow: 0.5, life: 0.08, additive: true }); } }
 }
 // стрельба игрока: розыск от выстрелов у банка и по полиции
