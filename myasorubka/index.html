@@ -22472,6 +22472,7 @@ function tsVM2(o, dt) {
   tsVM4(o, dt);
   tsVM5(o, dt);
   tsVM6(o, dt);
+  tsVM10(o, dt);
   if (TS.act && TS.act.kind === 'bandage') { const t = TS.act.t, w = Math.sin(t * 7); o.L = [-0.04, -0.16, -0.34]; o.R = [0.05 + w * 0.06, -0.14 + Math.cos(t * 7) * 0.04, -0.33]; o.curlL = 0.6; o.curlR = 0.8; TS.camDropT = Math.max(TS.camDropT || 0, 0.05); }
   o.R = [o.R[0], o.R[1] - 0.3, o.R[2]]; o.L = [o.L[0], o.L[1] - 0.3, o.L[2]];
   // кольцо: банка в руке крутится к лицу; ящик держим двумя руками
@@ -22479,7 +22480,7 @@ function tsVM2(o, dt) {
 }
 /* ---------- тело от первого лица ---------- */
 function tsBodyUndo() { for (const P of TS.bodyHid) P.mesh.visible = true; TS.bodyHid = []; }
-function tsBody() { tsBody2(); const A = avatar; if (A && mapId === 'testsite' && TS.on && A.state === 'alive') tsBody3(A); if (mapId === 'testsite' && TS.on) tsBotPose(); if (mapId === 'testsite') tsBody7(); }
+function tsBody() { tsBody2(); const A = avatar; if (A && mapId === 'testsite' && TS.on && A.state === 'alive') tsBody3(A); if (mapId === 'testsite' && TS.on) tsBotPose(); if (mapId === 'testsite') { tsBody7(); tsBody10(); } }
 function tsBody2() {
   const A = avatar; if (!A) return;
   if (!(mapId === 'testsite' && TS.on && A.state === 'alive' && !view3() && !VEH.in)) { if (TS.bodyHid.length) tsBodyUndo(); return; }
@@ -24567,9 +24568,9 @@ function tsPost9(dt) {
   const W = TS.wl, dtt = dt * (worldTs || 1); if (!TS.radar) tsRadarUi();
   // кто видит игрока
   if ((W.seeT = (W.seeT || 0) - dt) < 0 && W.stars) { W.seeT = 0.25; let seen = false; const E = eye.position;
-    for (const c of W.cops) if (c.alive && c.pos.distanceTo(player.pos) < (TS.disg ? 12 : 40) && losFrom(headPos(c, _t9b).clone(), E)) { seen = true; break; }
+    for (const c of W.cops) if (c.alive && c.pos.distanceTo(player.pos) < (TS.disg ? (TS.disg.cop ? 6 : 12) : 40) && losFrom(headPos(c, _t9b).clone(), E)) { seen = true; break; }
     if (!seen && TS.bank) for (const g of TS.bank.guards) if (g.alive && !g.calm && g.pos.distanceTo(player.pos) < 30 && losFrom(headPos(g, _t9b).clone(), E)) { seen = true; break; }
-    if (!seen) for (const U of W.units) { if (U.dead || U.state === 'leave') continue; const c = U.g.position, h = U.type === 'heli' ? 0 : U.type === 'mech' ? 5 : 1.6, r = (U.type === 'heli' ? 75 : 55) * (TS.disg ? 0.35 : 1); if (Math.hypot(c.x - player.pos.x, c.z - player.pos.z) < r && losFrom(_t9b.set(c.x, c.y + h, c.z).clone(), E)) { seen = true; break; } }
+    if (!seen) for (const U of W.units) { if (U.dead || U.state === 'leave') continue; const c = U.g.position, h = U.type === 'heli' ? 0 : U.type === 'mech' ? 5 : 1.6, r = (U.type === 'heli' ? 75 : 55) * (TS.disg ? (TS.disg.cop ? 0.2 : 0.35) : 1); if (Math.hypot(c.x - player.pos.x, c.z - player.pos.z) < r && losFrom(_t9b.set(c.x, c.y + h, c.z).clone(), E)) { seen = true; break; } }
     if (seen) { W.unseen = 0; W.last.copy(player.pos); if (W.search) { W.search = false; toast('👁 Вас заметили!'); } } else { W.unseen += 0.25; if (W.unseen > 3 && !W.search) { W.search = true; toast('🔍 Вас потеряли из виду — затаитесь'); } } }
   if (W.stars && W.search && W.unseen > 6 + W.stars * 2.5) tsWlClear('escape');
   // подкрепление
@@ -24708,64 +24709,169 @@ Humanoid.prototype.soldierThink = function (dt) {
   if (this.los) { W.unseen = 0; W.search = false; W.last.copy(player.pos); }
 };
 /* ===================== ТЕСТ-ПЛОЩАДКА 10: ЛЮДИ И МАСКИРОВКА =====================
-   На площадке 4 гражданина. Удерживайте E рядом с человеком — и вы снимете с него всю одежду.
-   Не на глазах полиции: вы «переоделись», полиция вас сильно хуже видит (это работает, пока
-   вы не стреляете и вас не ранят). Рядом с полицейскими или с полицейского — вас видят: +1 звезда.
-   Одежда героя меняется на снятую. */
+   На площадке 4 гражданина. Удерживайте E рядом с человеком (или полицейским):
+   он замирает и поднимает руки, а герой по очереди снимает с него одежду —
+   шапка слетает, рубашка стягивается через голову, штаны съезжают до щиколоток, ботинки скидываются.
+   Остаётся нижнее бельё (как в GTA), человек прикрывается и с криком убегает,
+   полицейский теряет оружие и форму и тоже убегает. Герой надевает снятое: в руках комок одежды,
+   руки поднимаются над головой — и рукава от первого лица, и тело от третьего лица в новой одежде.
+   Не на глазах полиции — маскировка (полиция узнаёт вас только вблизи), рядом с полицией — +1 звезда,
+   с полицейского — +1 звезда всегда (зато в форме полиция узнаёт только вплотную). */
 const TS_CIV_SPOTS = [[-30, -28, 0.4], [33, -30, 2.2], [-36, 30, -1.1], [44, 14, 3.0]];
-Object.assign(TS, { civs: [], needCivs: true, disg: null, strip: null });
+const TS_UW_COL = [0xf2f2f0, 0x1a1a1c, 0x2a4a8a, 0x8a2a3a, 0x5a5a60];
+Object.assign(TS, { civs: [], needCivs: true, disg: null, strip: null, stripHold: null, dressAcc: [], clothFly: [] });
 function tsCivSpawn() {
   TS.civs = []; for (const [x, z, yaw] of TS_CIV_SPOTS) { const n = spawnNPC('human', x, z, yaw); if (!n) continue; n.civ = true; n.pos.set(x, 0, z); TS.civs.push(n); }
   TS.needCivs = false;
 }
-function tsBuild10() { for (const n of TS.civs) { const i = npcs.indexOf(n); if (i >= 0) { try { n.dispose(); } catch (e) {} npcs.splice(i, 1); } } TS.civs = []; TS.needCivs = true; TS.disg = null; TS.strip = null; }
-// цвет кожи/одежды
-function tsDress(P, col) { if (!P || !P.mat) return; P.baseColor.setHex(col); P.mat.color.copy(P.baseColor); }
-function tsDressAvatar(look) {
-  const A = avatar; if (!A || !A.partList) return; const sh = look.shirt ?? 0x3a4a64, pa = look.pants ?? 0x2a2e38, sk = look.skin ?? 0xe0b48c;
-  for (const P of A.partList) { const n = P.name; if (n === 'head') continue; if (n === 'torso' || n.startsWith('uArm')) tsDress(P, sh); else if (n === 'pelvis' || n.includes('Leg')) tsDress(P, pa); else tsDress(P, look.sleeves === 'long' ? sh : sk); }
-  if (A.parts.torso && A.parts.torso.mat) A.parts.torso.mat.color.copy(A.parts.torso.baseColor);
-  TS.disgLook = { shirt: sh, pants: pa };
+function tsBuild10() {
+  for (const n of TS.civs) { const i = npcs.indexOf(n); if (i >= 0) { try { n.dispose(); } catch (e) {} npcs.splice(i, 1); } }
+  for (const c of TS.clothFly) if (c.m.parent) c.m.parent.remove(c.m);
+  TS.civs = []; TS.needCivs = true; TS.disg = null; TS.strip = null; TS.stripHold = null; TS.clothFly = [];
 }
-function tsNaked(n) { const sk = (n.look && n.look.skin) ?? 0xe0b48c; for (const P of n.partList) tsDress(P, sk); n.civNaked = true; n.speed = 0; }
-// свидетели: полиция в зоне видимости или рядом с игроком
-function tsWitness(at) {
+/* ---------- что считается одеждой ---------- */
+function tsIsCloth(m) {
+  if (!m || !m.isMesh) return false; const g = m.geometry, p = g && g.parameters;
+  if (g && [RM.collar, RM.buckle, RM.sole, RM.toe, RM.print, RM.vest, RM.strap, RM.pouch, RM.pack, RM.boot, RM.knee, RM.gog, RM.capDome, RM.capBill, GEO.belt, GEO.helmet].includes(g)) return true;
+  if (m.material && [capMat, helmMat, beltMat, goldMat, rifleMat].includes(m.material)) return true;
+  if (g && g.type === 'BoxGeometry' && p && ((p.width === 0.045 && (p.height === 0.3 || p.height === 0.055)) || (p.width === 0.05 && p.depth === 0.55) || (p.width === 0.15 && p.height === 0.012))) return true; // галстук, значок, автомат, козырёк
+  if (g && g.type === 'PlaneGeometry' && p && p.width === 0.22 && p.height === 0.06) return true; // надпись на жилете
+  if (g && g.type === 'CylinderGeometry' && p && p.radiusTop === 0.15 && p.height === 0.012) return true; // поля каски
+  return false;
+}
+function tsSkinPart(n, Pt) { const s = n.skinMat; if (!Pt || !Pt.mat || Pt.gone) return; Pt.baseColor.copy(s.color); Pt.mat.map = s.map || null; Pt.mat.roughness = s.roughness; Pt.baseRough = s.roughness; Pt.mat.needsUpdate = true; Pt.skin = true; bloody(Pt, 0); }
+function tsUwPart(n, Pt) { if (!Pt || !Pt.mat || Pt.gone) return; Pt.baseColor.setHex(n.uwCol); Pt.mat.map = null; Pt.mat.roughness = 0.75; Pt.baseRough = 0.75; Pt.mat.needsUpdate = true; bloody(Pt, 0); }
+function tsHideCloth(obj) { const L = []; obj.traverse((c) => { if (c !== obj && tsIsCloth(c) && c.visible) L.push(c); }); for (const c of L) c.visible = false; return L; }
+// верх: рубашка, жилет, воротник, галстук, значок, принт, перчатки, оружие; у женщин — спортивный топ
+function tsStripTop(n) {
+  const P = n.parts; for (const k of ['torso', 'uArmL', 'uArmR', 'lArmL', 'lArmR']) { const Pt = P[k]; if (!Pt || Pt.gone) continue; tsSkinPart(n, Pt); tsHideCloth(Pt.mesh); }
+  for (const s of ['L', 'R']) { const h = P['lArm' + s] && P['lArm' + s].hand; if (h) h.material = n.skinMat; }
+  if (n.tsGunM) n.tsGunM.visible = false;
+  if (n.look && n.look.female && P.torso && !P.torso.gone) { const bm = std({ color: n.uwCol, roughness: 0.7 }); if (n.fx && n.fx.chest) n.fx.chest.material = bm; const band = new THREE.Mesh(IM_G.box, bm); band.scale.set(0.392, 0.075, 0.232); band.position.set(0, 0.03, 0); P.torso.mesh.add(band); for (const sx of [-1, 1]) for (const sz of [-1, 1]) { const st = new THREE.Mesh(IM_G.box, bm); st.scale.set(0.024, 0.19, 0.012); st.position.set(sx * 0.07, 0.15, sz * 0.112); P.torso.mesh.add(st); } }
+}
+// низ: штаны, ремень, пряжка, наколенники, сапоги — остаются трусы
+function tsStripBottom(n) { const P = n.parts; tsUwPart(n, P.pelvis); tsHideCloth(P.pelvis.mesh); for (const k of ['uLegL', 'uLegR', 'lLegL', 'lLegR']) { const Pt = P[k]; if (!Pt || Pt.gone) continue; tsSkinPart(n, Pt); for (const c of [...Pt.mesh.children]) if (tsIsCloth(c) && (c.geometry === RM.knee || c.geometry === RM.boot)) c.visible = false; } }
+function tsStripShoes(n) { for (const s of ['L', 'R']) { const ll = n.parts['lLeg' + s]; if (!ll || ll.gone || !ll.foot) continue; ll.foot.material = n.skinMat; tsHideCloth(ll.foot); for (const c of ll.mesh.children) if (c.geometry === RM.boot) c.visible = false; } }
+// головной убор слетает и падает на землю
+function tsHatsOff(n) { const H = n.parts.head; if (!H || H.gone) return; const L = []; H.mesh.traverse((c) => { if (c !== H.mesh && tsIsCloth(c) && c.visible) L.push(c); }); const f = new V3(player.pos.x - n.pos.x, 0, player.pos.z - n.pos.z).normalize(); for (const c of L) { scene.attach(c); const sd = Math.random() < 0.5 ? -1 : 1; TS.clothFly.push({ m: c, v: new V3(-f.x * 0.7 - f.z * sd * 1.3, 2.8, -f.z * 0.7 + f.x * sd * 1.3), w: new V3(rand(-6, 6), rand(-4, 4), rand(-6, 6)), t: 0 }); } if (L.length) SFX.tsWhoosh(0.35); }
+function tsClothFlyStep(dt) { for (let i = TS.clothFly.length - 1; i >= 0; i--) { const C = TS.clothFly[i]; C.t += dt; if (!C.rest) { C.v.y -= 9.8 * dt; C.m.position.addScaledVector(C.v, dt); C.m.rotation.x += C.w.x * dt; C.m.rotation.z += C.w.z * dt; const fy = floorAt(C.m.position.x, C.m.position.z, C.m.position.y) + 0.03; if (C.m.position.y <= fy) { C.m.position.y = fy; C.v.multiplyScalar(0.3); C.v.y = Math.abs(C.v.y) > 1 ? -C.v.y * 0.3 : 0; if (Math.abs(C.v.y) < 0.2) C.rest = true; } } if (C.t > 40) { if (C.m.parent) C.m.parent.remove(C.m); TS.clothFly.splice(i, 1); } } }
+/* ---------- летящая одежда: рубашка и штаны ---------- */
+function tsShirtMesh(mat, f) { const g = new THREE.Group(); const b = new THREE.Mesh(IM_G.box, mat); b.scale.set(0.4, 0.46, 0.24); g.add(b); for (const s of [-1, 1]) { const sl = new THREE.Mesh(IM_G.box, mat); sl.scale.set(0.11, 0.3, 0.11); sl.position.set(s * 0.26, 0.08, 0); sl.rotation.z = s * 0.5; g.add(sl); } if (f) { const ch = new THREE.Mesh(IM_G.box, mat); ch.scale.set(0.3, 0.12, 0.08); ch.position.set(0, 0.07, 0.13); g.add(ch); } g.traverse((c) => { if (c.isMesh) c.castShadow = true; }); scene.add(g); return g; }
+function tsPantsMesh(mat) { const g = new THREE.Group(); const hip = new THREE.Mesh(IM_G.box, mat); hip.scale.set(0.36, 0.2, 0.23); hip.position.y = -0.1; g.add(hip); for (const s of [-1, 1]) { const l = new THREE.Mesh(IM_G.box, mat); l.scale.set(0.15, 0.82, 0.16); l.position.set(s * 0.1, -0.6, 0); g.add(l); } g.traverse((c) => { if (c.isMesh) c.castShadow = true; }); scene.add(g); return g; }
+/* ---------- свидетели ---------- */
+function tsWitness(at, except) {
   const W = TS.wl, E = eye.position;
-  for (const c of W.cops) if (c.alive && c.pos.distanceTo(player.pos) < 14) return true;
-  for (const c of W.cops) if (c.alive && c.pos.distanceTo(at) < 28 && losFrom(headPos(c, _t9b).clone(), E)) return true;
-  if (TS.bank) for (const g of TS.bank.guards) if (g.alive && g.pos.distanceTo(at) < 26 && losFrom(headPos(g, _t9b).clone(), E)) return true;
+  for (const c of W.cops) if (c !== except && c.alive && !c.stripped && c.pos.distanceTo(player.pos) < 14) return true;
+  for (const c of W.cops) if (c !== except && c.alive && !c.stripped && c.pos.distanceTo(at) < 28 && losFrom(headPos(c, _t9b).clone(), E)) return true;
+  if (TS.bank) for (const g of TS.bank.guards) if (g !== except && g.alive && !g.stripped && !g.calm && g.pos.distanceTo(at) < 26 && losFrom(headPos(g, _t9b).clone(), E)) return true;
   for (const U of W.units) { if (U.dead || U.gone) continue; if (U.g.position.distanceTo(at) < 40 && losFrom(_t9b.set(U.g.position.x, U.g.position.y + 2, U.g.position.z).clone(), E)) return true; }
   return false;
 }
-function tsStripDone(n) {
-  const W = TS.wl, cop = !!(n.tsCop || n.bankRole === 'guard'); const seen = tsWitness(n.pos) || cop;
-  tsNaked(n); n.panic = Math.max(n.panic, 6); if (n.civ || n.tsCop) n.calm = false;
-  tsDressAvatar(n.look || {});
-  if (seen) { tsWantedBump(1); banner('🧥 ЗАСВЕТИЛИ', 'полиция видела, как вы раздевали человека: +1 звезда'); }
-  else { TS.disg = { t: 0 }; if (W.stars) { W.unseen += 4; } toast('🧥 Переоделись незаметно — вас теперь сложнее найти'); }
-  // с полицейского сняли форму — ещё +1 звезда (даже если никто не видел)
-  if (cop && !seen) tsWantedBump(1);
-  SFX.tsLeather(0.5);
+const tsVoiceOf = (n) => (n.look && n.look.female ? { p: 1.35, r: 1.15 } : { p: 0.95, r: 1.1 });
+const tsWhoOf = (n) => (n.tsCop || n.bankRole === 'guard' ? (n.bankRole === 'guard' ? 'Охранник' : 'Полицейский') : n.look && n.look.female ? 'Прохожая' : 'Прохожий');
+/* ---------- переодевание героя ---------- */
+function tsDressAvatar(look) {
+  const A = avatar; if (!A || !A.partList) return; const sh = look.shirt ?? 0x3a4a64, pa = look.pants ?? 0x2a2e38, sk = look.skin ?? 0xe0b48c;
+  for (const P of A.partList) { if (!P.mat || P.gone) continue; const n = P.name; let c = null; if (n === 'head') continue; if (n === 'torso' || n.startsWith('uArm')) c = sh; else if (n === 'pelvis' || n.includes('Leg')) c = pa; else c = look.sleeves === 'long' ? sh : null; if (c == null) continue; P.baseColor.setHex(c); if (!P.mat.map) { P.mat.map = TEX.cloth; P.mat.needsUpdate = true; } bloody(P, 0); }
+  for (const m of TS.dressAcc) if (m.parent) m.parent.remove(m); TS.dressAcc = [];
+  if (look.cap && A.parts.head && !A.parts.head.gone) { const cp = new THREE.Mesh(GEO.helmet, capMat); cp.scale.set(1, 0.72, 1.02); A.parts.head.mesh.add(cp); const vz = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.012, 0.08), capMat); vz.position.set(0, 0.03, 0.13); A.parts.head.mesh.add(vz); TS.dressAcc.push(cp, vz); }
+  if (look.badge && A.parts.torso) { const bd = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.055, 0.012), goldMat); bd.position.set(0.085, 0.12, 0.113); A.parts.torso.mesh.add(bd); TS.dressAcc.push(bd); }
+  // рукава от первого лица
+  const R = TS.rig; if (R) { const sm = R.R.sh.children.find((c) => c.isMesh); if (sm) sm.material.color.setHex(look.sleeves === 'none' ? sk : sh); }
+  TS.disgLook = { shirt: sh, pants: pa };
 }
-// кандидат для E: ближайший гражданин или полицейский перед лицом
+/* ---------- кандидат для E ---------- */
 function tsStripCand() {
-  const e = tsEyeP(), f = tsFwd(), W = TS.wl; let best = null, bd = 1.9;
+  if (TS.strip) return null; const e = tsEyeP(), f = tsFwd(), W = TS.wl; let best = null, bd = 1.9;
   const list = [...TS.civs, ...W.cops, ...(TS.bank ? TS.bank.guards : [])];
-  for (const n of list) { if (!n || !n.alive || n.civNaked || !n.root || !n.root.visible) continue; const d = n.pos.distanceTo(e) - 0.3; if (d > bd) continue; const dir = _tsV2.subVectors(n.pos.clone().setY(e.y), e).normalize(); if (dir.dot(f) < 0.3 && d > 0.9) continue; best = { n, d }; bd = d; }
-  if (!best) return null;
-  return { d: best.d, D: { label: `🧥 Удерживайте E — снять одежду (${best.n.civ ? 'человек' : 'полицейский'})`, hl: 'Снимаем одежду…', hold: 1.8, key: 'strip', run() { tsStripStart(best.n); } } };
+  for (const n of list) { if (!n || !n.alive || n.civNaked || !n.root || !n.root.visible || n.pose === 'down') continue; const d = Math.hypot(n.pos.x - e.x, n.pos.z - e.z) - 0.3; if (d > bd) continue; const dir = _tsV2.subVectors(n.pos.clone().setY(e.y), e).normalize(); if (dir.dot(f) < 0.3 && d > 0.9) continue; best = { n, d }; bd = d; }
+  if (!best) return null; const n = best.n, cop = !!(n.tsCop || n.bankRole === 'guard');
+  return { d: best.d, D: { label: `🧥 Удерживайте E — раздеть и переодеться (${cop ? 'форма полиции: +1★' : n.look && n.look.female ? 'прохожая' : 'прохожий'})`, hl: 'Руки вверх…', hold: 1.6, key: 'strip', tick() { tsStripFreeze(n); }, run() { tsStripStart(n); } } };
 }
-function tsStripStart(n) {
-  if (TS.act || TS.strip) return; TS.strip = n;
-  tsAct('loot', { w: n.pos.clone().add(new V3(0, 1.0, 0)), dur: 2.4, at: 1.2, fn() { if (TS.strip === n) { tsStripDone(n); } TS.strip = null; } });
+function tsStripFreeze(n) {
+  if (TS.stripHold === n) return; tsStripUnfreeze(); TS.stripHold = n; n.scripted = true; n.speed = 0; n.vel && n.vel.set(0, 0, 0); n.setPose('surrender', 30);
+  tsSay(tsWhoOf(n), n.tsCop || n.bankRole === 'guard' ? pick(['Ты что творишь, гражданин?!', 'Стоять! Не трогай форму!']) : pick(['Эй! Ты что делаешь?!', 'Не трогай меня!', 'Только не стреляй…']), 2.2, tsVoiceOf(n));
 }
-// подключаем кандидата к E (пристраиваемся к tsDecide6)
+function tsStripUnfreeze() { const n = TS.stripHold; TS.stripHold = null; if (!n || (TS.strip && TS.strip.n === n)) return; n.scripted = false; n.pose = 'stand'; n.poseDur = 0; }
 const _tsDecide6_10 = tsDecide6;
 tsDecide6 = function () { const A = _tsDecide6_10(); const S = tsStripCand(); if (!S) return A; if (!A || S.d < A.d) return S; return A; };
-// кадр: пружина маскировки и сброс при стрельбе/ранении
+/* ---------- раздевание по этапам (сюжет 4 секунды) ---------- */
+function tsStripStart(n) {
+  if (TS.strip || !n.alive) return; tsAct('strip', { dur: 4.1 }); const P = n.parts;
+  n.uwCol = pick(TS_UW_COL); n.scripted = true; n.speed = 0; TS.stripHold = n;
+  const L = n.look || {}, cop = !!(n.tsCop || n.bankRole === 'guard');
+  TS.strip = { n, t: 0, cop, shirtMat: P.torso.mat.clone(), pantsMat: P.pelvis.mat.clone(), look: { shirt: L.shirt, pants: L.pants, sleeves: L.sleeves, skin: L.skin, cap: !!(L.cap || cop), badge: !!(L.badge || cop) }, ev: {} };
+}
+function tsStripStep(dt) {
+  const S = TS.strip; if (!S) return; const n = S.n, E = S.ev; S.t += dt; const t = S.t;
+  if (!n.alive || !n.root) { tsStripAbort(); return; }
+  // лицом к герою
+  if (t < 2.4) { n.yaw += angDiff(n.yaw, Math.atan2(player.pos.x - n.pos.x, player.pos.z - n.pos.z)) * Math.min(1, dt * 6); n.speed = 0; }
+  const fwd = new V3(Math.sin(n.yaw), 0, Math.cos(n.yaw)), toP = player.pos.clone().add(new V3(0, 1.1, 0));
+  if (!E.hat) { E.hat = 1; tsHatsOff(n); }
+  // рубашка через голову
+  if (t > 0.3 && !E.shirt) { E.shirt = 1; S.shirt = tsShirtMesh(S.shirtMat, n.look && n.look.female); n.parts.torso.mesh.updateMatrixWorld(true); n.parts.torso.mesh.getWorldPosition(S.shirt.position); S.shirt.rotation.y = n.yaw; S.s0 = S.shirt.position.clone(); SFX.tsLeather(0.5); }
+  if (S.shirt) { const k = tsEase((t - 0.3) / 0.75), fly = clamp((t - 1.05) / 0.25, 0, 1); const p = S.s0.clone().add(new V3(0, 0.85 * k, 0)).addScaledVector(fwd, 0.15 * k); S.shirt.position.copy(p).lerp(toP, tsEase(fly)); S.shirt.rotation.x = -1.3 * k; S.shirt.scale.set(1 - 0.35 * k - 0.6 * fly, 1 - 0.45 * k - 0.5 * fly, 1 - 0.5 * fly + 0.001); if (fly >= 1) { scene.remove(S.shirt); S.shirt = null; } }
+  if (t > 0.65 && !E.top) { E.top = 1; tsStripTop(n); }
+  // штаны вниз
+  if (t > 1.2 && !E.stand) { E.stand = 1; n.pose = 'stand'; n.poseDur = 0; }
+  if (t > 1.25 && !E.pants) { E.pants = 1; S.pants = tsPantsMesh(S.pantsMat); n.parts.pelvis.mesh.updateMatrixWorld(true); n.parts.pelvis.mesh.getWorldPosition(S.pants.position); S.pants.position.y += 0.1; S.pants.rotation.y = n.yaw; S.p0 = S.pants.position.clone(); SFX.tsZip(0.45); }
+  if (S.pants) { const k = tsEase((t - 1.25) / 0.6), fly = clamp((t - 1.9) / 0.28, 0, 1); const p = S.p0.clone(); p.y = lerp(S.p0.y, 0.32, k); S.pants.position.copy(p).lerp(toP, tsEase(fly)); S.pants.scale.set(1 + 0.15 * k - 0.8 * fly, 1 - 0.7 * k, 1 + 0.2 * k - 0.8 * fly + 0.001); if (fly >= 1) { scene.remove(S.pants); S.pants = null; } }
+  if (t > 1.4 && !E.bottom) { E.bottom = 1; tsStripBottom(n); }
+  // ботинки
+  if (t > 2.0 && !E.shoes) { E.shoes = 1; tsStripShoes(n); for (const s of [-1, 1]) { const sh = new THREE.Mesh(IM_G.box, shoeMat); sh.scale.set(0.1, 0.08, 0.24); sh.position.copy(n.pos).add(new V3(Math.cos(n.yaw) * s * 0.12, 0.08, -Math.sin(n.yaw) * s * 0.12)); sh.castShadow = true; scene.add(sh); TS.clothFly.push({ m: sh, v: fwd.clone().multiplyScalar(-1.2).add(new V3(s * 0.8, 1.6, 0)), w: new V3(rand(-5, 5), rand(-5, 5), rand(-5, 5)), t: 0 }); } SFX.tsShell(0.3); }
+  // отпустить: прикрывается и убегает
+  if (t > 2.35 && !E.free) { E.free = 1; n.civNaked = true; n.scripted = false; n.pose = 'stand'; n.poseDur = 0; n.panic = Math.max(n.panic || 0, 16); n.stripCover = 6; if (S.cop) { n.stripped = true; n.calm = false; } TS.stripHold = null; Sound.voice && Sound.voice('scream', 0.4);
+    tsSay(tsWhoOf(n), S.cop ? pick(['Верни форму! Это нападение на полицию!', 'Ты за это ответишь!']) : pick(['Отдай одежду!', 'Маньяк! Полиция!', 'Ааа! Холодно же!']), 2.4, tsVoiceOf(n)); }
+  // герой надевает одежду
+  if (t > 3.05 && !E.dress) { E.dress = 1; tsDressAvatar(S.look); SFX.tsLeather(0.6); tsStripResult(S); }
+  if (t > 4.1) TS.strip = null;
+}
+function tsStripAbort() { const S = TS.strip; if (!S) return; for (const m of [S.shirt, S.pants]) if (m && m.parent) m.parent.remove(m); TS.strip = null; TS.stripHold = null; if (TS.act && TS.act.kind === 'strip') TS.act = null; }
+function tsStripResult(S) {
+  const n = S.n, W = TS.wl, seen = tsWitness(n.pos, n);
+  if (seen) { tsWantedBump(1); TS.disg = null; banner('🚨 ЗАСВЕТИЛИ', 'полиция видела, как вы раздевали человека: +1 ★'); return; }
+  TS.disg = { t: 0, cop: S.cop }; if (W.stars) W.unseen += 4;
+  if (S.cop) { tsWantedBump(1); banner('👮 ФОРМА ПОЛИЦИИ', '+1 ★ за нападение, но в форме вас узнают только вплотную'); }
+  else banner('🧥 НОВЫЙ ОБРАЗ', W.stars ? 'полиция ищет другого человека — держитесь подальше' : 'вас будет сложнее узнать');
+}
+/* ---------- руки героя: стянуть рубашку, спустить штаны, скомкать, надеть ---------- */
+function tsVM10(o, dt) {
+  const S = TS.strip; if (!S) { if (TS.vmCloth) TS.vmCloth.visible = false; return; } const R = TS.rig, t = S.t, n = S.n;
+  const ry = player.yaw, rr = new V3(Math.cos(ry), 0, -Math.sin(ry)), side = (w, s, d) => tsLoc(w.clone().addScaledVector(rr, s * d));
+  const chest = n.parts.torso && !n.parts.torso.gone ? n.parts.torso.mesh.getWorldPosition(new V3()) : n.pos.clone().add(new V3(0, 1.3, 0));
+  let A = null, B = null, curl = 0.9;
+  if (t < 0.3) { const k = tsEase(t / 0.3); A = tsMix([0.2, -0.3, -0.45], side(chest, 1, 0.14), k); B = tsMix([-0.2, -0.3, -0.45], side(chest, -1, 0.14), k); curl = 0.3 + k * 0.6; }
+  else if (S.shirt) { A = side(S.shirt.position, 1, 0.16); B = side(S.shirt.position, -1, 0.16); }
+  else if (t < 1.25) { const hip = n.pos.clone().add(new V3(0, 1.0, 0)); A = side(hip, 1, 0.13); B = side(hip, -1, 0.13); }
+  else if (S.pants) { const top = S.pants.position.clone().add(new V3(0, -0.05, 0)); A = side(top, 1, 0.13); B = side(top, -1, 0.13); TS.camDropT = Math.max(TS.camDropT || 0, 0.42); }
+  else if (t < 2.6) { const k = tsEase((t - 2.2) / 0.4); A = tsMix([0.12, -0.3, -0.42], [0.08, -0.22, -0.36], k); B = tsMix([-0.12, -0.3, -0.42], [-0.08, -0.22, -0.36], k); }
+  else if (t < 3.5) { const u = (t - 2.6) / 0.9, up = tsBell(clamp(u * 1.25, 0, 1)), down = tsEase(clamp((u - 0.55) / 0.45, 0, 1)); A = [0.09 + 0.12 * down, -0.22 + 0.5 * up - 0.12 * down, -0.36 + 0.2 * up]; B = [-0.09 - 0.12 * down, -0.22 + 0.5 * up - 0.12 * down, -0.36 + 0.2 * up]; TS.camPV -= u < 0.4 ? dt * 0.6 : 0; }
+  if (A && B) { o.R = A; o.L = B; o.curlR = o.curlL = curl; R.R.hz = R.R.hy = R.L.hz = R.L.hy = null; R.R.point = R.L.point = false; }
+  // комок одежды в руках
+  if (!TS.vmCloth) { TS.vmCloth = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), S.shirtMat); TS.vmCloth.userData.tsOwn = true; TS.vmCloth.frustumCulled = false; vmRoot.add(TS.vmCloth); }
+  const vis = t > 2.15 && t < 3.0; TS.vmCloth.visible = vis; if (vis) { TS.vmCloth.material = S.shirtMat; const a = A || [0.08, -0.22, -0.36], b = B || [-0.08, -0.22, -0.36]; TS.vmCloth.position.set((a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + 0.03, (a[2] + b[2]) / 2 - 0.02); TS.vmCloth.scale.set(1.3, 0.8, 1); }
+}
+/* ---------- раздетый прикрывается, пока бежит ---------- */
+function tsBody10() {
+  for (const n of [...TS.civs, ...TS.wl.cops, ...(TS.bank ? TS.bank.guards : [])]) { if (!n || !n.alive || !(n.stripCover > 0) || n.scripted) continue; const P = n.parts, set = (k, x, y, z) => { if (P[k] && !P[k].gone && P[k].attached) P[k].pivot.rotation.set(x, y, z); };
+    set('uArmR', -0.55, 0.1, 0.6); set('lArmR', -1.75, 0, 0); set('uArmL', -0.3, -0.1, -0.35); set('lArmL', -0.9, 0, 0); if (P.head && !P.head.gone) P.head.pivot.rotation.x += 0.3; }
+}
+// раздетый полицейский не стреляет и убегает
+const _gf10 = guardFire; guardFire = function (g) { if (g.stripped) return; return _gf10(g); };
+const _sth10 = Humanoid.prototype.soldierThink;
+Humanoid.prototype.soldierThink = function (dt) { if (!this.stripped) return _sth10.call(this, dt); const dx = this.pos.x - player.pos.x, dz = this.pos.z - player.pos.z, d = Math.hypot(dx, dz) || 1; this.steer(dx / d, dz / d, d < 40 ? 1.9 : 0, dt); };
+/* ---------- кадр ---------- */
 function tsPost10(dt) {
   if (TS.needCivs && mapId === 'testsite' && TS.on) tsCivSpawn();
-  if (TS.disg) { TS.disg.t += dt; if (TS.fireDown || TS.firePress || player.lastHurt < 0.3) { TS.disg = null; } }
+  if (TS.stripHold && !TS.strip && !(TS.hold && TS.hold.D.key === 'strip')) tsStripUnfreeze();
+  tsStripStep(dt); tsClothFlyStep(dt);
+  for (const n of [...TS.civs, ...TS.wl.cops]) if (n && n.stripCover > 0) n.stripCover -= dt;
+  if (player.dead) TS.disg = null;
+  if (TS.disg) { TS.disg.t += dt; if (TS.fireDown || TS.firePress || player.lastHurt < 0.3) { TS.disg = null; toast('🧥 Маскировка раскрыта'); } }
+  let b = document.getElementById('tsDisgB'); const tr = document.getElementById('tsTR');
+  if (!b && tr) { b = document.createElement('div'); b.id = 'tsDisgB'; b.style.cssText = 'font:800 12px var(--ui);color:#8aff7a;background:rgba(0,0,0,.5);padding:2px 8px;border-radius:8px;display:none'; tr.insertBefore(b, tr.children[1] || null); }
+  if (b) { const on = !!TS.disg; if ((b.style.display === 'block') !== on) b.style.display = on ? 'block' : 'none'; const tx = TS.disg ? (TS.disg.cop ? '👮 В форме полиции' : '🧥 Маскировка') : ''; if (b.textContent !== tx) b.textContent = tx; }
 }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
