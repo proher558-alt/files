@@ -22387,6 +22387,7 @@ function tsBuild2() {
   tsBuild6();
   tsBuild8();
   tsBuild9();
+  tsBuild10();
 }
 function tsSpawnItems() {
   TS.needItems = false; TS.items = [];
@@ -22571,6 +22572,7 @@ function tsPost2(dt) {
   tsPost6(dt);
   tsPost8(dt);
   tsPost9(dt);
+  tsPost10(dt);
 }
 // поворот камеры: кивок/крен от приземлений, наклон при питье, кувырок
 function tsCam() {
@@ -24565,9 +24567,9 @@ function tsPost9(dt) {
   const W = TS.wl, dtt = dt * (worldTs || 1); if (!TS.radar) tsRadarUi();
   // кто видит игрока
   if ((W.seeT = (W.seeT || 0) - dt) < 0 && W.stars) { W.seeT = 0.25; let seen = false; const E = eye.position;
-    for (const c of W.cops) if (c.alive && c.pos.distanceTo(player.pos) < 40 && losFrom(headPos(c, _t9b).clone(), E)) { seen = true; break; }
+    for (const c of W.cops) if (c.alive && c.pos.distanceTo(player.pos) < (TS.disg ? 12 : 40) && losFrom(headPos(c, _t9b).clone(), E)) { seen = true; break; }
     if (!seen && TS.bank) for (const g of TS.bank.guards) if (g.alive && !g.calm && g.pos.distanceTo(player.pos) < 30 && losFrom(headPos(g, _t9b).clone(), E)) { seen = true; break; }
-    if (!seen) for (const U of W.units) { if (U.dead || U.state === 'leave') continue; const c = U.g.position, h = U.type === 'heli' ? 0 : U.type === 'mech' ? 5 : 1.6, r = U.type === 'heli' ? 75 : 55; if (Math.hypot(c.x - player.pos.x, c.z - player.pos.z) < r && losFrom(_t9b.set(c.x, c.y + h, c.z).clone(), E)) { seen = true; break; } }
+    if (!seen) for (const U of W.units) { if (U.dead || U.state === 'leave') continue; const c = U.g.position, h = U.type === 'heli' ? 0 : U.type === 'mech' ? 5 : 1.6, r = (U.type === 'heli' ? 75 : 55) * (TS.disg ? 0.35 : 1); if (Math.hypot(c.x - player.pos.x, c.z - player.pos.z) < r && losFrom(_t9b.set(c.x, c.y + h, c.z).clone(), E)) { seen = true; break; } }
     if (seen) { W.unseen = 0; W.last.copy(player.pos); if (W.search) { W.search = false; toast('👁 Вас заметили!'); } } else { W.unseen += 0.25; if (W.unseen > 3 && !W.search) { W.search = true; toast('🔍 Вас потеряли из виду — затаитесь'); } } }
   if (W.stars && W.search && W.unseen > 6 + W.stars * 2.5) tsWlClear('escape');
   // подкрепление
@@ -24705,6 +24707,66 @@ Humanoid.prototype.soldierThink = function (dt) {
   this.losT = (this.losT || 0) - dt; if (this.losT <= 0) { this.losT = 0.3; this.los = this.pos.distanceTo(player.pos) < 28 && losFrom(headPos(this, _cfH), eye.position); }
   if (this.los) { W.unseen = 0; W.search = false; W.last.copy(player.pos); }
 };
+/* ===================== ТЕСТ-ПЛОЩАДКА 10: ЛЮДИ И МАСКИРОВКА =====================
+   На площадке 4 гражданина. Удерживайте E рядом с человеком — и вы снимете с него всю одежду.
+   Не на глазах полиции: вы «переоделись», полиция вас сильно хуже видит (это работает, пока
+   вы не стреляете и вас не ранят). Рядом с полицейскими или с полицейского — вас видят: +1 звезда.
+   Одежда героя меняется на снятую. */
+const TS_CIV_SPOTS = [[-30, -28, 0.4], [33, -30, 2.2], [-36, 30, -1.1], [44, 14, 3.0]];
+Object.assign(TS, { civs: [], needCivs: true, disg: null, strip: null });
+function tsCivSpawn() {
+  TS.civs = []; for (const [x, z, yaw] of TS_CIV_SPOTS) { const n = spawnNPC('human', x, z, yaw); if (!n) continue; n.civ = true; n.pos.set(x, 0, z); TS.civs.push(n); }
+  TS.needCivs = false;
+}
+function tsBuild10() { for (const n of TS.civs) { const i = npcs.indexOf(n); if (i >= 0) { try { n.dispose(); } catch (e) {} npcs.splice(i, 1); } } TS.civs = []; TS.needCivs = true; TS.disg = null; TS.strip = null; }
+// цвет кожи/одежды
+function tsDress(P, col) { if (!P || !P.mat) return; P.baseColor.setHex(col); P.mat.color.copy(P.baseColor); }
+function tsDressAvatar(look) {
+  const A = avatar; if (!A || !A.partList) return; const sh = look.shirt ?? 0x3a4a64, pa = look.pants ?? 0x2a2e38, sk = look.skin ?? 0xe0b48c;
+  for (const P of A.partList) { const n = P.name; if (n === 'head') continue; if (n === 'torso' || n.startsWith('uArm')) tsDress(P, sh); else if (n === 'pelvis' || n.includes('Leg')) tsDress(P, pa); else tsDress(P, look.sleeves === 'long' ? sh : sk); }
+  if (A.parts.torso && A.parts.torso.mat) A.parts.torso.mat.color.copy(A.parts.torso.baseColor);
+  TS.disgLook = { shirt: sh, pants: pa };
+}
+function tsNaked(n) { const sk = (n.look && n.look.skin) ?? 0xe0b48c; for (const P of n.partList) tsDress(P, sk); n.civNaked = true; n.speed = 0; }
+// свидетели: полиция в зоне видимости или рядом с игроком
+function tsWitness(at) {
+  const W = TS.wl, E = eye.position;
+  for (const c of W.cops) if (c.alive && c.pos.distanceTo(player.pos) < 14) return true;
+  for (const c of W.cops) if (c.alive && c.pos.distanceTo(at) < 28 && losFrom(headPos(c, _t9b).clone(), E)) return true;
+  if (TS.bank) for (const g of TS.bank.guards) if (g.alive && g.pos.distanceTo(at) < 26 && losFrom(headPos(g, _t9b).clone(), E)) return true;
+  for (const U of W.units) { if (U.dead || U.gone) continue; if (U.g.position.distanceTo(at) < 40 && losFrom(_t9b.set(U.g.position.x, U.g.position.y + 2, U.g.position.z).clone(), E)) return true; }
+  return false;
+}
+function tsStripDone(n) {
+  const W = TS.wl, cop = !!(n.tsCop || n.bankRole === 'guard'); const seen = tsWitness(n.pos) || cop;
+  tsNaked(n); n.panic = Math.max(n.panic, 6); if (n.civ || n.tsCop) n.calm = false;
+  tsDressAvatar(n.look || {});
+  if (seen) { tsWantedBump(1); banner('🧥 ЗАСВЕТИЛИ', 'полиция видела, как вы раздевали человека: +1 звезда'); }
+  else { TS.disg = { t: 0 }; if (W.stars) { W.unseen += 4; } toast('🧥 Переоделись незаметно — вас теперь сложнее найти'); }
+  // с полицейского сняли форму — ещё +1 звезда (даже если никто не видел)
+  if (cop && !seen) tsWantedBump(1);
+  SFX.tsLeather(0.5);
+}
+// кандидат для E: ближайший гражданин или полицейский перед лицом
+function tsStripCand() {
+  const e = tsEyeP(), f = tsFwd(), W = TS.wl; let best = null, bd = 1.9;
+  const list = [...TS.civs, ...W.cops, ...(TS.bank ? TS.bank.guards : [])];
+  for (const n of list) { if (!n || !n.alive || n.civNaked || !n.root || !n.root.visible) continue; const d = n.pos.distanceTo(e) - 0.3; if (d > bd) continue; const dir = _tsV2.subVectors(n.pos.clone().setY(e.y), e).normalize(); if (dir.dot(f) < 0.3 && d > 0.9) continue; best = { n, d }; bd = d; }
+  if (!best) return null;
+  return { d: best.d, D: { label: `🧥 Удерживайте E — снять одежду (${best.n.civ ? 'человек' : 'полицейский'})`, hl: 'Снимаем одежду…', hold: 1.8, key: 'strip', run() { tsStripStart(best.n); } } };
+}
+function tsStripStart(n) {
+  if (TS.act || TS.strip) return; TS.strip = n;
+  tsAct('loot', { w: n.pos.clone().add(new V3(0, 1.0, 0)), dur: 2.4, at: 1.2, fn() { if (TS.strip === n) { tsStripDone(n); } TS.strip = null; } });
+}
+// подключаем кандидата к E (пристраиваемся к tsDecide6)
+const _tsDecide6_10 = tsDecide6;
+tsDecide6 = function () { const A = _tsDecide6_10(); const S = tsStripCand(); if (!S) return A; if (!A || S.d < A.d) return S; return A; };
+// кадр: пружина маскировки и сброс при стрельбе/ранении
+function tsPost10(dt) {
+  if (TS.needCivs && mapId === 'testsite' && TS.on) tsCivSpawn();
+  if (TS.disg) { TS.disg.t += dt; if (TS.fireDown || TS.firePress || player.lastHurt < 0.3) { TS.disg = null; } }
+}
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
