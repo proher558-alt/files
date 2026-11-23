@@ -22431,7 +22431,6 @@ function mk9CredBuild(br) {
 <div class="stage"><div class="ph"><img alt=""><i></i></div><div class="ph"><img alt=""><i></i></div><div class="chap"></div></div>
 <div class="wall">${MK9_CRED.map((q) => `<div style="background-image:url(${q[1]})"></div>`).join('')}</div>
 <div class="rollw"><div class="roll">${MK9_ROLL1}</div></div>
-<div class="fin"><div class="logo">МЯСОРУБКА</div><p>Спасибо, что прошли все три главы.</p><p style="opacity:.55;letter-spacing:.45em">КОНЕЦ ГЛАВЫ 3</p></div>
 <div class="bars"></div><button class="skip">Пропустить ⏭</button>`;
   document.body.appendChild(el);
   el.querySelector('.skip').onclick = (e) => { e.stopPropagation(); const C = MAK.cut; if (C) C.t = C.dur; };
@@ -22467,7 +22466,6 @@ function mk9Credits(X, br) {
     // бегущие титры
     const rw = el.querySelector('.rollw'), roll = el.querySelector('.roll'), H = rw.clientHeight, CHh = roll.scrollHeight;
     if (t < M0) { const k = clamp((t - 3.6) / (M0 - 4.4), 0, 1); roll.style.transform = `translateY(${H - k * (H + CHh)}px)`; }
-    else if (t > M1 + 0.6) { if (R.roll === 1) { R.roll = 2; roll.innerHTML = MK9_ROLL2; } const k = clamp((t - M1 - 0.6) / (61 - M1 - 0.6), 0, 1); roll.style.transform = `translateY(${H - k * (H + roll.scrollHeight)}px)`; }
     // середина: рука и пальцы, без текста
     const midNow = t >= M0 && t < M1;
     if (midNow && !R.mid) { R.mid = true; R.mt = 0; el.classList.add('mid'); const f = document.getElementById('makFade'); if (f) { f.style.transition = 'opacity 1.2s'; f.style.opacity = 0; } renderer.domElement.style.transition = 'filter 1.2s'; X.grade('grayscale(.85) contrast(1.22) brightness(.9)'); if (R.mus) R.mus.vol(0.05, 0.6); try { SFX.rain && SFX.rain(0.7); } catch (e) {} R.rig = mk9RigOn(hand()); if (br === 'stay') { S.gWant = 1; S.mHoldW = 0.6; } }
@@ -22476,8 +22474,8 @@ function mk9Credits(X, br) {
     if (!midNow && R.mid && t >= M1) { R.mid = false; el.classList.remove('mid'); const f = document.getElementById('makFade'); if (f) f.style.opacity = 1; if (R.rig) { mk9RigOff(R.rig); R.rig = null; } try { SFX.rain && SFX.rain(0); } catch (e) {} if (R.mus) R.mus.vol(0.75, 1); X.muz.intensity = 0; }
     // стена воспоминаний
     const wall = el.querySelector('.wall'); wall.classList.toggle('on', t > M1 + 0.6 && t < 61); if (t > M1 + 0.6) { const k = clamp((t - M1 - 0.6) / 22, 0, 1); wall.style.transform = `scale(${1.06 - k * 0.12}) rotate(${(1 - k) * -2}deg)`; const n = Math.min(MK9_CRED.length, Math.floor((t - M1 - 0.6) / 0.28)); const cells = wall.children; while (R.wallN < n) cells[R.wallN++].classList.add('on'); }
-    el.querySelector('.rollw').style.opacity = t > 61 ? 0 : 1; el.querySelector('.fin').classList.toggle('on', t > 61.3);
-    if (t > 63.5 && !R.fading) { R.fading = 1; if (R.mus) R.mus.vol(0.0001, 0.9); el.style.transition = 'opacity 2.2s'; el.querySelector('.fin').style.transition = 'opacity 2.2s'; el.querySelector('.fin').classList.remove('on'); }
+    el.querySelector('.rollw').style.opacity = t >= M0 ? 0 : 1; // после сцены с рукой титров-текста больше нет
+    if (t > 63.5 && !R.fading) { R.fading = 1; if (R.mus) R.mus.vol(0.0001, 0.9); el.style.transition = 'opacity 2.2s'; }
   } };
 }
 /* ===================== ТЕСТ-ПЛОЩАДКА (экспериментальная) =====================
