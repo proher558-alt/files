@@ -22385,7 +22385,7 @@ const MK9_ROLL1 = `<h4>ГЛАВА 3 · «МАКАР»</h4><h5>В РОЛЯХ</h5>
 <p>Воскреситель<b>бессмертный, у которого остался один раз</b></p><p>Мелоди<b>та, что держала его за руку</b></p><p>Макар<b>герой с ядром вместо сердца</b></p><p>Свити<b>звезда, которая гипнотизирует</b></p><p>Гигант<b>тот, кто нарушил слово</b></p><p>Солдаты гиганта<b>четверо с лазерами</b></p><p>Бульдог · Обнулитель · Черепа</p>
 <h4>ГЛАВА 1 · «ПРЕСТУПНИЦА СВИТИ»</h4><p>Свити<b>блогер, звезда, преступница</b></p><p>Продюсер</p><p>Фанат<b>это были вы</b></p><p>Отделение полиции №7</p><p>Гости «Ужина принцессы»</p>
 <h4>ГЛАВА 2 · «РАСПЛАТА»</h4><p>Мелоди</p><p>Воскреситель</p><p>Марк</p><p>Счетовод<b>номер семь миллиардов…</b></p><p>Пустые</p><p>Инспектор</p>`;
-const MK9_ROLL2 = `<h4>СОЗДАТЕЛИ</h4><p>Идея, сюжет и три главы<b>автор «Мясорубки»</b></p><p>Код, 3D и анимация<b>нейросеть-напарник</b></p><p>Движок<b>three.js</b></p><p>Физика тел<b>cannon-es</b></p>
+const MK9_ROLL2 = `<h4>СТУДИЯ</h4><p>Gagarin_1204 company<b>всё, что вы видели</b></p>
 <h4>ЗВУК</h4><p>Музыка и эффекты<b>синтезированы прямо в браузере</b></p><p>Голоса<b>синтез речи вашего телефона</b></p><p>Дождь<b>1100 капель, каждая на счету</b></p>
 <h4>КАМЕРА</h4><p>Оператор<b>дрожащая рука</b></p><p>Замедленная съёмка<b>worldTs = 0.2</b></p>
 <h4>ОСОБАЯ БЛАГОДАРНОСТЬ</h4><p>Всем, кто нажал «Выйти»</p><p>Всем, кто нажал «Остаться»</p><p>Всем, кто не успел за 3 секунды</p>
@@ -22431,6 +22431,7 @@ function mk9CredBuild(br) {
 <div class="stage"><div class="ph"><img alt=""><i></i></div><div class="ph"><img alt=""><i></i></div><div class="chap"></div></div>
 <div class="wall">${MK9_CRED.map((q) => `<div style="background-image:url(${q[1]})"></div>`).join('')}</div>
 <div class="rollw"><div class="roll">${MK9_ROLL1}</div></div>
+<div class="fin"><div class="logo">МЯСОРУБКА</div><p>Спасибо, что прошли все три главы.</p><p style="opacity:.55;letter-spacing:.45em">КОНЕЦ ГЛАВЫ 3</p></div>
 <div class="bars"></div><button class="skip">Пропустить ⏭</button>`;
   document.body.appendChild(el);
   el.querySelector('.skip').onclick = (e) => { e.stopPropagation(); const C = MAK.cut; if (C) C.t = C.dur; };
@@ -22472,10 +22473,11 @@ function mk9Credits(X, br) {
     if (R.mid) { R.mt += dt; if (R.rig) mk9RigPose(R.rig, R.mt); const h = hand(); if (h) { h.getWorldPosition(cp); X.muz.position.set(cp.x + 0.15, cp.y + 0.45, cp.z + 0.1); X.muz.distance = 2.5; X.muz.intensity = br === 'out' ? 5 : 2; if (Math.random() < dt * 14) mk9Sprite(TEX.soft, cp.clone().add(new V3(rand(-0.12, 0.12), 0.02, rand(-0.12, 0.12))), { color: 0xc8d8ec, size: rand(0.012, 0.03), grow: 3, life: 0.35, opacity: 0.6, vel: new V3(rand(-0.2, 0.2), rand(0.2, 0.5), rand(-0.2, 0.2)), gravity: 0.5 }); }
       if (R.mt > 4.35 && !R.beat) { R.beat = 1; try { SFX.makHeart(0.45); } catch (e) {} } }
     if (!midNow && R.mid && t >= M1) { R.mid = false; el.classList.remove('mid'); const f = document.getElementById('makFade'); if (f) f.style.opacity = 1; if (R.rig) { mk9RigOff(R.rig); R.rig = null; } try { SFX.rain && SFX.rain(0); } catch (e) {} if (R.mus) R.mus.vol(0.75, 1); X.muz.intensity = 0; }
+    if (t > M1 + 0.6) { if (R.roll === 1) { R.roll = 2; roll.innerHTML = MK9_ROLL2; } const k = clamp((t - M1 - 0.6) / (61 - M1 - 0.6), 0, 1); roll.style.transform = `translateY(${H - k * (H + roll.scrollHeight)}px)`; }
     // стена воспоминаний
     const wall = el.querySelector('.wall'); wall.classList.toggle('on', t > M1 + 0.6 && t < 61); if (t > M1 + 0.6) { const k = clamp((t - M1 - 0.6) / 22, 0, 1); wall.style.transform = `scale(${1.06 - k * 0.12}) rotate(${(1 - k) * -2}deg)`; const n = Math.min(MK9_CRED.length, Math.floor((t - M1 - 0.6) / 0.28)); const cells = wall.children; while (R.wallN < n) cells[R.wallN++].classList.add('on'); }
-    el.querySelector('.rollw').style.opacity = t >= M0 ? 0 : 1; // после сцены с рукой титров-текста больше нет
-    if (t > 63.5 && !R.fading) { R.fading = 1; if (R.mus) R.mus.vol(0.0001, 0.9); el.style.transition = 'opacity 2.2s'; }
+    el.querySelector('.rollw').style.opacity = t > 61 ? 0 : 1; el.querySelector('.fin').classList.toggle('on', t > 61.3);
+    if (t > 63.5 && !R.fading) { R.fading = 1; if (R.mus) R.mus.vol(0.0001, 0.9); el.style.transition = 'opacity 2.2s'; el.querySelector('.fin').style.transition = 'opacity 2.2s'; el.querySelector('.fin').classList.remove('on'); }
   } };
 }
 /* ===================== ТЕСТ-ПЛОЩАДКА (экспериментальная) =====================
