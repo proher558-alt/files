@@ -22549,7 +22549,7 @@ function tsBuildRig() {
   }
   rig.key = new THREE.Group(); rig.key.visible = false; rig.R.wr.add(rig.key); rig.key.position.set(0, 0.02, 0.12);
   { const kb = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.008, 6, 12), std({ color: 0xd8b040, metalness: 1, roughness: 0.25 })); rig.key.add(kb); const kbar = new THREE.Mesh(IM_G.box, kb.material); kbar.scale.set(0.01, 0.01, 0.12); kbar.position.z = 0.06; rig.key.add(kbar); }
-  TS.rig = rig; return rig;
+  rig.mats = { skin, sleeve, cuff }; TS.rig = rig; return rig;
 }
 function tsVM(dt) {
   if (!TS.on) return; const R = tsBuildRig(); const p = player.pos;
@@ -26005,7 +26005,7 @@ function updG4(dt) {
   try { g4EconTick && g4EconTick(dt); } catch (e) { console.warn('econ', e); }
   try { g4MissionTick && g4MissionTick(dt); } catch (e) { console.warn('mis', e); }
   try { g4HudTick && g4HudTick(dt); } catch (e) { console.warn('hud', e); }
-  for (const f of [g4DuoTick, g4TacticsTick, g4BoatTick, g4RadioTick, g4WorldTick, g4JobsTick, g4HeistTick, g4LoanTick, g4EliteTick]) { try { f(dt); } catch (e) { console.warn(f.name, e); } }
+  for (const f of [g4DuoTick, g4TacticsTick, g4BoatTick, g4RadioTick, g4WorldTick, g4JobsTick, g4HeistTick, g4LoanTick, g4EliteTick, g4HandsTick]) { try { f(dt); } catch (e) { console.warn(f.name, e); } }
   G4.saveT -= dt; if (G4.saveT <= 0) { G4.saveT = 60; g4Save(false, true); }
 }
 { const _um0 = updMons; updMons = function (dt) { if (mode === 'g4') { updG4(dt); return; } _um0(dt); }; }
@@ -26318,7 +26318,7 @@ function g4HudOff() { if (G4H.el) G4H.el.style.display = 'none'; g4PhoneClose();
 body.g4-focus #g4FocusB{box-shadow:0 0 16px #c070ff;border-color:#e0b0ff}
 #g4Prompt{position:absolute;left:50%;top:calc(58px + env(safe-area-inset-top,0px));transform:translateX(-50%);padding:6px 12px;border-radius:9px;background:rgba(8,10,16,.75);font:700 12.5px var(--ui);display:none;white-space:nowrap}
 body.g4 #touch [data-act="pause"]{right:calc(10px + env(safe-area-inset-right,0px))!important;top:calc(10px + env(safe-area-inset-top,0px))!important;width:44px!important;height:44px!important;border-radius:12px!important}
-body.g4 #tsRadar,body.g4 #tsHP,body.g4 #tsTR .st,body.g4 #tsTR .cash,body.g4 #tsDisgB,body.g4 #tsG,body.g4 #tsA b[data-a="flash"],body.g4 #tsK,body.g4 #tsCode{display:none!important}
+body.g4 #tsRadar,body.g4 #tsHP,body.g4 #tsTR .st,body.g4 #tsTR .cash,body.g4 #tsDisgB,body.g4 #tsG,body.g4 #tsA b[data-a="view"],body.g4 #tsA b[data-a="flash"],body.g4 #tsK,body.g4 #tsCode{display:none!important}
 body.g4 #tsTR{top:calc(128px + env(safe-area-inset-top,0px))!important;right:calc(10px + env(safe-area-inset-right,0px))!important}
 body.g4.g4-foot #actBtn{display:none!important}
 body.g4 #touch .tb[data-act="view"]{display:flex!important;visibility:visible!important}
@@ -28138,6 +28138,19 @@ const G4_CALL_LINES = {
   melodie: { hi: ['…Слушаю.', 'Да. Говори коротко.'], how: ['Нормально. Тихо. Так лучше.', 'Жива — и это уже много.'], come: ['Скоро буду. Не шуми.'], gone: ['Занята. Позже.'] },
   makar: { hi: ['Макар на связи. Ядро стабильно.', 'Слышу тебя. Что стряслось?'], how: ['Системы в норме. Почти.', 'Держусь. Ядро гудит, как всегда.'], come: ['Лечу. Две минуты.'], gone: ['Сейчас не могу — чиню ядро.'] },
 };
+/* ---------- руки от первого лица и в машине — как у героя ---------- */
+function g4HandCols() { const A = typeof avatar !== 'undefined' ? avatar : null; if (!A || !A.skinMat || !A.parts) return null; const sk = A.skinMat.color, ua = A.parts.uArmR && A.parts.uArmR.mat; const sl = ua ? ua.color : sk; return { sk, sl }; }
+function g4HandsTick() {
+  const c = g4HandCols(); if (!c) return; const key = c.sk.getHex() + ':' + c.sl.getHex() + ':' + G4.char;
+  if (TS.rig && TS.rig.mats && G4CALL.hk !== key) { G4CALL.hk = key; const M = TS.rig.mats; M.skin.color.copy(c.sk); M.sleeve.color.copy(c.sl); M.cuff.color.copy(c.sl).lerp(new THREE.Color(0xffffff), 0.35); }
+  const C = VEH.in; if (C && C.skinM && C.sleeveM && C.g4hk !== key) { C.g4hk = key; C.skinM.color.copy(c.sk); C.sleeveM.color.copy(c.sl); }
+}
+{ const _vh = vehHandsSkin; vehHandsSkin = function (C) { _vh(C); const c = g4HandCols(); if (mode === 'g4' && c && C && C.skinM) { C.skinM.color.copy(c.sk); C.sleeveM.color.copy(c.sl); C.g4hk = null; } }; }
+/* ---------- 080: смена погоды за $500 ---------- */
+function g4CallWeather() {
+  G4CALL.chat = { who: 'sys', log: [['Метеослужба «Небо 080»', 'Заказ погоды: любая, сколько угодно раз. Стоимость — $500 за смену.']], wx: 1 }; G4CALL.num = ''; g4CallRender();
+}
+function g4CallWx(w) { const nm = { clear: 'Ясно', clouds: 'Облачно', rain: 'Дождь', storm: 'Гроза' }[w]; if (!g4Pay(500)) { toast('💸 Не хватает $500'); return; } G4.weather = w; G4.wT = rand(300, 600); Sound.chime && Sound.chime(); toast(`🌦 Погода: ${nm} (−$500)`); g4Tx(-500, 'Метеослужба 080'); g4CallSay('Метеослужба', `Готово: «${nm}». Звоните ещё!`); g4CallRender(); }
 function g4CallWho() { return Object.keys(G4_CHARS).filter((k) => k !== G4.char); }
 function g4CallRender() { g4PhoneApp('call'); }
 function g4CallSay(from, txt) { const C = G4CALL.chat; if (!C) return; C.log.push([from, txt]); }
@@ -28153,6 +28166,7 @@ function g4CallOpt(id) {
 function g4CallDial() {
   const n = G4CALL.num; Sound.click && Sound.click(700, 0.25);
   if (n === '6292') { const S = G4.S; if (S.call6292) { G4CALL.chat = { who: 'sys', log: [['Автоответчик', 'Номер больше не обслуживается. Приз уже получен.']] }; } else { S.call6292 = 1; S.cash += 88888; Sound.chime && Sound.chime(); g4Tx(88888, 'Звонок 6292'); toast('🎉 +$88 888!'); G4CALL.chat = { who: 'sys', log: [['Автоответчик', 'Поздравляем! Вы — наш счастливый абонент. На руки: $88 888. Только никому.']] }; } G4CALL.num = ''; g4CallRender(); return; }
+  if (n === '080') { g4CallWeather(); return; }
   if (n === '911') { G4CALL.chat = { who: 'sys', log: [['Диспетчер', 'Служба спасения. Что у вас случилось?'], ['Вы', 'Всё в порядке, ошибся.']] }; G4CALL.num = ''; g4CallRender(); return; }
   G4CALL.chat = { who: 'sys', log: [['Оператор', n ? `Абонент ${n} недоступен или не существует.` : 'Введите номер.']] }; G4CALL.num = ''; g4CallRender();
 }
@@ -28200,8 +28214,8 @@ function g4CallBoom() {
 G4_APP_FN.call = () => {
   const C = G4CALL.chat, S = G4.S;
   if (C) { const nm = C.who === 'gg' ? 'Воскреситель' : C.who === 'sys' ? 'Звонок' : G4_CHARS[C.who].name, log = C.log.map(([f, t]) => `<div class="it" style="${f === 'Вы' ? 'text-align:right;background:rgba(255,90,180,.15)' : ''}"><small>${f}</small><div>${t}</div></div>`).join('');
-    const opts = C.who === 'gg' ? [['how', 'Как ты?'], ['dead', 'Ты же умер?'], ['do', 'Чем занят?'], ['where', 'Где ты?']] : C.who === 'sys' ? [] : [['hi', 'Привет!'], ['how', 'Как дела?'], ['where', 'Где ты?'], ['come', 'Приезжай ко мне']];
-    return { html: `<div class="it"><b>📞 ${nm}</b><small>на линии…</small></div>${log}<div class="row" style="flex-wrap:wrap;gap:6px">${opts.map(([k, n]) => `<button class="b g" data-o="${k}">${n}</button>`).join('')}<button class="b" data-o="bye">✖ Положить трубку</button></div>`, after(el) { for (const b of el.querySelectorAll('[data-o]')) b.onclick = () => { if (b.dataset.o === 'bye') { G4CALL.chat = null; g4CallRender(); } else g4CallOpt(b.dataset.o); }; } }; }
+    const opts = C.wx ? [['wclear', '☀️ Ясно · $500'], ['wclouds', '☁️ Облачно · $500'], ['wrain', '🌧 Дождь · $500'], ['wstorm', '⛈ Гроза · $500']] : C.who === 'gg' ? [['how', 'Как ты?'], ['dead', 'Ты же умер?'], ['do', 'Чем занят?'], ['where', 'Где ты?']] : C.who === 'sys' ? [] : [['hi', 'Привет!'], ['how', 'Как дела?'], ['where', 'Где ты?'], ['come', 'Приезжай ко мне']];
+    return { html: `<div class="it"><b>📞 ${nm}</b><small>на линии…</small></div>${log}<div class="row" style="flex-wrap:wrap;gap:6px">${opts.map(([k, n]) => `<button class="b g" data-o="${k}">${n}</button>`).join('')}<button class="b" data-o="bye">✖ Положить трубку</button></div>`, after(el) { for (const b of el.querySelectorAll('[data-o]')) b.onclick = () => { if (b.dataset.o === 'bye') { G4CALL.chat = null; g4CallRender(); } else if (b.dataset.o[0] === 'w' && b.dataset.o !== 'where' && C.wx) g4CallWx(b.dataset.o.slice(1)); else g4CallOpt(b.dataset.o); }; } }; }
   const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
   return { html: `<div class="it" style="text-align:center"><div class="big" style="letter-spacing:.2em;min-height:30px">${G4CALL.num || '&nbsp;'}</div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">${keys.map((k) => `<button class="b g" data-k="${k}" style="padding:10px;font-size:16px">${k}</button>`).join('')}</div><div class="row" style="gap:6px"><button class="b g" data-k="del" style="flex:1">⌫</button><button class="b" data-k="call" style="flex:2">📞 Позвонить</button></div><div class="it"><b>Контакты</b></div>${g4CallWho().map((k) => `<button class="b g" data-c="${k}">${G4_CHARS[k].name}</button>`).join('')}<button class="b" data-c="gg">🎸 Воскреситель</button>`,
     after(el) { for (const b of el.querySelectorAll('[data-k]')) b.onclick = () => { const k = b.dataset.k; if (k === 'del') G4CALL.num = G4CALL.num.slice(0, -1); else if (k === 'call') { g4CallDial(); return; } else if (G4CALL.num.length < 11) G4CALL.num += k; Sound.click && Sound.click(900 + Math.random() * 300, 0.15); g4CallRender(); }; for (const b of el.querySelectorAll('[data-c]')) b.onclick = () => g4CallStart(b.dataset.c); } };
