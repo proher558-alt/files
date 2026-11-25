@@ -28127,6 +28127,86 @@ function g4EliteOff() {
   if (G4EL.audio) { try { G4EL.audio.pause(); G4EL.audio.currentTime = 0; } catch (e) {} } G4EL.vol = 0; G4EL.wasRadio = false; if (G4EL.ride) { G4EL.ride = null; story.ride = null; } const el = document.getElementById('g4Lift'); if (el) el.style.display = 'none';
   if (G4EL.conc) { try { G4EL.conc.dispose(); } catch (e) {} const j = npcs.indexOf(G4EL.conc); if (j >= 0) npcs.splice(j, 1); G4EL.conc = null; } MAPS.coral.lamp[1] = 0; for (let i = 0; i < 4; i++) if (lamps[i]) lamps[i].position.set(0, -50, 0); G4EL.lt = ''; G4EL.dyn = null;
 }
+/* ===================== ГЛАВА 4 · ПРИЛОЖЕНИЕ «ЗВОНОК» =====================
+   Набор номера и звонки героям (Свити, Мелоди, Макар) и… Воскресителю — он отвечает так, будто жив.
+   Если спросить, где он, — телефон взрывается, экран темнеет, и мы, еле живые, видим искажённого
+   Воскресителя, похожего на дракона. Потом — пробуждение, будто ничего не было.
+   Номер 6292 — тайный: один раз даёт $88 888. */
+const G4CALL = { num: '', chat: null, busy: false };
+const G4_CALL_LINES = {
+  svity: { hi: ['Приве-ет! Я как раз монтирую ролик 💖', 'Алло! Ты вовремя — у меня идея для эфира!'], how: ['Всё супер! Подписчики растут, а я — вместе с ними.', 'Устала, но счастлива. А ты там берегись, ладно?'], come: ['Бегу! Только пудру поправлю… шучу, уже еду!'], gone: ['Не сегодня, у меня прямой эфир.'] },
+  melodie: { hi: ['…Слушаю.', 'Да. Говори коротко.'], how: ['Нормально. Тихо. Так лучше.', 'Жива — и это уже много.'], come: ['Скоро буду. Не шуми.'], gone: ['Занята. Позже.'] },
+  makar: { hi: ['Макар на связи. Ядро стабильно.', 'Слышу тебя. Что стряслось?'], how: ['Системы в норме. Почти.', 'Держусь. Ядро гудит, как всегда.'], come: ['Лечу. Две минуты.'], gone: ['Сейчас не могу — чиню ядро.'] },
+};
+function g4CallWho() { return Object.keys(G4_CHARS).filter((k) => k !== G4.char); }
+function g4CallRender() { g4PhoneApp('call'); }
+function g4CallSay(from, txt) { const C = G4CALL.chat; if (!C) return; C.log.push([from, txt]); }
+function g4CallOpt(id) {
+  const C = G4CALL.chat; if (!C) return; if (C.who === 'gg') { g4CallGG(id); return; } const L = G4_CALL_LINES[C.who], nm = G4_CHARS[C.who].name; Sound.click && Sound.click(1100, 0.2);
+  if (id === 'hi') { g4CallSay('Вы', 'Привет!'); g4CallSay(nm, pick(L.hi)); }
+  else if (id === 'how') { g4CallSay('Вы', 'Как дела?'); g4CallSay(nm, pick(L.how)); }
+  else if (id === 'where') { g4CallSay('Вы', 'Где ты сейчас?'); const D = G4_DIST.filter((d) => d.id !== 'sea' && d.id !== 'elite'); g4CallSay(nm, `Я в районе «${pick(D).name}». Не волнуйся.`); }
+  else if (id === 'come') { g4CallSay('Вы', 'Приезжай ко мне!'); if (!G4P.ch) { g4CallSay(nm, pick(L.come)); later(1.5, () => { try { if (!G4P.ch) g4PartnerSpawn(C.who); } catch (e) {} }); } else g4CallSay(nm, G4P.ch === C.who ? 'Я уже рядом, ты чего?' : pick(L.gone)); }
+  else if (id === 'bye') { G4CALL.chat = null; }
+  g4CallRender();
+}
+function g4CallDial() {
+  const n = G4CALL.num; Sound.click && Sound.click(700, 0.25);
+  if (n === '6292') { const S = G4.S; if (S.call6292) { G4CALL.chat = { who: 'sys', log: [['Автоответчик', 'Номер больше не обслуживается. Приз уже получен.']] }; } else { S.call6292 = 1; S.cash += 88888; Sound.chime && Sound.chime(); g4Tx(88888, 'Звонок 6292'); toast('🎉 +$88 888!'); G4CALL.chat = { who: 'sys', log: [['Автоответчик', 'Поздравляем! Вы — наш счастливый абонент. На руки: $88 888. Только никому.']] }; } G4CALL.num = ''; g4CallRender(); return; }
+  if (n === '911') { G4CALL.chat = { who: 'sys', log: [['Диспетчер', 'Служба спасения. Что у вас случилось?'], ['Вы', 'Всё в порядке, ошибся.']] }; G4CALL.num = ''; g4CallRender(); return; }
+  G4CALL.chat = { who: 'sys', log: [['Оператор', n ? `Абонент ${n} недоступен или не существует.` : 'Введите номер.']] }; G4CALL.num = ''; g4CallRender();
+}
+function g4CallStart(who) {
+  G4CALL.chat = { who, log: [] }; Sound.click && Sound.click(1300, 0.25);
+  if (who === 'gg') { g4CallSay('Воскреситель', pick(['О-о, это ты! Хе-хе. Как раз думал о тебе.', 'Алло? Да-да, слушаю. Я всегда слушаю.', 'Ну наконец-то позвонил. Заждался.'])); g4CallSay('Воскреситель', 'У меня всё отлично. Как всегда. Как будто и не уходил.'); }
+  else g4CallSay(G4_CHARS[who].name, pick(G4_CALL_LINES[who].hi));
+  g4CallRender();
+}
+function g4CallGG(id) {
+  Sound.click && Sound.click(1000, 0.2);
+  if (id === 'how') { g4CallSay('Вы', 'Как ты?'); g4CallSay('Воскреситель', pick(['Лучше всех! Пью чай, смотрю на город. Хе-хе.', 'Живее всех живых. Честное слово.'])); }
+  else if (id === 'dead') { g4CallSay('Вы', 'Но ты же… умер?'); g4CallSay('Воскреситель', 'Умер? Фу, какие глупости. Я тут. Всегда тут. Один раз — и навсегда.'); }
+  else if (id === 'do') { g4CallSay('Вы', 'Чем занят?'); g4CallSay('Воскреситель', 'Слушаю музыку. Красную. Ты тоже услышишь — когда придёшь в гости.'); }
+  else if (id === 'where') { g4CallSay('Вы', 'А где ты?'); g4CallSay('Воскреситель', 'Я?.. Хе-хе… Я — совсем рядом.'); g4CallRender(); later(1.4, g4CallBoom); return; }
+  else if (id === 'bye') { G4CALL.chat = null; }
+  g4CallRender();
+}
+/* ---------- взрыв телефона и «сон» ---------- */
+function g4CallBoom() {
+  if (G4CALL.busy) return; G4CALL.busy = true; const hp0 = player.hp; G4CALL.chat = null; story.ride = () => { player.vel.set(0, 0, 0); };
+  try { Sound.explosion && Sound.explosion(0.9); } catch (e) {} flashScreen && flashScreen('#fff', 700); shake = Math.max(shake, 0.9); sparks && sparks(new V3(player.pos.x, 1.4, player.pos.z), 40, UP, 6); g4PhoneClose();
+  let ov = document.getElementById('g4Dream'); if (!ov) { ov = document.createElement('div'); ov.id = 'g4Dream'; ov.style.cssText = 'position:fixed;inset:0;z-index:97;background:#000;opacity:0;pointer-events:none;display:none;overflow:hidden'; ov.innerHTML = '<canvas width="512" height="512" style="position:absolute;left:50%;top:50%;width:min(95vh,95vw);height:min(95vh,95vw);transform:translate(-50%,-50%);opacity:0;filter:blur(1px)"></canvas><div class="vg" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 20%,#000 85%)"></div><div class="tx" style="position:absolute;left:0;right:0;bottom:12%;text-align:center;color:#b33;font:italic 700 15px var(--ui);letter-spacing:.1em;opacity:0"></div>'; document.body.appendChild(ov); }
+  ov.style.display = 'block'; ov.style.transition = 'opacity 1.4s'; requestAnimationFrame(() => { ov.style.opacity = 1; }); const cv = ov.querySelector('canvas'), tx = ov.querySelector('.tx'), g = cv.getContext('2d');
+  const src = makeCanvas(512, 512), s = src.getContext('2d'); // искажённый «драконий» Воскреситель
+  { s.fillStyle = '#05000a'; s.fillRect(0, 0, 512, 512); const gl = s.createRadialGradient(256, 230, 10, 256, 230, 260); gl.addColorStop(0, 'rgba(120,10,30,.55)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); s.fillStyle = gl; s.fillRect(0, 0, 512, 512);
+    s.fillStyle = '#0c0408'; for (const sd of [-1, 1]) { s.beginPath(); s.moveTo(256 + sd * 40, 300); s.bezierCurveTo(256 + sd * 200, 120, 256 + sd * 270, 160, 256 + sd * 250, 330); for (let i = 0; i < 5; i++) s.lineTo(256 + sd * (230 - i * 38), 300 + i * 26 - 10); s.lineTo(256 + sd * 60, 360); s.fill(); }
+    s.beginPath(); s.moveTo(210, 512); s.bezierCurveTo(200, 400, 230, 330, 236, 270); s.lineTo(276, 270); s.bezierCurveTo(284, 330, 312, 400, 302, 512); s.fill();
+    s.beginPath(); s.ellipse(256, 200, 62, 78, 0, 0, 7); s.fill(); s.beginPath(); s.moveTo(206, 140); s.lineTo(180, 60); s.lineTo(226, 120); s.moveTo(306, 140); s.lineTo(332, 60); s.lineTo(286, 120); s.fill();
+    s.fillStyle = '#d8f0d0'; s.beginPath(); s.ellipse(256, 150, 60, 22, 0, Math.PI, 0); s.fill(); s.strokeStyle = '#3a8a4a'; s.lineWidth = 3; for (let i = 0; i < 6; i++) { s.beginPath(); s.moveTo(210 + i * 19, 130); s.lineTo(210 + i * 19, 150); s.stroke(); }
+    s.fillStyle = '#ffb030'; for (const sd of [-1, 1]) { s.beginPath(); s.ellipse(256 + sd * 24, 190, 13, 17, sd * 0.3, 0, 7); s.fill(); s.fillStyle = '#100'; s.beginPath(); s.ellipse(256 + sd * 24, 191, 3, 14, 0, 0, 7); s.fill(); s.fillStyle = '#ffb030'; }
+    s.fillStyle = '#000'; s.beginPath(); s.ellipse(256, 244, 40, 24, 0, 0, 7); s.fill(); s.fillStyle = '#fff'; for (let i = 0; i < 12; i++) { s.beginPath(); s.moveTo(222 + i * 6, 232); s.lineTo(225 + i * 6, 256 + (i % 2) * 8); s.lineTo(228 + i * 6, 232); s.fill(); } }
+  let t = 0, alive = true, last = performance.now(); const lines = ['…', 'Я — рядом…', 'Один… раз…'];
+  const frame = (now) => { if (!alive) return; const dt = (now - last) / 1000; last = now; t += dt; const a = t < 3 ? 0 : t < 6 ? (t - 3) / 3 * 0.55 : t < 9 ? 0.55 : Math.max(0, 0.55 - (t - 9) / 1.6 * 0.55); cv.style.opacity = a * (0.7 + Math.random() * 0.3); g.clearRect(0, 0, 512, 512);
+    for (let y = 0; y < 512; y += 8) { const off = Math.random() < 0.3 ? (Math.random() - 0.5) * 36 * (0.4 + a) : Math.sin(y * 0.03 + t * 3) * 4; g.drawImage(src, 0, y, 512, 8, off, y, 512, 8); }
+    g.fillStyle = 'rgba(255,0,30,.06)'; for (let y = 0; y < 512; y += 4) g.fillRect(0, y, 512, 1); tx.style.opacity = a > 0.2 ? 0.8 : 0; tx.textContent = lines[Math.min(2, Math.floor(t / 3.2))]; requestAnimationFrame(frame); };
+  requestAnimationFrame(frame); renderer.domElement.style.filter = 'grayscale(.8) blur(2px) brightness(.5)'; player.hp = Math.min(player.hp, 6);
+  try { Sound.clip && later(3.5, () => Sound.clip('ult', { vol: 0.5, rate: 0.55 })); } catch (e) {}
+  later(5, () => { try { Sound.laugh && Sound.laugh({ pitch: 0.4, n: 3, gap: 0.3, vol: 0.4 }); } catch (e) {} });
+  setTimeout(() => { // пробуждение: «ничего не было»
+    ov.style.transition = 'opacity 0.1s'; ov.style.background = '#fff'; flashScreen && flashScreen('#fff', 500); alive = false; renderer.domElement.style.filter = ''; player.hp = hp0; story.ride = null; cv.style.opacity = 0; tx.style.opacity = 0;
+    setTimeout(() => { ov.style.transition = 'opacity 1.6s'; ov.style.opacity = 0; setTimeout(() => { ov.style.display = 'none'; ov.style.background = '#000'; G4CALL.busy = false; }, 1700); g4Card && g4Card('…', 'вы очнулись. будто ничего и не было', 3.6); later(4, () => { toast('📱 Телефон цел. Звонок… был сном?'); }); }, 250);
+  }, 11500);
+}
+G4_APP_FN.call = () => {
+  const C = G4CALL.chat, S = G4.S;
+  if (C) { const nm = C.who === 'gg' ? 'Воскреситель' : C.who === 'sys' ? 'Звонок' : G4_CHARS[C.who].name, log = C.log.map(([f, t]) => `<div class="it" style="${f === 'Вы' ? 'text-align:right;background:rgba(255,90,180,.15)' : ''}"><small>${f}</small><div>${t}</div></div>`).join('');
+    const opts = C.who === 'gg' ? [['how', 'Как ты?'], ['dead', 'Ты же умер?'], ['do', 'Чем занят?'], ['where', 'Где ты?']] : C.who === 'sys' ? [] : [['hi', 'Привет!'], ['how', 'Как дела?'], ['where', 'Где ты?'], ['come', 'Приезжай ко мне']];
+    return { html: `<div class="it"><b>📞 ${nm}</b><small>на линии…</small></div>${log}<div class="row" style="flex-wrap:wrap;gap:6px">${opts.map(([k, n]) => `<button class="b g" data-o="${k}">${n}</button>`).join('')}<button class="b" data-o="bye">✖ Положить трубку</button></div>`, after(el) { for (const b of el.querySelectorAll('[data-o]')) b.onclick = () => { if (b.dataset.o === 'bye') { G4CALL.chat = null; g4CallRender(); } else g4CallOpt(b.dataset.o); }; } }; }
+  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
+  return { html: `<div class="it" style="text-align:center"><div class="big" style="letter-spacing:.2em;min-height:30px">${G4CALL.num || '&nbsp;'}</div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">${keys.map((k) => `<button class="b g" data-k="${k}" style="padding:10px;font-size:16px">${k}</button>`).join('')}</div><div class="row" style="gap:6px"><button class="b g" data-k="del" style="flex:1">⌫</button><button class="b" data-k="call" style="flex:2">📞 Позвонить</button></div><div class="it"><b>Контакты</b></div>${g4CallWho().map((k) => `<button class="b g" data-c="${k}">${G4_CHARS[k].name}</button>`).join('')}<button class="b" data-c="gg">🎸 Воскреситель</button>`,
+    after(el) { for (const b of el.querySelectorAll('[data-k]')) b.onclick = () => { const k = b.dataset.k; if (k === 'del') G4CALL.num = G4CALL.num.slice(0, -1); else if (k === 'call') { g4CallDial(); return; } else if (G4CALL.num.length < 11) G4CALL.num += k; Sound.click && Sound.click(900 + Math.random() * 300, 0.15); g4CallRender(); }; for (const b of el.querySelectorAll('[data-c]')) b.onclick = () => g4CallStart(b.dataset.c); } };
+};
+G4_APPS.push(['call', '☎️', 'Звонок']);
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
