@@ -28167,6 +28167,7 @@ function g4CallDial() {
   const n = G4CALL.num; Sound.click && Sound.click(700, 0.25);
   if (n === '6292') { const S = G4.S; if (S.call6292) { G4CALL.chat = { who: 'sys', log: [['Автоответчик', 'Номер больше не обслуживается. Приз уже получен.']] }; } else { S.call6292 = 1; S.cash += 88888; Sound.chime && Sound.chime(); g4Tx(88888, 'Звонок 6292'); toast('🎉 +$88 888!'); G4CALL.chat = { who: 'sys', log: [['Автоответчик', 'Поздравляем! Вы — наш счастливый абонент. На руки: $88 888. Только никому.']] }; } G4CALL.num = ''; g4CallRender(); return; }
   if (n === '080') { g4CallWeather(); return; }
+  if (n === '543') { G4CALL.num = ''; g4PhoneClose(); g4SpawnMenu(); return; }
   if (n === '911') { G4CALL.chat = { who: 'sys', log: [['Диспетчер', 'Служба спасения. Что у вас случилось?'], ['Вы', 'Всё в порядке, ошибся.']] }; G4CALL.num = ''; g4CallRender(); return; }
   G4CALL.chat = { who: 'sys', log: [['Оператор', n ? `Абонент ${n} недоступен или не существует.` : 'Введите номер.']] }; G4CALL.num = ''; g4CallRender();
 }
@@ -28221,6 +28222,29 @@ G4_APP_FN.call = () => {
     after(el) { for (const b of el.querySelectorAll('[data-k]')) b.onclick = () => { const k = b.dataset.k; if (k === 'del') G4CALL.num = G4CALL.num.slice(0, -1); else if (k === 'call') { g4CallDial(); return; } else if (G4CALL.num.length < 11) G4CALL.num += k; Sound.click && Sound.click(900 + Math.random() * 300, 0.15); g4CallRender(); }; for (const b of el.querySelectorAll('[data-c]')) b.onclick = () => g4CallStart(b.dataset.c); } };
 };
 G4_APPS.push(['call', '☎️', 'Звонок']);
+
+
+
+/* ---------- 543: спавн-меню персонажей за $4000 ---------- */
+const G4_SPAWNS = [
+  { id: 'human', name: 'Прохожий', ic: '🧍', desc: 'обычный горожанин: бьётся, раздевается', kind: () => pick(['street', 'worker', 'office']) },
+  { id: 'svity', name: 'Свити', ic: '💖', desc: 'блогерша в уличном образе', kind: () => 'svity-street' },
+  { id: 'melodie', name: 'Мелоди', ic: '🎤', desc: 'тихая и быстрая', kind: () => 'melodie' },
+  { id: 'gagarin', name: 'Воскреситель', ic: '🎸', desc: 'клетчатый шлем и оскал. Лучше не злить', kind: () => 'gagarin' },
+  { id: 'bottle', name: 'Бутылка', ic: '🍾', desc: 'странный, но живой персонаж', kind: () => 'bottle' },
+  { id: 'blockhead', name: 'Ник52', ic: '🟦', desc: 'квадратная голова', kind: () => 'blockhead' },
+  { id: 'dummy', name: 'Манекен', ic: '🥋', desc: 'мишень для перчаток', type: 'dummy' },
+  { id: 'makar', name: 'Макар', ic: '🦾', desc: 'вместо героя — железный костюм в сумку. Ломбард купит за $200', suit: 1 },
+];
+function g4SpawnMenu() {
+  g4ShopPanel('Спавн-меню «543»', 'Любой персонаж — $4000. На них работают боксёрские перчатки, можно раздеть и угнать одежду.', G4_SPAWNS.map((s) => ({ id: s.id, name: s.name, ic: s.ic, price: 4000, desc: s.desc })), (o) => g4SpawnChar(o.id));
+}
+function g4SpawnChar(id) {
+  const S = G4_SPAWNS.find((q) => q.id === id), p = player.pos, a = player.yaw;
+  if (S.suit) { if (!g4AddLoot('suit', 'Железный костюм', 400, 6)) { G4.S.cash += 4000; toast('💸 Деньги возвращены: сумка полна'); return; } toast('🦾 Железный костюм в сумке. Ломбард «Второй шанс» купит за $200'); return; }
+  const x = p.x - Math.sin(a) * 4, z = p.z - Math.cos(a) * 4, n = mkNpc(S.kind ? S.kind() : undefined, x, z, a + Math.PI, S.type || 'human');
+  n.pos.set(x, 0, z); pushOutAABBs(n.pos, 0.4, 0); n.g4summon = true; n.g4ped = { ring: null, idx: 0, dir: 1, inside: { x0: x - 6, x1: x + 6, z0: z - 6, z1: z + 6 }, zone: [x - 6, x + 6, z - 6, z + 6] }; G4L.peds.push(n); Sound.chime && Sound.chime(); toast(`✨ ${S.name} призван(а) в 4 м перед вами`);
+}
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
