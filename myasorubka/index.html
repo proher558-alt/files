@@ -11752,7 +11752,7 @@ function admRender() {
   $('admLock').hidden = adm.ok; $('admBody').hidden = !adm.ok;
   $('admDisp').textContent = [0, 1, 2, 3].map((i) => (i < adm.in.length ? '●' : '–')).join(' ');
   if (!adm.ok) return;
-  const T = [['end', 'Концовки'], ['cut', 'Кат-сцены'], ['ch2', 'Глава 2'], ['ch3', 'Глава 3'], ['gg', 'Воскреситель'], ['cheat', 'Читы']];
+  const T = [['end', 'Концовки'], ['cut', 'Кат-сцены'], ['ch2', 'Глава 2'], ['ch4', 'Глава 4'], ['gg', 'Воскреситель'], ['cheat', 'Читы']];
   $('admTabs').innerHTML = T.map(([k, l]) => `<button class="chip${adm.tab === k ? ' on' : ''}" data-t="${k}">${l}</button>`).join('');
   $('admTabs').querySelectorAll('[data-t]').forEach((b) => b.onclick = () => { adm.tab = b.dataset.t; Sound.click(900, 0.15); admRender(); });
   const it = admItems(adm.tab); window.__admFns = it;
@@ -29417,6 +29417,63 @@ function g4NikOff() {
   if (G4NK.g) { if (G4NK.g.parent) G4NK.g.parent.remove(G4NK.g); const i = mapObjs.indexOf(G4NK.g); if (i >= 0) mapObjs.splice(i, 1); } G4NK.g = null; G4NK.rise = null; G4NK.car = null; G4NK.pad = null; G4NK.doorWant = 0; G4NK.door = 0; G4NK.lt = ''; G4NK.warned = false; G4NK.sceneLt = false;
   const el = document.getElementById('g4Pad'); if (el) el.style.display = 'none';
 }
+/* ===================== админка · Глава 4: телепорты, деньги, розыск ===================== */
+function admG4Ok() { if (!(mode === 'g4' && G4.playing && G4.S)) { toast('Сначала запустите Главу 4'); return false; } return true; }
+function admG4Tp(name, x, z, y) {
+  if (!admG4Ok()) return; admClose();
+  try { if (G4RT && G4RT.inside) { G4RT.inside = null; g4RentLights(''); } } catch (e) {}
+  try { if (G4A && G4A.clip) g4ClipEnd(); } catch (e) {}
+  if (VEH.in) { try { vehExit(true); } catch (e) {} }
+  const gy = y !== undefined ? y : floorAt(x, z, Infinity);
+  player.pos.set(x, gy + 0.05, z); player.vel.set(0, 0, 0); player.onGround = true;
+  if (typeof G4EL !== 'undefined' && y !== undefined && y > 100) { try { G4EL.lt = ''; } catch (e) {} }
+  toast(`📍 ${name}`);
+}
+function admCh4() {
+  const S = G4.S || {}, L = [];
+  L.push({ sec: `Деньги и розыск · $${S.cash || 0} на руках · звёзды ${TS.wl ? TS.wl.stars : 0}` });
+  L.push({ l: '+ $10 000 на руки', s: 'Наличные', f: () => { if (!admG4Ok()) return; S.cash = (S.cash || 0) + 10000; g4Tx(10000, 'Админка'); toast('💵 +$10 000'); admRender(); } });
+  L.push({ l: '+ $100 000 на счёт', s: 'Банк', f: () => { if (!admG4Ok()) return; S.bank = (S.bank || 0) + 100000; toast('🏦 +$100 000 на счёт'); admRender(); } });
+  L.push({ l: 'Очистить карманы', s: 'Обнулить наличные', f: () => { if (!admG4Ok()) return; S.cash = 0; admRender(); } });
+  L.push({ l: 'Розыск 0 ★', s: 'Очистить розыск', f: () => { if (!admG4Ok()) return; tsWlClear(); toast('⭐ Розыска нет'); admRender(); } });
+  for (const n of [2, 4, 6]) L.push({ l: `Розыск ${n} ★`, s: 'Полиция и вертолёты', f: () => { if (!admG4Ok()) return; tsWlSet(n); admClose(); } });
+  L.push({ l: 'Розыск 8 ★', s: 'Танки и мехи', f: () => { if (!admG4Ok()) return; tsWlSet(8); admClose(); } });
+
+  L.push({ sec: 'Секретка: Ник52' });
+  L.push({ l: 'Площадь Ник52 (ночью)', s: 'Толпа у башни, E — присоединиться', f: () => admG4Tp('Площадь Ник52', G4NK_P.x, G4NK_P.z + 5) });
+  if (G4NK && G4NK.g) L.push({ l: 'Гараж Ник52 · код 2426', s: 'Внутри гаража', f: () => admG4Tp('Гараж Ник52', G4NK_G.dx, (G4NK_G.z0 + G4NK_G.z1) / 2) });
+  else L.push({ l: 'Гараж Ник52 · код 2426', s: 'Ещё не открыт: сначала помогите толпе', f: () => { toast('Сначала помогите толпе у башни'); } });
+  L.push({ l: 'Тихоня-52 (пистолет)', s: 'Выдать легендарный пистолет', f: () => { if (!admG4Ok()) return; g4GiveLegend(); admRender(); } });
+
+  L.push({ sec: 'ELITE City: пасхалки' });
+  L.push({ l: 'Холл «Эдема»', s: 'Лобби башни, лифт', f: () => admG4Tp('Эдем · лобби', 515, -150, 0) });
+  L.push({ l: 'Этаж 88 · квартира Воскресителя', s: 'Красный интерьер и музыка', f: () => admG4Tp('Эдем · 88 этаж', 515, 312, 312) });
+  if (typeof G4EL !== 'undefined' && G4EL.poi) {
+    const eggs = G4EL.poi.filter((o) => o.apt && o.kind !== 'lift' && o.kind !== 'bed' && o.kind !== 'bar');
+    eggs.forEach((o, i) => L.push({ l: `88 этаж: ${String(o.label || o.kind || ('точка ' + (i + 1))).replace(/^[^ ]+ /, '').slice(0, 40)}`, s: 'Пасхалка в квартире', f: () => admG4Tp('Квартира: пасхалка', o.x, o.z + 1.2, 312) }));
+  }
+  L.push({ l: 'Вилла «Сапфир»', s: 'ELITE City, аренда', f: () => admG4Tp('Вилла «Сапфир»', 431, -270) });
+
+  L.push({ sec: 'Город: пасхалки и места' });
+  const P = G4M.pois || {};
+  if (P.gallery) L.push({ l: 'Галерея «Лазурь» · Сириус', s: 'Пасхалка с картиной Воскресителя', f: () => admG4Tp('Галерея «Лазурь»', P.gallery.x, P.gallery.z) });
+  if (P.lab) L.push({ l: 'Лаборатория Воскресителя', s: 'Скрытое место', f: () => admG4Tp('Лаборатория', P.lab.x, P.lab.z) });
+  if (P.caiman) L.push({ l: 'Хижина Каймана', s: 'Притон в болотах', f: () => admG4Tp('Хижина Каймана', P.caiman.x, P.caiman.z) });
+  if (P.trap) L.push({ l: 'Притон на Пальмовой', s: 'Скрытое место', f: () => admG4Tp('Притон', P.trap.x, P.trap.z) });
+  if (P.sharks) L.push({ l: 'Склад «Акул»', s: 'Скрытое место', f: () => admG4Tp('Склад «Акул»', P.sharks.x, P.sharks.z) });
+  if (P.bank) L.push({ l: 'Банк «Монолит» · банкир', s: 'Ограбление', f: () => admG4Tp('Банк', P.bank.x, P.bank.z + 4) });
+  if (P.guns) L.push({ l: 'Арсенал 24', s: 'Оружейный магазин', f: () => admG4Tp('Арсенал 24', P.guns.x, P.guns.z) });
+  if (P.melodie) L.push({ l: 'Мотель «Прибой» · дом Мелоди', s: 'Пасхалка', f: () => admG4Tp('Мотель «Прибой»', P.melodie.x + 3, P.melodie.z + 3) });
+  if (P.svity) L.push({ l: 'Розовый домик Свити', s: 'Безопасный дом', f: () => admG4Tp('Домик Свити', P.svity.x, P.svity.z + 3) });
+  if (P.makar) L.push({ l: 'Вилла Макара', s: 'Остров Ключей', f: () => admG4Tp('Вилла Макара', P.makar.x, P.makar.z + 3) });
+  if (typeof G4_PUMPS !== 'undefined') { const seen = {}; for (const p of G4_PUMPS) if (!seen[p.st]) { seen[p.st] = 1; L.push({ l: `⛽ Заправка «${p.st}»`, s: 'Колонка с пистолетом', f: () => admG4Tp('Заправка ' + p.st, p.x, p.z + 1.6) }); } }
+
+  L.push({ sec: 'Аренда и клуб' });
+  if (typeof G4_RENTS !== 'undefined') for (const R of G4_RENTS) if (R.door) L.push({ l: R.name, s: `$${R.price}/сутки · у двери`, f: () => admG4Tp(R.name, R.door.x + R.door.ox * 2, R.door.z + R.door.oz * 2) });
+  if (typeof G4RT !== 'undefined' && G4RT.clubOut) L.push({ l: 'Клуб «Неон»', s: 'Вход с Главной улицы', f: () => admG4Tp('Клуб «Неон»', G4RT.clubOut.x, G4RT.clubOut.z + 2) });
+  return L;
+}
+{ const _ai4 = admItems; admItems = function (tab) { if (tab === 'ch4') return admCh4(); return _ai4(tab); }; }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
 function d3Finish() {
