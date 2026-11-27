@@ -7392,6 +7392,7 @@ class Humanoid {
     // an arm shot to pieces hangs limp
     for (const s2 of ['L', 'R']) { const u = p['uArm' + s2]; if (u.attached && !u.gone && u.hp < u.maxHp * 0.5 && pose !== 'crawl') { tg('uArm' + s2, 0.05 + Math.sin(t * 2.3) * 0.04, 0, sg(s2) * 0.06); tg('lArm' + s2, -0.05, 0, 0); } }
     if (this.sv && pose === 'stand' && s > 0.25 && !this.controlled && T.torso && T.uArmL) { const m = Math.min(1, s / 1.6), w = Math.sin(this.phase); prz += w * 0.07 * m; pry += w * 0.12 * m; T.torso[1] -= w * 0.16 * m; T.uArmL[0] *= 0.65; T.uArmR[0] *= 0.65; T.uArmL[2] += 0.04; T.uArmR[2] -= 0.04; }
+    if (this.g4anim) { const o = this.g4anim(this, T, tg, dt, t); if (o) { if (o.py !== undefined) py = o.py; if (o.prx !== undefined) prx = o.prx; if (o.pry !== undefined) pry = o.pry; if (o.prz !== undefined) prz = o.prz; if (o.rate) this.poseRate = o.rate; } }
     const k = 1 - Math.exp(-this.poseRate * dt);
     for (const n of ORDER) {
       if (n === 'pelvis') continue; const P = p[n], a = T[n]; if (!a || !P.attached || P.gone || P.body) continue;
@@ -24253,7 +24254,7 @@ function tsPickHandsRaw(H, o) { const R = TS.rig; if (H.Rv) { o.R = [H.Rv[0].x, 
 // осмотр после подбора — у каждого оружия свой
 function tsInspect(G, u, P, E, H, dt) {
   const U = G.U, id = G.it.id;
-  if (id === 'pistol') { const pull = tsPh(u, 0.35, 0.55) * (1 - tsPh(u, 0.62, 0.7)); E[2] += 0.7 * tsBell(u); E[1] += 0.25 * tsBell(u); if (u > 0.25 && u < 0.78) H.L = { p: U.slideGrab, z: new V3(0.2, -0.3, -0.93), y: new V3(0.3, -0.95, 0) }; H.slide = 0.034 * pull; if (!G.sp1 && u > 0.4) { G.sp1 = 1; SFX.tsSlide(0.6); } if (u > 0.95) G.sp1 = 0; }
+  if (id === 'pistol' || id === 'legend') { const pull = tsPh(u, 0.35, 0.55) * (1 - tsPh(u, 0.62, 0.7)); E[2] += 0.7 * tsBell(u); E[1] += 0.25 * tsBell(u); if (u > 0.25 && u < 0.78) H.L = { p: U.slideGrab, z: new V3(0.2, -0.3, -0.93), y: new V3(0.3, -0.95, 0) }; H.slide = 0.034 * pull; if (!G.sp1 && u > 0.4) { G.sp1 = 1; SFX.tsSlide(0.6); } if (u > 0.95) G.sp1 = 0; }
   else if (id === 'revolver') { // кручение на пальце и прокрут барабана
     const sp = tsPh(u, 0.08, 0.5); if (u > 0.06 && u < 0.52) { H.pivot = new V3(0, 0.012, -0.038); H.q0 = new THREE.Quaternion().setFromEuler(new THREE.Euler(E[0], E[1], E[2], 'YXZ')); E[0] += sp * Math.PI * 4; H.freeL = true; H.R = { p: new V3(0.01, 0.0, -0.01), z: new V3(-0.2, -0.3, -0.93), y: new V3(-1, 0, 0) }; H.curlR = 0.35; H.pointR = true; }
     if (u > 0.58 && u < 0.92) { const k = tsPh(u, 0.58, 0.72); U.cyl.rotation.z = G.cylA + k * Math.PI * 4; H.L = { p: new V3(-0.04, 0.045, -0.04), z: new V3(0.3, 0.3, -0.9), y: new V3(1, 0, 0) }; if (!G.sp1) { G.sp1 = 1; SFX.tsCylSpin(0.6); } } if (u > 0.95) G.sp1 = 0;
@@ -24291,7 +24292,7 @@ function tsReloadAnim(G, A, u, P, E, H) {
   if (!A.s2 && u > 0.74) { A.s2 = 1; SFX.tsMag(0.6, true); TS.camPV -= 0.15; }
   // досылание: затвор/рукоятка
   const ch = tsPh(u, 0.82, 0.9) * (1 - tsPh(u, 0.9, 0.95));
-  if (id === 'pistol') { if (u > 0.8) { H.L = { p: U.slideGrab, z: new V3(0.2, -0.3, -0.93), y: new V3(0.3, -0.95, 0) }; H.slide = (A.wasEmpty ? 0.032 : 0) + 0.004 * ch - (A.wasEmpty ? 0.032 * tsPh(u, 0.86, 0.9) : 0); } }
+  if (id === 'pistol' || id === 'legend') { if (u > 0.8) { H.L = { p: U.slideGrab, z: new V3(0.2, -0.3, -0.93), y: new V3(0.3, -0.95, 0) }; H.slide = (A.wasEmpty ? 0.032 : 0) + 0.004 * ch - (A.wasEmpty ? 0.032 * tsPh(u, 0.86, 0.9) : 0); } }
   else if (id === 'carbine' && U.ch) { if (u > 0.8) H.L = { p: U.chGrab.clone().setZ(U.chGrab.z + 0.06 * ch), z: new V3(0.1, -0.2, 1), y: new V3(0, -1, 0) }; U.ch.position.z = 0.09 + 0.06 * ch; }
   else if (id === 'smg' && U.knob) { if (u > 0.8) H.L = { p: U.knobGrab.clone().setZ(U.knobGrab.z + 0.05 * ch), z: new V3(0.2, 0, -1), y: new V3(1, 0, 0) }; U.knob.position.z = -0.13 + 0.05 * ch; }
   if (!A.s3 && u > 0.86) { A.s3 = 1; SFX.tsSlide(0.6); }
@@ -24324,7 +24325,7 @@ function tsGunReload() {
 // пустой магазин падает на землю
 function tsMagDrop(G) {
   const U = G.U; if (!U.mag) return; camera.updateMatrixWorld(); const pv = U.mag.position.clone(); if (U.mag.parent !== G.m) { U.mag.parent.updateMatrix(); pv.applyMatrix4(U.mag.parent.matrix); } pv.applyQuaternion(G.q).add(G.pos); const wp = tsVmToW(pv, new V3());
-  const m = new THREE.Mesh(IM_G.box, TSG_M.blk); m.scale.set(0.026, G.it.id === 'pistol' ? 0.11 : 0.16, 0.04); m.position.copy(wp); m.castShadow = true; scene.add(m);
+  const m = new THREE.Mesh(IM_G.box, TSG_M.blk); m.scale.set(0.026, G.it.id === 'pistol' || G.it.id === 'legend' ? 0.11 : 0.16, 0.04); m.position.copy(wp); m.castShadow = true; scene.add(m);
   TS.magsW.push({ m, v: new V3(rand(-0.4, 0.4), -0.5, rand(-0.4, 0.4)).add(player.vel.clone().multiplyScalar(0.5)), w: new V3(rand(-6, 6), rand(-3, 3), rand(-6, 6)), t: 0 }); if (TS.magsW.length > 12) { const o = TS.magsW.shift(); scene.remove(o.m); }
 }
 function tsMagsUpdate(dt) { for (const M of TS.magsW) { if (M.rest) continue; M.v.y -= 9.8 * dt; M.m.position.addScaledVector(M.v, dt); M.m.rotation.x += M.w.x * dt; M.m.rotation.z += M.w.z * dt; const fy = floorAt(M.m.position.x, M.m.position.z, M.m.position.y) + 0.015; if (M.m.position.y <= fy) { M.m.position.y = fy; if (Math.abs(M.v.y) > 1.5) { M.v.y *= -0.3; M.v.x *= 0.5; M.v.z *= 0.5; SFX.tsShell(0.3); } else { M.rest = true; M.m.rotation.set(Math.PI / 2, rand(0, 6), 0); } } } }
@@ -24483,10 +24484,10 @@ const TS_GICON = {};
 function tsGunIcon(id) {
   if (TS_GICON[id]) return TS_GICON[id];
   const c = document.createElement('canvas'); c.width = 168; c.height = 84; const g = c.getContext('2d'); g.lineJoin = 'round'; g.lineCap = 'round'; g.translate(84, 42);
-  g.strokeStyle = '#141416'; g.lineWidth = 3; g.fillStyle = '#ececee';
+  g.strokeStyle = '#141416'; g.lineWidth = 3; g.fillStyle = id === 'legend' ? '#f0c050' : '#ececee';
   const R = (x, y, w, h, r = 2, rot = 0) => { g.save(); if (rot) { g.translate(x, y); g.rotate(rot); x = 0; y = 0; } g.beginPath(); g.roundRect(x, y, w, h, r); g.fill(); g.stroke(); g.restore(); };
   const C = (x, y, r) => { g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.stroke(); };
-  if (id === 'pistol') { R(-22, 0, 14, 30, 3, 0.3); R(-30, -6, 54, 9, 2); R(-32, -18, 64, 13, 3); g.beginPath(); g.arc(-2, 4, 7, 0.2, Math.PI - 0.2); g.stroke(); }
+  if (id === 'pistol' || id === 'legend') { R(-22, 0, 14, 30, 3, 0.3); R(-30, -6, 54, 9, 2); R(-32, -18, 64, 13, 3); g.beginPath(); g.arc(-2, 4, 7, 0.2, Math.PI - 0.2); g.stroke(); if (id === 'legend') { g.fillStyle = '#1a1a20'; R(30, -16, 36, 9, 3); } }
   else if (id === 'revolver') { R(-30, 2, 13, 28, 5, 0.55); R(-22, -12, 26, 18, 3); C(-6, -4, 10); R(4, -14, 44, 9, 2); R(4, -6, 30, 6, 2); g.beginPath(); g.arc(-10, 9, 6, 0.2, Math.PI - 0.2); g.stroke(); }
   else if (id === 'smg') { R(-50, -10, 22, 4, 1); R(-50, -2, 22, 4, 1); R(-52, -12, 5, 18, 2); R(-28, -14, 60, 16, 3); R(32, -9, 16, 6, 2); R(4, 2, 11, 30, 2, 0.08); R(-20, 0, 11, 24, 3, 0.25); R(24, 2, 8, 14, 2); }
   else if (id === 'shotgun') { R(-80, -6, 50, 14, 4, -0.08); R(-34, -12, 26, 16, 3); R(-10, -12, 72, 7, 2); R(-10, -4, 60, 6, 2); R(14, -6, 24, 10, 4); R(-26, 2, 9, 16, 3, 0.4); }
@@ -25913,7 +25914,7 @@ function startG4() {
 function g4Loading(on, txt) { let el = document.getElementById('g4Load'); if (!el) { el = document.createElement('div'); el.id = 'g4Load'; el.style.cssText = 'position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(ellipse at center,#ff7ab0 0%,#7a3ad0 45%,#0a0a1a 100%);color:#fff;font-family:var(--ui)'; el.innerHTML = '<div style="font:900 clamp(30px,7vw,64px)/1 var(--ui);letter-spacing:.04em;text-shadow:0 0 24px #ff3aa0">КОРАЛЛ-СИТИ</div><div class="t" style="margin-top:14px;font:700 13px var(--ui);letter-spacing:.3em;opacity:.85"></div><div style="margin-top:18px;width:180px;height:4px;border-radius:2px;background:rgba(255,255,255,.2);overflow:hidden"><i style="display:block;height:100%;width:40%;background:#fff;animation:g4ld 1s ease-in-out infinite"></i></div>'; document.body.appendChild(el); const css = document.createElement('style'); css.textContent = '@keyframes g4ld{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}'; document.head.appendChild(css); } el.querySelector('.t').textContent = txt || ''; el.style.display = on ? 'flex' : 'none'; }
 function g4Exit(toMenu = true) {
   if (G4.playing) g4Save(false);
-  G4.on = false; G4.playing = false; document.body.classList.remove('g4', 'g4-play', 'g4-cut'); try { g4HudOff(); } catch (e) {} try { g4LifeClear(); } catch (e) {} try { g4CrimeOff(); } catch (e) {} try { g4CharOff(); } catch (e) {} try { g4SelectOff(); } catch (e) {} try { g4StoryOff(); } catch (e) {} try { g4EconOff(); } catch (e) {} for (const f of [g4DuoOff, g4TacticsOff, g4BoatOff, g4RadioOff, g4WorldOff, g4JobsOff, g4HeistOff, g4EliteOff]) { try { f(); } catch (e) {} } MAK.hero = 'makar';
+  G4.on = false; G4.playing = false; document.body.classList.remove('g4', 'g4-play', 'g4-cut'); try { g4HudOff(); } catch (e) {} try { g4LifeClear(); } catch (e) {} try { g4CrimeOff(); } catch (e) {} try { g4CharOff(); } catch (e) {} try { g4SelectOff(); } catch (e) {} try { g4StoryOff(); } catch (e) {} try { g4EconOff(); } catch (e) {} for (const f of [g4DuoOff, g4TacticsOff, g4BoatOff, g4RadioOff, g4WorldOff, g4JobsOff, g4HeistOff, g4EliteOff, g4AnimOff, g4RentOff, g4NikOff]) { try { f(); } catch (e) {} } MAK.hero = 'makar';
   try { if (VEH.in) vehExit(true); } catch (e) {} story.ride = null; story.rideCam = null; story.fov = 0; worldTs = 1; G4.cut = null; renderer.domElement.style.filter = '';
   if (G4.view0 !== null) { settings.view = G4.view0; G4.view0 = null; } try { SFX.loopsOff && SFX.loopsOff(); SFX.rain && SFX.rain(0); } catch (e) {} g4SkyOff(); g4TsRestore();
   if (toMenu) { document.body.classList.remove('playing'); state = 'menu'; mode = 'sandbox'; try { loadMap('polygon'); } catch (e) {} $('menu').hidden = false; $('hud').hidden = false; $('resumeBtn').hidden = true; }
@@ -26005,7 +26006,7 @@ function updG4(dt) {
   try { g4EconTick && g4EconTick(dt); } catch (e) { console.warn('econ', e); }
   try { g4MissionTick && g4MissionTick(dt); } catch (e) { console.warn('mis', e); }
   try { g4HudTick && g4HudTick(dt); } catch (e) { console.warn('hud', e); }
-  for (const f of [g4DuoTick, g4TacticsTick, g4BoatTick, g4RadioTick, g4WorldTick, g4JobsTick, g4HeistTick, g4LoanTick, g4EliteTick, g4HandsTick]) { try { f(dt); } catch (e) { console.warn(f.name, e); } }
+  for (const f of [g4DuoTick, g4TacticsTick, g4BoatTick, g4RadioTick, g4WorldTick, g4JobsTick, g4HeistTick, g4LoanTick, g4EliteTick, g4HandsTick, g4AnimTick, g4RentTick, g4NikTick]) { try { f(dt); } catch (e) { console.warn(f.name, e); } }
   G4.saveT -= dt; if (G4.saveT <= 0) { G4.saveT = 60; g4Save(false, true); }
 }
 { const _um0 = updMons; updMons = function (dt) { if (mode === 'g4') { updG4(dt); return; } _um0(dt); }; }
@@ -26872,7 +26873,7 @@ function g4Switch(ch, slot) {
   if (VEH.in) vehExit(true); g4FocusOff(); const T = { t: 0, from, to };
   G4.cut = { kind: 'switch', tick(dt) { T.t += dt; const t = T.t; let x, y, z, lx, lz; if (t < 1.1) { const k = t / 1.1; x = from.x; z = from.z + 6 * (1 - k); y = lerp(3, 160, k * k); lx = from.x; lz = from.z; } else if (t < 2.4) { const k = (t - 1.1) / 1.3, e = k * k * (3 - 2 * k); x = lerp(from.x, to.x, e); z = lerp(from.z, to.z, e); y = 160; lx = x; lz = z; } else { const k = Math.min(1, (t - 2.4) / 1.1); x = to.x; z = to.z + 6 * k; y = lerp(160, 3, 1 - (1 - k) * (1 - k)); lx = to.x; lz = to.z; }
     camera.position.set(x, y, z + 0.01); camera.lookAt(lx, 0, lz); story.fov = 60; renderer.domElement.style.filter = t > 0.9 && t < 2.6 ? 'blur(1.5px) saturate(1.3)' : '';
-    if (t > 2.4 && !T.swapped) { T.swapped = true; G4.cut = null; story.rideCam = null; renderer.domElement.style.filter = ''; try { g4LifeClear(); g4CrimeOff(); g4CharOff(); } catch (e) {} for (const f of [g4DuoOff, g4TacticsOff, g4BoatOff, g4RadioOff, g4WorldOff, g4JobsOff, g4HeistOff, g4EliteOff]) { try { f(); } catch (e) {} } TS.wl.stars && tsWlClear(); g4Begin(ch, slot, !G4SAVE.chars[ch][slot]); } } };
+    if (t > 2.4 && !T.swapped) { T.swapped = true; G4.cut = null; story.rideCam = null; renderer.domElement.style.filter = ''; try { g4LifeClear(); g4CrimeOff(); g4CharOff(); } catch (e) {} for (const f of [g4DuoOff, g4TacticsOff, g4BoatOff, g4RadioOff, g4WorldOff, g4JobsOff, g4HeistOff, g4EliteOff, g4AnimOff, g4RentOff, g4NikOff]) { try { f(); } catch (e) {} } TS.wl.stars && tsWlClear(); g4Begin(ch, slot, !G4SAVE.chars[ch][slot]); } } };
   story.rideCam = () => {}; document.body.classList.add('g4-cut'); SFX.makWhoosh && SFX.makWhoosh(0.8);
 }
 /* ---------- оружие из сохранения ---------- */
@@ -28244,6 +28245,1164 @@ function g4SpawnChar(id) {
   if (S.suit) { if (!g4AddLoot('suit', 'Железный костюм', 400, 6)) { G4.S.cash += 4000; toast('💸 Деньги возвращены: сумка полна'); return; } toast('🦾 Железный костюм в сумке. Ломбард «Второй шанс» купит за $200'); return; }
   const x = p.x - Math.sin(a) * 4, z = p.z - Math.cos(a) * 4, n = mkNpc(S.kind ? S.kind() : undefined, x, z, a + Math.PI, S.type || 'human');
   n.pos.set(x, 0, z); pushOutAABBs(n.pos, 0.4, 0); n.g4summon = true; n.g4ped = { ring: null, idx: 0, dir: 1, inside: { x0: x - 6, x1: x + 6, z0: z - 6, z1: z + 6 }, zone: [x - 6, x + 6, z - 6, z + 6] }; G4L.peds.push(n); Sound.chime && Sound.chime(); toast(`✨ ${S.name} призван(а) в 4 м перед вами`);
+}
+/* ===================== ГЛАВА 4 · ДВИЖЕНИЕ, ЖЕСТЫ И ТОПЛИВО (механики в духе GTA 6) =====================
+   Кувырок-уклонение (кнопка 🤸, в кувырке меньше урона), перелезание через низкие преграды, подтягивание
+   на уступы и перелезание через заборы (прыжок у края), карманник (подкрасться сзади, удерживать E, следить
+   за «глазом»), тащить тело (спрятать от прохожих, погрузить в багажник), жесты и танцы (кнопка 😎, прохожие
+   отвечают), топливо у машин, заправки с пистолетом-заправщиком и шлангом, канистра.
+   Все движения — на общем скелете через хук g4anim: работают для героя в третьем лице и для NPC.
+   От первого лица — движения камерой (нырок кувырка, крен при перелезании). */
+const G4A = { clip: null, tps: new Set(), prevView: null, vault: null, rollCd: 0, drag: null, pick: null, fuel: null, auto: null, lock: false, emo: null, lastCar: null, lowWarn: null, hum: null, hose: null, noz: null };
+const G4_PUMPS = [];
+const G4_TANK = 60, G4_LITRE = 2.2;
+function g4Seg(k, a, b) { return clamp((k - a) / (b - a), 0, 1); }
+function g4Sm(k) { return k * k * (3 - 2 * k); }
+// временно включить вид от третьего лица (жесты, сон, заправка); несколько систем могут просить одновременно
+function g4Tps(key, on) {
+  if (on) { if (!G4A.tps.size && !view3()) G4A.prevView = settings.view; G4A.tps.add(key); settings.view = 'tps'; }
+  else if (G4A.tps.has(key)) { G4A.tps.delete(key); if (!G4A.tps.size && G4A.prevView !== null) { settings.view = G4A.prevView; G4A.prevView = null; } }
+}
+/* ---------- маленькие синтезированные звуки ---------- */
+function g4Sfx(kind, v = 1) {
+  if (!Sound.ok || !Sound.ok()) return; try {
+    const c = Sound.ctx, t = c.currentTime, g = c.createGain(); g.connect(Sound.master);
+    if (kind === 'whoosh' || kind === 'clap' || kind === 'rustle' || kind === 'hiss') {
+      const n = c.createBufferSource(); n.buffer = Sound.noiseBuf; const f = c.createBiquadFilter(); f.type = 'bandpass';
+      const d = kind === 'whoosh' ? 0.32 : kind === 'clap' ? 0.07 : kind === 'hiss' ? 0.5 : 0.22;
+      f.frequency.setValueAtTime(kind === 'whoosh' ? 500 : kind === 'clap' ? 1600 : kind === 'hiss' ? 3000 : 2400, t); if (kind === 'whoosh') f.frequency.exponentialRampToValueAtTime(1800, t + d * 0.6); f.Q.value = kind === 'clap' ? 1.2 : 0.8;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime((kind === 'clap' ? 0.5 : kind === 'hiss' ? 0.08 : 0.22) * v, t + (kind === 'clap' ? 0.004 : 0.06)); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      n.connect(f); f.connect(g); n.start(t, Math.random() * 2); n.stop(t + d + 0.02); return;
+    }
+    const o = c.createOscillator();
+    if (kind === 'beep') { o.type = 'square'; o.frequency.value = 1320 * v; g.gain.setValueAtTime(0.06, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09); o.connect(g); o.start(t); o.stop(t + 0.1); }
+    else if (kind === 'clunk') { o.type = 'triangle'; o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.12); g.gain.setValueAtTime(0.3 * v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16); o.connect(g); o.start(t); o.stop(t + 0.18); }
+    else if (kind === 'ding') { o.type = 'sine'; o.frequency.value = 1760; g.gain.setValueAtTime(0.12 * v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7); o.connect(g); o.start(t); o.stop(t + 0.72); }
+    else if (kind === 'kick') { o.type = 'sine'; o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.14); g.gain.setValueAtTime(0.5 * v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2); o.connect(g); o.start(t); o.stop(t + 0.22); }
+    else if (kind === 'sputter') { o.type = 'sawtooth'; o.frequency.setValueAtTime(48, t); g.gain.setValueAtTime(0.0001, t); for (let i = 0; i < 4; i++) { g.gain.setValueAtTime(0.12 * v, t + i * 0.09); g.gain.setValueAtTime(0.0001, t + i * 0.09 + 0.04); } o.connect(g); o.start(t); o.stop(t + 0.4); }
+  } catch (e) {}
+}
+// гул колонки во время заправки
+function g4Hum(on) {
+  if (!Sound.ok || !Sound.ok()) return; const c = Sound.ctx;
+  if (on && !G4A.hum) { try { const o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(); o.type = 'sawtooth'; o.frequency.value = 62; o2.type = 'sine'; o2.frequency.value = 124; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 420; g.gain.value = 0.0001; g.gain.setTargetAtTime(0.06, c.currentTime, 0.1); o.connect(f); o2.connect(f); f.connect(g); g.connect(Sound.master); o.start(); o2.start(); G4A.hum = { o, o2, g }; } catch (e) {} }
+  else if (!on && G4A.hum) { const H = G4A.hum; G4A.hum = null; try { H.g.gain.setTargetAtTime(0.0001, c.currentTime, 0.06); H.o.stop(c.currentTime + 0.3); H.o2.stop(c.currentTime + 0.3); } catch (e) {} }
+}
+/* ===================== библиотека движений (k — прогресс 0..1, t — время) =====================
+   соглашения скелета: uArm x<0 — рука вперёд/вверх, z — в сторону (L +, R −); lArm x<0 — сгиб локтя;
+   uLeg x<0 — бедро вперёд; lLeg x>0 — сгиб колена; torso x>0 — наклон вперёд; pelvis prx>0 — вперёд */
+function g4Legs(tg, a = 0, kn = 0.1) { tg('uLegL', -a, 0, 0.07); tg('uLegR', a, 0, -0.07); tg('lLegL', kn, 0, 0); tg('lLegR', kn, 0, 0); }
+const G4_CLIP = {
+  roll(k, C, h, T, tg) {
+    const a = g4Seg(k, 0.06, 0.8), e = g4Sm(a), tuck = Math.sin(Math.min(1, k / 0.9) * Math.PI);
+    tg('uLegL', -0.3 - 1.75 * tuck, 0, 0.12); tg('uLegR', -0.3 - 1.75 * tuck, 0, -0.12); tg('lLegL', 0.3 + 2.0 * tuck, 0, 0); tg('lLegR', 0.3 + 2.0 * tuck, 0, 0);
+    tg('torso', 0.25 + 0.95 * tuck, 0, 0); tg('head', 0.2 + 0.7 * tuck, 0, 0);
+    tg('uArmL', -0.7 - 0.6 * tuck, 0, 0.3); tg('uArmR', -0.7 - 0.6 * tuck, 0, -0.3); tg('lArmL', -0.4 - 1.1 * tuck, 0, 0); tg('lArmR', -0.4 - 1.1 * tuck, 0, 0);
+    const pc = h.pelvisCur, py = 1 - 0.56 * tuck, prx = e * Math.PI * 2; pc.x = prx; pc.y = py; pc.z = 0; pc.ry = 0; h.pvy = 0;
+    if (C.o.yaw !== undefined) h.root.rotation.y = C.o.yaw;
+    return { py, prx, pry: 0, prz: 0, rate: 30 };
+  },
+  vault(k, C, h, T, tg) {
+    const s = C.o.side || 1, sw = Math.sin(g4Seg(k, 0.18, 0.85) * Math.PI), land = g4Seg(k, 0.78, 1), reach = g4Sm(g4Seg(k, 0, 0.3));
+    tg('uArmL', -0.6 - 0.8 * reach + sw * 0.7, 0, 0.25); tg('uArmR', -0.6 - 0.8 * reach + sw * 0.7, 0, -0.25); tg('lArmL', -0.25, 0, 0); tg('lArmR', -0.25, 0, 0);
+    tg('torso', 0.15 + 0.4 * reach * (1 - land), 0.2 * s * sw, -0.3 * s * sw); tg('head', -0.15, 0, 0.1 * s * sw);
+    tg('uLegL', -0.2 - 1.45 * sw, 0, 0.1 + 0.55 * s * sw); tg('uLegR', -0.1 - 1.2 * sw, 0, -0.1 + 0.55 * s * sw); tg('lLegL', 0.25 + 1.3 * sw + 0.4 * land, 0, 0); tg('lLegR', 0.2 + 1.0 * sw + 0.4 * land, 0, 0);
+    if (C.o.yaw !== undefined) h.root.rotation.y = C.o.yaw;
+    return { py: 1 - 0.16 * Math.sin(land * Math.PI), prx: 0.25 * reach * (1 - land), pry: 0.2 * s * sw, prz: 0.5 * s * sw, rate: 24 };
+  },
+  climb(k, C, h, T, tg) {
+    const up = g4Sm(g4Seg(k, 0, 0.6)), over = g4Sm(g4Seg(k, 0.5, 0.95)), knee = Math.sin(over * Math.PI);
+    const a = -2.95 + up * 1.55 + over * 1.15;
+    tg('uArmL', a, 0, 0.32 - over * 0.15); tg('uArmR', a, 0, -0.32 + over * 0.15); tg('lArmL', -0.35 - Math.sin(up * Math.PI) * 1.3, 0, 0); tg('lArmR', -0.35 - Math.sin(up * Math.PI) * 1.3, 0, 0);
+    tg('torso', 0.15 + knee * 0.55, 0, 0); tg('head', -0.4 * (1 - over) + 0.15 * knee, 0, 0);
+    tg('uLegL', -0.15 - knee * 1.7, 0, 0.1); tg('lLegL', 0.25 + knee * 1.9, 0, 0); tg('uLegR', 0.25 * up - over * 0.3, 0, -0.1); tg('lLegR', 0.35 + Math.sin(up * Math.PI) * 0.8, 0, 0);
+    if (C.o.yaw !== undefined) h.root.rotation.y = C.o.yaw;
+    return { py: 1, prx: 0.1 + knee * 0.35, pry: 0, prz: 0, rate: 20 };
+  },
+  fence(k, C, h, T, tg) {
+    const up = g4Sm(g4Seg(k, 0, 0.45)), over = Math.sin(g4Seg(k, 0.35, 0.75) * Math.PI), drop = g4Seg(k, 0.7, 1);
+    tg('uArmL', -2.9 + up * 1.4 + drop * 0.9, 0, 0.3); tg('uArmR', -2.9 + up * 1.4 + drop * 0.9, 0, -0.3); tg('lArmL', -0.4 - over * 0.8, 0, 0); tg('lArmR', -0.4 - over * 0.8, 0, 0);
+    tg('torso', 0.2 + over * 0.6, 0, -0.35 * over); tg('head', -0.3 + over * 0.6, 0, 0);
+    tg('uLegL', -0.3 - over * 1.6, 0, 0.1 + over * 0.6); tg('uLegR', -0.1 - over * 1.2, 0, -0.1 + over * 0.6); tg('lLegL', 0.4 + over * 1.6 + drop * 0.5 * (1 - drop) * 4, 0, 0); tg('lLegR', 0.3 + over * 1.2 + drop * 0.4 * (1 - drop) * 4, 0, 0);
+    if (C.o.yaw !== undefined) h.root.rotation.y = C.o.yaw;
+    return { py: 1, prx: 0.15 + over * 0.3, pry: over * 0.3, prz: over * 0.5, rate: 20 };
+  },
+  pick(k, C, h, T, tg, t) {
+    const w = Math.sin(t * 9) * 0.07, sn = Math.sin(t * 1.3) * 0.03;
+    tg('uLegL', -0.35, 0, 0.1); tg('uLegR', 0.15, 0, -0.1); tg('lLegL', 0.65, 0, 0); tg('lLegR', 0.55, 0, 0);
+    tg('torso', 0.36 + sn, 0.15, 0); tg('head', 0.3, -0.15 + Math.sin(t * 0.9) * 0.35, 0);
+    tg('uArmR', -0.72 + w, 0, -0.16); tg('lArmR', -0.6 - w * 2, 0, 0); tg('uArmL', -0.15, 0, 0.3); tg('lArmL', -1.1, 0, 0);
+    return { py: 0.86, prx: 0.1, pry: 0.2, prz: 0, rate: 10 };
+  },
+  drag(k, C, h, T, tg) {
+    const s = Math.hypot(player.vel.x, player.vel.z), sw = Math.sin(C.ph || 0) * Math.min(1, s / 1.4) * 0.45;
+    tg('uLegL', -0.35 + sw, 0, 0.1); tg('uLegR', -0.35 - sw, 0, -0.1); tg('lLegL', 0.55 + Math.max(0, -sw) * 1.2, 0, 0); tg('lLegR', 0.55 + Math.max(0, sw) * 1.2, 0, 0);
+    tg('torso', 0.62, 0, 0); tg('head', -0.25, 0, 0);
+    tg('uArmL', -0.95, 0, -0.05); tg('uArmR', -0.95, 0, 0.05); tg('lArmL', -0.2, 0, 0); tg('lArmR', -0.2, 0, 0);
+    return { py: 0.82, prx: 0.16 + Math.abs(sw) * 0.1, pry: 0, prz: sw * 0.12, rate: 12 };
+  },
+  pump(k, C, h, T, tg, t) {
+    const br = Math.sin(t * 1.6) * 0.02, gl = Math.sin(t * 0.55);
+    tg('uLegL', -0.05, 0, 0.12); tg('uLegR', 0.08, 0, -0.1); tg('lLegL', 0.1, 0, 0); tg('lLegR', 0.2, 0, 0);
+    tg('torso', 0.06 + br, -0.15, 0); tg('head', 0.18, gl > 0.55 ? 0.65 : -0.25, 0);
+    tg('uArmR', -1.1, -0.2, -0.22); tg('lArmR', -0.45, 0, 0); tg('uArmL', 0.18, 0, 0.55); tg('lArmL', -1.75, 0, 0);
+    return { py: 1, prx: 0, pry: -0.2, prz: 0.03, rate: 8 };
+  },
+  sleep(k, C, h, T, tg, t) {
+    const br = Math.sin(t * 1.25) * 0.03;
+    tg('uLegL', 0.03, 0, 0.06); tg('uLegR', 0, 0, -0.1); tg('lLegL', 0.15, 0, 0); tg('lLegR', 0.06, 0, 0);
+    tg('torso', br, 0, 0); tg('head', 0.28, 0.35 + Math.sin(t * 0.21) * 0.06, 0);
+    tg('uArmL', -0.25, 0, 0.16); tg('lArmL', -1.25, 0, 0); tg('uArmR', 0.05, 0, -0.14); tg('lArmR', -0.2, 0, 0);
+    if (C.o.yaw !== undefined) h.root.rotation.y = C.o.yaw;
+    return { py: 0.14, prx: -Math.PI / 2, pry: 0, prz: 0, rate: 4 };
+  },
+  wake(k, C, h, T, tg) {
+    const sit = g4Sm(g4Seg(k, 0, 0.45)), str = Math.sin(g4Seg(k, 0.4, 0.95) * Math.PI);
+    tg('uLegL', -1.5 * sit, 0, 0.08); tg('uLegR', -1.5 * sit, 0, -0.08); tg('lLegL', 0.15 + 0.3 * sit, 0, 0); tg('lLegR', 0.1 + 0.3 * sit, 0, 0);
+    tg('torso', -0.1 * str, 0, 0); tg('head', -0.3 * str, 0, 0);
+    tg('uArmL', -0.2 - 2.7 * str, 0, 0.2 + 0.2 * str); tg('uArmR', -0.2 - 2.7 * str, 0, -0.2 - 0.2 * str); tg('lArmL', -0.4 - 0.6 * str, 0, 0); tg('lArmR', -0.4 - 0.6 * str, 0, 0);
+    if (C.o.yaw !== undefined) h.root.rotation.y = C.o.yaw;
+    return { py: 0.14 + 0.1 * sit, prx: -Math.PI / 2 * (1 - sit), pry: 0, prz: 0, rate: 6 };
+  },
+  keypad(k, C, h, T, tg, t) {
+    const pk = Math.max(0, 1 - ((G4.time || 0) - (h.g4poke || -9)) * 6);
+    g4Legs(tg, 0.02); tg('torso', 0.08, -0.08, 0); tg('head', 0.12, -0.05, 0);
+    tg('uArmR', -1.3 - pk * 0.12, 0, -0.08); tg('lArmR', -0.55 + pk * 0.35, 0, 0); tg('uArmL', 0.08, 0, 0.12); tg('lArmL', -0.3, 0, 0);
+    return { py: 1, prx: 0.03, pry: 0, prz: 0, rate: 14 };
+  },
+  search(k, C, h, T, tg, t) {
+    tg('uLegL', -1.45, 0, 0.12); tg('lLegL', 1.6, 0, 0); tg('uLegR', 0.15, 0, -0.1); tg('lLegR', 1.75, 0, 0);
+    tg('torso', 0.45, Math.sin(t * 1.7) * 0.12, 0); tg('head', 0.5, Math.sin(t * 2.1) * 0.2, 0);
+    tg('uArmL', -1.0 + Math.sin(t * 5) * 0.22, 0, 0.12); tg('lArmL', -0.6 + Math.cos(t * 4) * 0.25, 0, 0); tg('uArmR', -1.1 + Math.cos(t * 4.3) * 0.25, 0, -0.12); tg('lArmR', -0.5 + Math.sin(t * 3.7) * 0.3, 0, 0);
+    return { py: 0.56, prx: 0.1, pry: 0, prz: 0, rate: 9 };
+  },
+  // ---------- жесты ----------
+  wave(k, C, h, T, tg, t) { const w = Math.sin(t * 9); g4Legs(tg, 0.03); tg('torso', -0.05, -0.12, w * 0.03); tg('head', -0.05, 0, 0.1); tg('uArmR', -2.65, 0, -0.28 + w * 0.24); tg('lArmR', -0.55 + w * 0.4, 0, 0); tg('uArmL', 0.05, 0, 0.1); tg('lArmL', -0.25, 0, 0); return { py: 1, prx: 0, pry: 0, prz: 0, rate: 12 }; },
+  clap(k, C, h, T, tg, t) {
+    const s = Math.sin(t * 6.5), a = s * s; g4Legs(tg, 0.02); tg('torso', 0.02, 0, 0); tg('head', -0.08, Math.sin(t * 0.8) * 0.2, 0);
+    tg('uArmL', -1.25, 0, -0.2 + 0.55 * a); tg('uArmR', -1.25, 0, 0.2 - 0.55 * a); tg('lArmL', -0.95, 0, 0); tg('lArmR', -0.95, 0, 0);
+    if (h.controlled || h.pos.distanceTo(player.pos) < 14) { const sg = Math.sign(Math.cos(t * 6.5)); if (h.g4cs !== undefined && sg !== h.g4cs && a < 0.2) g4Sfx('clap', h.controlled ? 1 : 0.35); h.g4cs = sg; }
+    return { py: 1 - a * 0.015, prx: 0.02, pry: 0, prz: 0, rate: 16 };
+  },
+  cheer(k, C, h, T, tg, t) { const b = Math.sin(t * 8), up = Math.max(0, b); tg('uLegL', -up * 0.3, 0, 0.07); tg('uLegR', -up * 0.3, 0, -0.07); tg('lLegL', 0.1 + up * 0.6, 0, 0); tg('lLegR', 0.1 + up * 0.6, 0, 0); tg('torso', -0.1, 0, 0); tg('head', -0.3, 0, 0); tg('uArmL', -2.9 + b * 0.18, 0, 0.38); tg('uArmR', -2.9 - b * 0.18, 0, -0.38); tg('lArmL', -0.3, 0, 0); tg('lArmR', -0.3, 0, 0); return { py: 1 + up * 0.07, prx: -0.04, pry: 0, prz: 0, rate: 16 }; },
+  shrug(k, C, h, T, tg, t) { const b = Math.sin(Math.min(1, t * 1.5) * Math.PI * 0.5); g4Legs(tg, 0.03); tg('torso', -0.06, 0, 0.04); tg('head', -0.05, 0.1, 0.25 * b); tg('uArmL', 0.12, 0, 0.42 * b + 0.05); tg('lArmL', -1.55 * b, 0.6 * b, 0); tg('uArmR', 0.12, 0, -0.42 * b - 0.05); tg('lArmR', -1.55 * b, -0.6 * b, 0); return { py: 1, prx: -0.03, pry: 0, prz: 0, rate: 9 }; },
+  facepalm(k, C, h, T, tg, t) { g4Legs(tg, 0.03, 0.15); tg('torso', 0.18, 0, 0); tg('head', 0.45, Math.sin(t * 3.2) * 0.18, 0); tg('uArmR', -1.95, 0, 0.32); tg('lArmR', -2.3, 0, 0); tg('uArmL', 0.1, 0, 0.12); tg('lArmL', -0.3, 0, 0); return { py: 0.99, prx: 0.05, pry: 0, prz: 0, rate: 8 }; },
+  think(k, C, h, T, tg, t) { const tap = Math.max(0, Math.sin(t * 7)); tg('uLegL', -tap * 0.12, 0, 0.1); tg('lLegL', 0.1 + tap * 0.28, 0, 0); tg('uLegR', 0.04, 0, -0.07); tg('lLegR', 0.12, 0, 0); tg('torso', 0.04, 0.1, 0); tg('head', 0.12, 0.25 + Math.sin(t * 0.7) * 0.15, 0.18); tg('uArmR', -1.3, 0, 0.3); tg('lArmR', -2.35, 0, 0); tg('uArmL', -0.75, 0, -0.5); tg('lArmL', -1.55, 0, 0); return { py: 1, prx: 0, pry: 0, prz: 0.03, rate: 8 }; },
+  dwave(k, C, h, T, tg, t) {
+    const b = t * 4.2 + (h.g4dp || 0), kb = Math.abs(Math.sin(b));
+    tg('uLegL', -0.15 - kb * 0.14, 0, 0.1); tg('uLegR', -0.15 - kb * 0.14, 0, -0.1); tg('lLegL', 0.25 + kb * 0.3, 0, 0); tg('lLegR', 0.25 + kb * 0.3, 0, 0);
+    tg('torso', 0.05, Math.sin(b * 0.5) * 0.15, Math.sin(b) * 0.2); tg('head', -0.05, 0, Math.sin(b + 0.9) * 0.22);
+    tg('uArmL', -0.2 + Math.sin(b) * 0.3, 0, 1.35 + Math.sin(b + 0.5) * 0.22); tg('lArmL', -0.6 - Math.sin(b + 1.2) * 0.55, 0, 0); tg('uArmR', -0.2 - Math.sin(b) * 0.3, 0, -1.35 + Math.sin(b + 0.5) * 0.22); tg('lArmR', -0.6 + Math.sin(b + 1.2) * 0.55, 0, 0);
+    return { py: 0.97 - kb * 0.05, prx: 0, pry: Math.sin(b * 0.5) * 0.25, prz: Math.sin(b - 0.8) * 0.12, rate: 14 };
+  },
+  dtwist(k, C, h, T, tg, t) {
+    const b = t * 5 + (h.g4dp || 0), s = Math.sin(b);
+    tg('uLegL', -0.32, 0, 0.12); tg('uLegR', -0.32, 0, -0.12); tg('lLegL', 0.55 + Math.max(0, s) * 0.2, 0, 0); tg('lLegR', 0.55 + Math.max(0, -s) * 0.2, 0, 0);
+    tg('torso', 0.12, -s * 0.5, 0); tg('head', 0, s * 0.25, 0); tg('uArmL', -0.55, 0, 0.55); tg('lArmL', -1.6 + s * 0.2, 0, 0); tg('uArmR', -0.55, 0, -0.55); tg('lArmR', -1.6 - s * 0.2, 0, 0);
+    return { py: 0.9, prx: 0.05, pry: s * 0.55, prz: 0, rate: 16 };
+  },
+  djump(k, C, h, T, tg, t) {
+    const b = t * 6 + (h.g4dp || 0), up = Math.max(0, Math.sin(b)), side = Math.floor(b / Math.PI) % 2 ? 1 : -1;
+    tg('uLegL', -up * 0.5, 0, 0.1); tg('uLegR', -up * 0.5, 0, -0.1); tg('lLegL', 0.15 + up * 0.95, 0, 0); tg('lLegR', 0.15 + up * 0.95, 0, 0);
+    tg('torso', 0.05, side * 0.15, 0); tg('head', -0.15, 0, 0);
+    if (side > 0) { tg('uArmR', -2.8 + up * 0.3, 0, -0.2); tg('lArmR', -0.5, 0, 0); tg('uArmL', -0.9, 0, 0.35); tg('lArmL', -1.8, 0, 0); } else { tg('uArmL', -2.8 + up * 0.3, 0, 0.2); tg('lArmL', -0.5, 0, 0); tg('uArmR', -0.9, 0, -0.35); tg('lArmR', -1.8, 0, 0); }
+    return { py: 1 + up * 0.16 - (1 - up) * 0.05, prx: 0, pry: side * 0.15, prz: 0, rate: 18 };
+  },
+  pushup(k, C, h, T, tg, t) {
+    const c = (Math.sin(t * 3.2) + 1) / 2;
+    tg('uLegL', 0, 0, 0.05); tg('uLegR', 0, 0, -0.05); tg('lLegL', 0, 0, 0); tg('lLegR', 0, 0, 0);
+    tg('torso', 0, 0, 0); tg('head', -0.6, 0, 0);
+    tg('uArmL', -1.57 + (1 - c) * 0.75, 0, 0.28); tg('uArmR', -1.57 + (1 - c) * 0.75, 0, -0.28); tg('lArmL', -(1 - c) * 1.5, 0, 0); tg('lArmR', -(1 - c) * 1.5, 0, 0);
+    return { py: 0.22 + 0.2 * c, prx: Math.PI / 2 - 0.08 * c, pry: 0, prz: 0, rate: 10 };
+  },
+  sitg(k, C, h, T, tg, t) {
+    tg('uLegL', -1.45, 0, 0.75); tg('uLegR', -1.45, 0, -0.75); tg('lLegL', 2.2, 0, 0); tg('lLegR', 2.2, 0, 0);
+    tg('torso', 0.12 + Math.sin(t * 1.2) * 0.02, 0, 0); tg('head', 0.08, Math.sin(t * 0.4) * 0.3, 0);
+    tg('uArmL', -0.5, 0, 0.25); tg('lArmL', -0.6, 0, 0); tg('uArmR', -0.5, 0, -0.25); tg('lArmR', -0.6, 0, 0);
+    return { py: 0.18, prx: 0, pry: 0, prz: 0, rate: 6 };
+  },
+  // ---------- танцпол: ритм и акценты ----------
+  dgroove(k, C, h, T, tg, t) {
+    const b = t * 12.98 + (h.g4dp || 0), bb = Math.abs(Math.sin(b * 0.5));
+    tg('uLegL', -0.12 - bb * 0.1, 0, 0.1); tg('uLegR', -0.12 - bb * 0.1, 0, -0.1); tg('lLegL', 0.22 + bb * 0.25, 0, 0); tg('lLegR', 0.22 + bb * 0.25, 0, 0);
+    tg('torso', 0.06, Math.sin(b * 0.25) * 0.25, 0); tg('head', 0.1 * bb - 0.05, 0, Math.sin(b * 0.25) * 0.1);
+    tg('uArmL', -0.6 + Math.sin(b * 0.5) * 0.25, 0, 0.35); tg('lArmL', -1.4, 0, 0); tg('uArmR', -0.6 - Math.sin(b * 0.5) * 0.25, 0, -0.35); tg('lArmR', -1.4, 0, 0);
+    return { py: 0.97 - bb * 0.04, prx: 0.02, pry: Math.sin(b * 0.25) * 0.2, prz: Math.sin(b * 0.5) * 0.05, rate: 14 };
+  },
+  dL(k, C, h, T, tg) { const a = Math.sin(Math.min(1, k * 1.6) * Math.PI * 0.5); g4Legs(tg, 0.05, 0.3); tg('torso', 0, 0.3, 0.25 * a); tg('head', -0.05, 0.6 * a, 0); tg('uArmL', -1.45, 0, 1.4 * a); tg('lArmL', 0, 0, 0); tg('uArmR', -1.0, 0, -0.2); tg('lArmR', -1.6, 0, 0); return { py: 0.95, prx: 0, pry: 0.35 * a, prz: 0.15 * a, rate: 24 }; },
+  dR(k, C, h, T, tg) { const a = Math.sin(Math.min(1, k * 1.6) * Math.PI * 0.5); g4Legs(tg, 0.05, 0.3); tg('torso', 0, -0.3, -0.25 * a); tg('head', -0.05, -0.6 * a, 0); tg('uArmR', -1.45, 0, -1.4 * a); tg('lArmR', 0, 0, 0); tg('uArmL', -1.0, 0, 0.2); tg('lArmL', -1.6, 0, 0); return { py: 0.95, prx: 0, pry: -0.35 * a, prz: -0.15 * a, rate: 24 }; },
+  dU(k, C, h, T, tg) { const a = Math.sin(Math.min(1, k * 1.4) * Math.PI); g4Legs(tg, 0, 0.1 + a * 0.4); tg('torso', -0.15, 0, 0); tg('head', -0.4, 0, 0); tg('uArmL', -2.85, 0, 0.55); tg('uArmR', -2.85, 0, -0.55); tg('lArmL', 0, 0, 0); tg('lArmR', 0, 0, 0); return { py: 1 + a * 0.12, prx: -0.05, pry: 0, prz: 0, rate: 26 }; },
+  dD(k, C, h, T, tg) { tg('uLegL', -1.2, 0, 0.3); tg('uLegR', -1.2, 0, -0.3); tg('lLegL', 1.95, 0, 0); tg('lLegR', 1.95, 0, 0); tg('torso', 0.55, 0, 0); tg('head', -0.3, 0, 0); tg('uArmL', -0.85, 0, 0.1); tg('uArmR', -0.85, 0, -0.1); tg('lArmL', -0.35, 0, 0); tg('lArmR', -0.35, 0, 0); return { py: 0.6, prx: 0.1, pry: 0, prz: 0, rate: 24 }; },
+  // ---------- NPC: пинки, свернувшийся на земле, поклон, диджей ----------
+  kick(k, C, h, T, tg, t) {
+    const ph = ((t * 0.95 + (h.g4dp || 0)) % 1 + 1) % 1, w = g4Seg(ph, 0, 0.35), st = g4Seg(ph, 0.35, 0.47), bk = g4Seg(ph, 0.47, 0.85);
+    const a = ph < 0.35 ? 0.6 * g4Sm(w) : ph < 0.47 ? 0.6 - 1.95 * g4Sm(st) : -1.35 * (1 - g4Sm(bk)), kn = ph < 0.35 ? 1.3 * g4Sm(w) : ph < 0.47 ? 1.3 - 1.15 * g4Sm(st) : 0.15 + 0.1 * bk, s = ph >= 0.35 && ph < 0.6 ? 1 : 0;
+    tg('uLegR', a, 0, -0.08); tg('lLegR', kn, 0, 0); tg('uLegL', 0.05, 0, 0.1); tg('lLegL', 0.28, 0, 0);
+    tg('torso', 0.15 * w - 0.28 * s, 0.1 * s, 0); tg('head', 0.35, 0, 0);
+    tg('uArmL', -0.4 - 0.5 * s, 0, 0.6); tg('lArmL', -0.6, 0, 0); tg('uArmR', 0.3 + 0.35 * s, 0, -0.5); tg('lArmR', -0.5, 0, 0);
+    if (h.g4ph !== undefined && h.g4ph < 0.43 && ph >= 0.43 && h.g4onHit) h.g4onHit(h); h.g4ph = ph;
+    return { py: 1 - 0.04 * w, prx: 0.05, pry: 0.12 * s, prz: 0, rate: 18 };
+  },
+  stomp(k, C, h, T, tg, t) {
+    const ph = ((t * 0.8 + (h.g4dp || 0)) % 1 + 1) % 1, up = g4Sm(g4Seg(ph, 0, 0.45)), dn = g4Sm(g4Seg(ph, 0.45, 0.55)), rec = g4Seg(ph, 0.55, 1);
+    const a = -1.55 * up * (1 - dn) - 0.35 * dn * (1 - rec), kn = 1.7 * up * (1 - dn) + 0.15;
+    tg('uLegR', a, 0, -0.08); tg('lLegR', kn, 0, 0); tg('uLegL', 0.02, 0, 0.1); tg('lLegL', 0.2 + dn * 0.3 * (1 - rec), 0, 0);
+    tg('torso', 0.25 + dn * 0.15, 0, 0); tg('head', 0.45, 0, 0); tg('uArmL', -0.3 - up * 0.6, 0, 0.55); tg('lArmL', -0.7, 0, 0); tg('uArmR', 0.2, 0, -0.45); tg('lArmR', -0.5, 0, 0);
+    if (h.g4ph !== undefined && h.g4ph < 0.5 && ph >= 0.5 && h.g4onHit) h.g4onHit(h); h.g4ph = ph;
+    return { py: 1 - dn * 0.05 * (1 - rec), prx: 0.08, pry: 0, prz: 0, rate: 18 };
+  },
+  taunt(k, C, h, T, tg, t) { const b = Math.sin(t * 4 + (h.g4dp || 0)); g4Legs(tg, 0.05, 0.15); tg('torso', 0.12, b * 0.1, 0); tg('head', 0.28 + b * 0.06, b * 0.1, 0); tg('uArmR', -1.35 + b * 0.35, 0, -0.35); tg('lArmR', -0.8, 0, 0); tg('uArmL', -0.4, 0, 0.45 + b * 0.1); tg('lArmL', -1.0, 0, 0); return { py: 0.99, prx: 0.04, pry: 0, prz: 0, rate: 10 }; },
+  film(k, C, h, T, tg, t) { g4Legs(tg, 0.03); tg('torso', -0.04, 0, 0); tg('head', 0.12, 0, 0); tg('uArmR', -1.6, 0, -0.08); tg('lArmR', -0.55, 0, 0); tg('uArmL', -1.3, 0, -0.2); tg('lArmL', -0.9, 0, 0); return { py: 1, prx: 0, pry: 0, prz: 0, rate: 8 }; },
+  curl(k, C, h, T, tg, t) {
+    const f = h.flinch || 0, sh = Math.sin(t * 19) * 0.03 * (0.4 + f);
+    tg('uLegL', -1.5 - f * 0.2, 0, 0.1); tg('uLegR', -1.3 - f * 0.2, 0, -0.1); tg('lLegL', 1.9, 0, 0); tg('lLegR', 1.75, 0, 0);
+    tg('torso', 0.55 + f * 0.35 + sh, 0, 0); tg('head', 0.6 + sh, 0, 0);
+    tg('uArmL', -2.4, 0, -0.3); tg('uArmR', -2.4, 0, 0.3); tg('lArmL', -2.05, 0, 0); tg('lArmR', -2.05, 0, 0);
+    return { py: 0.24, prx: 0.15, pry: 0, prz: 1.45, rate: 7 };
+  },
+  thanks(k, C, h, T, tg, t) { const b = Math.sin(Math.min(1, t * 0.9) * Math.PI); g4Legs(tg, 0.02); tg('torso', 0.45 * b, 0, 0); tg('head', 0.3 * b, 0, 0); tg('uArmL', -1.1, 0, -0.45); tg('uArmR', -1.1, 0, 0.45); tg('lArmL', -1.35, 0, 0); tg('lArmR', -1.35, 0, 0); return { py: 1, prx: 0.1 * b, pry: 0, prz: 0, rate: 8 }; },
+  dj(k, C, h, T, tg, t) { const b = t * 12.98, nod = Math.abs(Math.sin(b * 0.5)); g4Legs(tg, 0.03, 0.2 + nod * 0.15); tg('torso', 0.12, 0, 0); tg('head', 0.12 + nod * 0.28, 0.1, 0.25); tg('uArmL', -2.25, 0, 0.6); tg('lArmL', -2.2, 0, 0); tg('uArmR', -0.9, 0, -0.15); tg('lArmR', -0.9 + Math.sin(t * 6) * 0.25, 0, 0); return { py: 0.97 - nod * 0.03, prx: 0.05, pry: 0, prz: 0, rate: 14 }; },
+};
+/* ---------- проигрыватель движений: герой ---------- */
+function g4Clip(name, dur, o = {}) {
+  const A = avatar; if (!A || A.state !== 'alive') return null;
+  const old = G4A.clip; if (old && old.o.spin) A.pelvisCur.x = 0;
+  G4A.clip = { name, t: 0, dur, o }; A.g4anim = g4ClipAnim; A.ikLeft = false;
+  if (o.tps) g4Tps('clip', true);
+  return G4A.clip;
+}
+function g4ClipAnim(h, T, tg, dt, t) { const C = G4A.clip; if (!C) { h.g4anim = null; return null; } const f = G4_CLIP[C.name]; if (!f) return null; h.ikLeft = false; return f(C.o.loop ? 0 : clamp(C.t / C.dur, 0, 1), C, h, T, tg, C.t); }
+function g4ClipEnd() {
+  const C = G4A.clip, A = avatar; G4A.clip = null;
+  if (A) { A.g4anim = null; A.poseRate = 14; A.ikFn = null; if (C && C.o.spin) { A.pelvisCur.x = 0; } }
+  if (C && C.o.tps) g4Tps('clip', false); if (C && C.o.end) try { C.o.end(); } catch (e) {}
+}
+/* ---------- проигрыватель движений: NPC ---------- */
+function g4NpcClip(n, name, dur, o = {}) {
+  if (!n || !n.alive || n.state !== 'alive') return; if (!n.g4c) n.g4scr0 = n.scripted; n.g4c = { name, t: 0, dur, o }; n.scripted = true; n.g4anim = g4NpcAnim;
+}
+function g4NpcAnim(h, T, tg, dt, t) {
+  const C = h.g4c; if (!C) { h.g4anim = null; return null; } C.t += dt;
+  if (!C.o.loop && C.t >= C.dur) { h.g4c = null; h.g4anim = null; h.scripted = !!h.g4scr0; if (C.o.end) try { C.o.end(h); } catch (e) {} return null; }
+  if (C.o.face) { const dx = C.o.face.x - h.pos.x, dz = C.o.face.z - h.pos.z; h.yaw += angDiff(h.yaw, Math.atan2(dx, dz)) * Math.min(1, dt * 5); h.root.rotation.y = h.yaw; }
+  const f = G4_CLIP[C.name]; return f ? f(C.o.loop ? 0 : clamp(C.t / C.dur, 0, 1), C, h, T, tg, C.t) : null;
+}
+function g4NpcClipStop(n) { if (!n || !n.g4c) return; n.g4c = null; n.g4anim = null; n.scripted = !!n.g4scr0; }
+/* ===================== кувырок / уклонение ===================== */
+function g4MoveDir() {
+  const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw), rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw);
+  if (touch.moveId !== null && Math.hypot(touch.jx, touch.jy) > 0.25) { const x = fx * -touch.jy + rx * touch.jx, z = fz * -touch.jy + rz * touch.jx, l = Math.hypot(x, z) || 1; return { x: x / l, z: z / l, mv: true }; }
+  return { x: fx, z: fz, mv: false };
+}
+function g4CanMove() { return mode === 'g4' && G4.playing && !G4.cut && !VEH.in && !player.dead && !player.rag && state === 'play' && !G4A.vault && !G4A.fuel && !G4A.lock && !(G4L && G4L.swim) && !G4E.ui; }
+function g4Roll() {
+  if (!g4CanMove() || !player.onGround || G4A.rollCd > 0 || (G4A.clip && !G4A.clip.o.loop)) return false;
+  if (G4A.drag) g4DragStop(); if (G4A.clip) g4ClipEnd();
+  const d = g4MoveDir(); G4A.rollCd = 0.95; TS.crouchOn = false;
+  g4Clip('roll', 0.68, { dx: d.x, dz: d.z, yaw: Math.atan2(d.x, d.z), spin: true });
+  g4Sfx('whoosh', 1); later(0.42, () => Sound.thud && Sound.thud(0.22)); later(0.58, () => Sound.step && Sound.step(0.3));
+  return true;
+}
+// в кувырке пули чаще проходят мимо
+{ const _dp0 = damagePlayer; damagePlayer = function (d) { const C = G4A.clip; if (mode === 'g4' && C && C.name === 'roll') { const k = C.t / C.dur; if (k > 0.08 && k < 0.75) { d *= 0.3; if (!G4A.dodgeT || G4.time - G4A.dodgeT > 2) { G4A.dodgeT = G4.time; toast('🤸 Уклонение!'); } } } return _dp0(d); }; }
+/* ===================== перелезание / подтягивание ===================== */
+// пересечение луча (2D) с прямоугольником: [вход, выход] или null
+function g4RayBox(px, pz, dx, dz, x0, z0, x1, z1) {
+  let t0 = -1e9, t1 = 1e9;
+  for (const [p, d, a, b] of [[px, dx, x0, x1], [pz, dz, z0, z1]]) { if (Math.abs(d) < 1e-6) { if (p < a || p > b) return null; continue; } let ta = (a - p) / d, tb = (b - p) / d; if (ta > tb) { const q = ta; ta = tb; tb = q; } t0 = Math.max(t0, ta); t1 = Math.min(t1, tb); if (t0 > t1) return null; }
+  return t1 < 0 ? null : [t0, t1];
+}
+function g4Blocked(x, z, y0, y1, skip) { for (const o of obstacles) { if (o === skip) continue; if (x > o.min.x - 0.3 && x < o.max.x + 0.3 && z > o.min.z - 0.3 && z < o.max.z + 0.3 && o.min.y < y1 && o.max.y > y0) return true; } return false; }
+function g4TryVault() {
+  if (!g4CanMove() || G4A.clip || G4A.drag) return false;
+  const d = g4MoveDir(), p = player.pos, feet = p.y; let best = null;
+  for (const o of obstacles) {
+    if (o.max.y <= feet + 0.45 || o.max.y > feet + 2.35 || o.min.y > feet + 0.35) continue;
+    const r = g4RayBox(p.x, p.z, d.x, d.z, o.min.x, o.min.z, o.max.x, o.max.z); if (!r || r[0] < 0.02 || r[0] > 1.25) continue;
+    if (!best || r[0] < best.tin) best = { o, tin: r[0], tout: r[1] };
+  }
+  if (!best) return false;
+  const { o, tin, tout } = best, top = o.max.y, h = top - feet, thick = tout - tin, at = (t) => ({ x: p.x + d.x * t, z: p.z + d.z * t });
+  // что-то сверху мешает (козырёк, стена выше)
+  const mid = at(tin + Math.min(0.3, thick / 2)); if (g4Blocked(mid.x, mid.z, top + 0.15, top + 1.6, o)) return false;
+  const yaw = Math.atan2(d.x, d.z), side = Math.random() < 0.5 ? 1 : -1;
+  const landOk = (t) => { const L = at(t); if (g4Blocked(L.x, L.z, feet + 0.45, feet + 1.8, o)) return null; const gy = floorAt(L.x, L.z, top); if (gy > feet + 0.5 || gy < feet - 3.2) return null; return { ...L, y: gy }; };
+  let V = null;
+  if (h <= 1.35 && thick <= 1.7) { const L = landOk(tout + 0.55); if (L) V = { kind: 'vault', dur: 0.42 + thick * 0.1 + h * 0.08, pts: [[p.x, feet, p.z], [at(tin - 0.05).x, top + 0.18, at(tin - 0.05).z], [at(tout + 0.1).x, top + 0.18, at(tout + 0.1).z], [L.x, L.y, L.z]], seg: [0.3, 0.35, 0.35] }; }
+  if (!V && thick >= 0.6 && h <= 2.35) { const T = at(tin + Math.min(0.6, thick / 2)); if (!g4Blocked(T.x, T.z, top + 0.1, top + 1.8, o)) { const E = at(tin - 0.12); V = { kind: 'climb', dur: h > 1.35 ? 1.0 : 0.7, pts: [[p.x, feet, p.z], [E.x, top - (h > 1.35 ? 0.9 : 0.4), E.z], [E.x, top + 0.05, E.z], [T.x, top, T.z]], seg: [0.35, 0.3, 0.35] }; } }
+  if (!V && thick < 0.6 && h <= 2.35) { const L = landOk(tout + 0.5); if (L) V = { kind: 'fence', dur: 1.15, pts: [[p.x, feet, p.z], [at(tin - 0.1).x, top - 0.4, at(tin - 0.1).z], [at(tout + 0.15).x, top + 0.25, at(tout + 0.15).z], [L.x, L.y, L.z]], seg: [0.38, 0.27, 0.35] }; }
+  if (!V) return false;
+  V.t = 0; V.dx = d.x; V.dz = d.z; G4A.vault = V; TS.crouchOn = false;
+  g4Clip(V.kind, V.dur, { yaw, side }); g4Sfx('whoosh', 0.6); Sound.step && Sound.step(0.3);
+  later(V.dur * V.seg[0], () => Sound.thud && Sound.thud(0.15)); later(V.dur * 0.98, () => Sound.step && Sound.step(0.4));
+  if (!(G4.S.flags && G4.S.flags.vault)) { G4.S.flags = G4.S.flags || {}; G4.S.flags.vault = 1; g4Note('🧗 Прыжок у низкой преграды — перелезть; у уступа — подтянуться; у забора — перелезть через верх'); }
+  return true;
+}
+function g4VaultStep(V, dt) {
+  V.t += dt; const k = Math.min(1, V.t / V.dur), P = V.pts, S = V.seg; let i = 0, a = k;
+  if (k < S[0]) { i = 0; a = k / S[0]; } else if (k < S[0] + S[1]) { i = 1; a = (k - S[0]) / S[1]; } else { i = 2; a = (k - S[0] - S[1]) / S[2]; }
+  const e = g4Sm(clamp(a, 0, 1)), A0 = P[i], A1 = P[i + 1];
+  player.pos.set(lerp(A0[0], A1[0], e), lerp(A0[1], A1[1], e), lerp(A0[2], A1[2], e)); player.vel.set(0, 0, 0); player.onGround = false;
+  if (k >= 1) { G4A.vault = null; const L = P[3]; player.pos.set(L[0], L[1], L[2]); if (V.kind === 'vault') { player.vel.x = V.dx * 3.2; player.vel.z = V.dz * 3.2; } player.onGround = true; if (G4A.clip && G4A.clip.name === V.kind) g4ClipEnd(); }
+  eye.position.set(player.pos.x, player.pos.y + player.eye, player.pos.z); eye.rotation.set(player.pitch, player.yaw, 0); eye.updateMatrixWorld();
+}
+/* ===================== движение героя: кувырок, авто-шаг, блокировка, перелезание ===================== */
+{ const _up0 = updatePlayer; updatePlayer = function (dt) {
+  if (mode !== 'g4' || !G4.playing || player.dead || player.rag) return _up0(dt);
+  if (G4A.vault) { g4VaultStep(G4A.vault, dt); return; }
+  const C = G4A.clip, roll = C && C.name === 'roll', lock = G4A.lock || (C && C.o.lock), au = G4A.auto; let mid = null, jx = touch.jx, jy = touch.jy;
+  if (!roll && !lock && touch.jump && player.onGround && state === 'play' && g4TryVault()) { touch.jump = false; return; }
+  if (roll || lock || au) { mid = touch.moveId; touch.moveId = null; touch.jump = false; }
+  if (roll) { const k = C.t / C.dur, sp = k < 0.8 ? 6.6 * (1 - 0.3 * k) : 1.6; player.vel.x = C.o.dx * sp / 0.81; player.vel.z = C.o.dz * sp / 0.81; }
+  else if (au) { const dx = au.x - player.pos.x, dz = au.z - player.pos.z, d = Math.hypot(dx, dz); au.t += dt; if (d < 0.22 || au.t > 3) { G4A.auto = null; player.vel.x = player.vel.z = 0; if (au.done) try { au.done(); } catch (e) {} } else { player.vel.x = dx / d * 2.3 / 0.81; player.vel.z = dz / d * 2.3 / 0.81; } }
+  else if (G4A.drag && touch.moveId !== null) { touch.jx *= 0.48; touch.jy *= 0.48; }
+  const r = _up0(dt);
+  if (mid !== null) touch.moveId = mid; touch.jx = jx; touch.jy = jy;
+  return r;
+}; }
+/* ===================== камера: эффекты от первого лица и постановочные ракурсы ===================== */
+{ const _pc0 = placeCamera; placeCamera = function (dt) {
+  _pc0(dt); if (mode !== 'g4' || !G4.playing) return;
+  try {
+    if (G4A.cam) { G4A.cam(dt); return; }
+    const C = G4A.clip; if (avatar && avatar.held && C && (C.name !== 'roll' || true) && C.o.hideGun) avatar.held.visible = false;
+    if (!C || view3()) return; const k = clamp(C.t / C.dur, 0, 1);
+    if (C.name === 'roll') { const tuck = Math.sin(Math.min(1, k / 0.9) * Math.PI), a = g4Sm(g4Seg(k, 0.06, 0.8)); camera.position.y -= 1.0 * tuck; camera.rotation.x -= Math.sin(a * Math.PI) * 1.05; camera.rotation.z += Math.sin(a * Math.PI) * 0.12; }
+    else if (C.name === 'vault' || C.name === 'fence') { camera.rotation.z += Math.sin(k * Math.PI) * 0.16 * (C.o.side || 1); camera.rotation.x -= Math.sin(k * Math.PI) * 0.25; }
+    else if (C.name === 'climb') { camera.rotation.x += Math.sin(g4Seg(k, 0, 0.5) * Math.PI) * 0.35 - Math.sin(g4Seg(k, 0.5, 1) * Math.PI) * 0.3; }
+    else if (C.name === 'pick') { camera.position.y -= 0.32; camera.rotation.x -= 0.25; }
+    else if (C.name === 'drag') { camera.position.y -= 0.3; camera.rotation.z += Math.sin((C.ph || 0)) * 0.02; }
+  } catch (e) {}
+}; }
+/* ===================== карманник ===================== */
+function g4PickTarget() {
+  if (!g4CanMove() || G4A.drag) return null; const p = player.pos; let best = null, bd = 1.55;
+  for (const n of G4L.peds) {
+    if (!n.alive || n.state !== 'alive' || n.g4hostile || n.tsCop || n.g4picked || n.g4c || n.panic > 0.5 || n.pose !== 'stand' || (n.scripted && !(G4A.pick && G4A.pick.n === n))) continue;
+    const dx = p.x - n.pos.x, dz = p.z - n.pos.z, d = Math.hypot(dx, dz); if (d > bd) continue;
+    const fx = Math.sin(n.yaw), fz = Math.cos(n.yaw); if ((fx * dx + fz * dz) / (d || 1) > -0.2) continue; best = n; bd = d;
+  }
+  return best;
+}
+function g4PickTick(n, t, D) {
+  let P = G4A.pick;
+  if (!P || P.n !== n) { P = G4A.pick = { n, aw: 0, scr: n.scripted }; n.scripted = true; n.speed = 0; g4PhoneProp(n, true); g4Clip('pick', 99, { loop: true, hideGun: true }); }
+  const mv = Math.hypot(player.vel.x, player.vel.z), cr = TS.crouch > 0.5 || TS.crouchOn;
+  P.aw += (0.1 + (cr ? 0 : 0.16) + Math.min(0.6, mv * 0.25) + (G4.tod > 20 || G4.tod < 6 ? -0.05 : 0.04)) * (1 / 60) * (Math.random() < 0.06 ? 6 : 1);
+  if (player.pos.distanceTo(n.pos) > 1.9) P.aw += 0.05;
+  const pct = Math.round(clamp(P.aw, 0, 1) * 100); D.hl = `Карманы… 👁 ${pct}%`;
+  if (P.aw >= 1) { TS.hold = null; TS.useDown = false; g4PickCaught(n); }
+}
+function g4PickRelease() { const P = G4A.pick; if (!P) return; G4A.pick = null; const n = P.n; if (n && n.alive) { n.scripted = !!P.scr; g4PhoneProp(n, false); } if (G4A.clip && G4A.clip.name === 'pick') g4ClipEnd(); }
+function g4PickCaught(n) {
+  g4PickRelease(); n.g4picked = true; if (!n.alive) return; n.yaw = Math.atan2(player.pos.x - n.pos.x, player.pos.z - n.pos.z); n.root.rotation.y = n.yaw;
+  tsSay && tsSay(tsWhoOf(n), pick(['Эй! Руки из моего кармана!', 'Вор! Держите вора!', 'Ты что там шаришь?!', 'Полиция! Меня грабят!']), 2.2, tsVoiceOf(n));
+  if (n.g4armed || Math.random() < 0.25) { later(0.5, () => { if (n.alive) g4ArmUp(n); }); } else { n.panic = 8; g4Crime('rob', n.pos, 1); }
+  flashScreen && flashScreen('rgba(255,60,40,.35)', 300); toast('👁 Вас заметили!');
+}
+function g4PickDone(n) {
+  const P = G4A.pick; g4PickRelease(); n.g4picked = true; const S = G4.S, cash = Math.round(rand(12, 90) * (n.look && n.look.rich ? 3 : 1) + (Math.random() < 0.15 ? rand(80, 220) : 0));
+  S.cash += cash; g4Tx(cash, 'Карманы'); const R = Math.random(); let item = '';
+  if (R < 0.22) { if (g4AddLoot('wallet', 'Кошелёк с картами', 60, 0.3)) item = ' + 👛 кошелёк'; } else if (R < 0.4) { if (g4AddLoot('phone', 'Чужой смартфон', 120, 0.3)) item = ' + 📱 смартфон'; } else if (R < 0.48) { if (g4AddLoot('watch', 'Часы «Хронос»', 260, 0.2)) item = ' + ⌚ часы'; }
+  Sound.click && Sound.click(1500, 0.2); g4Sfx('rustle', 0.6); toast(`🤏 Чисто! +$${cash}${item}`);
+  S.picks = (S.picks || 0) + 1; if (S.picks === 1) g4Note('🤏 Карманник: подходите сзади, присев и не спеша. «Глаз» — насколько жертва чувствует вас. Добычу из сумки — в ломбард');
+}
+/* ===================== тащить тело ===================== */
+function g4BodyNear(r = 1.9) { const p = player.pos; let best = null, bd = r; for (const n of npcs) { if (n.state !== 'dead' && n.state !== 'limp') continue; if (n.g4gone) continue; const P = n.parts.torso && n.parts.torso.body ? n.parts.torso : n.parts.pelvis; if (!P || !P.body) continue; const b = P.body.position, d = Math.hypot(b.x - p.x, b.z - p.z); if (d < bd && Math.abs(b.y - p.y) < 1.6) { best = n; bd = d; } } return best; }
+function g4DragStart(n) { const P = n.parts.torso && n.parts.torso.body && !n.parts.torso.gone ? n.parts.torso : n.parts.pelvis; if (!P || !P.body) return; G4A.drag = { n, P }; g4Clip('drag', 99, { loop: true, hideGun: true }); toast('🫳 Тащим. Отходите назад; E — бросить. У багажника — погрузить'); Sound.thud && Sound.thud(0.2); }
+function g4DragStop() { const D = G4A.drag; G4A.drag = null; if (G4A.clip && G4A.clip.name === 'drag') g4ClipEnd(); if (D) Sound.thud && Sound.thud(0.25); }
+function g4DragTick(dt) {
+  const D = G4A.drag; if (!D) return; const n = D.n, b = D.P.body; if (!b || n.g4gone || VEH.in || player.dead || player.rag) { g4DragStop(); return; }
+  const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw), tx = player.pos.x + fx * 0.95, tz = player.pos.z + fz * 0.95, ty = player.pos.y + 0.55;
+  const dx = tx - b.position.x, dy = ty - b.position.y, dz = tz - b.position.z, d = Math.hypot(dx, dy, dz);
+  if (d > 3.2) { g4DragStop(); toast('Тело выскользнуло'); return; }
+  b.wakeUp(); const k = 9; b.velocity.set(clamp(dx * k, -6, 6), clamp(dy * k, -4, 6), clamp(dz * k, -6, 6));
+  const C = G4A.clip; if (C && C.name === 'drag') C.ph = (C.ph || 0) + dt * (2 + Math.hypot(player.vel.x, player.vel.z) * 5);
+  if ((G4A.dragS = (G4A.dragS || 0) - dt) < 0 && Math.hypot(player.vel.x, player.vel.z) > 0.6) { G4A.dragS = 0.45; g4Sfx('rustle', 0.4); }
+}
+function g4BodyToTrunk(Cr) {
+  const D = G4A.drag; if (!D) return; const n = D.n; g4DragStop(); n.g4gone = true; flashScreen && flashScreen('#000', 500);
+  later(0.25, () => { try { n.dispose(); } catch (e) {} const i = npcs.indexOf(n); if (i >= 0) npcs.splice(i, 1); }); Sound.thud && Sound.thud(0.5); g4Sfx('clunk', 1);
+  Cr.g4bodies = (Cr.g4bodies || 0) + 1; toast('🚗 Тело в багажнике. Свидетели его не найдут'); const S = G4.S; S.hidden = (S.hidden || 0) + 1;
+}
+/* ===================== жесты и танцы ===================== */
+const G4_EMO = [['wave', '👋', 'Помахать'], ['clap', '👏', 'Хлопать'], ['cheer', '🙌', 'Ура!'], ['shrug', '🤷', 'Пожать плечами'], ['facepalm', '🤦', 'Фейспалм'], ['think', '🤔', 'Задуматься'], ['dwave', '🕺', 'Танец «Волна»'], ['dtwist', '💃', 'Танец «Твист»'], ['djump', '🦘', 'Танец «Прыжки»'], ['pushup', '💪', 'Отжимания'], ['sitg', '🧘', 'Сесть']];
+function g4EmoUi() {
+  let b = document.getElementById('g4EmoB'); if (!b) {
+    b = document.createElement('div'); b.id = 'g4EmoB'; b.textContent = '😎'; document.body.appendChild(b);
+    b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); g4EmoMenu(); });
+    const st = document.createElement('style'); st.textContent = `#g4EmoB{position:fixed;left:calc(196px + env(safe-area-inset-left,0px));top:calc(12px + env(safe-area-inset-top,0px));width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#ff5ab4,#7a3ad0);display:none;align-items:center;justify-content:center;font-size:22px;z-index:31;box-shadow:0 2px 10px rgba(0,0,0,.4);border:2px solid rgba(255,255,255,.7);touch-action:none;user-select:none}
+body.g4-play.g4-foot:not(.g4-cut):not(.g4-act) #g4EmoB{display:flex}
+body.g4.g4-act #touch,body.g4.g4-act #tsHud,body.g4.g4-act #tsArs{visibility:hidden!important}
+#g4Emo{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;background:rgba(14,10,24,.92);border:2px solid #ff5ab4;border-radius:18px;padding:10px;display:none;grid-template-columns:repeat(4,86px);gap:7px;backdrop-filter:blur(6px)}
+#g4Emo button{height:62px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:linear-gradient(180deg,#2a1d40,#170f26);color:#fff;font:800 10px var(--ui);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}#g4Emo button b{font-size:24px}#g4Emo button.x{background:#3a1420}
+#g4EmoTag{position:fixed;left:50%;top:calc(58px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:30;background:rgba(0,0,0,.55);color:#fff;font:800 12px var(--ui);padding:5px 12px;border-radius:20px;display:none;pointer-events:none}
+#g4Roll{grid-row:2;grid-column:3;background:radial-gradient(circle,#3a2a6a,#140c28)!important;border-color:#c8a0ff!important}body.g4-swim #g4Roll,body:not(.g4) #g4Roll,body.g4-makar #g4Roll{display:none!important}
+#g4Fuel{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:3px;font:800 11px var(--ui)}#g4Fuel i{display:block;width:90px;height:7px;border-radius:4px;background:rgba(255,255,255,.2);overflow:hidden}#g4Fuel i b{display:block;height:100%;background:linear-gradient(90deg,#ff4a2a,#ffd04a,#5aff8a)}#g4Fuel.low{animation:g4blink .6s infinite}@keyframes g4blink{50%{opacity:.35}}
+#g4Pump{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:40;background:rgba(10,14,10,.88);border:2px solid #5aff8a;border-radius:14px;padding:8px 16px;color:#d8ffe0;font:800 13px var(--ui);text-align:center;display:none;min-width:210px}#g4Pump .lcd{font:900 26px ui-monospace,monospace;color:#7aff9a;text-shadow:0 0 8px #3aff6a;letter-spacing:.05em}#g4Pump i{display:block;height:8px;border-radius:4px;background:rgba(255,255,255,.15);margin-top:5px;overflow:hidden}#g4Pump i b{display:block;height:100%;background:#5aff8a;width:0}`;
+    document.head.appendChild(st);
+  }
+  // кнопка кувырка в блоке действий
+  const tsA = document.getElementById('tsA'); if (tsA && !document.getElementById('g4Roll')) { const r = document.createElement('b'); r.id = 'g4Roll'; r.dataset.a = 'g4roll'; r.innerHTML = '<span>🤸</span>КУВЫРОК'; tsA.appendChild(r); r.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); g4Roll(); }); }
+}
+function g4EmoMenu() {
+  if (!g4CanMove()) return; let el = document.getElementById('g4Emo'); if (!el) { el = document.createElement('div'); el.id = 'g4Emo'; document.body.appendChild(el); el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true }); }
+  el.innerHTML = G4_EMO.map(([k, i, n]) => `<button data-e="${k}"><b>${i}</b>${n}</button>`).join('') + '<button class="x" data-e="x"><b>✖</b>Закрыть</button>';
+  for (const b of el.querySelectorAll('button')) b.onclick = () => { el.style.display = 'none'; G4A.emoOpen = false; if (b.dataset.e !== 'x') g4Emote(b.dataset.e); };
+  el.style.display = 'grid'; G4A.emoOpen = true; touch.moveId = null; touch.jx = touch.jy = 0; Sound.click && Sound.click(1000, 0.12);
+}
+function g4Emote(id) {
+  if (!g4CanMove()) return; const E = G4_EMO.find((q) => q[0] === id); if (!E) return; if (G4A.clip) g4ClipEnd(); if (G4A.drag) g4DragStop();
+  const once = { wave: 2.6, shrug: 2.2, facepalm: 2.8 }[id];
+  g4Clip(id, once || 99, { loop: !once, tps: true, hideGun: true, emo: true }); G4A.emoT = 0;
+  const tag = document.getElementById('g4EmoTag') || (() => { const d = document.createElement('div'); d.id = 'g4EmoTag'; document.body.appendChild(d); return d; })();
+  tag.textContent = `${E[1]} ${E[2]} · сдвиньтесь, чтобы закончить`; tag.style.display = 'block';
+  // прохожие реагируют
+  const dance = id[0] === 'd' && id !== 'dD'; let joined = 0;
+  for (const n of G4L.peds) { if (!n.alive || n.state !== 'alive' || n.g4hostile || n.tsCop || n.g4c || n.scripted || n.pose !== 'stand') continue; const d = n.pos.distanceTo(player.pos); if (d > 9) continue;
+    if (id === 'wave' && Math.random() < 0.7) { g4NpcClip(n, 'wave', 2.4, { face: player.pos }); later(0.3, () => tsSay && tsSay(tsWhoOf(n), pick(['Привет!', 'Хей!', 'О, здорово!', 'Мы знакомы?']), 1.6, tsVoiceOf(n))); }
+    else if (dance && joined < 3 && Math.random() < 0.5) { joined++; n.g4dp = rand(0, 6); g4NpcClip(n, pick(['dwave', 'dtwist', 'djump']), rand(6, 10), { face: player.pos }); }
+    else if ((id === 'pushup' || id === 'cheer' || dance) && Math.random() < 0.5) { n.g4dp = rand(0, 6); g4NpcClip(n, 'clap', rand(3, 5), { face: player.pos }); }
+    else if (id === 'facepalm' && Math.random() < 0.4) g4NpcClip(n, 'shrug', 2.2, { face: player.pos });
+  }
+  if (joined) toast(`🕺 Прохожие подхватили танец (${joined})!`);
+}
+function g4EmoTick(dt) {
+  const C = G4A.clip, tag = document.getElementById('g4EmoTag');
+  if (C && C.o.emo) { G4A.emoT += dt; const mv = touch.moveId !== null && Math.hypot(touch.jx, touch.jy) > 0.3; if ((mv && G4A.emoT > 0.3) || VEH.in || W.fireHeld || player.lastHurt < 0.1) g4ClipEnd(); }
+  if (tag && tag.style.display !== 'none' && !(G4A.clip && G4A.clip.o.emo)) tag.style.display = 'none';
+}
+/* ===================== топливо и заправки ===================== */
+function g4CarName(C) { return C.g4name || (CARS[C.id] && CARS[C.id].name) || 'машина'; }
+function g4FuelInit(C) { if (C.g4fuel === undefined) C.g4fuel = C.g4own || C === G4L.own ? 0.8 : rand(0.22, 0.75); return C.g4fuel; }
+function g4FuelTick(dt) {
+  const C = VEH.in; if (C) { G4A.lastCar = C; g4FuelInit(C); const sp = Math.abs(C.vf || 0), th = (C.in && C.in.th) || 0; C.g4fuel = Math.max(0, C.g4fuel - sp * dt / 5200 * (0.7 + th * 0.7 + (C.nOn ? 1.6 : 0)) - (th > 0.1 ? dt * 0.00002 : 0));
+    if (C.g4fuel < 0.12 && G4A.lowWarn !== C) { G4A.lowWarn = C; toast('⛽ Бензин на исходе!'); const P = g4NearPump(C.x, C.z); if (P) g4SetWaypoint(P.x, P.z + 3, `Заправка «${P.st}»`); }
+    if (C.g4fuel <= 0 && !C.g4dry) { C.g4dry = true; g4Sfx('sputter', 1); banner('⛽ БЕНЗИН КОНЧИЛСЯ', 'Канистра — на любой заправке. Или идите пешком'); }
+    if (C.g4fuel > 0) C.g4dry = false;
+    if (C.g4fuel > 0 && C.g4fuel < 0.03 && Math.random() < dt * 1.5) { C.g4cough = 0.25; g4Sfx('sputter', 0.6); }
+    let el = document.getElementById('g4Fuel'); const hud = document.getElementById('vehHud'); if (!el && hud) { el = document.createElement('div'); el.id = 'g4Fuel'; el.innerHTML = '⛽<i><b></b></i><span></span>'; hud.appendChild(el); }
+    if (el) { el.querySelector('b').style.width = Math.round(C.g4fuel * 100) + '%'; const tx = C.g4fuel <= 0 ? 'ПУСТО' : Math.round(C.g4fuel * G4_TANK) + ' л'; const s = el.querySelector('span'); if (s.textContent !== tx) s.textContent = tx; el.classList.toggle('low', C.g4fuel < 0.12); }
+  }
+}
+// нет бензина — нет тяги; на последних каплях мотор чихает
+{ const _vp0 = vehPhys; vehPhys = function (C, dt) { if (mode === 'g4' && C === VEH.in && C.g4fuel !== undefined && (C.g4fuel <= 0 || C.g4cough > 0)) { if (C.g4cough > 0) C.g4cough -= dt; const th = C.in.th; C.in.th = 0; const nb = VEH.nitroBtn; VEH.nitroBtn = false; _vp0(C, dt); C.in.th = th; VEH.nitroBtn = nb; return; } _vp0(C, dt); }; }
+function g4NearPump(x, z) { let best = null, bd = 1e9; for (const P of G4_PUMPS) { const d = Math.hypot(P.x - x, P.z - z); if (d < bd) { bd = d; best = P; } } return best; }
+// заправка на карте: навес с подсветкой, колонки с экранами, табло цен, ларёк
+function g4GasStation(cx, cz, ry, name, col) {
+  const M = G4MAT, c = Math.cos(ry), s = Math.sin(ry), W2 = (x, z) => [cx + x * c + z * s, cz - x * s + z * c];
+  g4Plane(M.plain, cx - 9, cz - 6, cx + 9, cz + 6, 0.035, 4, 0x8a8a90);
+  const roofY = 4.6; g4Box(M.plain, cx, roofY, cz, Math.abs(c) > 0.5 ? 14 : 8, 0.5, Math.abs(c) > 0.5 ? 8 : 14, 0xf4f4f4); g4Box(M.glow, cx, roofY - 0.3, cz, Math.abs(c) > 0.5 ? 14.1 : 8.1, 0.12, Math.abs(c) > 0.5 ? 8.1 : 14.1, col);
+  for (const [px, pz] of [[-5.5, -3], [5.5, -3], [-5.5, 3], [5.5, 3]]) { const [x, z] = W2(px, pz); g4Cyl(M.plain, x, roofY / 2, z, 0.16, 0.16, roofY, 8, 0xe0e0e0); }
+  const pumps = [];
+  for (const px of [-2.6, 2.6]) {
+    const [x, z] = W2(px, 0); g4Box(M.plain, x, 0.12, z, 1.6, 0.24, 3.2, 0xbdbdbd);
+    g4Box(M.plain, x, 0.95, z, 0.55, 1.55, 0.8, 0xf0f0f0); g4Box(M.glow, x, 1.62, z, 0.57, 0.12, 0.82, col); g4Box(M.glow, x, 1.25, z + (c > 0 ? 0.41 : -0.41) * (Math.abs(c) > 0.5 ? 1 : 0), Math.abs(c) > 0.5 ? 0.4 : 0.03, 0.26, Math.abs(c) > 0.5 ? 0.03 : 0.4, 0x2aff6a);
+    g4Solid(x - 0.3, z - 0.42, x + 0.3, z + 0.42, 0, 1.7); pumps.push({ x, z, st: name, y: 1.3 });
+  }
+  const [bx, bz] = W2(7.5, -5.2); g4Box(M.plain, bx, 2.6, bz, 0.3, 5.2, 0.3, 0x444448); g4Sign(`⛽ ${name.toUpperCase()}`, bx, 5.6, bz, ry + Math.PI / 2, 3.6, 1.1, { bg: '#101418', fg: '#fff', lit: true, glow: col, sub: `92 · $${G4_LITRE.toFixed(2)}/л` });
+  for (const P of pumps) G4_PUMPS.push(P);
+  G4M.pois['gas_' + name] = { x: cx, z: cz, name: `Заправка «${name}»`, ic: '⛽' };
+}
+function g4FreeRect(x0, z0, x1, z1) {
+  for (const o of obstacles) if (o.max.x > x0 && o.min.x < x1 && o.max.z > z0 && o.min.z < z1 && o.min.y < 3) return false;
+  for (const L of G4M.lots) if (L.x1 > x0 && L.x0 < x1 && L.z1 > z0 && L.z0 < z1) return false;
+  for (const [x, z] of [[x0, z0], [x1, z0], [x0, z1], [x1, z1]]) if (typeof g4InWater === 'function' && g4InWater(x, z)) return false;
+  return true;
+}
+function g4AnimBuild() {
+  G4_PUMPS.length = 0; G4_PUMPS.push({ x: -232, z: 7, st: 'Кайман', y: 1.2 }, { x: -228, z: 7, st: 'Кайман', y: 1.2 });
+  G4M.pois.gas_kaiman = { x: -230, z: 7, name: 'Заправка «Кайман»', ic: '⛽' };
+  const tryAt = (list, name, col) => { for (const [x, z, ry] of list) if (g4FreeRect(x - 9.5, z - 7.5, x + 9.5, z + 7.5)) { g4GasStation(x, z, ry, name, col); return true; } return false; };
+  tryAt([[180, -85, 0], [180, -160, 0], [180, 25, 0], [180, -215, 0], [-195, -95, 0]], 'Пальма-Ойл', 0xff8a2a);
+  tryAt([[664, -170, 0], [664, -250, 0], [664, -60, 0], [664, 40, 0], [420, -250, 0]], 'Платина', 0x60e0ff);
+}
+{ const _ge0 = g4Elite; g4Elite = function () { _ge0(); try { g4AnimBuild(); } catch (e) { console.warn('gas', e); } }; }
+// заправка: идём к лючку, берём пистолет, литры бегут на табло
+function g4FuelSpot(C, P) {
+  const S = C.S, side = (() => { const lx = vehToLocal(C, P.x - C.x, P.z - C.z, _g4av).x; return lx > 0 ? 1 : -1; })();
+  const lx = side * (S.W / 2 + 0.02), lz = -S.L * 0.27, o = vehToWorld(C, lx, lz, _g4av), o2 = vehToWorld(C, side * (S.W / 2 + 0.62), lz, _g4bv);
+  return { cap: new V3(C.x + o.x, (C.y || 0) + S.bh * 0.92, C.z + o.z), stand: { x: C.x + o2.x, z: C.z + o2.z } };
+}
+const _g4av = new V3(), _g4bv = new V3();
+function g4NozzleMesh() {
+  const g = new THREE.Group(), bm = new THREE.MeshStandardMaterial({ color: 0x111114, roughness: 0.6 }), mm = new THREE.MeshStandardMaterial({ color: 0xc8c8d0, roughness: 0.25, metalness: 0.9 }), gm = new THREE.MeshStandardMaterial({ color: 0x2aff6a, emissive: 0x1a8a3a, roughness: 0.5 });
+  const h = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.14, 0.05), bm); g.add(h); const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.014, 0.2, 8), mm); sp.rotation.x = Math.PI / 2; sp.position.set(0, 0.06, 0.1); g.add(sp); const gd = new THREE.Mesh(new THREE.BoxGeometry(0.052, 0.04, 0.09), gm); gd.position.set(0, 0.07, 0.02); g.add(gd); return g;
+}
+function g4FuelStart(C, P) {
+  if (G4A.fuel || !g4CanMove()) return; g4FuelInit(C); if (C.g4fuel > 0.97) { toast('⛽ Бак уже полный'); return; }
+  const sp = g4FuelSpot(C, P); G4A.fuel = { C, P, sp, t: 0, ph: 'walk', l0: C.g4fuel, paid: 0 }; G4A.lock = false; g4Tps('fuel', true);
+  G4A.auto = { x: sp.stand.x, z: sp.stand.z, t: 0, done: () => { const F = G4A.fuel; if (!F) return; F.ph = 'grab'; F.t = 0; G4A.lock = true; document.body.classList.add('g4-act'); player.yaw = Math.atan2(-(F.sp.cap.x - player.pos.x), -(F.sp.cap.z - player.pos.z)); g4Clip('pump', 99, { loop: true, hideGun: true }); g4Sfx('clunk', 0.6); } };
+  const el = document.getElementById('g4Pump') || (() => { const d = document.createElement('div'); d.id = 'g4Pump'; document.body.appendChild(d); return d; })(); el.innerHTML = `<div>⛽ «${P.st}» · ${g4CarName(C)}</div><div class="lcd">0.0 л · $0.00</div><i><b></b></i>`; el.style.display = 'block';
+}
+function g4FuelEnd(msg) {
+  const F = G4A.fuel; if (!F) return; G4A.fuel = null; G4A.lock = false; G4A.auto = null; g4Hum(false); g4Tps('fuel', false); G4A.cam = null; document.body.classList.remove('g4-act');
+  if (G4A.noz) { if (G4A.noz.parent) G4A.noz.parent.remove(G4A.noz); G4A.noz = null; } if (G4A.hose) { scene.remove(G4A.hose); G4A.hose.geometry.dispose(); G4A.hose = null; }
+  if (G4A.clip && G4A.clip.name === 'pump') g4ClipEnd(); const el = document.getElementById('g4Pump'); if (el) el.style.display = 'none'; if (msg) toast(msg);
+}
+function g4FuelStep(dt) {
+  const F = G4A.fuel; if (!F) return; const C = F.C; F.t += dt;
+  if (C.burnt || !VEH.list.includes(C) || player.dead || TS.wl.stars > 1 || Math.hypot(C.x - F.P.x, C.z - F.P.z) > 11) { g4FuelEnd('⛽ Заправка прервана'); return; }
+  if (F.ph === 'walk') return;
+  // постановочная камера: сбоку от колонки на героя и машину
+  G4A.cam = (dt2) => { const a = Math.atan2(player.pos.x - F.P.x, player.pos.z - F.P.z) + 0.9, cx = (player.pos.x + F.sp.cap.x) / 2, cz = (player.pos.z + F.sp.cap.z) / 2; camera.position.lerp(_g4av.set(cx + Math.sin(a) * 4.2, player.pos.y + 1.9, cz + Math.cos(a) * 4.2), Math.min(1, (dt2 || 0.016) * 3)); camera.lookAt(cx, player.pos.y + 1.0, cz); };
+  const A = avatar;
+  if (F.ph === 'grab') {
+    if (!G4A.noz && A && A.parts.lArmR) { G4A.noz = g4NozzleMesh(); G4A.noz.position.set(0, -0.27, 0.04); G4A.noz.rotation.x = -0.4; A.parts.lArmR.mesh.add(G4A.noz); }
+    if (A) A.ikFn = (n) => { n.ikArm('R', F.sp.cap, Math.min(1, F.t * 2.5)); };
+    if (F.t > 0.55) { F.ph = 'fill'; F.t = 0; g4Hum(true); }
+  }
+  // шланг от колонки к пистолету
+  if (G4A.noz) { const a = new V3(F.P.x, F.P.y || 1.3, F.P.z), b = G4A.noz.getWorldPosition(new V3()), m = a.clone().lerp(b, 0.5); m.y = Math.min(a.y, b.y) - 0.55; const cur = new THREE.QuadraticBezierCurve3(a, m, b); const geo = new THREE.TubeGeometry(cur, 14, 0.022, 5, false);
+    if (!G4A.hose) { G4A.hose = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x141416, roughness: 0.7 })); scene.add(G4A.hose); } else { G4A.hose.geometry.dispose(); G4A.hose.geometry = geo; } }
+  if (F.ph === 'fill') {
+    const S = G4.S, rate = 0.27 * dt, need = 1 - C.g4fuel, add = Math.min(rate, need), cost = add * G4_TANK * G4_LITRE, have = S.cash + tsCashTotal();
+    if (cost > have) { g4FuelEnd('💸 Деньги кончились — заправились на сколько хватило'); return; }
+    if (add > 0) { if (S.cash >= cost) S.cash -= cost; else g4Pay(Math.ceil(cost)); F.paid += cost; C.g4fuel += add; }
+    const L = (C.g4fuel - F.l0) * G4_TANK, el = document.getElementById('g4Pump'); if (el) { el.querySelector('.lcd').textContent = `${L.toFixed(1)} л · $${F.paid.toFixed(2)}`; el.querySelector('b').style.width = Math.round(C.g4fuel * 100) + '%'; }
+    if ((F.bt = (F.bt || 0) - dt) < 0) { F.bt = 0.45; g4Sfx('beep', 1); }
+    if (C.g4fuel >= 0.999) { F.ph = 'done'; F.t = 0; g4Hum(false); g4Sfx('clunk', 1); g4Sfx('ding', 0.8); }
+  }
+  if (F.ph === 'done' && F.t > 0.6) { const p = F.paid; g4Tx(-Math.round(p), 'Бензин'); g4FuelEnd(`⛽ Полный бак · −$${p.toFixed(2)}`); C.g4dry = false; G4A.lowWarn = null; }
+}
+/* ===================== выбор действия на E ===================== */
+function g4DecideAnim(look) {
+  const L = [], S = G4.S, p = player.pos;
+  if (G4A.fuel || G4A.vault) return L;
+  // тащим тело: бросить или в багажник
+  if (G4A.drag) {
+    let car = null; for (const Cr of VEH.list) { if (Cr.ai || Cr.burnt || Cr.g4sink) continue; const lp = vehToLocal(Cr, p.x - Cr.x, p.z - Cr.z, _g4av); if (Math.abs(lp.x) < Cr.S.W / 2 + 0.9 && lp.z < -Cr.S.L / 2 + 0.6 && lp.z > -Cr.S.L / 2 - 1.8) { car = Cr; break; } }
+    if (car) L.push({ d: 0.01, D: { label: `🚗 Удерживайте E — погрузить тело в багажник (${g4CarName(car)})`, hl: 'Грузим…', hold: 1.1, key: 'trunk', run() { g4BodyToTrunk(car); } } });
+    L.push({ d: 0.02, D: { label: '🫳 E — бросить тело', run() { g4DragStop(); } } }); return L;
+  }
+  // карманы
+  const n = g4PickTarget(); if (n) { const D = { label: '🤏 Удерживайте E — обчистить карманы (сзади, тихо)', hl: 'Карманы… 👁 0%', hold: 2.4, key: 'pick', tick(t) { g4PickTick(n, t, D); }, run() { g4PickDone(n); } }; L.push({ d: 0.5, D }); }
+  // тело рядом
+  const b = g4BodyNear(); if (b) { const P = b.parts.torso && b.parts.torso.body ? b.parts.torso.body.position : b.pos; const d = look(P.x, P.y, P.z, 2.4); if (d >= 0) L.push({ d: d + 0.2, D: { label: '🫳 Удерживайте E — тащить тело (спрятать от прохожих)', hl: 'Хватаем…', hold: 0.45, key: 'drag', run() { g4DragStart(b); } } }); }
+  // колонка
+  for (const P of G4_PUMPS) { const d = look(P.x, 1.2, P.z, 2.6); if (d < 0) continue;
+    let car = null, cd = 9; for (const Cr of VEH.list) { if (Cr.ai || Cr.burnt || Cr.g4sink) continue; const dd = Math.hypot(Cr.x - P.x, Cr.z - P.z); if (dd < cd) { cd = dd; car = Cr; } }
+    if (car) { g4FuelInit(car); const lit = Math.max(0, (1 - car.g4fuel) * G4_TANK); L.push({ d, D: { label: car.g4fuel > 0.97 ? `⛽ ${g4CarName(car)}: бак полный` : `⛽ E — заправить «${g4CarName(car)}» (${lit.toFixed(0)} л ≈ $${g4Fmt(lit * G4_LITRE)})`, run() { if (car.g4fuel > 0.97) { toast('⛽ Бак полный'); return; } g4FuelStart(car, P); } } }); }
+    else L.push({ d: d + 0.01, D: { label: `🛢 E — канистра 15 л за $45 (${(S.items && S.items.can) || 0} шт.)`, run() { if (!g4Pay(45)) { toast('💸 Нужно $45'); return; } S.items = S.items || {}; S.items.can = (S.items.can || 0) + 1; g4Sfx('clunk', 0.7); toast('🛢 Канистра в сумке'); } } });
+    break;
+  }
+  // канистра у пустой машины
+  if ((S.items && S.items.can) > 0) for (const Cr of VEH.list) { if (Cr.ai || Cr.burnt || Cr.g4fuel === undefined || Cr.g4fuel > 0.7) continue; if (Math.hypot(Cr.x - p.x, Cr.z - p.z) > 3.4) continue; L.push({ d: 0.9, D: { label: `🛢 Удерживайте E — залить канистру в «${g4CarName(Cr)}» (+15 л)`, hl: 'Льём…', hold: 2.2, key: 'can', tick(t) { if (!G4A.clip) g4Clip('pump', 99, { loop: true, hideGun: true }); if (Math.random() < 0.05) g4Sfx('rustle', 0.3); }, run() { if (G4A.clip && G4A.clip.name === 'pump') g4ClipEnd(); S.items.can--; Cr.g4fuel = Math.min(1, Cr.g4fuel + 15 / G4_TANK); Cr.g4dry = false; g4Sfx('clunk', 0.8); toast(`🛢 +15 л · ${Math.round(Cr.g4fuel * G4_TANK)} л в баке`); } } }); break; }
+  return L;
+}
+{ const _de9 = g4DecideEcon; g4DecideEcon = function (look) { const L = _de9(look); try { for (const x of g4DecideAnim(look)) L.push(x); } catch (e) { console.warn('anim decide', e); } return L; }; }
+// иконки заправок на миникарте и большой карте
+{ const _me9 = g4MiniExtra; g4MiniExtra = function (ic, T) { _me9(ic, T); const seen = {}; for (const P of G4_PUMPS) { if (seen[P.st]) continue; seen[P.st] = 1; ic(P.x, P.z, '⛽', '#1a6a3a', 15, false); } }; }
+/* ===================== тик и выключение ===================== */
+function g4AnimTick(dt) {
+  if (!G4.playing || !G4.S) return; g4EmoUi(); G4A.rollCd = Math.max(0, G4A.rollCd - dt);
+  const C = G4A.clip; if (C) { C.t += dt; if (!C.o.loop && C.t >= C.dur) g4ClipEnd(); }
+  if (G4A.pick && !(TS.hold && TS.hold.D && TS.hold.D.key === 'pick')) g4PickRelease();
+  if (G4A.clip && G4A.clip.name === 'pump' && !G4A.fuel && !(TS.hold && TS.hold.D && TS.hold.D.key === 'can')) g4ClipEnd();
+  if (avatar && avatar.g4anim && !G4A.clip && avatar.g4anim === g4ClipAnim) avatar.g4anim = null;
+  g4DragTick(dt); g4EmoTick(dt); g4FuelTick(dt); g4FuelStep(dt);
+  if (VEH.in && (G4A.clip || G4A.drag)) { if (G4A.drag) g4DragStop(); if (G4A.clip) g4ClipEnd(); }
+  if (G4A.vault && (VEH.in || player.rag)) G4A.vault = null;
+}
+function g4AnimOff() {
+  try { g4FuelEnd(); } catch (e) {} try { g4PickRelease(); } catch (e) {} G4A.drag = null; G4A.vault = null; G4A.auto = null; G4A.lock = false; G4A.cam = null;
+  if (G4A.clip) { try { g4ClipEnd(); } catch (e) {} } G4A.tps.clear(); if (G4A.prevView !== null) { settings.view = G4A.prevView; G4A.prevView = null; } g4Hum(false);
+  for (const id of ['g4Emo', 'g4EmoTag', 'g4Pump']) { const e = document.getElementById(id); if (e) e.style.display = 'none'; }
+}
+/* ===================== ГЛАВА 4 · АРЕНДА ЖИЛЬЯ, МОТЕЛИ И КЛУБ «НЕОН» =====================
+   Снять на 1/3/7 дней: мотель «Закат» (новое здание на Болотном тракте), номер 7 в «Прибое», студию
+   в Ар-деко, дом в Пальмовых холмах, виллу «Сапфир» в ELITE City. В каждом — кровать (сон с анимацией,
+   перемотка времени, лечение, сохранение) и тайник: оружие, добыча, наличные. Приложение «Аренда».
+   Клуб «Неон»: живой танцпол с LED-плиткой, диджей, бар с коктейлями, синтезированная музыка и
+   ритм-игра на танцполе (стрелки под бит, комбо, чаевые, толпа подхватывает). */
+const G4RT = { inside: null, lt: '', sleep: null, dance: null, clubN: [], dyn: {}, beat: null, drunk: 0, dayChk: -1, door: null };
+const G4_IY = 200;
+const G4_INT = {
+  motel: { cx: -318, cz: -300, w: 6.4, d: 8, h: 3.0, exit: [1.6, 3.0], door: [1.6, 4], bed: { x: -1.2, z: -2.0, len: 2.1, top: 0.56 }, stash: [2.6, -3.2], tv: [2.45, -1.0] },
+  flat: { cx: -292, cz: -300, w: 10, d: 9, h: 3.2, exit: [-3.5, 3.5], door: [-3.5, 4.5], bed: { x: 3.0, z: -2.6, len: 2.2, top: 0.55 }, stash: [-4.2, -3.6], tv: [4.85, 1.2] },
+  villa: { cx: -258, cz: -300, w: 14, d: 11, h: 4.0, exit: [4.5, 4.5], door: [4.5, 5.5], bed: { x: 4.6, z: -2.8, len: 2.3, top: 0.6 }, stash: [-6.85, -1.0], tv: null },
+  club: { cx: -220, cz: -297, w: 20, d: 18, h: 6.0, exit: [-7, 8], door: [-7, 9], bed: null, stash: null, tv: null },
+};
+const G4_RENTS = [
+  { id: 'zakat', name: 'Мотель «Закат» · номер 4', ic: '🌅', kind: 'motel', price: 45, desc: 'Болотный тракт: дёшево, тихо, неон мигает', neon: 0xff7a3a },
+  { id: 'priboj', name: 'Мотель «Прибой» · номер 7', ic: '🌊', kind: 'motel', price: 85, desc: 'У пляжа, стена к стене с Мелоди', neon: 0x2af0ff },
+  { id: 'studio', name: 'Студия «Ар-деко»', ic: '🏙', kind: 'flat', price: 180, desc: 'Западный проспект: огни города в окне' },
+  { id: 'house', name: 'Дом в Пальмовых холмах', ic: '🏡', kind: 'flat', price: 320, desc: 'Тихая улица, свой двор, свой ключ' },
+  { id: 'villa', name: 'Вилла «Сапфир» · ELITE', ic: '💎', kind: 'villa', price: 1500, desc: 'Мрамор, панорама на океан, личный сейф' },
+];
+function g4RentOn(id) { const S = G4.S; return !!(S && S.rent && S.rent[id] >= G4.day); }
+function g4Stash(id) { const S = G4.S; S.stash = S.stash || {}; return S.stash[id] || (S.stash[id] = { cash: 0, w: [], loot: [] }); }
+/* ===================== постройка: интерьеры «над болотом» и входы в городе ===================== */
+function g4IntShell(T, floorMat, ft, wt, ct) {
+  const M = G4MAT, { cx, cz, w, d, h } = T, y0 = G4_IY, x0 = cx - w / 2, x1 = cx + w / 2, z0 = cz - d / 2, z1 = cz + d / 2;
+  g4Plane(floorMat, x0, z0, x1, z1, y0 + 0.01, 2, ft); g4Box(M.plain, cx, y0 - 0.2, cz, w + 0.6, 0.4, d + 0.6, 0x2a2a2a);
+  g4Box(M.plain, cx, y0 + h + 0.1, cz, w + 0.6, 0.2, d + 0.6, ct);
+  g4Box(M.plain, cx, y0 + h / 2, z0 - 0.1, w + 0.4, h, 0.2, wt); g4Box(M.plain, cx, y0 + h / 2, z1 + 0.1, w + 0.4, h, 0.2, wt);
+  g4Box(M.plain, x0 - 0.1, y0 + h / 2, cz, 0.2, h, d, wt); g4Box(M.plain, x1 + 0.1, y0 + h / 2, cz, 0.2, h, d, wt);
+  for (const [a, b, c, e] of [[x0, z0 + 0.02, x1, z0 + 0.04], [x0, z1 - 0.04, x1, z1 - 0.02]]) g4Box(M.plain, (a + c) / 2, y0 + 0.06, (b + e) / 2, c - a, 0.12, 0.04, 0x3a2a22);
+  g4Solid(x0 - 0.6, z0 - 0.6, x1 + 0.6, z1 + 0.6, y0 - 0.4, y0); addDeck(x0, x1, z0, z1, y0);
+  g4Solid(x0 - 0.4, z0 - 0.4, x1 + 0.4, z0, y0, y0 + h); g4Solid(x0 - 0.4, z1, x1 + 0.4, z1 + 0.4, y0, y0 + h); g4Solid(x0 - 0.4, z0, x0, z1, y0, y0 + h); g4Solid(x1, z0, x1 + 0.4, z1, y0, y0 + h);
+  // дверь изнутри и табличка «выход»
+  const [dx, dz] = T.door; g4Box(M.plain, cx + dx, y0 + 1.08, cz + dz - 0.1, 1.05, 2.16, 0.08, 0x5a3a2a); g4Box(M.metal, cx + dx + 0.38, y0 + 1.05, cz + dz - 0.16, 0.06, 0.06, 0.08, 0xd8c070);
+  g4Box(M.glow, cx + dx, y0 + 2.35, cz + dz - 0.12, 0.6, 0.18, 0.03, 0x2aff6a);
+  return { x0, x1, z0, z1, y0 };
+}
+function g4Bed(T, frame, sheet, blanket) {
+  const M = G4MAT, y0 = G4_IY, B = T.bed, bx = T.cx + B.x, bz = T.cz + B.z, wd = B.len > 2.15 ? 1.9 : 1.6;
+  g4Box(M.plain, bx, y0 + 0.2, bz, wd + 0.1, 0.4, B.len + 0.1, frame); g4Box(M.plain, bx, y0 + (B.top - 0.08), bz, wd, 0.16, B.len, sheet);
+  g4Box(M.plain, bx, y0 + B.top + 0.02, bz + B.len * 0.17, wd + 0.04, 0.06, B.len * 0.66, blanket);
+  for (const s of [-1, 1]) g4Box(M.plain, bx + s * wd * 0.24, y0 + B.top + 0.07, bz - B.len / 2 + 0.25, wd * 0.4, 0.14, 0.34, 0xffffff);
+  g4Box(M.plain, bx, y0 + 0.75, bz - B.len / 2 - 0.08, wd + 0.2, 1.2, 0.12, frame);
+  g4Solid(bx - wd / 2, bz - B.len / 2, bx + wd / 2, bz + B.len / 2, y0, y0 + B.top);
+}
+function g4Lamp2(x, y, z, col) { g4Box(G4MAT.plain, x, y - 0.25, z, 0.08, 0.5, 0.08, 0x2a2a2a); g4Cyl(G4MAT.glow, x, y + 0.08, z, 0.12, 0.2, 0.24, 10, col); }
+function g4SkyPanel(kind, x, y, z, ry, w, h) {
+  const c = makeCanvas(512, 256), g = c.getContext('2d');
+  if (kind === 'city') { const gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#0a0a2a'); gr.addColorStop(0.7, '#3a1a4a'); gr.addColorStop(1, '#ff6a4a'); g.fillStyle = gr; g.fillRect(0, 0, 512, 256); for (let i = 0; i < 26; i++) { const bw = rand(14, 40), bh = rand(50, 200), bx = rand(0, 500); g.fillStyle = '#0a0a14'; g.fillRect(bx, 256 - bh, bw, bh); for (let k = 0; k < bh / 9; k++) for (let j = 0; j < bw / 7; j++) if (Math.random() < 0.35) { g.fillStyle = pick(['#ffd88a', '#ff9ad8', '#9ae8ff']); g.fillRect(bx + 2 + j * 7, 256 - bh + 4 + k * 9, 3, 4); } } }
+  else { const gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#1a2a6a'); gr.addColorStop(0.55, '#ff9a6a'); gr.addColorStop(0.56, '#1a6a9a'); gr.addColorStop(1, '#0a3a5a'); g.fillStyle = gr; g.fillRect(0, 0, 512, 256); g.fillStyle = '#ffe0a0'; g.beginPath(); g.arc(380, 128, 26, 0, 7); g.fill(); for (let i = 0; i < 60; i++) { g.fillStyle = `rgba(255,220,160,${rand(0.2, 0.6)})`; g.fillRect(rand(300, 460), rand(146, 250), rand(8, 30), 2); } g.fillStyle = '#0a1a10'; for (let i = 0; i < 5; i++) { const px = 40 + i * 30; g.fillRect(px, 120, 4, 120); g.beginPath(); g.ellipse(px + 2, 118, 22, 8, 0.3, 0, 7); g.fill(); } }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t })); m.position.set(x, y, z); m.rotation.y = ry; addMesh(m); return m;
+}
+function g4BuildMotelInt() {
+  const T = G4_INT.motel, M = G4MAT, { cx, cz } = T, y0 = G4_IY; g4IntShell(T, M.tile, 0x9a4a5a, 0xd9c9a3, 0xe8e0d0);
+  for (const [x, z, sx, sz] of [[cx, cz - 3.97, 6.4, 0.04], [cx - 3.17, cz, 0.04, 8], [cx + 3.17, cz, 0.04, 8]]) g4Box(M.plain, x, y0 + 0.5, z, sx, 1.0, sz, 0x8a5a3a);
+  g4Bed(T, 0x6a4028, 0xf0ece0, 0x8a2a4a);
+  g4Box(M.wood, cx - 2.55, y0 + 0.28, cz - 3.4, 0.5, 0.56, 0.45, 0x8a5a3a); g4Lamp2(cx - 2.55, y0 + 1.0, cz - 3.4, 0xffd8a0);
+  g4Box(M.wood, cx + 2.75, y0 + 0.42, cz - 1.0, 0.55, 0.84, 1.6, 0x7a4a2a); g4Box(M.plain, cx + 2.8, y0 + 1.1, cz - 1.0, 0.4, 0.5, 0.66, 0x141416); g4Box(M.glow, cx + 2.58, y0 + 1.1, cz - 1.0, 0.02, 0.38, 0.54, 0x4a6aaa);
+  g4Box(M.plain, cx + 2.75, y0 + 0.43, cz + 1.5, 0.55, 0.86, 0.55, 0xf0f0f0); g4Box(M.plain, cx + 1.5, y0 + 0.45, cz + 2.3, 0.5, 0.9, 0.5, 0x5a3a2a);
+  g4Solid(cx + 2.45, cz - 1.8, cx + 3.2, cz + 1.8, y0, y0 + 0.9);
+  // окно с жалюзи: снаружи мигает неон
+  for (let i = 0; i < 6; i++) g4Box(i % 2 ? M.plain : M.glow, cx - 3.16, y0 + 1.15 + i * 0.16, cz + 0.6, 0.03, 0.12, 1.4, i % 2 ? 0xd8d0c0 : 0xff5a8a);
+  g4Box(M.metal, cx + 2.6, y0 + 0.35, cz - 3.55, 0.6, 0.7, 0.5, 0x3a3a42); g4Box(M.glow, cx + 2.6, y0 + 0.55, cz - 3.29, 0.18, 0.1, 0.02, 0x2aff6a); g4Solid(cx + 2.3, cz - 3.8, cx + 2.9, cz - 3.3, y0, y0 + 0.7);
+  g4Cyl(M.glow, cx, y0 + 2.95, cz, 0.35, 0.35, 0.08, 14, 0xfff0d0);
+}
+function g4BuildFlatInt() {
+  const T = G4_INT.flat, M = G4MAT, { cx, cz } = T, y0 = G4_IY; g4IntShell(T, M.wood, 0xc89a68, 0xe8e0d4, 0xf0ece8);
+  g4Box(M.plain, cx, y0 + 1.6, cz - 4.48, 10, 3.2, 0.04, 0xb8644a); for (let i = -2; i <= 2; i++) g4Box(M.wood, cx + i * 2, y0 + 3.05, cz, 0.18, 0.2, 9, 0x6a4a30);
+  g4SkyPanel('city', cx - 4.97, y0 + 1.7, cz + 0.2, Math.PI / 2, 6.2, 2.2); g4Box(M.plain, cx - 4.95, y0 + 0.55, cz + 0.2, 0.08, 0.1, 6.4, 0x2a2a2a);
+  g4Bed(T, 0x3a3a42, 0xf4f0ea, 0x2a4a7a);
+  g4Box(M.plain, cx - 0.5, y0 + 0.25, cz + 0.6, 3.2, 0.5, 1.0, 0x5a6a7a); g4Box(M.plain, cx - 0.5, y0 + 0.65, cz + 1.05, 3.2, 0.5, 0.2, 0x5a6a7a); g4Box(M.plain, cx - 0.5, y0 + 0.2, cz - 0.6, 1.4, 0.4, 0.7, 0x3a2a22); g4Plane(M.plain, cx - 2.4, cz - 1.6, cx + 1.4, cz + 1.8, y0 + 0.02, 2, 0x3a4a6a);
+  g4Solid(cx - 2.1, cz + 0.1, cx + 1.1, cz + 1.15, y0, y0 + 0.5);
+  g4Box(M.plain, cx + 4.92, y0 + 1.4, cz + 1.2, 0.06, 1.0, 1.8, 0x0c0c10); g4Box(M.glow, cx + 4.88, y0 + 1.4, cz + 1.2, 0.02, 0.9, 1.7, 0x3a5aaa);
+  g4Box(M.plain, cx + 3.3, y0 + 0.5, cz + 3.6, 3.0, 1.0, 0.7, 0xf0f0f0); g4Box(M.metal, cx + 3.3, y0 + 1.02, cz + 3.6, 3.1, 0.05, 0.75, 0x9a9aa0); g4Solid(cx + 1.8, cz + 3.25, cx + 4.8, cz + 3.95, y0, y0 + 1.0);
+  g4Box(M.wood, cx - 4.2, y0 + 1.1, cz - 3.9, 1.3, 2.2, 0.6, 0x8a6a4a); g4Box(M.metal, cx - 4.2, y0 + 1.1, cz - 3.58, 0.03, 2.0, 0.02, 0xd8c070); g4Solid(cx - 4.85, cz - 4.2, cx - 3.55, cz - 3.6, y0, y0 + 2.2);
+  for (const [x, z] of [[cx - 4.4, cz + 3.8], [cx + 1.4, cz - 4.0]]) { g4Cyl(M.plain, x, y0 + 0.25, z, 0.25, 0.2, 0.5, 8, 0x8a5a3a); g4Add(M.plain, new THREE.IcosahedronGeometry(0.5, 0).translate(x, y0 + 0.95, z), 0x3a7a3a); }
+  g4Lamp2(cx + 1.8, y0 + 1.0, cz - 3.9, 0xffe0b0); g4Cyl(M.glow, cx - 1, y0 + 3.15, cz, 0.3, 0.3, 0.06, 12, 0xfff0d8);
+}
+function g4BuildVillaInt() {
+  const T = G4_INT.villa, M = G4MAT, { cx, cz } = T, y0 = G4_IY; g4IntShell(T, M.tile, 0xf2efe8, 0xf7f4ee, 0xffffff);
+  g4SkyPanel('ocean', cx - 1, y0 + 2.0, cz - 5.47, 0, 11.5, 3.4); for (const x of [-6.8, -1, 4.8]) g4Box(M.metal, cx + x, y0 + 2.0, cz - 5.42, 0.12, 3.6, 0.08, 0xe0b860);
+  for (const z of [-5.45, 5.45]) g4Box(M.metal, cx, y0 + 3.85, cz + z * 0.995, 14, 0.06, 0.04, 0xe0b860);
+  g4Bed(T, 0xf0ece4, 0xffffff, 0xe0b860); g4Box(M.metal, cx + 4.6, y0 + 1.45, cz - 4.05, 2.4, 0.08, 0.14, 0xe0b860);
+  for (const [x, z, ry] of [[-2.2, -1.6, 0], [-2.2, 1.4, Math.PI]]) { g4Box(M.plain, cx + x, y0 + 0.25, cz + z, 3.2, 0.5, 1.0, 0xfafafa); g4Box(M.plain, cx + x, y0 + 0.62, cz + z + (ry ? 0.42 : -0.42), 3.2, 0.5, 0.18, 0xfafafa); g4Solid(cx + x - 1.6, cz + z - 0.5, cx + x + 1.6, cz + z + 0.5, y0, y0 + 0.5); }
+  g4Box(M.metal, cx - 2.2, y0 + 0.35, cz - 0.1, 1.6, 0.05, 0.9, 0x9ad8ff); for (const s of [-1, 1]) g4Box(M.metal, cx - 2.2 + s * 0.7, y0 + 0.17, cz - 0.1, 0.06, 0.34, 0.8, 0xe0b860);
+  g4Box(M.plain, cx + 5.9, y0 + 0.55, cz + 2.2, 0.8, 1.1, 3.2, 0x1a1a1e); g4Box(M.metal, cx + 5.9, y0 + 1.12, cz + 2.2, 0.85, 0.05, 3.3, 0xe0b860); g4Solid(cx + 5.5, cz + 0.6, cx + 6.3, cz + 3.8, y0, y0 + 1.1);
+  for (let i = 0; i < 9; i++) g4Cyl(M.glow, cx + 6.75, y0 + 1.5 + (i % 3) * 0.45, cz + 1.2 + Math.floor(i / 3) * 0.7, 0.05, 0.05, 0.3, 6, pick([0xff4a6a, 0x4affaa, 0xffd04a, 0x8a6aff]));
+  g4Box(M.plain, cx + 1.6, y0 + 0.5, cz + 2.8, 1.6, 0.95, 1.2, 0x0a0a0c); g4Box(M.plain, cx + 1.6, y0 + 1.05, cz + 2.5, 1.6, 0.05, 0.6, 0x0a0a0c); g4Solid(cx + 0.8, cz + 2.2, cx + 2.4, cz + 3.4, y0, y0 + 1.0);
+  // картина с сейфом за ней
+  { const c = makeCanvas(256, 192), g = c.getContext('2d'); for (let i = 0; i < 14; i++) { g.fillStyle = `hsl(${rand(0, 360)},80%,${rand(40, 70)}%)`; g.beginPath(); g.arc(rand(0, 256), rand(0, 192), rand(14, 60), 0, 7); g.fill(); } const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const m = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.2), new THREE.MeshBasicMaterial({ map: t })); m.position.set(cx - 6.94, y0 + 1.7, cz - 1.0); m.rotation.y = Math.PI / 2; addMesh(m); g4Box(M.metal, cx - 6.96, y0 + 1.7, cz - 1.0, 0.04, 1.32, 1.72, 0xe0b860); }
+  g4Lamp2(cx + 3.0, y0 + 1.0, cz - 4.0, 0xffe0b0); g4Lamp2(cx + 6.2, y0 + 1.0, cz - 4.0, 0xffe0b0);
+  for (const [x, z] of [[-6.2, 4.6], [6.2, -4.8]]) { g4Cyl(M.plain, cx + x, y0 + 0.35, cz + z, 0.3, 0.25, 0.7, 10, 0xf0f0f0); g4Add(M.plain, new THREE.ConeGeometry(0.5, 1.6, 7).translate(cx + x, y0 + 1.5, cz + z), 0x2a6a3a); }
+  for (const z of [-2.5, 2.5]) g4Cyl(M.glow, cx + z * 1.6, y0 + 3.95, cz, 0.45, 0.45, 0.06, 16, 0xfff4e0);
+}
+function g4BuildClubInt() {
+  const T = G4_INT.club, M = G4MAT, { cx, cz, w, d, h } = T, y0 = G4_IY; g4IntShell(T, M.metal, 0x141418, 0x0c0c12, 0x08080a);
+  const cols = [0xff3aa0, 0x2af0ff, 0x9a5aff, 0xffe04a];
+  for (const yy of [1.2, 4.6]) { g4Box(M.glow, cx, y0 + yy, cz - d / 2 + 0.03, w, 0.08, 0.04, cols[yy > 2 ? 0 : 1]); g4Box(M.glow, cx - w / 2 + 0.03, y0 + yy, cz, 0.04, 0.08, d, cols[yy > 2 ? 2 : 0]); g4Box(M.glow, cx + w / 2 - 0.03, y0 + yy, cz, 0.04, 0.08, d, cols[yy > 2 ? 1 : 2]); }
+  for (let i = -2; i <= 2; i++) g4Box(M.metal, cx + i * 4, y0 + 5.6, cz, 0.25, 0.25, d, 0x2a2a30); g4Box(M.metal, cx, y0 + 5.6, cz - 2, w, 0.25, 0.25, 0x2a2a30); g4Box(M.metal, cx, y0 + 5.6, cz + 3, w, 0.25, 0.25, 0x2a2a30);
+  // сцена и диджейский пульт
+  g4Box(M.plain, cx, y0 + 0.3, cz - 7.4, 9, 0.6, 3.0, 0x1a1a22); g4Box(M.glow, cx, y0 + 0.62, cz - 5.88, 9, 0.04, 0.04, 0xff3aa0); g4Solid(cx - 4.5, cz - 8.9, cx + 4.5, cz - 5.9, y0, y0 + 0.6); addDeck(cx - 4.5, cx + 4.5, cz - 8.9, cz - 5.9, y0 + 0.6);
+  g4Box(M.plain, cx, y0 + 1.1, cz - 6.6, 2.6, 1.0, 0.8, 0x0a0a0c); g4Box(M.glow, cx, y0 + 1.1, cz - 6.19, 2.5, 0.06, 0.02, 0x2af0ff); for (const s of [-0.7, 0.7]) g4Cyl(M.glow, cx + s, y0 + 1.62, cz - 6.6, 0.22, 0.22, 0.03, 16, 0x9a5aff);
+  for (const s of [-1, 1]) { g4Box(M.plain, cx + s * 6.2, y0 + 1.6, cz - 7.6, 1.6, 3.2, 1.4, 0x0a0a0c); for (const yy of [0.8, 2.2]) g4Cyl(M.plain, cx + s * 6.2, y0 + yy, cz - 6.88, 0.5, 0.5, 0.06, 16, 0x2a2a30); g4Solid(cx + s * 6.2 - 0.8, cz - 8.3, cx + s * 6.2 + 0.8, cz - 6.9, y0, y0 + 3.2); }
+  // бар
+  g4Box(M.plain, cx + 8.4, y0 + 0.55, cz + 2.5, 0.8, 1.1, 8, 0x1a1a22); g4Box(M.glow, cx + 7.98, y0 + 0.2, cz + 2.5, 0.02, 0.08, 8, 0x9a5aff); g4Box(M.metal, cx + 8.4, y0 + 1.12, cz + 2.5, 0.9, 0.05, 8.1, 0xd0d0d8); g4Solid(cx + 8.0, cz - 1.5, cx + 8.8, cz + 6.5, y0, y0 + 1.1);
+  for (let i = 0; i < 18; i++) g4Cyl(M.glow, cx + 9.8, y0 + 1.5 + (i % 3) * 0.5, cz - 1 + Math.floor(i / 3) * 1.2, 0.05, 0.05, 0.32, 6, pick([0xff4a6a, 0x4affaa, 0xffd04a, 0x8a6aff, 0x4ac8ff]));
+  // VIP-диваны
+  for (const z of [-3, 1.5, 6]) { g4Box(M.plain, cx - 9.2, y0 + 0.3, cz + z, 1.0, 0.6, 2.8, 0x8a1a3a); g4Box(M.plain, cx - 9.6, y0 + 0.8, cz + z, 0.3, 0.8, 2.8, 0x8a1a3a); g4Box(M.glow, cx - 8.1, y0 + 0.5, cz + z, 0.6, 0.04, 0.6, 0xffe04a); g4Solid(cx - 9.8, cz + z - 1.4, cx - 8.7, cz + z + 1.4, y0, y0 + 0.6); }
+  G4M.pois.club = { x: G4RT.clubOut ? G4RT.clubOut.x : 134, z: G4RT.clubOut ? G4RT.clubOut.z : -10, name: 'Клуб «Неон» (танцпол)', ic: '🪩' };
+}
+// динамика клуба: LED-пол, диско-шар, лучи, экран за диджеем
+function g4ClubDyn() {
+  if (G4RT.dyn.club) return; const T = G4_INT.club, { cx, cz } = T, y0 = G4_IY, D = G4RT.dyn.club = {};
+  const g = new THREE.BoxGeometry(1.06, 0.06, 1.06), m = new THREE.MeshBasicMaterial({ color: 0xffffff }); D.floor = new THREE.InstancedMesh(g, m, 64); const o = new THREE.Object3D();
+  for (let i = 0; i < 64; i++) { o.position.set(cx - 3.85 + (i % 8) * 1.1, y0 + 0.035, cz + 0.5 - 3.85 + Math.floor(i / 8) * 1.1); o.updateMatrix(); D.floor.setMatrixAt(i, o.matrix); D.floor.setColorAt(i, new THREE.Color(0x222222)); }
+  addMesh(D.floor);
+  D.ball = new THREE.Mesh(new THREE.IcosahedronGeometry(0.55, 1), new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: 0.12, flatShading: true, emissive: 0x222222 })); D.ball.position.set(cx, y0 + 4.9, cz + 0.5); addMesh(D.ball);
+  D.beams = []; for (let i = 0; i < 4; i++) { const b = new THREE.Mesh(new THREE.ConeGeometry(0.9, 5.2, 12, 1, true).translate(0, -2.6, 0), new THREE.MeshBasicMaterial({ color: [0xff3aa0, 0x2af0ff, 0x9a5aff, 0xffe04a][i], transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); b.position.set(cx + (i - 1.5) * 4, y0 + 5.5, cz - 2); addMesh(b); D.beams.push(b); }
+  const c = makeCanvas(256, 96); D.scr = { c, t: new THREE.CanvasTexture(c) }; D.scr.t.colorSpace = THREE.SRGBColorSpace; const s = new THREE.Mesh(new THREE.PlaneGeometry(7, 2.6), new THREE.MeshBasicMaterial({ map: D.scr.t })); s.position.set(cx, y0 + 3.6, cz - 8.9); addMesh(s);
+}
+function g4ClubDynTick(dt) {
+  const D = G4RT.dyn.club; if (!D) return; const bt = g4BeatNow(), beat = Math.floor(bt), ph = bt - beat, t = G4.time;
+  if (D.lastB !== beat) { D.lastB = beat; const pal = [0xff3aa0, 0x2af0ff, 0x9a5aff, 0xffe04a, 0x3aff8a], c = new THREE.Color(); const mode = Math.floor(beat / 8) % 3;
+    for (let i = 0; i < 64; i++) { const x = i % 8, z = Math.floor(i / 8); let on = mode === 0 ? (x + z + beat) % 2 === 0 : mode === 1 ? Math.abs(x - 3.5) + Math.abs(z - 3.5) < ((beat % 4) + 1) * 1.3 : Math.random() < 0.45; c.setHex(on ? pal[(x * 3 + z + beat) % pal.length] : 0x18181c); D.floor.setColorAt(i, c); }
+    D.floor.instanceColor.needsUpdate = true; }
+  D.ball.rotation.y += dt * 0.8; D.beams.forEach((b, i) => { b.rotation.z = Math.sin(t * 0.9 + i * 1.7) * 0.5; b.rotation.x = Math.cos(t * 0.7 + i) * 0.4; b.material.opacity = 0.1 + 0.12 * (1 - ph); });
+  if ((D.st = (D.st || 0) - dt) < 0) { D.st = 0.08; const g = D.scr.c.getContext('2d'); g.fillStyle = '#05030a'; g.fillRect(0, 0, 256, 96); for (let i = 0; i < 32; i++) { const hgt = (0.25 + 0.75 * Math.abs(Math.sin(t * 3 + i * 0.6)) * (1 - ph * 0.6)) * 80; g.fillStyle = `hsl(${(i * 11 + t * 60) % 360},90%,60%)`; g.fillRect(i * 8, 92 - hgt, 6, hgt); } g.fillStyle = '#fff'; g.font = '900 22px sans-serif'; g.textAlign = 'center'; g.fillText('НЕОН', 128, 26); D.scr.t.needsUpdate = true; }
+}
+// входы в городе: дверь, козырёк, номер, фонарь
+function g4DoorFront(x, z, ox, oz, label, col) {
+  const M = G4MAT, ry = Math.atan2(ox, oz); g4Box(M.plain, x + ox * 0.06, 1.12, z + oz * 0.06, Math.abs(oz) > 0.5 ? 1.1 : 0.12, 2.24, Math.abs(oz) > 0.5 ? 0.12 : 1.1, 0x5a3a2a);
+  g4Box(M.glow, x + ox * 0.1, 2.36, z + oz * 0.1, Math.abs(oz) > 0.5 ? 1.3 : 0.06, 0.06, Math.abs(oz) > 0.5 ? 0.06 : 1.3, col);
+  g4Box(M.plain, x + ox * 0.6, 2.65, z + oz * 0.6, Math.abs(oz) > 0.5 ? 1.8 : 1.2, 0.1, Math.abs(oz) > 0.5 ? 1.2 : 1.8, 0x2a2a30);
+  g4Sign(label, x + ox * 0.08, 2.95, z + oz * 0.08, ry, 1.4, 0.45, { bg: '#0c0c12', fg: '#' + col.toString(16).padStart(6, '0'), lit: true, glow: true });
+}
+// мотель «Закат»: одноэтажный корпус на 6 номеров, навес, парковка, неон на столбах
+function g4MotelZakat() {
+  const M = G4MAT, x0 = -212, x1 = -184, z0 = 12, z1 = 20, h = 3.4;
+  G4M.trees = G4M.trees.filter((t) => !(t.x > x0 - 4 && t.x < x1 + 4 && t.z > 2 && t.z < z1 + 4)); G4M.palms = G4M.palms.filter((t) => !(t.x > x0 - 4 && t.x < x1 + 4 && t.z > 2 && t.z < z1 + 4));
+  g4Box(M.plain, (x0 + x1) / 2, h / 2, (z0 + z1) / 2, x1 - x0, h, z1 - z0, 0xe8b888); g4Solid(x0, z0, x1, z1, 0, h);
+  g4Box(M.plain, (x0 + x1) / 2, h + 0.15, (z0 + z1) / 2 - 0.9, x1 - x0 + 1, 0.3, z1 - z0 + 3.2, 0x8a3a2a);
+  for (let i = 0; i < 7; i++) g4Cyl(M.plain, x0 + i * (x1 - x0) / 6, h / 2, z0 - 2.2, 0.1, 0.1, h, 6, 0xf0f0f0);
+  g4Plane(M.walk, x0, z0 - 2.4, x1, z0, 0.04, 2, 0xd8c8b8); g4Plane(M.asph, x0, 4.6, x1, z0 - 2.4, 0.032, 6, 0x9a9a9a);
+  for (let i = 0; i < 6; i++) { const x = x0 + 3 + i * 4.6; g4Box(M.plain, x, 1.1, z0 - 0.06, 1.0, 2.2, 0.1, i === 3 ? 0x6a2a3a : 0x8a6a4a); g4Box(M.glow, x + 0.9, 1.4, z0 - 0.04, 0.9, 0.7, 0.03, i % 2 ? 0xffd890 : 0x3a3a40); g4Sign(String(i + 1), x, 2.45, z0 - 0.08, Math.PI, 0.4, 0.32, { bg: '#1a1010', fg: i === 3 ? '#ff9a4a' : '#d8c8a8', lit: true }); g4Box(M.plain, x, 0.01, z0 - 6, 0.12, 0.02, 4.5, 0xf0f0f0); }
+  for (const s of [-1, 1]) g4Cyl(M.plain, -198 + s * 3.5, 3.5, 6.2, 0.12, 0.12, 7, 6, 0x3a3a40);
+  g4Sign('МОТЕЛЬ «ЗАКАТ»', -198, 6.8, 6.2, Math.PI, 8, 1.5, { bg: '#1a0a14', fg: '#ff8a3a', lit: true, glow: true, sub: 'есть свободные номера' });
+  g4Box(M.glow, -198, 5.9, 6.2, 7.6, 0.1, 0.1, 0xff3aa0);
+  return { x: x0 + 3 + 3 * 4.6, z: z0 - 0.02, ox: 0, oz: -1 };
+}
+function g4RentBuild() {
+  G4RT.dyn = {}; G4RT.clubOut = null;
+  try { g4BuildMotelInt(); g4BuildFlatInt(); g4BuildVillaInt(); } catch (e) { console.warn('rent int', e); }
+  const doors = {}; try { doors.zakat = g4MotelZakat(); } catch (e) { console.warn('zakat', e); }
+  const mel = G4M.pois.melodie; if (mel) doors.priboj = { x: mel.x - 3 + 0.02, z: mel.z - 5, ox: 1, oz: 0 };
+  doors.studio = { x: -151.02, z: 21, ox: -1, oz: 0 }; doors.house = { x: -145.02, z: -262.5, ox: -1, oz: 0 };
+  const vl = G4M.lots.find((l) => l.x0 > 400 && l.kind === 'house'); doors.villa = vl ? { x: (vl.x0 + vl.x1) / 2 + 7, z: vl.z1 + 0.02, ox: 0, oz: 1 } : { x: 431, z: -274.9, ox: 0, oz: 1 };
+  for (const R of G4_RENTS) { const D = doors[R.id]; R.door = D || null; if (!D || R.id === 'zakat') continue; try { g4DoorFront(D.x, D.z, D.ox, D.oz, R.id === 'priboj' ? '7 · АРЕНДА' : 'АРЕНДА', R.neon || 0xffd04a); } catch (e) {} }
+  // клуб: вход на фасаде квартала Ар-деко, со стороны Главной улицы
+  G4RT.clubOut = { x: 134, z: -11.98, ox: 0, oz: 1 };
+  try { const D = G4RT.clubOut; g4Box(G4MAT.plain, D.x, 1.5, D.z + 0.1, 3.2, 3.0, 0.2, 0x0a0a0c); g4Box(G4MAT.glow, D.x, 3.15, D.z + 0.12, 3.6, 0.14, 0.06, 0xff3aa0); for (const s of [-1, 1]) g4Box(G4MAT.glow, D.x + s * 1.75, 1.6, D.z + 0.12, 0.08, 3.1, 0.06, 0x2af0ff); g4Sign('НЕОН', D.x, 4.0, D.z + 0.14, 0, 4.2, 1.2, { bg: '#0a0610', fg: '#ff5ab4', lit: true, glow: true, sub: 'клуб · танцпол · бар' }); for (const s of [-1, 1]) { g4Cyl(G4MAT.metal, D.x + s * 2.6, 0.5, D.z + 1.4, 0.06, 0.06, 1.0, 8, 0xd8c070); } g4Box(G4MAT.plain, D.x, 0.95, D.z + 1.4, 5.2, 0.06, 0.06, 0xb0142a); g4BuildClubInt(); } catch (e) { console.warn('club', e); }
+  G4M.pois.motel_zakat = { x: -195, z: 8, name: 'Мотель «Закат» (аренда)', ic: '🌅' };
+}
+{ const _ge1 = g4Elite; g4Elite = function () { _ge1(); try { g4RentBuild(); } catch (e) { console.warn('rent', e); } }; }
+/* ===================== вход / выход ===================== */
+function g4Fade(on, ms = 450) { let el = document.getElementById('g4Fade'); if (!el) { el = document.createElement('div'); el.id = 'g4Fade'; el.style.cssText = 'position:fixed;inset:0;background:#000;z-index:90;pointer-events:none;opacity:0;transition:opacity .45s'; document.body.appendChild(el); } el.style.transition = `opacity ${ms}ms`; el.style.opacity = on ? '1' : '0'; }
+function g4Enter(R, kind) {
+  if (TS.wl.stars) { toast('🚨 Сначала оторвитесь от полиции'); return; } if (G4RT.inside) return;
+  const T = G4_INT[kind]; g4Fade(true); Sound.click && Sound.click(600, 0.2); g4Sfx('clunk', 0.5);
+  later(0.45, () => { G4RT.inside = { R, kind, T }; player.pos.set(T.cx + T.exit[0], G4_IY + 0.02, T.cz + T.exit[1]); player.vel.set(0, 0, 0); player.yaw = 0; player.pitch = -0.05; G4RT.lt = ''; if (kind === 'club') g4ClubIn(); later(0.2, () => g4Fade(false)); if (R && R.name) g4Note(`🔑 ${R.name}${T.bed ? ' · кровать — сон и сохранение, тайник — для вещей' : ''}`); });
+}
+function g4Exit2() {
+  const I = G4RT.inside; if (!I) return; const D = I.kind === 'club' ? G4RT.clubOut : I.R && I.R.door; if (!D) return; g4Fade(true); g4Sfx('clunk', 0.5);
+  later(0.45, () => { if (I.kind === 'club') g4ClubOut(); G4RT.inside = null; player.pos.set(D.x + D.ox * 1.3, 0.02, D.z + D.oz * 1.3); player.vel.set(0, 0, 0); player.yaw = Math.atan2(-D.ox, -D.oz); g4RentLights(''); later(0.2, () => g4Fade(false)); });
+}
+// свет внутри: четыре общие лампы
+function g4RentLights(mode) {
+  if (mode === G4RT.lt) return; G4RT.lt = mode; const set = (i, col, x, y, z, dist) => { const l = lamps[i]; if (!l) return; l.color.setHex(col); l.distance = dist; l.position.set(x, y, z); };
+  const I = G4RT.inside, y = G4_IY;
+  if (!mode || !I) { MAPS.coral.lamp[1] = 0; for (let i = 0; i < 4; i++) if (lamps[i]) lamps[i].position.set(0, -50, 0); return; }
+  const { cx, cz } = I.T, n = (I.R && I.R.neon) || 0xff5a8a;
+  if (mode === 'motel') { MAPS.coral.lamp[1] = 120; set(0, 0xffd8a8, cx, y + 2.6, cz, 9); set(1, 0xffb070, cx - 2.5, y + 1.3, cz - 3.2, 5); set(2, n, cx - 2.8, y + 1.6, cz + 0.6, 6); set(3, 0x6a8aff, cx + 2.2, y + 1.3, cz - 1.0, 4); }
+  else if (mode === 'flat') { MAPS.coral.lamp[1] = 140; set(0, 0xffe8c8, cx - 1, y + 3.0, cz, 12); set(1, 0xffc890, cx + 2.5, y + 1.4, cz - 3.0, 7); set(2, 0xff8ad8, cx - 4.4, y + 1.8, cz + 0.2, 8); set(3, 0x8ab0ff, cx + 4.3, y + 1.4, cz + 1.2, 5); }
+  else if (mode === 'villa') { MAPS.coral.lamp[1] = 170; set(0, 0xfff4e0, cx - 4, y + 3.8, cz, 16); set(1, 0xfff4e0, cx + 4, y + 3.8, cz, 16); set(2, 0xffc890, cx, y + 2.2, cz - 4.5, 12); set(3, 0xffe0b0, cx + 4.6, y + 1.3, cz - 3.0, 7); }
+  else if (mode === 'club') { MAPS.coral.lamp[1] = 220; for (let i = 0; i < 4; i++) set(i, [0xff3aa0, 0x2af0ff, 0x9a5aff, 0xffe04a][i], cx + (i - 1.5) * 4, y + 4.5, cz, 16); }
+}
+/* ===================== аренда: панель, продление, истечение ===================== */
+function g4RentUI(R) {
+  const on = g4RentOn(R.id), S = G4.S, left = on ? S.rent[R.id] - G4.day + 1 : 0;
+  const items = [[1, 1], [3, 2.8], [7, 6]].map(([d, k]) => ({ id: 'd' + d, name: `${on ? 'Продлить' : 'Снять'} на ${d} ${d === 1 ? 'день' : 'дня'}`.replace('7 дня', '7 дней'), ic: d === 7 ? '🗓' : '🔑', price: Math.round(R.price * k), desc: d === 7 ? 'неделя со скидкой' : d === 3 ? 'выгоднее на 7%' : 'сегодня и завтра до полуночи', days: d }));
+  if (on) items.unshift({ id: 'in', name: 'Войти', ic: '🚪', np: 1, desc: `оплачено ещё ${left} ${left === 1 ? 'день' : 'дн.'}` });
+  g4ShopPanel(`${R.ic} ${R.name}`, `${R.desc} · $${R.price}/сутки. Внутри: кровать (сон, лечение, сохранение) и тайник для оружия, добычи и наличных.`, items, (o) => {
+    if (o.id === 'in') { g4ShopClose(); g4Enter(R, R.kind); return; }
+    S.rent = S.rent || {}; const base = Math.max(G4.day, S.rent[R.id] || 0); S.rent[R.id] = base + o.days; g4Tx(-o.price, 'Аренда: ' + R.name); Sound.chime && Sound.chime(); g4Sfx('ding', 0.7);
+    toast(`🔑 ${R.name}: оплачено до дня ${S.rent[R.id]} · ключ у вас`); g4ShopClose(); g4Enter(R, R.kind);
+  });
+}
+function g4RentDayTick() {
+  const S = G4.S; if (!S || G4RT.dayChk === G4.day) return; const prev = G4RT.dayChk; G4RT.dayChk = G4.day; if (prev < 0 || !S.rent) return;
+  for (const R of G4_RENTS) if (S.rent[R.id] === G4.day - 1) g4Note(`🔑 Аренда «${R.name}» закончилась. Вещи ждут в тайнике — продлите в приложении «Аренда»`, 5);
+}
+G4_APP_FN.rent = () => {
+  const S = G4.S, rows = G4_RENTS.map((R) => { const on = g4RentOn(R.id), st = g4Stash(R.id), n = st.w.length + st.loot.length; return `<div class="it"><b>${R.ic} ${R.name}</b><small>${R.desc}</small><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px"><span style="color:${on ? '#5aff8a' : '#ffb06a'}">${on ? `✓ ваше до дня ${S.rent[R.id]}` : `$${R.price}/сутки`}</span>${n || st.cash ? `<span>🧳 ${n} предм. · $${g4Fmt(st.cash)}</span>` : ''}<button class="b g" data-w="${R.id}">📍 Метка</button>${on ? `<button class="b" data-x="${R.id}">+1 день · $${R.price}</button>` : ''}</div></div>`; }).join('');
+  return { html: `<div class="it"><b>🔑 Аренда жилья</b><small>Мотели и квартиры посуточно. Снять — у двери. Продлить можно отсюда.</small></div>${rows}<div class="it"><b>🪩 Клуб «Неон»</b><small>Главная улица, Ар-деко. Танцпол с ритм-игрой, бар.</small><div class="row"><button class="b g" data-w="club">📍 Метка</button></div></div>`,
+    after(el) { for (const b of el.querySelectorAll('[data-w]')) b.onclick = () => { const id = b.dataset.w; if (id === 'club') { const D = G4RT.clubOut; g4SetWaypoint(D.x, D.z + 2, 'Клуб «Неон»'); return; } const R = G4_RENTS.find((q) => q.id === id); if (R && R.door) g4SetWaypoint(R.door.x + R.door.ox * 2, R.door.z + R.door.oz * 2, R.name); };
+      for (const b of el.querySelectorAll('[data-x]')) b.onclick = () => { const R = G4_RENTS.find((q) => q.id === b.dataset.x); if (!R) return; if (!g4Pay(R.price)) { toast('💸 Не хватает денег'); return; } S.rent[R.id] = Math.max(G4.day, S.rent[R.id] || 0) + 1; g4Tx(-R.price, 'Аренда: ' + R.name); toast(`🔑 Продлено до дня ${S.rent[R.id]}`); g4PhoneApp('rent'); }; } };
+};
+G4_APPS.push(['rent', '🔑', 'Аренда']);
+/* ===================== тайник ===================== */
+function g4StashUI(id, title) {
+  const S = G4.S, st = g4Stash(id), carried = tsArsAll(), bag = S.loot || [], cashHand = S.cash;
+  const nm = (w) => (tsArsDef(w.id) || { name: w.id }).name + (w.sil ? ' (глушитель)' : '');
+  const items = [
+    { id: 'c+', name: `Положить наличные ($${g4Fmt(Math.min(cashHand, 1000))})`, ic: '💵', np: 1, dis: cashHand < 1, desc: `в тайнике $${g4Fmt(st.cash)}` },
+    { id: 'c++', name: 'Положить все наличные', ic: '💰', np: 1, dis: cashHand < 1 },
+    { id: 'c-', name: `Забрать наличные ($${g4Fmt(st.cash)})`, ic: '💸', np: 1, dis: st.cash < 1 },
+    ...carried.map((it, i) => ({ id: 'wp' + i, name: '⬇ Положить: ' + it.D.name + (it.sil && it.id !== 'legend' ? ' (глушитель)' : ''), ic: it.id === 'legend' ? '🌟' : '🔫', np: 1, it })),
+    ...st.w.map((w, i) => ({ id: 'wt' + i, name: '⬆ Взять: ' + nm(w), ic: w.id === 'legend' ? '🌟' : '🔫', np: 1, w, i })),
+    ...bag.map((L, i) => ({ id: 'lp' + i, name: `⬇ В тайник: ${L.n}`, ic: '🎒', np: 1, desc: `~$${g4Fmt(L.v)} · ${L.w} кг`, L, li: i })),
+    ...st.loot.map((L, i) => ({ id: 'lt' + i, name: `⬆ Забрать: ${L.n}`, ic: '📦', np: 1, desc: `~$${g4Fmt(L.v)}`, L2: L, i })),
+  ];
+  g4ShopPanel(title || '🧳 Тайник', 'Полиция сюда не заглянет. Всё хранится, даже если аренда закончится.', items, (o) => {
+    if (o.id === 'c+') { const v = Math.min(S.cash, 1000); S.cash -= v; st.cash += v; }
+    else if (o.id === 'c++') { st.cash += S.cash; S.cash = 0; }
+    else if (o.id === 'c-') { S.cash += st.cash; st.cash = 0; }
+    else if (o.it) { const it = o.it; if (TS.ars.hand === it) { try { tsArsStashNow(); } catch (e) {} } tsArsRemove(it); st.w.push({ id: it.id, ammo: it.ammo, res: it.res, sil: it.sil ? 1 : 0 }); tsArsAvatarSync(); tsArsHud(); }
+    else if (o.w) { const w = o.w, it = tsArsItem(w.id); it.ammo = w.ammo; it.res = w.res; it.sil = !!w.sil || w.id === 'legend'; const slot = tsArsSlotFor(it); if (!slot) { toast('🎒 Нет места'); return; } tsArsPut(it, slot); st.w.splice(o.i, 1); }
+    else if (o.L) { bag.splice(o.li, 1); st.loot.push(o.L); }
+    else if (o.L2) { if (!g4AddLoot(o.L2.k, o.L2.n, o.L2.v, o.L2.w)) return; st.loot.splice(o.i, 1); }
+    g4Sfx('rustle', 0.5); g4ShopClose(); g4StashUI(id, title);
+  });
+  if (!G4A.clip) g4Clip('search', 99, { loop: true, hideGun: true, stash: true });
+}
+/* ===================== сон ===================== */
+function g4SleepMenu(T, R) {
+  if (TS.wl.stars) { toast('🚨 Не уснуть, пока ищет полиция'); return; }
+  const h = G4.tod, toMorning = h < 8 ? 8 - h : 32 - h;
+  g4ShopPanel('😴 Кровать', `Сейчас ${String(Math.floor(h)).padStart(2, '0')}:${String(Math.floor((h % 1) * 60)).padStart(2, '0')}. Сон лечит, восстанавливает Фокус и сохраняет игру.`, [
+    { id: 'm', name: 'Спать до утра (08:00)', ic: '🌅', np: 1, desc: `≈ ${Math.round(toMorning)} ч`, hrs: toMorning },
+    { id: '4', name: 'Вздремнуть 4 часа', ic: '😴', np: 1, hrs: 4 }, { id: '8', name: 'Поспать 8 часов', ic: '🛌', np: 1, hrs: 8 },
+    { id: '12', name: 'До вечера / 12 часов', ic: '🌙', np: 1, hrs: 12 }], (o) => { g4ShopClose(); g4Sleep(T, R, o.hrs); });
+}
+function g4Sleep(T, R, hrs) {
+  if (G4RT.sleep) return; const B = T.bed, y0 = G4_IY, bx = T.cx + B.x, bz = T.cz + B.z; if (G4A.clip) g4ClipEnd();
+  G4RT.sleep = { t: 0, hrs, T, R, from: G4.tod, done: false, bx, bz }; G4A.lock = true; g4Tps('sleep', true); document.body.classList.add('g4-cut'); TS.crouchOn = false;
+  player.pos.set(bx, y0 + B.top, bz - 0.05); player.vel.set(0, 0, 0); player.onGround = true;
+  g4Clip('sleep', 99, { loop: true, hideGun: true, yaw: 0 });
+  let a = 0; G4A.cam = (dt) => { a += (dt || 0.016) * 0.06; const S2 = G4RT.sleep; if (!S2) return; const r = 3.0 - Math.min(0.8, S2.t * 0.12); camera.position.set(bx + Math.cos(0.5 + a) * r, y0 + 1.9, bz - 0.3 + Math.sin(0.5 + a) * r * 0.6); camera.lookAt(bx, y0 + B.top + 0.2, bz - 0.5); };
+  Sound.thud && later(0.5, () => Sound.thud(0.25));
+}
+function g4SleepTick(dt) {
+  const S2 = G4RT.sleep; if (!S2) return; S2.t += dt; const t = S2.t;
+  let z = document.getElementById('g4Zzz'); if (!z) { z = document.createElement('div'); z.id = 'g4Zzz'; z.style.cssText = 'position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:92;color:#fff;font:900 30px var(--ui);text-shadow:0 0 12px #6a8aff;pointer-events:none;text-align:center;display:none'; document.body.appendChild(z); }
+  if (t > 1.2 && t < 3.6) { z.style.display = 'block'; const k = clamp((t - 1.6) / 1.6, 0, 1), cur = (S2.from + S2.hrs * k) % 24; z.innerHTML = `💤 ${'z'.repeat(1 + Math.floor(t * 2) % 3)}<br><span style="font-size:42px">🕐 ${String(Math.floor(cur)).padStart(2, '0')}:${String(Math.floor((cur % 1) * 60)).padStart(2, '0')}</span>`; } else z.style.display = 'none';
+  if (t > 1.4 && !S2.dark) { S2.dark = true; g4Fade(true, 1200); }
+  if (t > 3.0 && !S2.done) { S2.done = true; const end = S2.from + S2.hrs; G4.day += Math.floor(end / 24); G4.tod = end % 24; player.hp = 100; G4.S.focus = 1; try { for (const n of npcs) if (n.g4ko) {} } catch (e) {} g4Save(true); }
+  if (t > 3.6 && !S2.wake) { S2.wake = true; g4Fade(false, 900); g4Clip('wake', 1.7, { yaw: 0 }); }
+  if (t > 5.4) { const B = S2.T.bed; G4RT.sleep = null; G4A.lock = false; G4A.cam = null; g4Tps('sleep', false); document.body.classList.remove('g4-cut'); if (G4A.clip) g4ClipEnd(); player.pos.set(S2.bx + (B.x > 0 ? -1.4 : 1.4), G4_IY + 0.02, S2.bz + 0.4); z.style.display = 'none'; toast(`😴 Выспались: ${String(Math.floor(G4.tod)).padStart(2, '0')}:00 · здоровье 100% · сохранено`); }
+}
+/* ===================== клуб: вход, NPC, музыка, бар ===================== */
+function g4ClubIn() {
+  g4ClubDyn(); g4ClubMusic(true); const T = G4_INT.club, { cx, cz } = T, y0 = G4_IY, L = G4RT.clubN = [];
+  const mk = (kind, x, z, yaw, clip, o = {}) => { try { const n = mkNpc(kind, x, z, yaw, 'human'); n.pos.set(x, y0 + (o.y || 0), z); n.yaw = yaw; n.root.position.copy(n.pos); n.root.rotation.y = yaw; n.scripted = true; n.protect = true; n.protMsg = 'Охрана клуба следит за порядком'; n.g4dp = rand(0, 6); if (clip) g4NpcClip(n, clip, 99, { loop: true }); L.push(n); return n; } catch (e) { return null; } };
+  mk('street', cx, cz - 6.6 - 0.75, 0, 'dj', { y: 0.6 });
+  mk('office', cx + 9.3, cz + 2.5, -Math.PI / 2, null);
+  for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2 + rand(-0.2, 0.2), r = rand(1.6, 3.6); mk(pick(['street', 'office', 'worker']), cx + Math.cos(a) * r, cz + 0.5 + Math.sin(a) * r, rand(0, 6.28), pick(['dwave', 'dtwist', 'djump', 'dgroove', 'clap'])); }
+  for (const z of [-3, 1.5]) { const n = mk(pick(['office', 'street']), cx - 8.9, cz + z, Math.PI / 2, null); if (n) { n.setPose && n.setPose('sit', 1e9); n.pos.y = y0; } }
+  G4RT.clubT = 0;
+}
+function g4ClubOut() { g4ClubMusic(false); g4DanceEnd(true); for (const n of G4RT.clubN) { try { n.dispose(); } catch (e) {} const i = npcs.indexOf(n); if (i >= 0) npcs.splice(i, 1); } G4RT.clubN = []; }
+function g4BeatNow() { const B = G4RT.beat; if (B && Sound.ctx) return (Sound.ctx.currentTime - B.t0) / (60 / 124); return (performance.now() / 1000) / (60 / 124); }
+function g4ClubMusic(on) {
+  if (!Sound.ok || !Sound.ok()) return; const c = Sound.ctx;
+  if (on && !G4RT.beat) { const g = c.createGain(); g.gain.value = 0.0001; g.gain.setTargetAtTime(0.42, c.currentTime, 0.4); g.connect(Sound.master); G4RT.beat = { g, next: c.currentTime + 0.12, step: 0, t0: c.currentTime + 0.12 }; }
+  else if (!on && G4RT.beat) { const B = G4RT.beat; G4RT.beat = null; B.g.gain.setTargetAtTime(0.0001, c.currentTime, 0.15); setTimeout(() => { try { B.g.disconnect(); } catch (e) {} }, 1500); }
+}
+function g4ClubSched() {
+  const B = G4RT.beat; if (!B || !Sound.ctx) return; const c = Sound.ctx, st = 60 / 124 / 4, bass = [45, 45, 0, 45, 48, 0, 45, 0, 43, 43, 0, 43, 40, 0, 43, 0], chord = [[57, 60, 64], [55, 59, 62], [52, 55, 59], [53, 57, 60]];
+  const f = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  while (B.next < c.currentTime + 0.2) {
+    const s = B.step % 16, bar = Math.floor(B.step / 16), t = B.next, out = B.g;
+    try {
+      if (s % 4 === 0) { const o = c.createOscillator(), g = c.createGain(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.12); g.gain.setValueAtTime(0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.22); o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.24); }
+      if (s % 4 === 2 || (s % 2 === 1 && Math.random() < 0.3)) { const n = c.createBufferSource(), hp = c.createBiquadFilter(), g = c.createGain(); n.buffer = Sound.noiseBuf; hp.type = 'highpass'; hp.frequency.value = 7000; g.gain.setValueAtTime(s % 4 === 2 ? 0.22 : 0.08, t); g.gain.exponentialRampToValueAtTime(0.001, t + (s % 4 === 2 ? 0.09 : 0.04)); n.connect(hp); hp.connect(g); g.connect(out); n.start(t, Math.random()); n.stop(t + 0.1); }
+      if (s === 4 || s === 12) { const n = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain(); n.buffer = Sound.noiseBuf; bp.type = 'bandpass'; bp.frequency.value = 1500; g.gain.setValueAtTime(0.3, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.14); n.connect(bp); bp.connect(g); g.connect(out); n.start(t, Math.random()); n.stop(t + 0.16); }
+      const bn = bass[s]; if (bn) { const o = c.createOscillator(), lp = c.createBiquadFilter(), g = c.createGain(); o.type = 'sawtooth'; o.frequency.value = f(bn - 12 + (bar % 4 === 3 ? -2 : 0)); lp.type = 'lowpass'; lp.frequency.setValueAtTime(900, t); lp.frequency.exponentialRampToValueAtTime(200, t + 0.12); g.gain.setValueAtTime(0.22, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.13); o.connect(lp); lp.connect(g); g.connect(out); o.start(t); o.stop(t + 0.14); }
+      if (s === 2 || s === 10 || s === 14) for (const m of chord[bar % 4]) { const o = c.createOscillator(), g = c.createGain(); o.type = 'square'; o.frequency.value = f(m); g.gain.setValueAtTime(0.035, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.16); o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.17); }
+    } catch (e) {}
+    B.next += st; B.step++;
+  }
+}
+/* ===================== ритм-игра на танцполе ===================== */
+const G4_DIRS = [['L', '⬅'], ['U', '⬆'], ['D', '⬇'], ['R', '➡']];
+function g4DanceStart() {
+  if (G4RT.dance) return; const p = player.pos, T = G4_INT.club; if (G4A.clip) g4ClipEnd();
+  const now = g4BeatNow(), b0 = Math.ceil(now) + 4, notes = []; let last = -1, same = 0;
+  for (let b = 0; b < 56; b++) { for (const off of [0, 0.5]) { if (off && Math.random() > (b > 28 ? 0.4 : 0.2)) continue; if (!off && Math.random() > 0.78) continue; let ln = randi(4); if (ln === last && ++same > 1) ln = (ln + 1 + randi(3)) % 4; else if (ln !== last) same = 0; last = ln; notes.push({ b: b0 + b + off, ln, st: 0, el: null }); } }
+  G4RT.dance = { notes, b0, end: b0 + 57, score: 0, combo: 0, best: 0, vibe: 0.5, hits: 0, miss: 0, acc: null };
+  G4A.lock = true; g4Tps('dance', true); document.body.classList.add('g4-act'); g4Clip('dgroove', 99, { loop: true, hideGun: true });
+  let a = 0; G4A.cam = (dt) => { a += (dt || 0.016) * 0.3; camera.position.set(p.x + Math.sin(a) * 3.6, p.y + 1.8, p.z + Math.cos(a) * 3.6); camera.lookAt(p.x, p.y + 1.05, p.z); };
+  let el = document.getElementById('g4Dance'); if (!el) { el = document.createElement('div'); el.id = 'g4Dance'; document.body.appendChild(el); el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+    const st = document.createElement('style'); st.textContent = `#g4Dance{position:fixed;left:50%;bottom:calc(6px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:70;width:300px;display:none;flex-direction:column;align-items:center;font:800 12px var(--ui);color:#fff;text-shadow:0 0 4px #000}
+#g4Dance .top{display:flex;gap:10px;align-items:center;margin-bottom:4px;background:rgba(10,4,20,.6);padding:3px 10px;border-radius:10px}#g4Dance .vb{width:80px;height:7px;border-radius:4px;background:rgba(255,255,255,.2);overflow:hidden}#g4Dance .vb b{display:block;height:100%;background:linear-gradient(90deg,#ff3aa0,#ffe04a)}
+#g4Dance .lanes{position:relative;width:280px;height:168px;background:linear-gradient(180deg,rgba(20,6,40,.05),rgba(20,6,40,.7));border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.2)}#g4Dance .hit{position:absolute;left:0;right:0;bottom:14px;height:4px;background:#ff5ab4;box-shadow:0 0 10px #ff5ab4}
+#g4Dance .n{position:absolute;width:58px;height:34px;margin-left:6px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;background:rgba(255,255,255,.15);border:2px solid #2af0ff}#g4Dance .n.ok{opacity:0}
+#g4Dance .btns{display:flex;gap:6px;margin-top:6px}#g4Dance .btns button{width:66px;height:52px;border-radius:14px;border:2px solid #ff5ab4;background:linear-gradient(180deg,#3a1450,#1a0628);color:#fff;font-size:26px;touch-action:none}#g4Dance .btns button.p{background:#ff5ab4}
+#g4Dance .fb{position:absolute;left:0;right:0;top:40%;text-align:center;font:900 22px var(--ui);pointer-events:none}`; document.head.appendChild(st); }
+  el.innerHTML = `<div class="top"><span class="sc">0</span><span class="cb">комбо 0</span><span>вайб</span><div class="vb"><b style="width:50%"></b></div></div><div class="lanes"><div class="hit"></div><div class="fb"></div></div><div class="btns">${G4_DIRS.map(([k, i], j) => `<button data-l="${j}">${i}</button>`).join('')}</div>`;
+  for (const b of el.querySelectorAll('[data-l]')) b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); b.classList.add('p'); setTimeout(() => b.classList.remove('p'), 120); g4DanceHit(+b.dataset.l); });
+  el.style.display = 'flex'; toast('💃 Жмите стрелки, когда они на розовой линии!');
+  for (const n of G4RT.clubN) if (n.g4c && Math.random() < 0.5) n.g4c.o.face = player.pos;
+}
+function g4DanceHit(ln) {
+  const D = G4RT.dance; if (!D) return; const now = g4BeatNow(), spb = 60 / 124; let best = null, bd = 0.45;
+  for (const N of D.notes) { if (N.st || N.ln !== ln) continue; const d = Math.abs(N.b - now); if (d < bd) { bd = d; best = N; } }
+  const fb = document.querySelector('#g4Dance .fb');
+  if (!best) { D.combo = 0; D.vibe = Math.max(0, D.vibe - 0.04); if (fb) { fb.textContent = 'мимо'; fb.style.color = '#ff6a6a'; } return; }
+  const ms = bd * spb; best.st = 1; if (best.el) best.el.classList.add('ok');
+  const perfect = ms < 0.09, good = ms < 0.18; D.combo++; D.best = Math.max(D.best, D.combo); D.hits++;
+  D.score += Math.round((perfect ? 100 : good ? 60 : 25) * (1 + Math.min(2, D.combo / 10))); D.vibe = Math.min(1, D.vibe + (perfect ? 0.05 : 0.03));
+  if (fb) { fb.textContent = perfect ? 'ИДЕАЛЬНО!' : good ? 'круто' : 'норм'; fb.style.color = perfect ? '#ffe04a' : good ? '#2af0ff' : '#ffffff'; }
+  const nm = 'd' + G4_DIRS[ln][0]; g4Clip(nm, 0.4, { hideGun: true, end: () => { if (G4RT.dance) g4Clip('dgroove', 99, { loop: true, hideGun: true }); } });
+  if (perfect) g4Sfx('clap', 0.4);
+  if (D.combo % 10 === 0) { toast(`🔥 Комбо ${D.combo}!`); for (const n of G4RT.clubN) if (n.g4c && Math.random() < 0.6) { const prev = n.g4c.name; n.g4c.name = 'cheer'; later(1.8, () => { if (n.g4c) n.g4c.name = prev; }); } }
+}
+function g4DanceTick() {
+  const D = G4RT.dance; if (!D) return; const now = g4BeatNow(), lanes = document.querySelector('#g4Dance .lanes'); if (!lanes) return;
+  for (const N of D.notes) {
+    const dy = N.b - now; if (!N.st && dy < -0.45) { N.st = 2; D.combo = 0; D.miss++; D.vibe = Math.max(0, D.vibe - 0.06); const fb = lanes.querySelector('.fb'); if (fb) { fb.textContent = 'мимо'; fb.style.color = '#ff6a6a'; } }
+    const vis = dy < 2.2 && dy > -0.5 && N.st !== 1;
+    if (vis && !N.el) { N.el = document.createElement('div'); N.el.className = 'n'; N.el.textContent = G4_DIRS[N.ln][1]; N.el.style.left = (N.ln * 70) + 'px'; lanes.appendChild(N.el); }
+    if (N.el) { if (!vis && N.st !== 1) { N.el.remove(); N.el = null; continue; } N.el.style.top = (168 - 14 - 34 / 2 - 2 - dy * 64 - 17) + 'px'; if (N.st === 1 && dy < -0.3) { N.el.remove(); N.el = null; } }
+  }
+  const el = document.getElementById('g4Dance'); el.querySelector('.sc').textContent = '⭐ ' + D.score; el.querySelector('.cb').textContent = 'комбо ' + D.combo; el.querySelector('.vb b').style.width = Math.round(D.vibe * 100) + '%';
+  if (now > D.end) g4DanceEnd(false);
+}
+function g4DanceEnd(quiet) {
+  const D = G4RT.dance; if (!D) return; G4RT.dance = null; G4A.lock = false; G4A.cam = null; g4Tps('dance', false); document.body.classList.remove('g4-act'); if (G4A.clip) g4ClipEnd();
+  const el = document.getElementById('g4Dance'); if (el) el.style.display = 'none'; if (quiet) return;
+  const S = G4.S, tot = D.hits + D.miss || 1, acc = D.hits / tot, gr = acc > 0.92 ? 'S' : acc > 0.8 ? 'A' : acc > 0.65 ? 'B' : acc > 0.45 ? 'C' : 'D', tips = Math.round(D.score / 55 * (gr === 'S' ? 1.6 : 1));
+  S.cash += tips; g4Tx(tips, 'Чаевые на танцполе'); const nb = D.score > (S.danceBest || 0); if (nb) S.danceBest = D.score;
+  banner(`💃 ОЦЕНКА ${gr} · ⭐ ${D.score}`, `комбо ${D.best} · точность ${Math.round(acc * 100)}% · чаевые +$${tips}${nb ? ' · новый рекорд!' : ''}`);
+  for (const n of G4RT.clubN) if (n.g4c && Math.random() < 0.7) { const prev = n.g4c.name; n.g4c.name = gr === 'D' ? 'shrug' : 'clap'; later(3, () => { if (n.g4c) n.g4c.name = prev; }); }
+  if (gr === 'S' || gr === 'A') g4Clip('cheer', 2.4, { hideGun: true });
+}
+/* ===================== действия на E ===================== */
+function g4DecideRent(look) {
+  const L = [], I = G4RT.inside, p = player.pos; if (G4RT.sleep || G4RT.dance || G4A.fuel) return L;
+  if (I) {
+    const T = I.T, y = G4_IY, [dx, dz] = T.door; let d = look(T.cx + dx, y + 1.2, T.cz + dz - 0.3, 2.3); if (d >= 0) L.push({ d, D: { label: I.kind === 'club' ? '🚪 E — выйти на улицу' : '🚪 E — выйти', run() { g4Exit2(); } } });
+    if (T.bed) { d = look(T.cx + T.bed.x, y + 0.6, T.cz + T.bed.z, 2.6); if (d >= 0) L.push({ d, D: { label: '😴 E — лечь спать (лечение, сохранение)', run() { g4SleepMenu(T, I.R); } } }); }
+    if (T.stash && I.R) { d = look(T.cx + T.stash[0], y + 0.9, T.cz + T.stash[1], 2.2); if (d >= 0) L.push({ d, D: { label: `🧳 E — тайник (${I.kind === 'villa' ? 'сейф за картиной' : I.kind === 'flat' ? 'шкаф' : 'сейф'})`, run() { g4StashUI(I.R.id); } } }); }
+    if (T.tv) { d = look(T.cx + T.tv[0], y + 1.2, T.cz + T.tv[1], 2.6); if (d >= 0) L.push({ d: d + 0.05, D: { label: '📺 E — переключить канал', run() { g4Sfx('beep', 0.6); toast(pick(['📺 «Новости Коралл-Сити»: в ELITE City опять видели квадратную голову…', '📺 Реклама: «Пальма-Ойл» — заправим даже лодку!', '📺 Сериал «Неоновые ночи», серия 52', '📺 Погода: завтра +31, гроза к вечеру', '📺 Музыкальный канал: хит недели «Кораллы и ты»'])); } } }); }
+    if (I.kind === 'club') {
+      const T2 = G4_INT.club; if (Math.abs(p.x - T2.cx) < 4.4 && Math.abs(p.z - (T2.cz + 0.5)) < 4.4) L.push({ d: 0.3, D: { label: `💃 E — танцевать (ритм-игра${G4.S.danceBest ? `, рекорд ⭐ ${G4.S.danceBest}` : ''})`, run() { g4DanceStart(); } } });
+      d = look(T2.cx + 8.2, y + 1.2, T2.cz + 2.5, 2.4); if (d >= 0) L.push({ d, D: { label: '🍸 E — коктейль «Неон» за $15', run() { if (!g4Pay(15)) { toast('💸 Нужно $15'); return; } g4Tx(-15, 'Коктейль'); player.hp = Math.min(100, player.hp + 10); G4RT.drunk = Math.min(1, G4RT.drunk + 0.45); g4Sfx('ding', 0.5); toast('🍸 Ух! Мир заиграл неоном'); } } });
+    }
+    return L;
+  }
+  for (const R of G4_RENTS) { const D = R.door; if (!D) continue; const d = look(D.x + D.ox * 0.3, 1.2, D.z + D.oz * 0.3, 2.6); if (d < 0) continue; const on = g4RentOn(R.id); L.push({ d, D: { label: on ? `🔑 E — войти: ${R.name}` : `🔑 E — снять: ${R.name} ($${R.price}/сутки)`, run() { if (on) g4Enter(R, R.kind); else g4RentUI(R); } } }); }
+  { const D = G4RT.clubOut; if (D) { const d = look(D.x, 1.3, D.z + 0.4, 3.2); if (d >= 0) L.push({ d, D: { label: '🪩 E — клуб «Неон» (вход $20)', run() { if (TS.wl.stars) { toast('🚨 Охранник: «Не сегодня, приятель»'); return; } if (!g4Pay(20)) { toast('💸 Вход $20'); return; } g4Tx(-20, 'Клуб «Неон»'); g4Enter(null, 'club'); } } }); } }
+  return L;
+}
+{ const _de10 = g4DecideEcon; g4DecideEcon = function (look) { const L = _de10(look); try { for (const x of g4DecideRent(look)) L.push(x); } catch (e) { console.warn('rent decide', e); } return L; }; }
+{ const _me10 = g4MiniExtra; g4MiniExtra = function (ic, T) { _me10(ic, T); for (const R of G4_RENTS) if (R.door) { const on = g4RentOn(R.id); ic(R.door.x, R.door.z, on ? '🏠' : '🔑', on ? '#1a6a3a' : null, on ? 16 : 13, on); } if (G4RT.clubOut) ic(G4RT.clubOut.x, G4RT.clubOut.z, '🪩', '#6a1a5a', 15, false); }; }
+/* ===================== тик ===================== */
+function g4RentTick(dt) {
+  if (!G4.playing || !G4.S) return; g4RentDayTick(); const I = G4RT.inside;
+  if (G4A.clip && G4A.clip.o.stash && !G4E.ui) g4ClipEnd();
+  if (I) {
+    g4RentLights(I.kind); hemi.intensity *= 0.35; sun.intensity *= 0.12; const p = player.pos; sun.position.y += p.y; sun.target.position.y = p.y; sun.target.updateMatrixWorld();
+    if (G4SKY && G4SKY.rain) G4SKY.rain.visible = false;
+    for (const C of G4M.chunks) if (C.m.visible && Math.hypot(C.x - p.x, C.z - p.z) > 80) C.m.visible = false;
+    // выпал из интерьера (не должен) — вернуть к двери
+    if (p.y < G4_IY - 3) { player.pos.set(I.T.cx + I.T.exit[0], G4_IY + 0.05, I.T.cz + I.T.exit[1]); player.vel.set(0, 0, 0); }
+    if (I.kind === 'club') { g4ClubSched(); g4ClubDynTick(dt); g4DanceTick(); const t = G4.time; for (let i = 0; i < 4; i++) { const l = lamps[i]; if (!l) continue; const T = I.T; l.position.set(T.cx + Math.sin(t * 0.7 + i * 1.6) * 6, G4_IY + 4.2, T.cz + Math.cos(t * 0.5 + i) * 5); l.color.setHSL(((t * 0.08 + i * 0.25) % 1), 1, 0.55); } }
+    if (player.dead) { G4RT.inside = null; g4RentLights(''); g4ClubOut(); }
+  } else if (G4RT.lt) g4RentLights('');
+  g4SleepTick(dt);
+  // коктейль: мир плывёт
+  if (G4RT.drunk > 0) { G4RT.drunk = Math.max(0, G4RT.drunk - dt / 40); const k = G4RT.drunk; renderer.domElement.style.filter = k > 0.02 ? `hue-rotate(${Math.sin(G4.time * 0.7) * 40 * k}deg) saturate(${1 + k * 0.8}) blur(${k * 1.2}px)` : ''; if (k > 0.1) camera.rotation.z += Math.sin(G4.time * 1.3) * 0.04 * k; if (k <= 0.02 && G4RT.drunkOn) { G4RT.drunkOn = false; renderer.domElement.style.filter = ''; } else if (k > 0.02) G4RT.drunkOn = true; }
+}
+function g4RentOff() {
+  try { g4ClubOut(); } catch (e) {} try { g4DanceEnd(true); } catch (e) {} G4RT.inside = null; G4RT.sleep = null; G4RT.drunk = 0; G4RT.dayChk = -1; try { g4RentLights(''); } catch (e) {} if (G4RT.drunkOn) { renderer.domElement.style.filter = ''; G4RT.drunkOn = false; }
+  for (const id of ['g4Zzz', 'g4Dance']) { const e = document.getElementById(id); if (e) e.style.display = 'none'; } g4Fade(false, 10); document.body.classList.remove('g4-act');
+}
+// сохранение внутри интерьера — при загрузке появляемся у двери снаружи
+{ const _sv7 = g4Save; g4Save = function (manual, quiet) { const I = G4RT.inside; if (!I || !G4.S) return _sv7(manual, quiet); const D = I.kind === 'club' ? G4RT.clubOut : I.R && I.R.door; const p = player.pos.clone(); if (D) player.pos.set(D.x + D.ox * 1.3, 0.02, D.z + D.oz * 1.3); try { return _sv7(manual, quiet); } finally { player.pos.copy(p); } }; }
+/* ===================== ГЛАВА 4 · СЕКРЕТ: НИК52 У СОСЕДНЕЙ БАШНИ =====================
+   Ночью (21:00–05:00) на площади у золотой башни рядом с «Эдемом» толпа хулиганов пинает Ник52.
+   Заступитесь (E или первый удар) — хулиганы дерутся кулаками, один достаёт ствол. Победа: Ник52
+   дарит легендарный пистолет с глушителем «Тихоня-52» (не продаётся), $2000 и рассказывает про
+   гараж: из-под земли поднимается гараж с кодовым замком 2426. Внутри — «Куб-52», тайник, патроны. */
+const G4NK = { nik: null, thugs: [], st: '', t: 0, g: null, door: 0, doorT: 0, rise: null, ob: [], doorOb: null, car: null, lt: '', pad: null, inside: false, nikIn: null, sayT: 0 };
+const G4NK_P = { x: 436, z: -139 }, G4NK_G = { x0: 422, x1: 450, z0: -201, z1: -189, h: 5.2, dx: 436, dw: 6 };
+/* ---------- легендарный пистолет ---------- */
+TS_GUN.legend = Object.assign({}, TS_GUN.pistol, { name: 'Тихоня-52 ★', mag: 17, res: 102, dmg: 58, rate: 0.12, spread: 0.0022, pen: 2, force: 72, reload: 1.15, kick: 0.05, climb: 0.008, len: 0.36, legend: true });
+TS_READY.legend = TS_READY.pistol.slice(); TS_READY.legend[2] -= 0.02; TS_ADSD.legend = TS_ADSD.pistol; TS_INSP.legend = 1.3;
+const G4NK_M = {};
+function g4LegendSkin(g) {
+  if (!G4NK_M.gold) { G4NK_M.gold = new THREE.MeshStandardMaterial({ color: 0xe8b84a, metalness: 1, roughness: 0.22 }); G4NK_M.blk = new THREE.MeshStandardMaterial({ color: 0x0c0c10, metalness: 0.6, roughness: 0.28 }); G4NK_M.blue = new THREE.MeshStandardMaterial({ color: 0x4a9fff, emissive: 0x2a6adf, emissiveIntensity: 0.9, roughness: 0.4 }); }
+  const M = tsgMats(); g.traverse((o) => { if (!o.isMesh) return; if (o.material === M.blk || o.material === M.steel) o.material = G4NK_M.gold; else if (o.material === M.poly) o.material = G4NK_M.blk; });
+  const U = g.userData, z0 = U.muzzle ? U.muzzle.z : -0.148, y = U.muzzle ? U.muzzle.y : 0.052;
+  const s = new THREE.Mesh(new THREE.CylinderGeometry(0.0165, 0.0165, 0.17, 14), G4NK_M.blk); s.rotation.x = Math.PI / 2; s.position.set(0, y, z0 - 0.085); g.add(s);
+  for (const k of [0.02, 0.15]) { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.0172, 0.0172, 0.008, 14), G4NK_M.gold); r.rotation.x = Math.PI / 2; r.position.set(0, y, z0 - k); g.add(r); }
+  const ln = new THREE.Mesh(new THREE.BoxGeometry(0.002, 0.004, 0.12), G4NK_M.blue); ln.position.set(0.0168, y, z0 - 0.085); g.add(ln);
+  if (U.muzzle) U.muzzle.z = z0 - 0.175; g.userData.legend = true; return g;
+}
+{ const _am0 = tsArsMesh; tsArsMesh = function (id) { if (id !== 'legend') return _am0(id); return g4LegendSkin(tsgPistol()); }; }
+{ const _ai0 = tsArsItem; tsArsItem = function (id) { const it = _ai0(id); if (id === 'legend') it.sil = true; return it; }; }
+function g4GiveLegend() {
+  if (G4.char === 'makar') { g4Stash('nik').w.push({ id: 'legend', ammo: 17, res: 102, sil: 1 }); toast('🌟 «Тихоня-52» ждёт в тайнике гаража Ник52 (Макар носит только костюм)'); return false; }
+  if (g4GiveWeapon('legend')) { toast('🌟 «Тихоня-52» в руках: глушитель встроен, урон как у револьвера'); return true; }
+  g4Stash('nik').w.push({ id: 'legend', ammo: 17, res: 102, sil: 1 }); toast('🌟 Руки заняты — Ник52 оставит пистолет в тайнике гаража'); return false;
+}
+/* ---------- событие на площади ---------- */
+function g4NikNight() { return G4.tod >= 21 || G4.tod < 5; }
+function g4NikSay(n, txt, d = 2.6) { if (!n || !n.alive) return; try { tsSay && tsSay(n === G4NK.nik ? 'Ник52' : 'Хулиган', txt, d, tsVoiceOf(n)); } catch (e) {} }
+function g4NikSpawn() {
+  const { x, z } = G4NK_P; let nik; try { nik = mkNpc('blockhead', x, z, 0, 'human'); } catch (e) { return; }
+  nik.pos.set(x, 0, z); nik.scripted = true; nik.protect = true; nik.protMsg = 'Ник52 и так досталось'; nik.g4nik = true; g4NpcClip(nik, 'curl', 99, { loop: true }); G4NK.nik = nik;
+  const clips = ['kick', 'stomp', 'kick', 'taunt', 'film'];
+  G4NK.thugs = clips.map((c, i) => { const a = i / clips.length * Math.PI * 2 + 0.4, r = c === 'film' || c === 'taunt' ? 2.6 : 1.35, tx = x + Math.cos(a) * r, tz = z + Math.sin(a) * r; try { const n = mkNpc(pick(['street', 'worker']), tx, tz, 0, 'human'); n.pos.set(tx, 0, tz); n.g4thug = true; n.g4dp = rand(0, 1); n.yaw = Math.atan2(x - tx, z - tz); n.root.rotation.y = n.yaw; g4NpcClip(n, c, 99, { loop: true, face: { x, z } }); if (c === 'film') g4PhoneProp(n, true);
+    n.g4onHit = () => { const N = G4NK.nik; if (!N) return; N.flinch = 0.8; N.hitLocal && N.hitLocal.set(rand(-1, 1), 0, rand(-1, 1)); if (N.pos.distanceTo(player.pos) < 30) Sound.thud && Sound.thud(0.3); if (Math.random() < 0.3) spawnSprite(TEX.soft, new V3(N.pos.x + rand(-0.3, 0.3), 0.25, N.pos.z + rand(-0.3, 0.3)), { color: 0xb8a890, size: rand(0.3, 0.6), grow: 1.5, life: 0.6, opacity: 0.5 }); };
+    return n; } catch (e) { return null; } }).filter(Boolean);
+  G4NK.st = 'beat'; G4NK.t = 0; G4NK.sayT = 1; G4NK.warned = false;
+}
+function g4NikClear() {
+  for (const n of [G4NK.nik, ...G4NK.thugs]) { if (!n) continue; try { n.dispose(); } catch (e) {} const i = npcs.indexOf(n); if (i >= 0) npcs.splice(i, 1); }
+  G4NK.nik = null; G4NK.thugs = []; G4NK.st = '';
+}
+function g4NikFight() {
+  if (G4NK.st !== 'beat') return; G4NK.st = 'fight'; G4NK.t = 0; let gun = false;
+  for (const n of G4NK.thugs) { if (!n.alive) continue; g4NpcClipStop(n); g4PhoneProp(n, false); n.scripted = false; if (!gun && Math.random() < 0.6) { gun = true; g4ArmUp(n); } else { n.g4brawl = true; n.g4pc = rand(0.4, 1); } }
+  g4NikSay(G4NK.thugs[0], pick(['О, герой нашёлся! Мочи его!', 'Ты чё, за квадратного впрягаешься?!', 'Сам напросился!']), 2.2);
+  banner('👊 ЗАСТУПИТЕСЬ ЗА НИК52', 'Разгоните хулиганов'); shake = Math.max(shake, 0.2);
+}
+// хулиганы дерутся кулаками
+{ const _th7 = Humanoid.prototype.think; Humanoid.prototype.think = function (dt) {
+  if (this.g4thug && this.g4hostile && this.alive && this.hp < this.maxHp * 0.3) { this.g4hostile = false; this.panic = 12; if (this.g4gun) this.g4gun.visible = false; g4NikSay(this, 'Всё, всё! Не стреляй!', 1.8); }
+  if (this.g4brawl && mode === 'g4' && this.alive && !this.scripted) {
+    if (this.pose === 'punchwind' || this.pose === 'punch') { this.steer(0, 0, 0, dt); return; }
+    if (this.pose !== 'stand') return _th7.call(this, dt);
+    const p = player.pos, dx = p.x - this.pos.x, dz = p.z - this.pos.z, d = Math.hypot(dx, dz) || 1;
+    if (player.dead || d > 45 || this.hp < this.maxHp * 0.3) { this.g4brawl = false; if (this.hp < this.maxHp * 0.3) { this.panic = 12; g4NikSay(this, pick(['Всё-всё, ухожу!', 'Да ну тебя!', 'Пацаны, валим!']), 1.8); } return _th7.call(this, dt); }
+    this.yaw += angDiff(this.yaw, Math.atan2(dx, dz)) * Math.min(1, dt * 7);
+    this.g4pc = (this.g4pc || 0) - dt;
+    if (d > 1.15) this.steer(dx / d, dz / d, d > 4 ? 2.7 : 1.5, dt);
+    else { this.steer(0, 0, 0, dt); if (this.g4pc <= 0) { this.g4pc = rand(0.9, 1.5); this.setPose('punchwind', 0.24); const me = this; later(0.24, () => { if (!me.alive || !me.g4brawl) return; me.setPose('punch', 0.26); if (me.pos.distanceTo(player.pos) < 1.65 && !player.dead) { damagePlayer(rand(5, 9)); shake = Math.max(shake, 0.25); Sound.thud && Sound.thud(0.45); } }); } }
+    return;
+  }
+  return _th7.call(this, dt);
+}; }
+{ const _oh7 = TS.onNpcHit; TS.onNpcHit = (n, was, dmg) => { if (_oh7) _oh7(n, was, dmg); if (mode === 'g4' && n && n.g4thug) g4NikFight(); }; }
+function g4ThugDown(n) { return !n.alive || n.state !== 'alive' || LOW_POSE[n.pose] || n.g4ko || n.panic > 0.5 || (!n.g4brawl && !n.g4hostile) || n.pos.distanceTo(G4NK.nik ? G4NK.nik.pos : player.pos) > 25; }
+function g4NikWin() {
+  G4NK.st = 'win'; G4NK.t = 0; const N = G4NK.nik, S = G4.S; S.nik = S.nik || {}; if (!N) return;
+  for (const n of G4NK.thugs) { n.g4brawl = false; if (n.alive && n.g4hostile) { n.g4hostile = false; n.panic = 10; if (n.g4gun) n.g4gun.visible = false; } }
+  g4NpcClipStop(N); N.setPose && N.setPose('kneel', 1.6); banner('🟦 НИК52 СПАСЁН', 'Секрет ELITE City'); Sound.chime && Sound.chime();
+  const face = () => { N.yaw = Math.atan2(player.pos.x - N.pos.x, player.pos.z - N.pos.z); N.root.rotation.y = N.yaw; };
+  later(0.4, () => g4NikSay(N, 'Ох… они ушли? Ушли!', 2));
+  later(2.0, () => { face(); g4NpcClip(N, 'thanks', 2.2, { face: player.pos }); g4NikSay(N, 'Спасибо! Ты меня реально спас.', 2.3); });
+  later(4.4, () => { face(); g4NikSay(N, 'Держи «Тихоню-52». Глушитель встроен. Такой не купишь ни в одном магазине.', 3); g4GiveLegend(); S.nik.gun = 1; });
+  later(7.4, () => { face(); g4NikSay(N, 'И ещё $2000 — на бензин и шаурму.', 2.4); S.cash += 2000; g4Tx(2000, 'Подарок Ник52'); Sound.click && Sound.click(1500, 0.25); toast('💵 +$2000 от Ник52'); });
+  later(9.8, () => { face(); g4NikSay(N, 'А за башней — мой гараж. Код 2426. Заходи когда хочешь!', 3.2); S.nik.stage = 1; S.nik.day = G4.day; g4NikGarage(true); g4SetWaypoint(G4NK_G.dx, G4NK_G.z0 - 4, 'Гараж Ник52'); });
+  later(13.5, () => { if (!G4NK.nik) return; G4NK.st = 'walk'; G4NK.t = 0; });
+}
+/* ---------- гараж: поднимается из-под земли ---------- */
+function g4NikGarage(rise) {
+  if (G4NK.g) return; const { x0, x1, z0, z1, h, dx, dw } = G4NK_G, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, g = new THREE.Group(); G4NK.g = g;
+  const wm = new THREE.MeshStandardMaterial({ color: 0x2a2e36, roughness: 0.7, metalness: 0.2 }), fm = new THREE.MeshStandardMaterial({ color: 0x4a4e58, roughness: 0.35, metalness: 0.3 }), nm = new THREE.MeshBasicMaterial({ color: 0x4a9fff }), wd = new THREE.MeshStandardMaterial({ color: 0x6a4a30, roughness: 0.8 }), sof = new THREE.MeshStandardMaterial({ color: 0x2a5aa8, roughness: 0.9 });
+  const B = (m, x, y, z, sx, sy, sz) => { const o = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), m); o.position.set(x - cx, y, z - cz); o.castShadow = true; o.receiveShadow = true; g.add(o); return o; };
+  B(fm, cx, 0.03, cz, x1 - x0 - 0.4, 0.06, z1 - z0 - 0.4);
+  B(wm, cx, h / 2, z1, x1 - x0, h, 0.3); B(wm, x0, h / 2, cz, 0.3, h, z1 - z0); B(wm, x1, h / 2, cz, 0.3, h, z1 - z0);
+  const dl = dx - dw / 2, dr = dx + dw / 2; B(wm, (x0 + dl) / 2, h / 2, z0, dl - x0, h, 0.3); B(wm, (dr + x1) / 2, h / 2, z0, x1 - dr, h, 0.3); B(wm, dx, h - 0.6, z0, dw, 1.2, 0.3);
+  B(wm, cx, h + 0.15, cz, x1 - x0 + 0.6, 0.3, z1 - z0 + 0.6); B(nm, cx, h + 0.32, z0 - 0.2, x1 - x0 + 0.6, 0.06, 0.06);
+  for (const [a, b2, c, d] of [[cx, 3.6, z1 - 0.17, 0], [x0 + 0.17, 3.6, cz, 1], [x1 - 0.17, 3.6, cz, 1]]) B(nm, a, b2, c, d ? 0.03 : x1 - x0 - 0.6, 0.07, d ? z1 - z0 - 0.6 : 0.03);
+  // большой неон «52» и квадратная голова на задней стене
+  { const c = makeCanvas(512, 256), q = c.getContext('2d'); q.fillStyle = '#0a0e18'; q.fillRect(0, 0, 512, 256); q.shadowColor = '#4a9fff'; q.shadowBlur = 24; q.strokeStyle = '#7ac0ff'; q.lineWidth = 10; q.strokeRect(60, 60, 140, 140); q.fillStyle = '#7ac0ff'; q.fillRect(95, 105, 18, 18); q.fillRect(150, 105, 18, 18); q.fillRect(100, 160, 70, 10); q.font = '900 150px sans-serif'; q.textAlign = 'center'; q.textBaseline = 'middle'; q.fillText('52', 360, 132); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const s = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.6), new THREE.MeshBasicMaterial({ map: t })); s.position.set(0, 2.6, z1 - cz - 0.17); s.rotation.y = Math.PI; g.add(s); }
+  { const c = makeCanvas(512, 128), q = c.getContext('2d'); q.fillStyle = '#0a0e18'; q.fillRect(0, 0, 512, 128); q.fillStyle = '#7ac0ff'; q.shadowColor = '#4a9fff'; q.shadowBlur = 16; q.font = '900 64px sans-serif'; q.textAlign = 'center'; q.textBaseline = 'middle'; q.fillText('ГАРАЖ 52', 256, 66); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const s = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 1.1), new THREE.MeshBasicMaterial({ map: t })); s.position.set(dx - cx, h - 0.6, z0 - cz - 0.17); s.rotation.y = Math.PI; g.add(s); }
+  // верстак, инструменты, диван, ТВ, холодильник, стойка с оружием, ящики
+  B(wd, x1 - 4.2, 0.45, z1 - 0.8, 4.4, 0.9, 1.0); B(wm, x1 - 4.2, 2.0, z1 - 0.2, 4.4, 1.6, 0.06); for (let i = 0; i < 8; i++) B(new THREE.MeshStandardMaterial({ color: pick([0xd83a2a, 0xe8c040, 0x3a8ad8, 0xc0c0c8]), metalness: 0.6, roughness: 0.4 }), x1 - 6 + i * 0.5, 1.7 + (i % 3) * 0.35, z1 - 0.28, 0.08, 0.32, 0.04);
+  B(sof, x0 + 1.1, 0.3, cz + 1.0, 1.1, 0.6, 3.2); B(sof, x0 + 0.55, 0.8, cz + 1.0, 0.25, 0.9, 3.2); B(wd, x0 + 2.6, 0.22, cz + 1.0, 0.9, 0.44, 1.4);
+  B(new THREE.MeshStandardMaterial({ color: 0x0a0a0c }), x0 + 4.6, 1.5, cz + 1.0, 0.1, 1.2, 2.0); G4NK.tv = B(new THREE.MeshBasicMaterial({ color: 0x2a4a8a }), x0 + 4.53, 1.5, cz + 1.0, 0.02, 1.08, 1.86);
+  B(new THREE.MeshStandardMaterial({ color: 0xe8eef8, roughness: 0.3 }), x0 + 0.6, 0.9, z1 - 0.7, 0.9, 1.8, 0.8); B(nm, x0 + 0.6, 1.7, z1 - 0.29, 0.5, 0.06, 0.02);
+  B(wm, x0 + 0.3, 1.6, cz - 3.2, 0.2, 2.2, 2.6); for (let i = 0; i < 4; i++) B(new THREE.MeshStandardMaterial({ color: 0x141418, metalness: 0.5 }), x0 + 0.45, 1.0 + i * 0.45, cz - 3.2, 0.08, 0.1, 1.9);
+  for (let i = 0; i < 3; i++) { B(new THREE.MeshStandardMaterial({ color: 0x4a5a3a, roughness: 0.9 }), x0 + 1.2 + i * 0.9, 0.3 + (i === 1 ? 0.6 : 0), z0 + 1.0, 0.8, 0.6, 0.6); }
+  G4NK.crate = { x: x0 + 2.1, z: z0 + 1.0 };
+  // рольворота и кодовый замок
+  const door = new THREE.Group(); for (let i = 0; i < 10; i++) { const r = new THREE.Mesh(new THREE.BoxGeometry(dw - 0.1, 0.4, 0.1), new THREE.MeshStandardMaterial({ color: i % 2 ? 0x3a4250 : 0x343a46, metalness: 0.6, roughness: 0.45 })); r.position.set(0, 0.2 + i * 0.4, 0); door.add(r); } door.position.set(dx - cx, 0, z0 - cz - 0.05); g.add(door); G4NK.doorM = door;
+  const pad = new THREE.Group(); const pb = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.46, 0.08), new THREE.MeshStandardMaterial({ color: 0x1a1a20, metalness: 0.7 })); pad.add(pb); const pc = makeCanvas(128, 64), ps = new THREE.Mesh(new THREE.PlaneGeometry(0.26, 0.12), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(pc) })); ps.position.set(0, 0.12, -0.045); ps.rotation.y = Math.PI; pad.add(ps); for (let i = 0; i < 12; i++) { const k = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.05, 0.02), new THREE.MeshBasicMaterial({ color: 0x8ac0ff })); k.position.set(-0.075 + (i % 3) * 0.075, 0.0 - Math.floor(i / 3) * 0.06, -0.045); pad.add(k); }
+  pad.position.set(dr + 0.7 - cx, 1.4, z0 - cz - 0.2); g.add(pad); G4NK.pad = { c: pc, t: ps.material.map, x: dr + 0.7, z: z0 - 0.2 }; g4NikPadScr('ГАРАЖ 52');
+  g.position.set(cx, rise ? -h - 0.6 : 0, cz); addMesh(g);
+  G4NK.lamp = null; G4NK.door = 0; G4NK.doorT = 0;
+  if (rise) { G4NK.rise = { t: 0 }; Sound.thud && Sound.thud(0.8); } else g4NikSolids();
+  G4M.pois.nik = { x: dx, z: z0 - 3, name: 'Гараж Ник52 (код 2426)', ic: '🟦' };
+}
+function g4NikPadScr(txt, col = '#7ac0ff') { const P = G4NK.pad; if (!P) return; const q = P.c.getContext('2d'); q.fillStyle = '#04080e'; q.fillRect(0, 0, 128, 64); q.fillStyle = col; q.font = '900 22px monospace'; q.textAlign = 'center'; q.textBaseline = 'middle'; q.fillText(txt, 64, 34); P.t.needsUpdate = true; }
+function g4NikSolids() {
+  for (const o of G4NK.ob) { const i = obstacles.indexOf(o); if (i >= 0) obstacles.splice(i, 1); } G4NK.ob = [];
+  const { x0, x1, z0, z1, h, dx, dw } = G4NK_G, add = (a, b, c, d, y1 = h) => { const o = { min: new V3(a, 0, b), max: new V3(c, y1, d) }; obstacles.push(o); G4NK.ob.push(o); return o; };
+  add(x0 - 0.15, z1 - 0.15, x1 + 0.15, z1 + 0.15); add(x0 - 0.15, z0, x0 + 0.15, z1); add(x1 - 0.15, z0, x1 + 0.15, z1); add(x0 - 0.15, z0 - 0.15, dx - dw / 2, z0 + 0.15); add(dx + dw / 2, z0 - 0.15, x1 + 0.15, z0 + 0.15);
+  add(x0 + 0.4, (z0 + z1) / 2 - 0.6, x0 + 1.7, (z0 + z1) / 2 + 2.6, 0.6); add(x1 - 6.4, z1 - 1.3, x1 - 2.0, z1 - 0.3, 0.9); add(x0 + 0.2, z1 - 1.1, x0 + 1.05, z1 - 0.3, 1.8);
+  G4NK.doorOb = add(dx - dw / 2, z0 - 0.15, dx + dw / 2, z0 + 0.15, h - 1.2); if (G4NK.door > 0.5) { const i = obstacles.indexOf(G4NK.doorOb); if (i >= 0) obstacles.splice(i, 1); }
+}
+function g4NikDoor(open) {
+  const want = open ? 1 : 0; if (G4NK.doorWant === want) return; G4NK.doorWant = want; Sound.thud && Sound.thud(0.35); g4Sfx(open ? 'whoosh' : 'clunk', 0.5);
+  const o = G4NK.doorOb; if (!o) return; const i = obstacles.indexOf(o); if (open && i >= 0) obstacles.splice(i, 1); if (!open && i < 0) obstacles.push(o);
+}
+/* ---------- кодовый замок ---------- */
+function g4NikPadUI() {
+  if (G4E.ui) return; let el = document.getElementById('g4Pad'); if (!el) { el = document.createElement('div'); el.id = 'g4Pad'; document.body.appendChild(el); el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+    const st = document.createElement('style'); st.textContent = `#g4Pad{position:fixed;right:calc(24px + env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:75;background:linear-gradient(180deg,#1a1e28,#0a0c12);border:2px solid #4a9fff;border-radius:18px;padding:10px;display:none;flex-direction:column;gap:6px;width:200px;box-shadow:0 0 30px rgba(74,159,255,.35)}#g4Pad .sc{height:42px;border-radius:8px;background:#04080e;color:#7ac0ff;font:900 26px ui-monospace,monospace;display:flex;align-items:center;justify-content:center;letter-spacing:.35em;text-shadow:0 0 10px #4a9fff}#g4Pad .sc.bad{color:#ff4a4a;text-shadow:0 0 10px #ff2a2a}#g4Pad .sc.ok{color:#5aff8a;text-shadow:0 0 10px #2aff6a}#g4Pad .g{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}#g4Pad button{height:40px;border-radius:10px;border:1px solid #3a5a8a;background:linear-gradient(180deg,#243048,#141a28);color:#fff;font:900 18px var(--ui)}#g4Pad .x{background:#3a1420;font-size:13px}`; document.head.appendChild(st); }
+  let code = ''; const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '✓'];
+  el.innerHTML = `<div style="font:800 12px var(--ui);color:#9ac8ff;text-align:center">🟦 ГАРАЖ 52 · введите код</div><div class="sc">····</div><div class="g">${keys.map((k) => `<button data-k="${k}">${k}</button>`).join('')}</div><button class="x">Отойти</button>`;
+  const sc = el.querySelector('.sc'), show = () => { sc.className = 'sc'; sc.textContent = (code + '····').slice(0, 4).replace(/\d/g, '•'); g4NikPadScr((code.replace(/./g, '*') + '____').slice(0, 4)); };
+  const close = () => { el.style.display = 'none'; G4E.ui = null; if (G4A.clip && G4A.clip.name === 'keypad') g4ClipEnd(); };
+  for (const b of el.querySelectorAll('[data-k]')) b.onclick = () => { const k = b.dataset.k; if (avatar) avatar.g4poke = G4.time; g4Sfx('beep', k === '✓' ? 1.2 : 0.9 + Math.random() * 0.2);
+    if (k === '⌫') { code = code.slice(0, -1); show(); return; }
+    if (k !== '✓') { if (code.length < 4) code += k; show(); if (code.length < 4) return; }
+    if (code.length < 4) { g4Sfx('sputter', 0.4); return; }
+    { if (code === '2426') { sc.className = 'sc ok'; sc.textContent = 'OK'; g4NikPadScr('ОТКРЫТО', '#5aff8a'); g4Sfx('ding', 1); G4.S.nik.open = (G4.S.nik.open || 0) + 1; g4NikDoor(true); later(0.7, close); if (G4.S.nik.open === 1) banner('🟦 ГАРАЖ 52 ОТКРЫТ', 'Тайник, патроны и «Куб-52» внутри'); }
+      else { sc.className = 'sc bad'; sc.textContent = 'НЕТ'; g4NikPadScr('ОШИБКА', '#ff4a4a'); g4Sfx('sputter', 0.6); code = ''; later(0.8, show); } }
+  };
+  el.querySelector('.x').onclick = close; show(); el.style.display = 'flex'; G4E.ui = el; touch.moveId = null; touch.jx = touch.jy = 0;
+  player.yaw = Math.atan2(-(G4NK.pad.x - player.pos.x), -(G4NK.pad.z - player.pos.z)); g4Clip('keypad', 99, { loop: true, hideGun: true });
+}
+/* ---------- машина «Куб-52» и Ник52 в гараже ---------- */
+function g4NikCar() {
+  const S = G4.S; if (G4NK.car || (S.nik && S.nik.car)) return; const { x0, z0, z1 } = G4NK_G;
+  try { const C = makeCar('sport', x0 + 9, (z0 + z1) / 2 + 0.6, Math.PI, { col: 0x1a5ad8 }); C.g4own = true; C.g4nik = true; C.g4name = '«Куб-52»'; C.g4fuel = 1; VEH.list.push(C); G4NK.car = C;
+    const cv = makeCanvas(256, 64), q = cv.getContext('2d'); q.fillStyle = '#f4f8ff'; q.fillRect(0, 0, 256, 64); q.fillStyle = '#1a3a8a'; q.font = '900 40px sans-serif'; q.textAlign = 'center'; q.textBaseline = 'middle'; q.fillText('НИК 52', 128, 34); const pl = new THREE.Mesh(new THREE.PlaneGeometry(0.52, 0.13), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv) })); pl.position.set(0, 0.55, -C.S.L / 2 - 0.02); pl.rotation.y = Math.PI; C.root.add(pl);
+  } catch (e) { console.warn('nik car', e); }
+}
+{ const _ve0 = vehEnter; vehEnter = function (C) { _ve0(C); try { if (mode === 'g4' && C && C.g4nik && G4.S && G4.S.nik && !G4.S.nik.car) { G4.S.nik.car = 1; (G4.S.cars = G4.S.cars || []).push({ id: 'sport', col: 0x1a5ad8 }); G4L.own = C; banner('🚗 «КУБ-52» ТЕПЕРЬ ВАШ', 'Синий спорткар Ник52 · в «Гараже» телефона'); } } catch (e) {} }; }
+function g4NikIn() {
+  if (G4NK.nikIn || !G4.S.nik || G4.S.nik.stage < 1) return; const { x0, z0, z1 } = G4NK_G, cz = (z0 + z1) / 2;
+  try { const n = mkNpc('blockhead', x0 + 1.15, cz + 1.0, Math.PI / 2, 'human'); n.pos.set(x0 + 1.15, 0, cz + 1.0); n.yaw = Math.PI / 2; n.scripted = true; n.protect = true; n.protMsg = 'Ник52 — свой'; n.setPose && n.setPose('sit', 1e9); G4NK.nikIn = n; } catch (e) {}
+}
+function g4NikInOut() { const n = G4NK.nikIn; if (!n) return; try { n.dispose(); } catch (e) {} const i = npcs.indexOf(n); if (i >= 0) npcs.splice(i, 1); G4NK.nikIn = null; }
+/* ---------- E ---------- */
+function g4DecideNik(look) {
+  const L = [], S = G4.S, p = player.pos;
+  if (G4NK.st === 'beat' && G4NK.nik) { const d = Math.hypot(G4NK.nik.pos.x - p.x, G4NK.nik.pos.z - p.z); if (d < 6) L.push({ d: 0.2, D: { label: '👊 E — заступиться за Ник52', run() { g4NikFight(); } } }); }
+  if (!G4NK.g || G4NK.rise) return L; const G = G4NK_G;
+  if (G4NK.pad) { const d = look(G4NK.pad.x, 1.4, G4NK.pad.z, 2.2); if (d >= 0) L.push({ d, D: { label: G4NK.doorWant ? '🔒 E — закрыть ворота' : '🔢 E — кодовый замок гаража', run() { if (G4NK.doorWant) g4NikDoor(false); else g4NikPadUI(); } } }); }
+  if (!G4NK.inside) return L;
+  { const d = look(G4NK.crate.x, 0.7, G4NK.crate.z, 2.4); if (d >= 0) L.push({ d, D: { label: S.nik.ammoDay === G4.day ? '📦 Ящик пуст до завтра' : '📦 Удерживайте E — патроны из ящика Ник52', hl: 'Набиваем магазины…', hold: 1.0, key: 'nikammo', run() { if (S.nik.ammoDay === G4.day) return; S.nik.ammoDay = G4.day; for (const it of tsArsAll()) if (it.D.mag) it.res = (it.res || 0) + it.D.mag * 4; tsArsHud(); toast('📦 Патроны ко всему оружию'); } } }); }
+  { const d = look(G.x0 + 0.6, 1.0, G.z1 - 0.8, 2.2); if (d >= 0) L.push({ d, D: { label: '🥤 E — энергетик «52» из холодильника', run() { if ((S.nik.drinkT || -99) > G4.time - 60) { toast('🥤 Хватит энергетиков на сегодня'); return; } S.nik.drinkT = G4.time; player.hp = Math.min(100, player.hp + 40); g4Sfx('hiss', 1); toast('🥤 +40 здоровья'); } } }); }
+  { const d = look(G.x1 - 4.2, 1.0, G.z1 - 0.8, 2.6); if (d >= 0) L.push({ d, D: { label: '🧳 E — тайник Ник52 (верстак)', run() { g4StashUI('nik', '🟦 Тайник Ник52'); } } }); }
+  { const n = G4NK.nikIn; if (n) { const d = look(n.pos.x, 1.0, n.pos.z, 2.6); if (d >= 0) L.push({ d, D: { label: '💬 E — поговорить с Ник52', run() { g4NikSay(n, pick(['Чувствуй себя как дома!', '«Куб-52» — мой малыш. Береги его.', 'Код никому не говори. Ну, разве что Воскресителю…', 'Говорят, на 88 этаже по ночам кто-то смеётся.', 'Квадратная голова — это стиль, а не диагноз.', 'Если что — я тут. Всегда.']), 2.6); g4NpcClip(n, 'wave', 1.8, { face: player.pos }); later(1.9, () => { if (G4NK.nikIn === n) n.setPose && n.setPose('sit', 1e9); }); } } }); } }
+  return L;
+}
+{ const _de11 = g4DecideEcon; g4DecideEcon = function (look) { const L = _de11(look); try { for (const x of g4DecideNik(look)) L.push(x); } catch (e) { console.warn('nik decide', e); } return L; }; }
+{ const _me11 = g4MiniExtra; g4MiniExtra = function (ic, T) { _me11(ic, T); if (G4NK.g) ic(G4NK_G.dx, G4NK_G.z0 - 2, '🟦', '#1a3a8a', 16, true); if (G4NK.st === 'beat' && G4NK.nik && player.pos.distanceTo(G4NK.nik.pos) < 60) ic(G4NK.nik.pos.x, G4NK.nik.pos.z, '❗', '#8a1a1a', 15, false); }; }
+/* ---------- тик ---------- */
+function g4NikTick(dt) {
+  if (!G4.playing || !G4.S) return; const S = G4.S; S.nik = S.nik || {}; const p = player.pos, dP = Math.hypot(p.x - G4NK_P.x, p.z - G4NK_P.z);
+  if (S.nik.stage >= 1 && !G4NK.g && Math.hypot(p.x - G4NK_G.dx, p.z - G4NK_G.z0) < 260) g4NikGarage(false);
+  // событие
+  if (!S.nik.stage && !G4NK.st && g4NikNight() && dP < 75) g4NikSpawn();
+  if (G4NK.st) { G4NK.t += dt; const N = G4NK.nik;
+    if (!N || player.dead || dP > 110 || (G4NK.st === 'beat' && !g4NikNight())) { g4NikClear(); }
+    else if (G4NK.st === 'beat') {
+      if ((G4NK.sayT -= dt) < 0) { G4NK.sayT = rand(2.5, 4.5); if (dP < 40) { if (Math.random() < 0.4) g4NikSay(N, pick(['Ай! Хватит!', 'Помогите кто-нибудь!', 'За что?!', 'Я просто гулял!']), 1.8); else g4NikSay(pick(G4NK.thugs), pick(['Где бабки, квадратный?!', 'Ещё раз сюда сунешься — получишь!', 'Снимай, снимай — в сеть выложим!', 'Квадратная башка, ха-ха!', 'Это наш район!']), 2); } }
+      if (dP < 7 && !G4NK.warned) { G4NK.warned = true; const n = G4NK.thugs.find((q) => q.alive); if (n) { g4NikSay(n, 'Тебе чего? Вали отсюда, пока цел!', 2.2); n.g4c && (n.g4c.o.face = player.pos); } }
+      if (dP < 2.2) g4NikFight();
+    }
+    else if (G4NK.st === 'fight') { if (G4NK.thugs.every(g4ThugDown)) g4NikWin(); }
+    else if (G4NK.st === 'walk') { const tx = G4NK_G.dx, tz = G4NK_G.z0 - 1.5, dx = tx - N.pos.x, dz = tz - N.pos.z, d = Math.hypot(dx, dz); N.scripted = true; if (d > 0.6 && G4NK.t < 30) { N.pos.x += dx / d * dt * 1.6; N.pos.z += dz / d * dt * 1.6; N.yaw = Math.atan2(dx, dz); N.speed = 1.6; N.root.position.copy(N.pos); N.root.rotation.y = N.yaw; } else { g4NikClear(); } }
+    else if (G4NK.st === 'win' && dP > 60) { g4NikClear(); }
+  }
+  { const want = (G4NK.st === 'beat' || G4NK.st === 'fight' || G4NK.st === 'win') && dP < 70 && !G4NK.inside && !(G4RT && G4RT.inside) && !(G4EL && G4EL.lt);
+    if (want && !G4NK.sceneLt) { G4NK.sceneLt = true; MAPS.coral.lamp[1] = 120; const l0 = lamps[0], l1 = lamps[1]; if (l0) { l0.color.setHex(0xffc890); l0.distance = 16; l0.position.set(G4NK_P.x - 1, 5.2, G4NK_P.z + 1); } if (l1) { l1.color.setHex(0x8ab0ff); l1.distance = 12; l1.position.set(G4NK_P.x + 3, 3.5, G4NK_P.z - 2); } }
+    else if (!want && G4NK.sceneLt) { G4NK.sceneLt = false; if (!G4NK.lt) { MAPS.coral.lamp[1] = 0; for (let i = 0; i < 4; i++) if (lamps[i]) lamps[i].position.set(0, -50, 0); } }
+    if (G4NK.sceneLt && lamps[0] && Math.random() < 0.02) lamps[0].position.y = Math.random() < 0.5 ? -50 : 5.2; else if (G4NK.sceneLt && lamps[0] && lamps[0].position.y < 0 && Math.random() < 0.3) lamps[0].position.y = 5.2; }
+  // гараж поднимается
+  const R = G4NK.rise; if (R && G4NK.g) { R.t += dt; const k = Math.min(1, R.t / 3.6), h = G4NK_G.h; G4NK.g.position.y = (-h - 0.6) * (1 - g4Sm(k)); if (Math.random() < dt * 14) spawnSprite(TEX.soft, new V3(rand(G4NK_G.x0, G4NK_G.x1), 0.3, G4NK_G.z0 - rand(0, 1.5)), { color: 0xb8a890, size: rand(0.8, 1.6), grow: 2, life: rand(0.8, 1.4), opacity: 0.55, vel: new V3(0, rand(0.5, 1.5), -rand(0.3, 1)) }); if (Math.hypot(p.x - G4NK_G.dx, p.z - G4NK_G.z0) < 60) shake = Math.max(shake, 0.12 * (1 - k)); if ((R.th = (R.th || 0) - dt) < 0) { R.th = 0.5; Sound.thud && Sound.thud(0.3); }
+    if (k >= 1) { G4NK.rise = null; g4NikSolids(); toast('🟦 Гараж Ник52 появился · код 2426'); } }
+  if (!G4NK.g || G4NK.rise) return;
+  // ворота
+  const tgt = G4NK.doorWant ? 1 : 0; G4NK.door += (tgt - G4NK.door) * Math.min(1, dt * 1.6); if (G4NK.doorM) { G4NK.doorM.position.y = G4NK.door * (G4NK_G.h - 1.3); G4NK.doorM.scale.y = 1 - G4NK.door * 0.75; }
+  const G = G4NK_G, inside = p.x > G.x0 && p.x < G.x1 && p.z > G.z0 - 0.2 && p.z < G.z1 && p.y < 4; G4NK.inside = inside;
+  if (G4NK.doorWant && !inside && Math.hypot(p.x - G.dx, p.z - G.z0) > 28 && !(VEH.in && VEH.in.g4nik && Math.hypot(VEH.in.x - G.dx, VEH.in.z - G.z0) < 12)) g4NikDoor(false);
+  const near = Math.hypot(p.x - G.dx, p.z - (G.z0 + G.z1) / 2) < 30;
+  if (near && G4NK.door > 0.3) { g4NikCar(); g4NikIn(); } else if (!near) g4NikInOut();
+  // свет внутри
+  const lt = inside ? 'in' : ''; if (lt !== G4NK.lt) { G4NK.lt = lt; if (lt && !(G4RT && G4RT.inside)) { MAPS.coral.lamp[1] = 150; const set = (i, col, x, y, z, dist) => { const l = lamps[i]; if (l) { l.color.setHex(col); l.distance = dist; l.position.set(x, y, z); } }; set(0, 0x8ac0ff, G.x0 + 7, 4.2, (G.z0 + G.z1) / 2, 14); set(1, 0xfff0e0, G.x1 - 7, 4.2, (G.z0 + G.z1) / 2, 14); set(2, 0x4a9fff, G.x0 + 2, 2.5, G.z1 - 2, 9); set(3, 0xffd8a0, G.x1 - 4, 2.2, G.z1 - 1.5, 8); } else if (!lt && !(G4RT && G4RT.inside)) { MAPS.coral.lamp[1] = 0; for (let i = 0; i < 4; i++) if (lamps[i]) lamps[i].position.set(0, -50, 0); } }
+  if (inside && G4NK.tv && (G4NK.tvT = (G4NK.tvT || 0) - dt) < 0) { G4NK.tvT = 0.25; G4NK.tv.material.color.setHSL(0.6 + Math.random() * 0.05, 0.7, 0.3 + Math.random() * 0.25); }
+}
+function g4NikOff() {
+  g4NikClear(); g4NikInOut(); for (const o of G4NK.ob) { const i = obstacles.indexOf(o); if (i >= 0) obstacles.splice(i, 1); } G4NK.ob = []; G4NK.doorOb = null;
+  if (G4NK.g) { if (G4NK.g.parent) G4NK.g.parent.remove(G4NK.g); const i = mapObjs.indexOf(G4NK.g); if (i >= 0) mapObjs.splice(i, 1); } G4NK.g = null; G4NK.rise = null; G4NK.car = null; G4NK.pad = null; G4NK.doorWant = 0; G4NK.door = 0; G4NK.lt = ''; G4NK.warned = false; G4NK.sceneLt = false;
+  const el = document.getElementById('g4Pad'); if (el) el.style.display = 'none';
 }
 /* ----- the final screen of location 3 ----- */
 const D3_END = { pay: ['Новый должник', 'заплатили собой'], burn: ['Чистый лист', 'сожгли гроссбух'], law: ['Счёт закрыт', 'встречный иск'], '': ['Долг', '—'] };
