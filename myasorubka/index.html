@@ -29240,11 +29240,11 @@ function g4NikClear() {
   for (const n of [G4NK.nik, ...G4NK.thugs]) { if (!n) continue; try { n.dispose(); } catch (e) {} const i = npcs.indexOf(n); if (i >= 0) npcs.splice(i, 1); }
   G4NK.nik = null; G4NK.thugs = []; G4NK.st = '';
 }
-function g4NikFight() {
+function g4NikBrawl() {
   if (G4NK.st !== 'beat') return; G4NK.st = 'fight'; G4NK.t = 0; let gun = false;
   for (const n of G4NK.thugs) { if (!n.alive) continue; g4NpcClipStop(n); g4PhoneProp(n, false); n.scripted = false; if (!gun && Math.random() < 0.6) { gun = true; g4ArmUp(n); } else { n.g4brawl = true; n.g4pc = rand(0.4, 1); } }
   g4NikSay(G4NK.thugs[0], pick(['О, герой нашёлся! Мочи его!', 'Ты чё, за квадратного впрягаешься?!', 'Сам напросился!']), 2.2);
-  banner('👊 ЗАСТУПИТЕСЬ ЗА НИК52', 'Разгоните хулиганов'); shake = Math.max(shake, 0.2);
+  banner('👊 ДРАКА', 'Вы ударили хулигана — они ответят'); shake = Math.max(shake, 0.2);
 }
 // хулиганы дерутся кулаками
 { const _th7 = Humanoid.prototype.think; Humanoid.prototype.think = function (dt) {
@@ -29262,19 +29262,32 @@ function g4NikFight() {
   }
   return _th7.call(this, dt);
 }; }
-{ const _oh7 = TS.onNpcHit; TS.onNpcHit = (n, was, dmg) => { if (_oh7) _oh7(n, was, dmg); if (mode === 'g4' && n && n.g4thug) g4NikFight(); }; }
+{ const _oh7 = TS.onNpcHit; TS.onNpcHit = (n, was, dmg) => { if (_oh7) _oh7(n, was, dmg); if (mode === 'g4' && n && n.g4thug) g4NikBrawl(); }; }
 function g4ThugDown(n) { return !n.alive || n.state !== 'alive' || LOW_POSE[n.pose] || n.g4ko || n.panic > 0.5 || (!n.g4brawl && !n.g4hostile) || n.pos.distanceTo(G4NK.nik ? G4NK.nik.pos : player.pos) > 25; }
+// помочь толпе: встать в круг пинающих, толпа награждает
+function g4NikHelp() {
+  if (G4NK.st !== 'beat' || !G4NK.nik) return; G4NK.st = 'help'; G4NK.t = 0;
+  for (const n of G4NK.thugs) if (n.alive) { n.g4brawl = false; n.g4hostile = false; }
+  const T0 = G4NK.thugs.find((q) => q.alive); g4NikSay(T0 || G4NK.nik, pick(['Ого, ты с нами! Покажем квадратному!', 'Вот это герой! Давай, пинай!']), 2.2);
+  banner('🦶 ВЫ В ТОЛПЕ', 'Толпа оценила помощь'); Sound.click && Sound.click(900, 0.2);
+}
+function g4NikBrawlEnd() {
+  G4NK.st = 'end'; G4NK.t = 0; for (const n of G4NK.thugs) { n.g4brawl = false; if (n.alive && n.g4hostile) { n.g4hostile = false; n.panic = 10; if (n.g4gun) n.g4gun.visible = false; } }
+  later(3, () => g4NikClear());
+}
 function g4NikWin() {
   G4NK.st = 'win'; G4NK.t = 0; const N = G4NK.nik, S = G4.S; S.nik = S.nik || {}; if (!N) return;
+  const T0 = G4NK.thugs.find((q) => q.alive) || N;
+  for (const n of G4NK.thugs) if (n.alive) { g4NpcClipStop(n); n.scripted = true; g4NpcClip(n, 'clap', 4, { face: player.pos }); }
   for (const n of G4NK.thugs) { n.g4brawl = false; if (n.alive && n.g4hostile) { n.g4hostile = false; n.panic = 10; if (n.g4gun) n.g4gun.visible = false; } }
-  g4NpcClipStop(N); N.setPose && N.setPose('kneel', 1.6); banner('🟦 НИК52 СПАСЁН', 'Секрет ELITE City'); Sound.chime && Sound.chime();
+  banner('🟦 ЛЕГЕНДА ТОЛПЫ', 'Секрет ELITE City'); Sound.chime && Sound.chime();
   const face = () => { N.yaw = Math.atan2(player.pos.x - N.pos.x, player.pos.z - N.pos.z); N.root.rotation.y = N.yaw; };
-  later(0.4, () => g4NikSay(N, 'Ох… они ушли? Ушли!', 2));
-  later(2.0, () => { face(); g4NpcClip(N, 'thanks', 2.2, { face: player.pos }); g4NikSay(N, 'Спасибо! Ты меня реально спас.', 2.3); });
-  later(4.4, () => { face(); g4NikSay(N, 'Держи «Тихоню-52». Глушитель встроен. Такой не купишь ни в одном магазине.', 3); g4GiveLegend(); S.nik.gun = 1; });
-  later(7.4, () => { face(); g4NikSay(N, 'И ещё $2000 — на бензин и шаурму.', 2.4); S.cash += 2000; g4Tx(2000, 'Подарок Ник52'); Sound.click && Sound.click(1500, 0.25); toast('💵 +$2000 от Ник52'); });
-  later(9.8, () => { face(); g4NikSay(N, 'А за башней — мой гараж. Код 2426. Заходи когда хочешь!', 3.2); S.nik.stage = 1; S.nik.day = G4.day; g4NikGarage(true); g4SetWaypoint(G4NK_G.dx, G4NK_G.z0 - 4, 'Гараж Ник52'); });
-  later(13.5, () => { if (!G4NK.nik) return; G4NK.st = 'walk'; G4NK.t = 0; });
+  later(0.4, () => g4NikSay(T0, 'Вот это удар! Наш человек!', 2.2));
+  later(2.4, () => g4NikSay(T0, 'Такие ребята нам нужны. Держи!', 2.4));
+  later(4.6, () => { g4NikSay(T0, 'Тихоня-52. Глушитель встроен. В магазинах такого нет.', 3); g4GiveLegend(); S.nik.gun = 1; });
+  later(7.8, () => { g4NikSay(T0, 'И ещё $2000 — за работу.', 2.4); S.cash += 2000; g4Tx(2000, 'Награда толпы'); Sound.click && Sound.click(1500, 0.25); toast('💵 +$2000 от толпы'); });
+  later(10.2, () => { g4NikSay(T0, 'А за башней — гараж. Код 2426. Заходи, если что.', 3.2); S.nik.stage = 1; S.nik.day = G4.day; g4NikGarage(true); g4SetWaypoint(G4NK_G.dx, G4NK_G.z0 - 4, 'Гараж (код 2426)'); });
+  later(13.5, () => g4NikClear());
 }
 /* ---------- гараж: поднимается из-под земли ---------- */
 function g4NikGarage(rise) {
@@ -29352,7 +29365,7 @@ function g4NikInOut() { const n = G4NK.nikIn; if (!n) return; try { n.dispose();
 /* ---------- E ---------- */
 function g4DecideNik(look) {
   const L = [], S = G4.S, p = player.pos;
-  if (G4NK.st === 'beat' && G4NK.nik) { const d = Math.hypot(G4NK.nik.pos.x - p.x, G4NK.nik.pos.z - p.z); if (d < 6) L.push({ d: 0.2, D: { label: '👊 E — заступиться за Ник52', run() { g4NikFight(); } } }); }
+  if (G4NK.st === 'beat' && G4NK.nik) { const d = Math.hypot(G4NK.nik.pos.x - p.x, G4NK.nik.pos.z - p.z); if (d < 6) L.push({ d: 0.2, D: { label: '🦶 E — присоединиться к толпе', run() { g4NikHelp(); } } }); }
   if (!G4NK.g || G4NK.rise) return L; const G = G4NK_G;
   if (G4NK.pad) { const d = look(G4NK.pad.x, 1.4, G4NK.pad.z, 2.2); if (d >= 0) L.push({ d, D: { label: G4NK.doorWant ? '🔒 E — закрыть ворота' : '🔢 E — кодовый замок гаража', run() { if (G4NK.doorWant) g4NikDoor(false); else g4NikPadUI(); } } }); }
   if (!G4NK.inside) return L;
@@ -29375,9 +29388,9 @@ function g4NikTick(dt) {
     else if (G4NK.st === 'beat') {
       if ((G4NK.sayT -= dt) < 0) { G4NK.sayT = rand(2.5, 4.5); if (dP < 40) { if (Math.random() < 0.4) g4NikSay(N, pick(['Ай! Хватит!', 'Помогите кто-нибудь!', 'За что?!', 'Я просто гулял!']), 1.8); else g4NikSay(pick(G4NK.thugs), pick(['Где бабки, квадратный?!', 'Ещё раз сюда сунешься — получишь!', 'Снимай, снимай — в сеть выложим!', 'Квадратная башка, ха-ха!', 'Это наш район!']), 2); } }
       if (dP < 7 && !G4NK.warned) { G4NK.warned = true; const n = G4NK.thugs.find((q) => q.alive); if (n) { g4NikSay(n, 'Тебе чего? Вали отсюда, пока цел!', 2.2); n.g4c && (n.g4c.o.face = player.pos); } }
-      if (dP < 2.2) g4NikFight();
     }
-    else if (G4NK.st === 'fight') { if (G4NK.thugs.every(g4ThugDown)) g4NikWin(); }
+    else if (G4NK.st === 'help') { if (G4NK.t > 2.6) g4NikWin(); }
+    else if (G4NK.st === 'fight') { if (G4NK.thugs.every(g4ThugDown)) g4NikBrawlEnd(); }
     else if (G4NK.st === 'walk') { const tx = G4NK_G.dx, tz = G4NK_G.z0 - 1.5, dx = tx - N.pos.x, dz = tz - N.pos.z, d = Math.hypot(dx, dz); N.scripted = true; if (d > 0.6 && G4NK.t < 30) { N.pos.x += dx / d * dt * 1.6; N.pos.z += dz / d * dt * 1.6; N.yaw = Math.atan2(dx, dz); N.speed = 1.6; N.root.position.copy(N.pos); N.root.rotation.y = N.yaw; } else { g4NikClear(); } }
     else if (G4NK.st === 'win' && dP > 60) { g4NikClear(); }
   }
