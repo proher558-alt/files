@@ -29429,6 +29429,14 @@ function admG4Tp(name, x, z, y) {
   if (typeof G4EL !== 'undefined' && y !== undefined && y > 100) { try { G4EL.lt = ''; } catch (e) {} }
   toast(`📍 ${name}`);
 }
+const G4_SECRET_NUMS = [['6292', 'звонок: $88 888 (один раз)'], ['080', 'смена погоды за $500'], ['543', 'меню призыва персонажей за $4000'], ['911', 'диспетчер службы спасения']];
+const G4_SECRET_CODES = [['2426', 'гараж Ник52 (замок)'], ['3398', 'вход в главу 2'], ['6508', 'эта админка']];
+// погода из админки: тихая смена без записки, дождь и шторм включают звук дождя
+function admG4Wx(w) {
+  if (!admG4Ok()) return; G4.weather = w; try { SFX.rain && SFX.rain(w === 'rain' || w === 'storm' ? 1 : 0); } catch (e) {}
+  if (w === 'clear') { try { G4SKY && G4SKY.rain && (G4SKY.rain.visible = false); } catch (e) {} }
+  toast(`🌦 Погода: ${{ clear: 'ясно', clouds: 'облачно', rain: 'дождь', storm: 'гроза' }[w]}`); admRender();
+}
 function admCh4() {
   const S = G4.S || {}, L = [];
   L.push({ sec: `Деньги и розыск · $${S.cash || 0} на руках · звёзды ${TS.wl ? TS.wl.stars : 0}` });
@@ -29438,6 +29446,19 @@ function admCh4() {
   L.push({ l: 'Розыск 0 ★', s: 'Очистить розыск', f: () => { if (!admG4Ok()) return; tsWlClear(); toast('⭐ Розыска нет'); admRender(); } });
   for (const n of [2, 4, 6]) L.push({ l: `Розыск ${n} ★`, s: 'Полиция и вертолёты', f: () => { if (!admG4Ok()) return; tsWlSet(n); admClose(); } });
   L.push({ l: 'Розыск 8 ★', s: 'Танки и мехи', f: () => { if (!admG4Ok()) return; tsWlSet(8); admClose(); } });
+
+  L.push({ sec: `Погода · сейчас: ${G4.weather || 'clear'} · ${G4.wT > 1e6 ? 'заморожена' : 'меняется сама'}` });
+  const WX = [['clear', '☀️ Ясно', 'Солнце'], ['clouds', '☁️ Облачно', 'Небо в облаках'], ['rain', '🌧 Дождь', 'Тропический ливень'], ['storm', '⛈ Гроза', 'Шторм над городом']];
+  for (const [w, t, s] of WX) L.push({ l: t, s, on: G4.weather === w, f: () => admG4Wx(w) });
+  L.push({ l: 'Убрать шторм', s: 'Гроза → ясно, дождь и молнии стихают', f: () => { if (!admG4Ok()) return; admG4Wx('clear'); } });
+  L.push({ l: G4.wT > 1e6 ? 'Разморозить погоду' : 'Заморозить погоду', s: G4.wT > 1e6 ? 'Погода снова меняется сама' : 'Текущая погода останется', f: () => { if (!admG4Ok()) return; if (G4.wT > 1e6) G4.wT = rand(300, 600); else G4.wT = 1e9; admRender(); } });
+
+  L.push({ sec: `Время суток · сейчас ${String(Math.floor(G4.tod || 0)).padStart(2, '0')}:${String(Math.floor(((G4.tod || 0) % 1) * 60)).padStart(2, '0')}` });
+  for (const [h, t, s] of [[6.5, '🌅 Рассвет', '06:30'], [12, '☀️ День', '12:00'], [18.5, '🌇 Закат', '18:30'], [21.5, '🌃 Ночь', '21:30 · секретка Ник52'], [2.5, '🌑 Глубокая ночь', '02:30']]) L.push({ l: t, s, f: () => { if (!admG4Ok()) return; G4.tod = h; admClose(); toast(`🕐 ${s.split(' ')[0]}`); } });
+
+  L.push({ sec: 'Секретные номера' });
+  for (const [n, what] of G4_SECRET_NUMS) L.push({ l: `☎️ ${n} — ${what}`, s: 'Набрать на телефоне', f: () => { if (!admG4Ok()) return; admClose(); G4CALL.num = n; g4PhoneOpen('call'); } });
+  for (const [c, what] of G4_SECRET_CODES) L.push({ l: `🔢 ${c} — ${what}`, s: 'Код (не телефон): показать', f: () => toast(`🔢 Код ${c}: ${what}`) });
 
   L.push({ sec: 'Секретка: Ник52' });
   L.push({ l: 'Площадь Ник52 (ночью)', s: 'Толпа у башни, E — присоединиться', f: () => admG4Tp('Площадь Ник52', G4NK_P.x, G4NK_P.z + 5) });
