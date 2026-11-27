@@ -24652,7 +24652,7 @@ function tsBody7() {
     T.position.copy(Pw); T.quaternion.copy(Qw);
     // механизмы копии повторяют VM
     const V = G.U; for (const k of ['slide', 'pump', 'bolt', 'boltH', 'crane', 'cyl', 'ham', 'mag', 'ch', 'knob', 'trig']) if (V[k] && U[k]) { U[k].position.copy(V[k].position); U[k].quaternion.copy(V[k].quaternion); U[k].visible = V[k].visible; }
-    const mz = U.muzzle.clone().applyQuaternion(Qw).add(Pw), d = new V3(0, 0, -1).applyQuaternion(Qw); const dist = Math.max(2, aimP.distanceTo(mz));
+    const mz = U.muzzle.clone().applyQuaternion(Qw).add(Pw), dAim = aimP.clone().sub(mz), d = dAim.lengthSq() > 1e-6 ? dAim.normalize() : new V3(0, 0, -1).applyQuaternion(Qw); const dist = Math.max(2, aimP.distanceTo(mz));
     TS.gunTW = { ok: true, mz, d, aim: mz.clone().addScaledVector(d, dist), base: Pw.clone() };
   } else { if (TS.twin) TS.twin.visible = false; if (TS.gunTW) TS.gunTW.ok = false; }
   // холодное оружие — в правой кисти аватара
@@ -29203,7 +29203,7 @@ function g4RentOff() {
    дарит легендарный пистолет с глушителем «Тихоня-52» (не продаётся), $2000 и рассказывает про
    гараж: из-под земли поднимается гараж с кодовым замком 2426. Внутри — «Куб-52», тайник, патроны. */
 const G4NK = { nik: null, thugs: [], st: '', t: 0, g: null, door: 0, doorT: 0, rise: null, ob: [], doorOb: null, car: null, lt: '', pad: null, inside: false, nikIn: null, sayT: 0 };
-const G4NK_P = { x: 436, z: -139 }, G4NK_G = { x0: 422, x1: 450, z0: -201, z1: -189, h: 5.2, dx: 436, dw: 6 };
+const G4NK_P = { x: 436, z: -195 }, G4NK_G = { x0: 422, x1: 450, z0: -201, z1: -189, h: 5.2, dx: 436, dw: 6 };
 /* ---------- легендарный пистолет ---------- */
 TS_GUN.legend = Object.assign({}, TS_GUN.pistol, { name: 'Тихоня-52 ★', mag: 17, res: 102, dmg: 58, rate: 0.12, spread: 0.0022, pen: 2, force: 72, reload: 1.15, kick: 0.05, climb: 0.008, len: 0.36, legend: true });
 TS_READY.legend = TS_READY.pistol.slice(); TS_READY.legend[2] -= 0.02; TS_ADSD.legend = TS_ADSD.pistol; TS_INSP.legend = 1.3;
@@ -29234,11 +29234,11 @@ function g4NikSpawn() {
   G4NK.thugs = clips.map((c, i) => { const a = i / clips.length * Math.PI * 2 + 0.4, r = c === 'film' || c === 'taunt' ? 2.6 : 1.35, tx = x + Math.cos(a) * r, tz = z + Math.sin(a) * r; try { const n = mkNpc(pick(['street', 'worker']), tx, tz, 0, 'human'); n.pos.set(tx, 0, tz); n.g4thug = true; n.g4dp = rand(0, 1); n.yaw = Math.atan2(x - tx, z - tz); n.root.rotation.y = n.yaw; g4NpcClip(n, c, 99, { loop: true, face: { x, z } }); if (c === 'film') g4PhoneProp(n, true);
     n.g4onHit = () => { const N = G4NK.nik; if (!N) return; N.flinch = 0.8; N.hitLocal && N.hitLocal.set(rand(-1, 1), 0, rand(-1, 1)); if (N.pos.distanceTo(player.pos) < 30) Sound.thud && Sound.thud(0.3); if (Math.random() < 0.3) spawnSprite(TEX.soft, new V3(N.pos.x + rand(-0.3, 0.3), 0.25, N.pos.z + rand(-0.3, 0.3)), { color: 0xb8a890, size: rand(0.3, 0.6), grow: 1.5, life: 0.6, opacity: 0.5 }); };
     return n; } catch (e) { return null; } }).filter(Boolean);
-  G4NK.st = 'beat'; G4NK.t = 0; G4NK.sayT = 1; G4NK.warned = false;
+  G4NK.st = 'beat'; G4NK.t = 0; G4NK.sayT = 1; G4NK.warned = false; g4NikDoor(true);
 }
 function g4NikClear() {
   for (const n of [G4NK.nik, ...G4NK.thugs]) { if (!n) continue; try { n.dispose(); } catch (e) {} const i = npcs.indexOf(n); if (i >= 0) npcs.splice(i, 1); }
-  G4NK.nik = null; G4NK.thugs = []; G4NK.st = '';
+  G4NK.nik = null; G4NK.thugs = []; G4NK.st = ''; if (!(G4.S && G4.S.nik && G4.S.nik.stage) && G4NK.g) g4NikDoor(false);
 }
 function g4NikBrawl() {
   if (G4NK.st !== 'beat') return; G4NK.st = 'fight'; G4NK.t = 0; let gun = false;
@@ -29380,7 +29380,7 @@ function g4DecideNik(look) {
 /* ---------- тик ---------- */
 function g4NikTick(dt) {
   if (!G4.playing || !G4.S) return; const S = G4.S; S.nik = S.nik || {}; const p = player.pos, dP = Math.hypot(p.x - G4NK_P.x, p.z - G4NK_P.z);
-  if (S.nik.stage >= 1 && !G4NK.g && Math.hypot(p.x - G4NK_G.dx, p.z - G4NK_G.z0) < 260) g4NikGarage(false);
+  if (!G4NK.g && Math.hypot(p.x - G4NK_G.dx, p.z - G4NK_G.z0) < 260) g4NikGarage(false);
   // событие
   if (!S.nik.stage && !G4NK.st && g4NikNight() && dP < 75) g4NikSpawn();
   if (G4NK.st) { G4NK.t += dt; const N = G4NK.nik;
