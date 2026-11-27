@@ -26621,7 +26621,7 @@ function g4Decide() {
 // продавец скупщика
 function g4FenceTick() { const F = G4M.spots.fence; if (!F) return; const d = Math.hypot(F.x - player.pos.x, F.z - player.pos.z); if (d < 60 && (!G4C.fence || !G4C.fence.root)) { const n = mkNpc('worker', F.x, F.z, F.yaw || 0, 'human'); n.scripted = true; n.protect = true; n.protMsg = 'Скупщик полезнее живым'; n.pos.set(F.x, 0, F.z); n.pose = 'stand'; G4C.fence = n; } if (G4C.fence && d > 90) { try { G4C.fence.dispose(); } catch (e) {} const j = npcs.indexOf(G4C.fence); if (j >= 0) npcs.splice(j, 1); G4C.fence = null; } }
 /* ---------- кадр ---------- */
-function g4CrimeStart() { G4C.wit = []; G4C.rob = null; G4C.alarm = null; G4C.dead = false; G4C.surr = false; G4C.busted = null; G4C.patrolT = 2; G4C.heat = G4.S.heat || {}; G4C.hot = {}; if (!TS.bank || !TS.bank.banker || !TS.bank.banker.root) { try { tsBankReset(); } catch (e) { console.warn('bank', e); } } }
+function g4CrimeStart() { G4C.wit = []; G4C.rob = null; G4C.alarm = null; G4C.dead = false; G4C.surr = false; G4C.busted = null; G4C.patrolT = 2; G4C.heat = G4.S.heat || {}; G4C.hot = {}; if (!TS.bank || !TS.bank.banker || !TS.bank.banker.root || !TS.bank.banker.root.parent || !TS.bank.banker.alive) { try { tsBankReset(); } catch (e) { console.warn('bank', e); } } }
 function g4CrimeTick(dt) {
   if (VEH.in || !TS.on) { try { tsPost9(dt); } catch (e) { console.warn(e); } }
   for (const p of G4L.peds) if (!p.alive && !p.g4dead) { p.g4dead = true; if (p.pos.distanceTo(player.pos) < 14 && !(p.g4ped && p.g4ped.gang)) g4Crime('kill', p.pos, 2); }
