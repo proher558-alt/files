@@ -29238,7 +29238,7 @@ function g4NikSpawn() {
 }
 function g4NikClear() {
   for (const n of [G4NK.nik, ...G4NK.thugs]) { if (!n) continue; try { n.dispose(); } catch (e) {} const i = npcs.indexOf(n); if (i >= 0) npcs.splice(i, 1); }
-  G4NK.nik = null; G4NK.thugs = []; G4NK.st = ''; if (!(G4.S && G4.S.nik && G4.S.nik.stage) && G4NK.g) g4NikDoor(false);
+  G4NK.nik = null; G4NK.thugs = []; G4NK.st = ''; if (!(G4.S && G4.S.nik && G4.S.nik.stage) && G4NK.g && !(player.pos.x > G4NK_G.x0 && player.pos.x < G4NK_G.x1 && player.pos.z > G4NK_G.z0 && player.pos.z < G4NK_G.z1)) g4NikDoor(false);
 }
 function g4NikBrawl() {
   if (G4NK.st !== 'beat') return; G4NK.st = 'fight'; G4NK.t = 0; let gun = false;
@@ -29405,6 +29405,7 @@ function g4NikTick(dt) {
   // ворота
   const tgt = G4NK.doorWant ? 1 : 0; G4NK.door += (tgt - G4NK.door) * Math.min(1, dt * 1.6); if (G4NK.doorM) { G4NK.doorM.position.y = G4NK.door * (G4NK_G.h - 1.3); G4NK.doorM.scale.y = 1 - G4NK.door * 0.75; }
   const G = G4NK_G, inside = p.x > G.x0 && p.x < G.x1 && p.z > G.z0 - 0.2 && p.z < G.z1 && p.y < 4; G4NK.inside = inside;
+  if (inside && !G4NK.doorWant) g4NikDoor(true); // внутри гаража ворота не закрываются: можно выйти
   if (G4NK.doorWant && !inside && Math.hypot(p.x - G.dx, p.z - G.z0) > 28 && !(VEH.in && VEH.in.g4nik && Math.hypot(VEH.in.x - G.dx, VEH.in.z - G.z0) < 12)) g4NikDoor(false);
   const near = Math.hypot(p.x - G.dx, p.z - (G.z0 + G.z1) / 2) < 30;
   if (near && G4NK.door > 0.3) { g4NikCar(); g4NikIn(); } else if (!near) g4NikInOut();
@@ -29437,8 +29438,22 @@ function admG4Wx(w) {
   if (w === 'clear') { try { G4SKY && G4SKY.rain && (G4SKY.rain.visible = false); } catch (e) {} }
   toast(`🌦 Погода: ${{ clear: 'ясно', clouds: 'облачно', rain: 'дождь', storm: 'гроза' }[w]}`); admRender();
 }
+// ноуклип: летаем сквозь стены. ПРЫЖОК — вверх, ПРИСЕСТЬ — вниз, джойстик — движение
+const G4NC = { on: false };
+{ const _upN = updatePlayer; updatePlayer = function (dt) {
+  if (!G4NC.on || mode !== 'g4' || !G4.playing || player.dead || player.rag || VEH.in || state !== 'play') return _upN(dt);
+  const d = g4MoveDir(), sp = 9 * dt;
+  if (d.mv) { player.pos.x += d.x * sp; player.pos.z += d.z * sp; }
+  if (touch.jump) player.pos.y += 7 * dt;
+  if (TS.crouchOn) player.pos.y -= 7 * dt;
+  player.pos.y = Math.max(-2, player.pos.y);
+  touch.jump = false; player.vel.set(0, 0, 0); player.onGround = true;
+  eye.position.set(player.pos.x, player.pos.y + player.eye, player.pos.z); eye.rotation.set(player.pitch, player.yaw, 0); eye.updateMatrixWorld();
+}; }
 function admCh4() {
   const S = G4.S || {}, L = [];
+  L.push({ sec: 'Ноуклип' });
+  L.push({ l: G4NC.on ? 'Ноуклип: ВКЛ · выключить' : 'Ноуклип: выкл · включить', s: 'Сквозь стены: ПРЫЖОК — вверх, ПРИСЕСТЬ — вниз', on: G4NC.on, f: () => { if (!admG4Ok()) return; G4NC.on = !G4NC.on; toast(G4NC.on ? '👻 Ноуклип включён' : 'Ноуклип выключен'); admRender(); } });
   L.push({ sec: `Деньги и розыск · $${S.cash || 0} на руках · звёзды ${TS.wl ? TS.wl.stars : 0}` });
   L.push({ l: '+ $10 000 на руки', s: 'Наличные', f: () => { if (!admG4Ok()) return; S.cash = (S.cash || 0) + 10000; g4Tx(10000, 'Админка'); toast('💵 +$10 000'); admRender(); } });
   L.push({ l: '+ $100 000 на счёт', s: 'Банк', f: () => { if (!admG4Ok()) return; S.bank = (S.bank || 0) + 100000; toast('🏦 +$100 000 на счёт'); admRender(); } });
