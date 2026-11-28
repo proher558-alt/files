@@ -29286,7 +29286,7 @@ function g4NikWin() {
   later(2.4, () => g4NikSay(T0, 'Такие ребята нам нужны. Держи!', 2.4));
   later(4.6, () => { g4NikSay(T0, 'Тихоня-52. Глушитель встроен. В магазинах такого нет.', 3); g4GiveLegend(); S.nik.gun = 1; });
   later(7.8, () => { g4NikSay(T0, 'И ещё $2000 — за работу.', 2.4); S.cash += 2000; g4Tx(2000, 'Награда толпы'); Sound.click && Sound.click(1500, 0.25); toast('💵 +$2000 от толпы'); });
-  later(10.2, () => { g4NikSay(T0, 'А за башней — гараж. Код 2426. Заходи, если что.', 3.2); S.nik.stage = 1; S.nik.day = G4.day; g4NikGarage(true); g4SetWaypoint(G4NK_G.dx, G4NK_G.z0 - 4, 'Гараж (код 2426)'); });
+  later(10.2, () => { g4NikSay(T0, 'Ты нам понравился. Мы тут каждую ночь — заглядывай.', 3.2); later(2.5, () => g4Note('📩 Ник52: «Гараж за башней. Ночью вход по коду 2426, утром открыто. Загляни — есть работа!»', 7)); S.nik.stage = 1; S.nik.day = G4.day; g4NikGarage(true); g4SetWaypoint(G4NK_G.dx, G4NK_G.z0 - 4, 'Гараж (код 2426)'); });
   later(13.5, () => g4NikClear());
 }
 /* ---------- гараж: поднимается из-под земли ---------- */
@@ -29343,7 +29343,7 @@ function g4NikPadUI() {
     if (k === '⌫') { code = code.slice(0, -1); show(); return; }
     if (k !== '✓') { if (code.length < 4) code += k; show(); if (code.length < 4) return; }
     if (code.length < 4) { g4Sfx('sputter', 0.4); return; }
-    { if (code === '2426') { sc.className = 'sc ok'; sc.textContent = 'OK'; g4NikPadScr('ОТКРЫТО', '#5aff8a'); g4Sfx('ding', 1); G4.S.nik.open = (G4.S.nik.open || 0) + 1; g4NikDoor(true); later(0.7, close); if (G4.S.nik.open === 1) banner('🟦 ГАРАЖ 52 ОТКРЫТ', 'Тайник, патроны и «Куб-52» внутри'); }
+    { if (code === '2426') { sc.className = 'sc ok'; sc.textContent = 'OK'; g4NikPadScr('ОТКРЫТО', '#5aff8a'); g4Sfx('ding', 1); G4.S.nik.open = (G4.S.nik.open || 0) + 1; G4NK.codeOpen = true; g4NikDoor(true); later(0.7, close); if (G4.S.nik.open === 1) banner('🟦 ГАРАЖ 52 ОТКРЫТ', 'Тайник, патроны и «Куб-52» внутри'); }
       else { sc.className = 'sc bad'; sc.textContent = 'НЕТ'; g4NikPadScr('ОШИБКА', '#ff4a4a'); g4Sfx('sputter', 0.6); code = ''; later(0.8, show); } }
   };
   el.querySelector('.x').onclick = close; show(); el.style.display = 'flex'; G4E.ui = el; touch.moveId = null; touch.jx = touch.jy = 0;
@@ -29358,7 +29358,7 @@ function g4NikCar() {
 }
 { const _ve0 = vehEnter; vehEnter = function (C) { _ve0(C); try { if (mode === 'g4' && C && C.g4nik && G4.S && G4.S.nik && !G4.S.nik.car) { G4.S.nik.car = 1; (G4.S.cars = G4.S.cars || []).push({ id: 'sport', col: 0x1a5ad8 }); G4L.own = C; banner('🚗 «КУБ-52» ТЕПЕРЬ ВАШ', 'Синий спорткар Ник52 · в «Гараже» телефона'); } } catch (e) {} }; }
 function g4NikIn() {
-  if (G4NK.nikIn || !G4.S.nik || G4.S.nik.stage < 1) return; const { x0, z0, z1 } = G4NK_G, cz = (z0 + z1) / 2;
+  if (G4NK.nikIn || !G4.S.nik || !g4NikDay()) return; const { x0, z0, z1 } = G4NK_G, cz = (z0 + z1) / 2;
   try { const n = mkNpc('blockhead', x0 + 1.15, cz + 1.0, Math.PI / 2, 'human'); n.pos.set(x0 + 1.15, 0, cz + 1.0); n.yaw = Math.PI / 2; n.scripted = true; n.protect = true; n.protMsg = 'Ник52 — свой'; n.setPose && n.setPose('sit', 1e9); G4NK.nikIn = n; } catch (e) {}
 }
 function g4NikInOut() { const n = G4NK.nikIn; if (!n) return; try { n.dispose(); } catch (e) {} const i = npcs.indexOf(n); if (i >= 0) npcs.splice(i, 1); G4NK.nikIn = null; }
@@ -29367,7 +29367,7 @@ function g4DecideNik(look) {
   const L = [], S = G4.S, p = player.pos;
   if (G4NK.st === 'beat' && G4NK.nik) { const d = Math.hypot(G4NK.nik.pos.x - p.x, G4NK.nik.pos.z - p.z); if (d < 6) L.push({ d: 0.2, D: { label: '🦶 E — присоединиться к толпе', run() { g4NikHelp(); } } }); }
   if (!G4NK.g || G4NK.rise) return L; const G = G4NK_G;
-  if (G4NK.pad) { const d = look(G4NK.pad.x, 1.4, G4NK.pad.z, 2.2); if (d >= 0) L.push({ d, D: { label: G4NK.doorWant ? '🔒 E — закрыть ворота' : '🔢 E — кодовый замок гаража', run() { if (G4NK.doorWant) g4NikDoor(false); else g4NikPadUI(); } } }); }
+  if (G4NK.pad && !g4NikDay()) { const d = look(G4NK.pad.x, 1.4, G4NK.pad.z, 2.2); if (d >= 0) L.push({ d, D: { label: G4NK.doorWant ? '🔒 E — закрыть ворота' : '🔢 E — кодовый замок гаража', run() { if (G4NK.doorWant) g4NikDoor(false); else g4NikPadUI(); } } }); }
   if (!G4NK.inside) return L;
   { const d = look(G4NK.crate.x, 0.7, G4NK.crate.z, 2.4); if (d >= 0) L.push({ d, D: { label: S.nik.ammoDay === G4.day ? '📦 Ящик пуст до завтра' : '📦 Удерживайте E — патроны из ящика Ник52', hl: 'Набиваем магазины…', hold: 1.0, key: 'nikammo', run() { if (S.nik.ammoDay === G4.day) return; S.nik.ammoDay = G4.day; for (const it of tsArsAll()) if (it.D.mag) it.res = (it.res || 0) + it.D.mag * 4; tsArsHud(); toast('📦 Патроны ко всему оружию'); } } }); }
   { const d = look(G.x0 + 0.6, 1.0, G.z1 - 0.8, 2.2); if (d >= 0) L.push({ d, D: { label: '🥤 E — энергетик «52» из холодильника', run() { if ((S.nik.drinkT || -99) > G4.time - 60) { toast('🥤 Хватит энергетиков на сегодня'); return; } S.nik.drinkT = G4.time; player.hp = Math.min(100, player.hp + 40); g4Sfx('hiss', 1); toast('🥤 +40 здоровья'); } } }); }
@@ -29405,10 +29405,12 @@ function g4NikTick(dt) {
   // ворота
   const tgt = G4NK.doorWant ? 1 : 0; G4NK.door += (tgt - G4NK.door) * Math.min(1, dt * 1.6); if (G4NK.doorM) { G4NK.doorM.position.y = G4NK.door * (G4NK_G.h - 1.3); G4NK.doorM.scale.y = 1 - G4NK.door * 0.75; }
   const G = G4NK_G, inside = p.x > G.x0 && p.x < G.x1 && p.z > G.z0 - 0.2 && p.z < G.z1 && p.y < 4; G4NK.inside = inside;
+  if (g4NikDay()) { if (!G4NK.doorWant && !G4NK.st) g4NikDoor(true); }
+  else if (G4NK.doorWant && !inside && !G4NK.st && !G4NK.codeOpen) g4NikDoor(false);
   if (inside && !G4NK.doorWant) g4NikDoor(true); // внутри гаража ворота не закрываются: можно выйти
-  if (G4NK.doorWant && !inside && Math.hypot(p.x - G.dx, p.z - G.z0) > 28 && !(VEH.in && VEH.in.g4nik && Math.hypot(VEH.in.x - G.dx, VEH.in.z - G.z0) < 12)) g4NikDoor(false);
+  if (G4NK.doorWant && !inside && !g4NikDay() && Math.hypot(p.x - G.dx, p.z - G.z0) > 28 && !(VEH.in && VEH.in.g4nik && Math.hypot(VEH.in.x - G.dx, VEH.in.z - G.z0) < 12)) { G4NK.codeOpen = false; g4NikDoor(false); }
   const near = Math.hypot(p.x - G.dx, p.z - (G.z0 + G.z1) / 2) < 30;
-  if (near && G4NK.door > 0.3) { g4NikCar(); g4NikIn(); } else if (!near) g4NikInOut();
+  if (near && G4NK.door > 0.3) { g4NikCar(); if (g4NikDay()) g4NikIn(); else g4NikInOut(); } else if (!near) g4NikInOut();
   // свет внутри
   const lt = inside ? 'in' : ''; if (lt !== G4NK.lt) { G4NK.lt = lt; if (lt && !(G4RT && G4RT.inside)) { MAPS.coral.lamp[1] = 150; const set = (i, col, x, y, z, dist) => { const l = lamps[i]; if (l) { l.color.setHex(col); l.distance = dist; l.position.set(x, y, z); } }; set(0, 0x8ac0ff, G.x0 + 7, 4.2, (G.z0 + G.z1) / 2, 14); set(1, 0xfff0e0, G.x1 - 7, 4.2, (G.z0 + G.z1) / 2, 14); set(2, 0x4a9fff, G.x0 + 2, 2.5, G.z1 - 2, 9); set(3, 0xffd8a0, G.x1 - 4, 2.2, G.z1 - 1.5, 8); } else if (!lt && !(G4RT && G4RT.inside)) { MAPS.coral.lamp[1] = 0; for (let i = 0; i < 4; i++) if (lamps[i]) lamps[i].position.set(0, -50, 0); } }
   if (inside && G4NK.tv && (G4NK.tvT = (G4NK.tvT || 0) - dt) < 0) { G4NK.tvT = 0.25; G4NK.tv.material.color.setHSL(0.6 + Math.random() * 0.05, 0.7, 0.3 + Math.random() * 0.25); }
@@ -29418,6 +29420,33 @@ function g4NikOff() {
   if (G4NK.g) { if (G4NK.g.parent) G4NK.g.parent.remove(G4NK.g); const i = mapObjs.indexOf(G4NK.g); if (i >= 0) mapObjs.splice(i, 1); } G4NK.g = null; G4NK.rise = null; G4NK.car = null; G4NK.pad = null; G4NK.doorWant = 0; G4NK.door = 0; G4NK.lt = ''; G4NK.warned = false; G4NK.sceneLt = false;
   const el = document.getElementById('g4Pad'); if (el) el.style.display = 'none';
 }
+
+/* ---------- день/ночь у гаража, задание Ник52 (+$55), прицел от первого лица ---------- */
+function g4NikDay() { return G4.tod >= 7 && G4.tod < 20; }
+function g4NikMission() {
+  const S = G4.S, P = G4M.pois, c = [P.smoothie, P.gym, P.bar, P.fence, P.gallery].filter(Boolean); if (!c.length) return;
+  const T = pick(c); S.nik.mis = { x: T.x + 1.5, z: T.z + 1.5, name: T.name };
+  if (G4NK.nikIn) { g4NikSay(G4NK.nikIn, `Отнеси посылку: ${T.name}. Не вскрывай. Отдашь — получишь $55.`, 3.4); g4NpcClip(G4NK.nikIn, 'wave', 1.6, { face: player.pos }); }
+  g4SetWaypoint(S.nik.mis.x, S.nik.mis.z, `Посылка Ник52: ${T.name}`); toast('📦 Посылка в сумке. Доставьте её на метку');
+}
+function g4NikMissionDone() {
+  const S = G4.S; S.cash += 55; g4Tx(55, 'Задание Ник52'); S.nik.mis = null; S.nik.mDay = G4.day; g4SetWaypoint(null);
+  Sound.click && Sound.click(1500, 0.25); banner('📦 ДОСТАВЛЕНО', '+$55 от Ник52');
+}
+function g4DecideNikMis(look) {
+  const L = [], S = G4.S; if (!S.nik) return L; const n = G4NK.nikIn;
+  if (n && !S.nik.mis && S.nik.mDay !== G4.day) { const d = look(n.pos.x, 1.0, n.pos.z, 2.6); if (d >= 0) L.push({ d: d - 0.1, D: { label: '📋 E — спросить Ник52 про работу (+$55)', run() { g4NikMission(); } } }); }
+  if (S.nik.mis) { const M = S.nik.mis, d = look(M.x, 1.2, M.z, 3.2); if (d >= 0) L.push({ d, D: { label: `📦 Удерживайте E — передать посылку (${M.name})`, hl: 'Передаём…', hold: 1.2, key: 'nikmis', run() { g4NikMissionDone(); } } }); }
+  return L;
+}
+{ const _de12 = g4DecideEcon; g4DecideEcon = function (look) { const L = _de12(look); try { for (const x of g4DecideNikMis(look)) L.push(x); } catch (e) { console.warn('nik mis', e); } return L; }; }
+// от первого лица пуля идёт из ствола (он смещён от центра) — сводим её в точку под кружком прицела
+{ const _mw0 = tsGunMuzzleW; tsGunMuzzleW = function (G) {
+  const r = _mw0(G); if (view3()) return r;
+  try { camera.updateMatrixWorld(); const cf = camera.getWorldDirection(new V3()), rc = new THREE.Raycaster(camera.position.clone(), cf, 0.5, 140), h = rc.intersectObjects(getTargets(), false)[0];
+    let aim = h ? h.point.clone() : camera.position.clone().addScaledVector(cf, 140); const Un = typeof tsUnitRay === 'function' ? tsUnitRay(camera.position, cf, 140) : null; if (Un && (!h || Un.d < h.distance)) aim = Un.p.clone();
+    const d = aim.sub(r[0]); if (d.lengthSq() > 0.25) r[1] = d.normalize(); } catch (e) {}
+  return r; }; }
 /* ===================== админка · Глава 4: телепорты, деньги, розыск ===================== */
 function admG4Ok() { if (!(mode === 'g4' && G4.playing && G4.S)) { toast('Сначала запустите Главу 4'); return false; } return true; }
 function admG4Tp(name, x, z, y) {
